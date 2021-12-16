@@ -19,13 +19,16 @@ public class IntegerUtil {
     }
 
     /**
-     * Find the minimum number of bytes to represent the integer
+     * Find the minimum number of bytes to represent the integer.
+     * Notes: the number of bytes can be 1, 2, 4 correspond to
+     * Byte, Short, Int
      *
      * @param i the integer
      * @return the number of bytes
      */
     public static int minBytes(int i) {
-        return ((minBits(i) - 1) >>> 3) + 1;
+        int n = ((minBits(i) - 1) >>> 3) + 1;
+        return n == 3 ? 4 : n;
     }
 
     /**
@@ -38,4 +41,16 @@ public class IntegerUtil {
         boolean bLittle = (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN);
         return (bLittle ? Integer.reverseBytes(i) : i);
     }
+
+    /**
+     * Get number of bits to store, due to BitSet store as long array,
+     * so the number of bits should be multiple of 64 bits.
+     *
+     * @param i the integer
+     * @return number of bits
+     */
+    public static int numOfBits(int i) {
+        return (((i) >>> 6) + 1) << 6;
+    }
+
 }

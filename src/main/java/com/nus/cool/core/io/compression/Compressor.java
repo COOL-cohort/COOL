@@ -3,9 +3,9 @@ package com.nus.cool.core.io.compression;
 public interface Compressor {
 
     /**
-     * Estimate the maximum size of compressed data
+     * Estimate the maximum size of compressed data in byte
      *
-     * @return the maximum size of compressed data
+     * @return number of bytes
      */
     int maxCompressedLength();
 

@@ -11,6 +11,21 @@ public enum CompressType {
     /**
      * Compress type for data store in HashMetaField.
      */
-    KeyString
+    KeyString,
+
+    /**
+     * Compress type for keys of HashField
+     */
+    KeyHash,
+
+    /**
+     * Compress type for values of hashField
+     */
+    Value,
+
+    /**
+     * Compress type for values of rangeField
+     */
+    ValueFast
 
 }

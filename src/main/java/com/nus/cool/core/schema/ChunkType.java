@@ -7,14 +7,11 @@ public enum ChunkType {
     /**
      * Chunk type for MetaChunk
      */
-    META;
+    META,
 
-    public static ChunkType fromInteger(int i) {
-        switch (i) {
-            case 0:
-                return META;
-            default:
-                throw new IllegalArgumentException("Invalid chunk type int: " + i);
-        }
-    }
+    /**
+     * Chunk type for DataChunk
+     */
+    DATA
+
 }

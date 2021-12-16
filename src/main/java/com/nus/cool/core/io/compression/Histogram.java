@@ -17,6 +17,11 @@ public class Histogram {
     private int rawSize;
 
     /**
+     * Means data value occurs in many consecutive data elements
+     */
+    private boolean sorted;
+
+    /**
      * Number of values if compress data is countable
      */
     private int numOfValues;

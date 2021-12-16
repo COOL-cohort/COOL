@@ -33,6 +33,12 @@ public class ZIntCompressor implements Compressor {
 
     public ZIntCompressor(Codec codec, Histogram hist) {
         switch (codec) {
+            case INT8:
+                this.width = 1;
+                break;
+            case INT16:
+                this.width = 2;
+                break;
             case INT32:
                 this.width = 4;
                 break;
