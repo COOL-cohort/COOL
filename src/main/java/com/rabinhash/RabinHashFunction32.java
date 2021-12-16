@@ -82,6 +82,7 @@ import java.nio.IntBuffer;
  * @version 2.0
  * @since 2.0
  */
+@SuppressWarnings({"lgtm [java/index-out-of-bounds]"})
 public final class RabinHashFunction32 implements Serializable, Cloneable {
 
   private static final long serialVersionUID = -7391492432154101379L;

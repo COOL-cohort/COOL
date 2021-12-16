@@ -210,7 +210,8 @@ public class FastOutputStream extends OutputStream {
           newCapacity = minCapacity;
       }
     if (newCapacity < 0) {
-        if (minCapacity < 0)    // overflow
+        // overflow. TODO: Check whether the following condition is always false
+        if (minCapacity < 0)    // lgtm [java/constant-comparison]
         {
             throw new OutOfMemoryError();
         }

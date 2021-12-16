@@ -46,6 +46,7 @@ import java.nio.LongBuffer;
  * @version 2.0
  * @since 2.0
  */
+@SuppressWarnings({"lgtm [java/index-out-of-bounds]", "lgtm [java/lshift-larger-than-type-width]"})
 public final class RabinHashFunction64 implements Serializable, Cloneable {
 
   private static final long serialVersionUID = 3537433736549974570L;
