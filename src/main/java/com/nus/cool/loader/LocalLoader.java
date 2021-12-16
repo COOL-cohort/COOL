@@ -25,8 +25,13 @@ import com.nus.cool.core.util.parser.CsvTupleParser;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.LineTupleReader;
 import com.nus.cool.core.util.reader.TupleReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.Files;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -43,6 +48,16 @@ public class LocalLoader {
 
   private static List<Integer> chunkOffsets = Lists.newArrayList();
 
+  /**
+   * Load a local data file in csv format
+   * 
+   * @param tableSchema
+   * @param dimensionFile
+   * @param dataFile
+   * @param outputDir
+   * @param chunkSize
+   * @throws IOException
+   */
   public static void load(TableSchema tableSchema, File dimensionFile, File dataFile,
       File outputDir, int chunkSize) throws IOException {
     TupleParser parser = new CsvTupleParser();
@@ -82,6 +97,15 @@ public class LocalLoader {
     }
   }
 
+  /**
+   * Create a metaChunk
+   * 
+   * @param inputMetaFile the dimension file
+   * @param schema the table schema
+   * @param parser the table schema parser
+   * @return the generated metaChunk
+   * @throws IOException
+   */
   private static MetaChunkWS newMetaChunk(File inputMetaFile, TableSchema schema,
       TupleParser parser) throws IOException {
     MetaChunkWS metaChunk = MetaChunkWS.newMetaChunkWS(schema, offset);
@@ -94,6 +118,15 @@ public class LocalLoader {
     return metaChunk;
   }
 
+  /**
+   * Create a new cublet for input data
+   * 
+   * @param dir The output dir
+   * @param metaChunk The generated metaChunk
+   * @return A DataOutputStream for further writing. Note that the input 
+   *  metaChunk will be written into the stream.
+   * @throws IOException
+   */
   private static DataOutputStream newCublet(File dir, MetaChunkWS metaChunk) throws IOException {
     File cublet = new File(dir, Long.toHexString(System.currentTimeMillis()) + ".dz");
     DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));
@@ -103,6 +136,13 @@ public class LocalLoader {
     return out;
   }
 
+  /**
+   * Close current cublet. Write chunk header offsets and header offset into
+   *  into the cublet
+   * 
+   * @param out The output stream for data
+   * @throws IOException
+   */
   private static void closeCublet(DataOutputStream out) throws IOException {
     int headOffset = offset;
     out.writeInt(IntegerUtil.toNativeByteOrder(chunkOffsets.size()));
@@ -114,4 +154,30 @@ public class LocalLoader {
     out.close();
   }
 
+  /**
+   * 
+   * @param args there are five arguments. List in input order
+   *  (1) output cube name: to be specified when loading from the repository
+   *  (2) table.yaml (3) dimension.csv (4) data.csv (5) output cube repository 
+   *  (6) chunkSize(Int) number of tuples in a chunk
+   * @throws IOException
+   */
+  public static void main(String[] args) throws IOException {
+    // read table schema
+    String cube = args[0];
+    String schemaFileName = args[1];
+    File schemaFile = new File(schemaFileName);
+    TableSchema schema = TableSchema.read(new FileInputStream(schemaFile));
+    File dimensionFile = new File(args[2]);
+    File dataFile = new File(args[3]);
+    String cubeRepo = args[4];
+    Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v1"); 
+    Files.createDirectories(outputCubeVersionDir);
+    File outputDir = outputCubeVersionDir.toFile();
+    int chunkSize = Integer.parseInt(args[5]);
+    load(schema, dimensionFile, dataFile, outputDir, chunkSize);
+    Files.copy(Paths.get(schemaFileName), 
+      Paths.get(cubeRepo, cube, "table.yaml"), 
+      StandardCopyOption.REPLACE_EXISTING);
+  }
 }
