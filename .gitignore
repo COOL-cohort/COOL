@@ -1,0 +1,9 @@
+# idea
+.idea/
+
+# product
+target/
+out/
+
+# test
+src/main/java/com/Test.java
