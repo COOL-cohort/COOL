@@ -113,6 +113,7 @@ public class CohortLoader {
     List<ResultTuple> resultSet = Lists.newArrayList();
     boolean tag = query.getOutSource() != null;
     List<BitSet> bitSets = Lists.newArrayList();
+    // process each cublet
     for (CubletRS cublet : cublets) {
       MetaChunkRS metaChunk = cublet.getMetaChunk();
       CohortSelection sigma = new CohortSelection();
@@ -153,6 +154,7 @@ public class CohortLoader {
         resultSet.add(new ResultTuple(cohort, age, measure));
       }
     }
+    // merge the partial query results
     return ResultTuple.merge(resultSet);
   }
 }

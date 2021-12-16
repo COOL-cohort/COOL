@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
 /**
+ * In memory data structure to contain and print query result
+ * 
  * @author zhongle, hongbin
  * @version 0.1
  * @since 0.1
@@ -56,7 +58,6 @@ public class QueryResult {
 
   public enum QueryStatus {
     OK,
-
     ERROR
   }
 }

@@ -77,6 +77,9 @@ public class CubletRS implements Input {
     this.schema = checkNotNull(schema);
   }
 
+  /**
+   * deserialize a cublet from a byte buffer
+   */
   @Override
   public void readFrom(ByteBuffer buffer) {
     // Read header offset

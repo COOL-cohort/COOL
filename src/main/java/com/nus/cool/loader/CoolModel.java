@@ -38,20 +38,41 @@ import java.util.Map;
  */
 public class CoolModel implements Closeable {
 
+  /**
+   * container of loaded cubes
+   */
   private Map<String, CubeRS> metaStore = Maps.newHashMap();
 
+  /**
+   * directory containing a set of cube files considered a repository
+   */
   private File localRepo;
 
+  /**
+   * Create a CoolModel to manage a cube repository
+   * @param path the repository directory
+   */
   public CoolModel(String path) {
     this.localRepo = new File(path);
   }
 
+  /**
+   * Load a cube (a set of cube files) from the repository into memory
+   * 
+   * @param cube the cube name
+   * @throws IOException
+   */
   public synchronized void reload(String cube) throws IOException {
+    // remove the old version of the cube
     this.metaStore.remove(cube);
+    
+    // check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
       if (!cubeRoot.exists()) {
           throw new FileNotFoundException(cube + " was not found");
       }
+    
+    // read schema information
     TableSchema schema = TableSchema.read(new FileInputStream(new File(cubeRoot, "table.yaml")));
     CubeRS cubeRS = new CubeRS(schema);
     File[] versions = cubeRoot.listFiles(new FileFilter() {
@@ -65,6 +86,8 @@ public class CoolModel implements Closeable {
           return;
       }
     Arrays.sort(versions);
+
+    // only load the latest version
     File currentVersion = versions[versions.length - 1];
     File[] cubletFiles = currentVersion.listFiles(new FilenameFilter() {
       @Override
@@ -72,6 +95,7 @@ public class CoolModel implements Closeable {
         return s.endsWith(".dz");
       }
     });
+    // load all cubes under latest version
     checkNotNull(cubletFiles);
       for (File cubletFile : cubletFiles) {
           cubeRS.addCublet(cubletFile);
@@ -84,6 +108,9 @@ public class CoolModel implements Closeable {
 
   }
 
+  /**
+   * Retrive a cube by name
+   */
   public synchronized CubeRS getCube(String cube) {
     return this.metaStore.get(cube);
   }

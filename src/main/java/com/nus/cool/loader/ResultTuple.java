@@ -32,12 +32,27 @@ import lombok.Data;
 @AllArgsConstructor
 public class ResultTuple {
 
+  /**
+   * cohort name
+   */
   private String cohort;
 
+  /**
+   * age of the cohort
+   */
   private int age;
 
+  /**
+   * measure of interest
+   */
   private long measure;
 
+  /**
+   * Merge query results to a distinct set of cohorts.
+   * 
+   * @param resultTuples a list of partial query results 
+   * @return merged results
+   */
   public static List<ResultTuple> merge(List<ResultTuple> resultTuples) {
     Map<String, Map<Integer, Long>> resMap = new HashMap<>();
     for (ResultTuple res : resultTuples) {
@@ -49,6 +64,7 @@ public class ResultTuple {
         Map<Integer, Long> map = resMap.get(res.cohort);
         map.put(res.age, res.measure);
       } else {
+        // aggregates the measure of the same cohort with the same age.
         Map<Integer, Long> map = resMap.get(res.cohort);
         map.put(res.age, res.measure + map.get(res.age));
       }
