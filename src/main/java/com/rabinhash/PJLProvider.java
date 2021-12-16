@@ -20,24 +20,22 @@ import java.security.Provider;
 
 /**
  * <p>
- * This class represents the provider "PJL", which provides two
- * {@link java.security.MessageDigest} algorithm implementations based on 32-
- * and 64-bit Rabin hash functions. The names of these algorithms are "RHF32"
- * and "RHF64", respectively. In this way, the services of this package can be
- * used through standard java.security APIs.
+ * This class represents the provider "PJL", which provides two {@link java.security.MessageDigest}
+ * algorithm implementations based on 32- and 64-bit Rabin hash functions. The names of these
+ * algorithms are "RHF32" and "RHF64", respectively. In this way, the services of this package can
+ * be used through standard java.security APIs.
  * </p>
  *
  * <p>
- * See <a href="http://java.sun.com/j2se/1.4.2/docs/api/index.html">here</a> for
- * details on how to use MessageDigest objects.
+ * See <a href="http://java.sun.com/j2se/1.4.2/docs/api/index.html">here</a> for details on how to
+ * use MessageDigest objects.
  * </p>
  *
  * <p>
- * Note: in order to use the {@link java.security.MessageDigest} algorithms
- * provided by this package, you must add this Provider class to your list of
- * approved providers. This is defined in the file (Java
- * home)/lib/security/java.security. After the last security.provider.x line,
- * add an additional one like this:
+ * Note: in order to use the {@link java.security.MessageDigest} algorithms provided by this
+ * package, you must add this Provider class to your list of approved providers. This is defined in
+ * the file (Java home)/lib/security/java.security. After the last security.provider.x line, add an
+ * additional one like this:
  * </p>
  *
  * <pre>
@@ -52,21 +50,21 @@ import java.security.Provider;
  */
 public final class PJLProvider extends Provider {
 
-	private static final long serialVersionUID = -6104559045952977426L;
+  private static final long serialVersionUID = -6104559045952977426L;
 
-	/**
-	 * <p>
-	 * Configures the provider "PJL" to provide
-	 * {@link java.security.MessageDigest} algorithms "RHF32" and "RHF64".
-	 * </p>
-	 */
-	public PJLProvider() {
-		super("PJL", 1.0,
-				"PJL Provider 1.0, providing digests based on Rabin hash functions");
-		put("MessageDigest.RHF32", "com.planetj.math.rabinhash.RHF32");
-		put("MessageDigest.RHF32 ImplementedIn", "Software");
-		put("MessageDigest.RHF64", "com.planetj.math.rabinhash.RHF64");
-		put("MessageDigest.RHF64 ImplementedIn", "Software");
-	}
+  /**
+   * <p>
+   * Configures the provider "PJL" to provide {@link java.security.MessageDigest} algorithms "RHF32"
+   * and "RHF64".
+   * </p>
+   */
+  public PJLProvider() {
+    super("PJL", 1.0,
+        "PJL Provider 1.0, providing digests based on Rabin hash functions");
+    put("MessageDigest.RHF32", "com.planetj.math.rabinhash.RHF32");
+    put("MessageDigest.RHF32 ImplementedIn", "Software");
+    put("MessageDigest.RHF64", "com.planetj.math.rabinhash.RHF64");
+    put("MessageDigest.RHF64 ImplementedIn", "Software");
+  }
 
 }

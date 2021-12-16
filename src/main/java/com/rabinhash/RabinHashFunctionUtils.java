@@ -25,49 +25,51 @@ package com.rabinhash;
  */
 final class RabinHashFunctionUtils {
 
-    private static final int BIT_32 = 0x80000000;
-    private static final long BIT_64 = 0x8000000000000000L;
+  private static final int BIT_32 = 0x80000000;
+  private static final long BIT_64 = 0x8000000000000000L;
 
-    /** Private constructor. */
-    private RabinHashFunctionUtils() {
-    }
+  /**
+   * Private constructor.
+   */
+  private RabinHashFunctionUtils() {
+  }
 
-    static String polynomialToString(final int P) {
-        final StringBuffer result = new StringBuffer();
-        result.append("x^32");
-        int exp = 31;
-        for (int temp = P; temp != 0; temp <<= 1, exp--) {
-            if ((temp & BIT_32) != 0) {
-                appendTerm(exp, result);
-            }
-        }
-        return result.toString();
+  static String polynomialToString(final int P) {
+    final StringBuffer result = new StringBuffer();
+    result.append("x^32");
+    int exp = 31;
+    for (int temp = P; temp != 0; temp <<= 1, exp--) {
+      if ((temp & BIT_32) != 0) {
+        appendTerm(exp, result);
+      }
     }
+    return result.toString();
+  }
 
-    static String polynomialToString(final long P) {
-        final StringBuffer result = new StringBuffer();
-        result.append("x^64");
-        int exp = 63;
-        for (long temp = P; temp != 0; temp <<= 1, exp--) {
-            if ((temp & BIT_64) != 0) {
-                appendTerm(exp, result);
-            }
-        }
-        return result.toString();
+  static String polynomialToString(final long P) {
+    final StringBuffer result = new StringBuffer();
+    result.append("x^64");
+    int exp = 63;
+    for (long temp = P; temp != 0; temp <<= 1, exp--) {
+      if ((temp & BIT_64) != 0) {
+        appendTerm(exp, result);
+      }
     }
+    return result.toString();
+  }
 
-    private static void appendTerm(final int exp, final StringBuffer result) {
-        switch (exp) {
-            case 0:
-                result.append(" + 1");
-                break;
-            case 1:
-                result.append(" + x");
-                break;
-            default:
-                result.append(" + x^");
-                result.append(exp);
-                break;
-        }
+  private static void appendTerm(final int exp, final StringBuffer result) {
+    switch (exp) {
+      case 0:
+        result.append(" + 1");
+        break;
+      case 1:
+        result.append(" + x");
+        break;
+      default:
+        result.append(" + x^");
+        result.append(exp);
+        break;
     }
+  }
 }

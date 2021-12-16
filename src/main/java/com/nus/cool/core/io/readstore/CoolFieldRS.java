@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 Cool Squad Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
@@ -5,7 +20,6 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.FieldType;
-
 import java.nio.ByteBuffer;
 import java.util.BitSet;
 
@@ -16,9 +30,8 @@ import java.util.BitSet;
  * -----------------
  * | keys | values |
  * -----------------
- * where
- * keys = globalIDs (compressed)
- * values = column data, stored as localIDs (compressed)
+ * where keys = globalIDs
+ * (compressed) values = column data, stored as localIDs (compressed)
  * <p>
  * range field layout
  * ------------------------------
@@ -28,117 +41,123 @@ import java.util.BitSet;
  * min = min of the values
  * max = max of the values
  * values = column data (compressed)
+ *
+ * @author zhongle, hongbin
+ * @version 0.1
+ * @since 0.1
  */
 public class CoolFieldRS implements FieldRS {
 
-    private FieldType fieldType;
+  private FieldType fieldType;
 
-    private boolean bRangeField;
+  private boolean bRangeField;
 
-    private boolean bSetField;
+  private boolean bSetField;
 
-    private int minKey;
+  private int minKey;
 
-    private int maxKey;
+  private int maxKey;
 
-    /**
-     * key vector for hash field
-     */
-    private InputVector keyVec;
+  /**
+   * key vector for hash field
+   */
+  private InputVector keyVec;
 
-    /**
-     * value vector for hash field
-     */
-    private InputVector valueVec;
+  /**
+   * value vector for hash field
+   */
+  private InputVector valueVec;
 
-    /**
-     * BitSet array if this field has been pre-calculated
-     */
-    private BitSet[] bitSets;
+  /**
+   * BitSet array if this field has been pre-calculated
+   */
+  private BitSet[] bitSets;
 
-    @Override
-    public void readFrom(ByteBuffer buffer) {
-        // Get field type
-        this.fieldType = FieldType.fromInteger(buffer.get());
-        Codec codec = Codec.fromInteger(buffer.get());
-        if (codec == Codec.Range) {
-            // Range field case
-            this.minKey = buffer.getInt();
-            this.maxKey = buffer.getInt();
-            this.bRangeField = true;
-        } else {
-            // Hash field case
-            buffer.position(buffer.position() - 1);
-            this.keyVec = InputVectorFactory.readFrom(buffer);
-            this.minKey = 0;
-            this.maxKey = this.keyVec.size();
-            this.bSetField = true;
+  @Override
+  public void readFrom(ByteBuffer buffer) {
+    // Get field type
+    this.fieldType = FieldType.fromInteger(buffer.get());
+    Codec codec = Codec.fromInteger(buffer.get());
+    if (codec == Codec.Range) {
+      // Range field case
+      this.minKey = buffer.getInt();
+      this.maxKey = buffer.getInt();
+      this.bRangeField = true;
+    } else {
+      // Hash field case
+      buffer.position(buffer.position() - 1);
+      this.keyVec = InputVectorFactory.readFrom(buffer);
+      this.minKey = 0;
+      this.maxKey = this.keyVec.size();
+      this.bSetField = true;
+    }
+
+    codec = Codec.fromInteger(buffer.get());
+    if (codec == Codec.PreCAL) {
+      int values = buffer.get();
+      this.bitSets = new BitSet[values];
+        for (int i = 0; i < values; i++) {
+            this.bitSets[i] = SimpleBitSetCompressor.read(buffer);
         }
+    } else {
+      buffer.position(buffer.position() - 1);
+      this.valueVec = InputVectorFactory.readFrom(buffer);
+    }
+  }
 
-        codec = Codec.fromInteger(buffer.get());
-        if (codec == Codec.PreCAL) {
-            int values = buffer.get();
-            this.bitSets = new BitSet[values];
-            for (int i = 0; i < values; i++)
-                this.bitSets[i] = SimpleBitSetCompressor.read(buffer);
-        } else {
-            buffer.position(buffer.position() - 1);
-            this.valueVec = InputVectorFactory.readFrom(buffer);
+  @Override
+  public InputVector getKeyVector() {
+    return this.keyVec;
+  }
+
+  @Override
+  public InputVector getValueVector() {
+    return this.valueVec;
+  }
+
+  @Override
+  public int minKey() {
+    return this.minKey;
+  }
+
+  @Override
+  public int maxKey() {
+    return this.maxKey;
+  }
+
+  @Override
+  public boolean isSetField() {
+    return this.bSetField;
+  }
+
+  @Override
+  public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
+    this.fieldType = fieldType;
+    Codec codec = Codec.fromInteger(buffer.get());
+    if (codec == Codec.Range) {
+      // Range field case
+      this.minKey = buffer.getInt();
+      this.maxKey = buffer.getInt();
+      this.bRangeField = true;
+    } else {
+      // Hash field case
+      buffer.position(buffer.position() - 1);
+      this.keyVec = InputVectorFactory.readFrom(buffer);
+      this.minKey = 0;
+      this.maxKey = this.keyVec.size();
+      this.bSetField = true;
+    }
+
+    codec = Codec.fromInteger(buffer.get());
+    if (codec == Codec.PreCAL) {
+      int values = buffer.get();
+      this.bitSets = new BitSet[values];
+        for (int i = 0; i < values; i++) {
+            this.bitSets[i] = SimpleBitSetCompressor.read(buffer);
         }
+    } else {
+      buffer.position(buffer.position() - 1);
+      this.valueVec = InputVectorFactory.readFrom(buffer);
     }
-
-    @Override
-    public InputVector getKeyVector() {
-        return this.keyVec;
-    }
-
-    @Override
-    public InputVector getValueVector() {
-        return this.valueVec;
-    }
-
-    @Override
-    public int minKey() {
-        return this.minKey;
-    }
-
-    @Override
-    public int maxKey() {
-        return this.maxKey;
-    }
-
-    @Override
-    public boolean isSetField() {
-        return this.bSetField;
-    }
-
-    @Override
-    public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
-        this.fieldType = fieldType;
-        Codec codec = Codec.fromInteger(buffer.get());
-        if (codec == Codec.Range) {
-            // Range field case
-            this.minKey = buffer.getInt();
-            this.maxKey = buffer.getInt();
-            this.bRangeField = true;
-        } else {
-            // Hash field case
-            buffer.position(buffer.position() - 1);
-            this.keyVec = InputVectorFactory.readFrom(buffer);
-            this.minKey = 0;
-            this.maxKey = this.keyVec.size();
-            this.bSetField = true;
-        }
-
-        codec = Codec.fromInteger(buffer.get());
-        if (codec == Codec.PreCAL) {
-            int values = buffer.get();
-            this.bitSets = new BitSet[values];
-            for (int i = 0; i < values; i++)
-                this.bitSets[i] = SimpleBitSetCompressor.read(buffer);
-        } else {
-            buffer.position(buffer.position() - 1);
-            this.valueVec = InputVectorFactory.readFrom(buffer);
-        }
-    }
+  }
 }

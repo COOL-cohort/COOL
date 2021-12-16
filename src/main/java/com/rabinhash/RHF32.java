@@ -28,57 +28,58 @@ import java.security.MessageDigestSpi;
  */
 public final class RHF32 extends MessageDigestSpi implements Cloneable {
 
-    private final RabinHashFunction32 rhf = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
-    private int hash;
+  private final RabinHashFunction32 rhf = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
+  private int hash;
 
-    /**
-     * @return 4
-     */
-    protected int engineGetDigestLength() {
-        return 4;
-    }
+  /**
+   * @return 4
+   */
+  protected int engineGetDigestLength() {
+    return 4;
+  }
 
-    protected void engineUpdate(final byte input) {
-        hash = rhf.hash(new byte[]{input}, 0, 1, hash);
-    }
+  protected void engineUpdate(final byte input) {
+    hash = rhf.hash(new byte[]{input}, 0, 1, hash);
+  }
 
-    protected void engineUpdate(final byte[] input, final int offset, final int len) {
-        hash = rhf.hash(input, offset, len, hash);
-    }
+  protected void engineUpdate(final byte[] input, final int offset, final int len) {
+    hash = rhf.hash(input, offset, len, hash);
+  }
 
-    protected byte[] engineDigest() {
-        final byte[] buf = new byte[4];
-        hashToBuf(buf, 0);
-        engineReset();
-        return buf;
-    }
+  protected byte[] engineDigest() {
+    final byte[] buf = new byte[4];
+    hashToBuf(buf, 0);
+    engineReset();
+    return buf;
+  }
 
-    /**
-     * @param buf buffer into which to write the digest
-     * @param offset offset into buffer at which to start writing
-     * @param len (not used)
-     * @return 4
-     * @throws DigestException if len is less than 4
-     */
-    protected int engineDigest(final byte[] buf, final int offset, final int len) throws DigestException {
-        if (len < 4) {
-            throw new DigestException("Output buffer is smaller than digest length of 4");
-        }
-        hashToBuf(buf, offset);
-        engineReset();
-        return 4;
+  /**
+   * @param buf    buffer into which to write the digest
+   * @param offset offset into buffer at which to start writing
+   * @param len    (not used)
+   * @return 4
+   * @throws DigestException if len is less than 4
+   */
+  protected int engineDigest(final byte[] buf, final int offset, final int len)
+      throws DigestException {
+    if (len < 4) {
+      throw new DigestException("Output buffer is smaller than digest length of 4");
     }
+    hashToBuf(buf, offset);
+    engineReset();
+    return 4;
+  }
 
-    protected void engineReset() {
-        hash = 0;
-    }
+  protected void engineReset() {
+    hash = 0;
+  }
 
-    private void hashToBuf(final byte[] buf, final int offset) {
-        buf[offset] = (byte) (hash >> 24);
-        buf[offset + 1] = (byte) (hash >> 16);
-        buf[offset + 2] = (byte) (hash >> 8);
-        buf[offset + 3] = (byte) hash;
-    }
+  private void hashToBuf(final byte[] buf, final int offset) {
+    buf[offset] = (byte) (hash >> 24);
+    buf[offset + 1] = (byte) (hash >> 16);
+    buf[offset + 2] = (byte) (hash >> 8);
+    buf[offset + 3] = (byte) hash;
+  }
 
 }
 
