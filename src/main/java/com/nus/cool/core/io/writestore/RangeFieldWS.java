@@ -10,7 +10,7 @@ import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.ArrayUtil;
 import com.nus.cool.core.util.IntegerUtil;
-import com.nus.cool.core.util.date.DayIntConverter;
+import com.nus.cool.core.util.converter.DayIntConverter;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -58,9 +58,10 @@ public class RangeFieldWS implements FieldWS {
 
     @Override
     public void put(String[] tuple) throws IOException {
-        if (this.fieldType == FieldType.ActionTime)
-            this.buffer.writeInt(DayIntConverter.toInt(tuple[this.i]));
-        else
+        if (this.fieldType == FieldType.ActionTime) {
+            DayIntConverter converter = new DayIntConverter();
+            this.buffer.writeInt(converter.toInt(tuple[this.i]));
+        } else
             this.buffer.writeInt(Integer.parseInt(tuple[i]));
     }
 

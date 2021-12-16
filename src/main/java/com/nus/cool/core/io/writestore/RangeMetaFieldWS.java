@@ -3,7 +3,7 @@ package com.nus.cool.core.io.writestore;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.IntegerUtil;
-import com.nus.cool.core.util.date.DayIntConverter;
+import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.parser.VerticalTupleParser;
 
@@ -46,8 +46,9 @@ public class RangeMetaFieldWS implements MetaFieldWS {
                 this.max = Integer.parseInt(range[1]);
                 break;
             case ActionTime:
-                this.min = DayIntConverter.toInt(range[0]);
-                this.max = DayIntConverter.toInt(range[1]);
+                DayIntConverter converter = new DayIntConverter();
+                this.min = converter.toInt(range[0]);
+                this.max = converter.toInt(range[1]);
                 break;
             default:
                 throw new IllegalArgumentException("Unable to index: " + this.fieldType);

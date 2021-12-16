@@ -134,7 +134,7 @@ public class MetaChunkWS implements Output {
 
         // Write fields for header layout
         out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
-        bytesWritten++;
+        bytesWritten += Ints.BYTES;
 
         // Write field offsets for header layout
         for (int offset : offsets) {

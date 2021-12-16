@@ -92,8 +92,16 @@ public class TableSchema {
         return this.getField(this.getFieldID(name));
     }
 
+    public FieldType getFieldType(String name) {
+        return this.getField(name).getFieldType();
+    }
+
     public int getFieldID(String name) {
         Integer id = this.name2Id.get(name);
         return id == null ? -1 : id;
+    }
+
+    public String getActionTimeFieldName() {
+        return this.fields.get(this.getActionTimeField()).getName();
     }
 }

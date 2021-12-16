@@ -51,6 +51,34 @@ public enum Codec {
     /**
      * Code for numeric data, use delta encoding
      */
-    Delta
+    Delta;
+
+    public static Codec fromInteger(int c) {
+        switch (c) {
+            case 0:
+                return INT8;
+            case 1:
+                return INT16;
+            case 2:
+                return INT32;
+            case 3:
+                return BitVector;
+            case 4:
+                return LZ4;
+            case 5:
+                return PreCAL;
+            case 6:
+                return RLE;
+            case 7:
+                return INTBit;
+            case 8:
+                return Range;
+            case 9:
+                return Delta;
+            default:
+                throw new IllegalArgumentException("Invalid codec ordinal: " + c);
+
+        }
+    }
 
 }

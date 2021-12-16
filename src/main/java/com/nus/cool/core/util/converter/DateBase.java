@@ -1,4 +1,4 @@
-package com.nus.cool.core.util.date;
+package com.nus.cool.core.util.converter;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

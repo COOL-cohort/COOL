@@ -11,5 +11,5 @@ public interface TupleParser {
      * @param tuple target tuple
      * @return string array
      */
-    public String[] parse(Object tuple);
+    String[] parse(Object tuple);
 }
