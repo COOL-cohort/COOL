@@ -75,12 +75,15 @@ public class CompressorAdviser {
         {
             return Codec.INT8;
         }
-    } else if (max < 65536)
+    }
     // max < 2^16
+    else if (max < 65536)
     {
         return Codec.INT16;
-    } else
+    }
+
     // max < 2^32 (Integer.MAX_VALUE)
+    else
     {
         return Codec.INT32;
     }

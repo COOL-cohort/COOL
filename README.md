@@ -9,8 +9,7 @@ Simply run `mvn package`
 ### BEFORE QUERY
 Required sources:
 
-1. **dataset**: a csv file with "," delimiter (normally dumped from a database
-        table)
+1. **dataset**: a csv file with "," delimiter (normally dumped from a database table)
 2. **dimension file**: a csv file with "," delimiter.
 Each line of this file has two fields: the first field is the name of a column in the dataset, and the second field is a value of this column.
 Each distinct value of each column in the dataset shall appear in this dimension file once.
@@ -73,3 +72,9 @@ The sample result is as follows
   } ]
 }
 ```
+
+## Publication
+* Z. Xie, H. Ying, C. Yue, M. Zhang, G. Chen, B. C. Ooi. [Cool: a COhort OnLine analytical processing system](https://www.comp.nus.edu.sg/~ooibc/icde20cool.pdf) IEEE International Conference on Data Engineering, 2020
+* Q. Cai, Z. Xie, M. Zhang, G. Chen, H.V. Jagadish and B.C. Ooi. [Effective Temporal Dependence Discovery in Time Series Data](http://www.comp.nus.edu.sg/~ooibc/cohana18.pdf) ACM International Conference on Very Large Data Bases (VLDB), 2018
+* Z. Xie, Q. Cai, F. He, G.Y. Ooi, W. Huang, B.C. Ooi. [Cohort Analysis with Ease](https://dl.acm.org/doi/10.1145/3183713.3193540) SIGMOD Proceedings of the 2018 International Conference on Management of Data
+* D. Jiang, Q. Cai, G. Chen, H. V. Jagadish, B. C. Ooi, K.-L. Tan, and A. K. H. Tung. [Cohort Query Processing](http://www.vldb.org/pvldb/vol10/p1-ooi.pdf) ACM International Conference on Very Large Data Bases (VLDB), 2016

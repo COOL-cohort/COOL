@@ -20,7 +20,8 @@ import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
 
 /**
- *
+ * For the moment, we only support Hash based meta field.
+ * TODO: add range meta field later
  * @author zhongle
  * @version 0.1
  * @since 0.1
@@ -29,14 +30,36 @@ public interface MetaFieldRS extends Input {
 
   FieldType getFieldType();
 
+  /**
+   * Return the id of the given value
+   *
+   * @param v
+   * @return
+   */
+
   int find(String key);
 
+  /**
+   * Return number of values in the field
+   */
   int count();
 
+  /**
+   * Return the value for the given id
+   *
+   * @param i
+   * @return
+   */
   String getString(int i);
 
+  /**
+   * Return the max value of the field
+   */
   int getMaxValue();
 
+  /**
+   * Return the min value of the field
+   */
   int getMinValue();
 
   void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType);

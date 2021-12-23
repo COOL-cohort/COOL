@@ -1,18 +1,24 @@
 /*
- * Copyright 2020 Cool Squad Team
+ * Copyright 2021 Cool Squad Team
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package com.nus.cool.loader;
 
 import com.google.common.collect.Lists;
@@ -45,13 +51,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
- * @author hongbin, zhongle
- * @version 0.1
- * @since 0.1
+ * CohortLoader is a higher level abstraction for cohort query
+ * With CohortLoader, you can easily get the query result
  */
 public class CohortLoader {
 
+  /**
+   * Local model for cool
+  */ 
   private static CoolModel coolModel;
 
   public static void main(String[] args) throws IOException {
@@ -60,7 +67,8 @@ public class CohortLoader {
 
 //        ObjectMapper mapper = new ObjectMapper();
 //        CohortQuery query = mapper.readValue(new File("query.json"), CohortQuery.class);
-
+    
+    // Configuration of cohort query
     CohortQuery query = new CohortQuery();
     query.setDataSource("sogamo");
     query.setAgeInterval(1);
@@ -76,6 +84,7 @@ public class CohortLoader {
     query.setBirthActions(new String[]{"launch"});
     query.setAppKey("fd1ec667-75a4-415d-a250-8fbb71be7cab");
 
+    // Load cubes
     Map<String, DataOutputStream> map = Maps.newHashMap();
     if (query.getOutSource() != null) {
       File root = new File("cube/", query.getOutSource());
@@ -106,6 +115,14 @@ public class CohortLoader {
     coolModel.close();
   }
 
+  /**
+   * ececute quety
+   * 
+   * @param cube the cube that stores the data we need
+   * @param query the cohort query needed to process
+   * @param map the cublet and it's data
+   * @return the result of the query
+   */
   public static List<ResultTuple> executeQuery(CubeRS cube, CohortQuery query,
       Map<String, DataOutputStream> map) throws IOException {
     List<CubletRS> cublets = cube.getCublets();
