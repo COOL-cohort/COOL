@@ -66,7 +66,9 @@ public class HashFieldWS implements FieldWS {
   private final FieldType fieldType;
 
   /**
-   * Convert globalID to localID key: globalID value: localID
+   * Convert globalID to localID
+   * Key: globalID
+   * Value: localID
    */
   private Map<Integer, Integer> idMap = Maps.newTreeMap();
 

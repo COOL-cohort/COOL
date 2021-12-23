@@ -1,17 +1,22 @@
 /*
- * Copyright 2020 Cool Squad Team
+ * Copyright 2021 Cool Squad Team
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.nus.cool.loader;
 
@@ -31,25 +36,20 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- *
- * @author hongbin, zhongle
- * @version 0.1
- * @since 0.1
+ * CoolModel is a higher level abstraction of cubes for data. CoolModel can load
+ * the cubes from the corresponding path.
  */
 public class CoolModel implements Closeable {
 
-  /**
-   * container of loaded cubes
-   */
+  // Container of loaded cubes
   private Map<String, CubeRS> metaStore = Maps.newHashMap();
 
-  /**
-   * directory containing a set of cube files considered a repository
-   */
+  // Directory containing a set of cube files considered a repository
   private File localRepo;
 
   /**
    * Create a CoolModel to manage a cube repository
+   * 
    * @param path the repository directory
    */
   public CoolModel(String path) {
@@ -63,16 +63,16 @@ public class CoolModel implements Closeable {
    * @throws IOException
    */
   public synchronized void reload(String cube) throws IOException {
-    // remove the old version of the cube
+    // Remove the old version of the cube
     this.metaStore.remove(cube);
     
-    // check the existence of cube under this repository
+    // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
       if (!cubeRoot.exists()) {
           throw new FileNotFoundException(cube + " was not found");
       }
     
-    // read schema information
+    // Read schema information
     TableSchema schema = TableSchema.read(new FileInputStream(new File(cubeRoot, "table.yaml")));
     CubeRS cubeRS = new CubeRS(schema);
     File[] versions = cubeRoot.listFiles(new FileFilter() {
@@ -87,7 +87,7 @@ public class CoolModel implements Closeable {
       }
     Arrays.sort(versions);
 
-    // only load the latest version
+    // Only load the latest version
     File currentVersion = versions[versions.length - 1];
     File[] cubletFiles = currentVersion.listFiles(new FilenameFilter() {
       @Override
@@ -95,7 +95,8 @@ public class CoolModel implements Closeable {
         return s.endsWith(".dz");
       }
     });
-    // load all cubes under latest version
+    
+    // Load all cubes under latest version
     checkNotNull(cubletFiles);
       for (File cubletFile : cubletFiles) {
           cubeRS.addCublet(cubletFile);

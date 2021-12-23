@@ -1,17 +1,22 @@
 /*
- * Copyright 2020 Cool Squad Team
+ * Copyright 2021 Cool Squad Team
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.nus.cool.core.cohort;
 
@@ -35,9 +40,8 @@ import java.util.Map;
 import lombok.Getter;
 
 /**
- * @author zhongle, hongbin
- * @version 0.1
- * @since 0.1
+ * CohortAggregation, for each chunk, divide the users into cohorts 
+ * and then aggregate the results
  */
 public class CohortAggregation implements Operator {
 
@@ -63,6 +67,9 @@ public class CohortAggregation implements Operator {
     this.sigma = checkNotNull(sigma);
   }
 
+  /**
+   * Initiate with table and query
+   */
   @Override
   public void init(TableSchema schema, CohortQuery query) {
     this.schema = checkNotNull(schema);
@@ -71,6 +78,11 @@ public class CohortAggregation implements Operator {
     this.sigma.init(schema, query);
   }
 
+  /**
+   * metachunk dictionary for birth action
+   * 
+   * @param metaChunk the metachunk to process
+   */
   @Override
   public void process(MetaChunkRS metaChunk) {
     this.sigma.process(metaChunk);
@@ -87,6 +99,13 @@ public class CohortAggregation implements Operator {
     }
   }
 
+  /**
+   * Check whether the chunk has the corresponding birth actions according to
+   * the metachunk dictionary, then divide the users into different cohorts and
+   * compute the results of cohorts
+   * 
+   * @param chunk the chunk to process
+   */
   @Override
   public void process(ChunkRS chunk) {
     this.sigma.process(chunk);
@@ -199,10 +218,16 @@ public class CohortAggregation implements Operator {
     }
   }
 
+  /**
+   * Load the field in the chunk according to fieldid
+   */
   private synchronized FieldRS loadField(ChunkRS chunk, int fieldId) {
     return chunk.getField(fieldId);
   }
 
+  /**
+   * Load the field in the chunk according to fieldname
+   */
   private FieldRS loadField(ChunkRS chunk, String fieldName) {
       if ("Retention".equals(fieldName)) {
           return null;
@@ -220,6 +245,13 @@ public class CohortAggregation implements Operator {
       }
   }
 
+  /**
+   * Find the birth tuple 
+   * 
+   * @param begin the start position to search
+   * @param end the end position to search
+   * @param actionInput The birth action
+   */
   private int seekToBirthTuple(int begin, int end, InputVector actionInput) {
     int pos = begin - 1;
     for (int id : this.bBirthActionChunkIDs) {

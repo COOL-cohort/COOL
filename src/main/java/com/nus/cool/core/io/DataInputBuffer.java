@@ -59,10 +59,14 @@ public class DataInputBuffer extends DataInputStream {
     return this.buffer.getData();
   }
 
+  /** Returns the current position in the input. */
   public int getPosition() {
     return this.buffer.getPosition();
   }
 
+  /**
+   * Returns the index one greater than the last valid character in the input stream buffer.
+   */
   public int getLength() {
     return this.buffer.getLength();
   }

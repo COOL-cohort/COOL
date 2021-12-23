@@ -1,17 +1,22 @@
 /*
- * Copyright 2020 Cool Squad Team
+ * Copyright 2021 Cool Squad Team
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.nus.cool.core.cohort;
 
@@ -34,22 +39,33 @@ import java.util.Map;
 import lombok.Getter;
 
 /**
- * @author zhongle, hongbin
- * @version 0.1
- * @since 0.1
+ * For each cublet, check whether the cublet contains eligible age tuples
+ * It is used to process the cublet when we need to get the age tuples
  */
 public class CohortSelection implements Operator {
 
   private TableSchema schema;
 
+  /**
+   * Whether the cublet contains eligible tuples
+   */
   @Getter
   private boolean bUserActiveCublet;
 
+  /**
+   * Whether the cublet contains eligible age tuples
+   */
   private boolean bAgeActiveCublet;
 
+  /**
+   * Whether the chunk contains eligible tuples
+   */
   @Getter
   private boolean bUserActiveChunk;
 
+  /**
+   * Whether the chunk contains eligible age tuples
+   */
   private boolean bAgeActiveChunk;
 
   @Getter
@@ -63,11 +79,17 @@ public class CohortSelection implements Operator {
 
   private Map<String, FieldRS> ageFilterFields = Maps.newHashMap();
 
+  /**
+   * Init the cohort select conditions
+   * @param schema the table to be checks
+   * @param query the condition of the selection
+   */
   @Override
   public void init(TableSchema schema, CohortQuery query) {
     this.schema = checkNotNull(schema);
     checkNotNull(query);
 
+    //Create AppKey, birthselectors and ageselectors
     String app = query.getAppKey();
     this.appFilter = FieldFilterFactory
         .create(this.schema.getField(this.schema.getAppKeyField()), Arrays.asList(app));
@@ -87,6 +109,11 @@ public class CohortSelection implements Operator {
     }
   }
 
+  /**
+   * Check whether the metachunk(cublet) contain eligible tuples
+   * 
+   * @param metaChunk the metachunk(cublet) to be checked
+   */
   @Override
   public void process(MetaChunkRS metaChunk) {
     this.bUserActiveCublet = true;
@@ -110,6 +137,12 @@ public class CohortSelection implements Operator {
     }
   }
 
+
+  /**
+   * Check whether the chunk contain eligible tuples and record the corresponding fields
+   * 
+   * @param Chunk the chunk to be checked
+   */
   @Override
   public void process(ChunkRS chunk) {
     this.birthFilterFields.clear();
@@ -140,6 +173,12 @@ public class CohortSelection implements Operator {
     return this.birthFilters.get(fieldName);
   }
 
+  /**
+   * Check whether the user is born
+   * 
+   * @param birthoff the birth offset of the user in the table
+   * @return 0 indicates the user cannot be born and 1 indicates the user is born
+   */
   public boolean selectUser(int birthOff) {
     boolean bSelected = true;
     for (Map.Entry<String, FieldFilter> entry : this.birthFilters.entrySet()) {
@@ -154,6 +193,13 @@ public class CohortSelection implements Operator {
     return bSelected;
   }
 
+  /**
+   * Check the age tuples of a user and record which tuple is needed
+   * 
+   * @param ageOff the offset of the start position in table
+   * @param ageEnd the offset of the end position in table
+   * @param bs the Bitset which indicate which tuple is needed
+   */
   public void selectAgeActivities(int ageOff, int ageEnd, BitSet bs) {
     for (Map.Entry<String, FieldFilter> entry : this.ageFilters.entrySet()) {
       FieldRS field = this.ageFilterFields.get(entry.getKey());

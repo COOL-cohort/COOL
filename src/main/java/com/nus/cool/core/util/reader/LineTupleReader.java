@@ -1,17 +1,22 @@
 /*
- * Copyright 2020 Cool Squad Team
+ * Copyright 2021 Cool Squad Team
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package com.nus.cool.core.util.reader;
 
@@ -27,10 +32,22 @@ import java.io.IOException;
  * @version 0.1
  * @since 0.1
  */
+
+/**
+ * LineTupleReader is a high-level data loader that read contents form FileReader
+ * LineTupleReader could test whether it has finished reading the file
+ * and close the FileReader
+ */
 public class LineTupleReader implements TupleReader {
-
+  
+  /**
+   * The line to store the loaded data
+   */ 
   private String line;
-
+  
+  /**
+   * The reader to read the content of files
+   */ 
   private BufferedReader reader;
 
   public LineTupleReader(File in) throws IOException {
@@ -38,11 +55,22 @@ public class LineTupleReader implements TupleReader {
     this.line = this.reader.readLine();
   }
 
+  /**
+   * check whether the reader finishes reading
+   *
+   * @return 1 denotes the reader still needs to read and
+   * 0 denoets there is nothing left to read.
+   */
   @Override
   public boolean hasNext() {
     return this.line != null;
   }
 
+  /**
+   * get the next line of file
+   *
+   * @return the original line
+   */
   @Override
   public Object next() throws IOException {
     String old = line;
@@ -50,6 +78,9 @@ public class LineTupleReader implements TupleReader {
     return old;
   }
 
+  /**
+   * Close the read
+   */
   @Override
   public void close() throws IOException {
     this.reader.close();
