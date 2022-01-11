@@ -34,11 +34,11 @@ We have given an example for cohort query processing in [CohortLoader.java](src/
 
 Load sample sogamo csv data with LocalLoader
 ```
-$ java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader sogamo sogamo/table.yaml sogamo/dim_test.csv sogamo/test.csv ./test 65536
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader sogamo sogamo/table.yaml sogamo/dim_test.csv sogamo/test.csv ./test 65536
 ```
 Execute sample query on the generated sogamo cube under test local repository
 ```
-$ java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo
 ```
 The sample result is as follows
 ```

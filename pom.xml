@@ -7,10 +7,16 @@
     <groupId>org.nus</groupId>
     <artifactId>cool</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <modules>
+        <module>cool-core</module>
+        <module>cool-extensions</module>
+    </modules>
 
 
     <dependencies>
@@ -33,59 +39,9 @@
         </dependency>
 
         <dependency>
-            <groupId>net.jpountz.lz4</groupId>
-            <artifactId>lz4</artifactId>
-            <version>1.3.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.8.2</version>
-        </dependency>
-
-        <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>2.0.1.Final</version>
-        </dependency>
-
-         <!-- hadoop -->
-        <dependency>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-common</artifactId>
-          <version>2.8.5</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-mapreduce-client-core</artifactId>
-          <version>2.8.5</version>
-        </dependency>
-        
-        <!-- parquet -->
-        <dependency>
-          <groupId>org.apache.parquet</groupId>
-          <artifactId>parquet-common</artifactId>
-          <version>1.12.0</version>
-        </dependency>
-        
-        <dependency>
-          <groupId>org.apache.parquet</groupId>
-          <artifactId>parquet-encoding</artifactId>
-          <version>1.12.0</version>
-        </dependency>
-        
-        <dependency>
-          <groupId>org.apache.parquet</groupId>
-          <artifactId>parquet-column</artifactId>
-          <version>1.12.0</version>
-        </dependency>
-        
-        <dependency>
-          <groupId>org.apache.parquet</groupId>
-          <artifactId>parquet-hadoop</artifactId>
-          <version>1.12.0</version>
         </dependency>
 
         <dependency>
