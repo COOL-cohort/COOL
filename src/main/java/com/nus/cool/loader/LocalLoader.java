@@ -80,7 +80,7 @@ public class LocalLoader {
   public static void load(TableSchema tableSchema, File dimensionFile, File dataFile,
                           File outputDir, int chunkSize) throws IOException {
     TupleParser parser = new CsvTupleParser();
-    MetaChunkWS metaChunk = newMetaChunk(dimensionFile, tableSchema, parser);
+    MetaChunkWS metaChunk = newMetaChunk(dimensionFile, tableSchema);
     DataOutputStream out = newCublet(outputDir, metaChunk);
     int userKeyIndex = tableSchema.getUserKeyField();
     String lastUser = null;
@@ -125,8 +125,9 @@ public class LocalLoader {
    * @return the generated metaChunk
    * @throws IOException
    */
-  private static MetaChunkWS newMetaChunk(File inputMetaFile, TableSchema schema,
-      TupleParser parser) throws IOException {
+  private static MetaChunkWS newMetaChunk(File inputMetaFile, 
+    TableSchema schema) throws IOException {
+    TupleParser parser = new CsvTupleParser();
     MetaChunkWS metaChunk = MetaChunkWS.newMetaChunkWS(schema, offset);
     try (TupleReader reader = new LineTupleReader(inputMetaFile)) {
       while (reader.hasNext()) {
