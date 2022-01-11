@@ -1,4 +1,4 @@
-package com.nus.cool.core.util.parquet;
+package com.nus.cool.extension.util.parquet;
 
 import java.util.Optional;
 

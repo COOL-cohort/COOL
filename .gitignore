@@ -4,9 +4,9 @@
 # product
 target/
 out/
+dependency-reduced-pom.xml
 
 # test
-src/main/java/com/Test.java
 
 .DS_Store
 NOTICE

@@ -1,12 +1,12 @@
-package com.nus.cool.core.util.reader;
+package com.nus.cool.extension.util.reader;
 
 import java.io.IOException;
 import java.util.Optional;
 
-import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.parquet.ParquetReadSupport;
-import com.nus.cool.core.util.parquet.ParquetRecordConverter;
+import com.nus.cool.core.util.reader.TupleReader;
+import com.nus.cool.extension.util.parquet.ParquetReadSupport;
+import com.nus.cool.extension.util.parquet.ParquetRecordConverter;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.example.data.Group;
