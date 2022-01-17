@@ -183,17 +183,29 @@ public class LocalLoader {
    */
   public static void main(String[] args) throws IOException {
     // read table schema
+    // sogamo
+    // sogamo   65536
+
     String cube = args[0];
+    // yaml file, eg, sogamo/table.yaml
     String schemaFileName = args[1];
+    // eg, sogamo/dim_test.csv
+    String dimensionFileName = args[2];
+    // eg, sogamo/test.csv
+    String dataFileName = args[3];
+    // eg, ./test
+    String cubeRepo = args[4];
+    // eg, 65536
+    String chunkSizeArg = args[5];
+
     File schemaFile = new File(schemaFileName);
     TableSchema schema = TableSchema.read(new FileInputStream(schemaFile));
-    File dimensionFile = new File(args[2]);
-    File dataFile = new File(args[3]);
-    String cubeRepo = args[4];
-    Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v1"); 
+    File dimensionFile = new File(dimensionFileName);
+    File dataFile = new File(dataFileName);
+    Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v1");
     Files.createDirectories(outputCubeVersionDir);
     File outputDir = outputCubeVersionDir.toFile();
-    int chunkSize = Integer.parseInt(args[5]);
+    int chunkSize = Integer.parseInt(chunkSizeArg);
     load(schema, dimensionFile, dataFile, outputDir, chunkSize);
     Files.copy(Paths.get(schemaFileName), 
       Paths.get(cubeRepo, cube, "table.yaml"), 
