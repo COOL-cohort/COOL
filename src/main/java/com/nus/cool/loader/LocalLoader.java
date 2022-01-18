@@ -70,11 +70,11 @@ public class LocalLoader {
   /**
    * Load the metachunk
    * 
-   * @param tableSchema the table of the meatchunk
+   * @param tableSchema the table of the metachunk
    * @param dimensionFile the dimension file of the matachunk
    * @param dataFile the data to process
    * @param outputDir the output path of the cublet
-   * @param chunkSize the size of meatchunk
+   * @param chunkSize the size of metachunk
    * @throws IOException
    */
   public static void load(TableSchema tableSchema, File dimensionFile, File dataFile,
