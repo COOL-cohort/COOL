@@ -184,8 +184,6 @@ public class LocalLoader {
   public static void main(String[] args) throws IOException {
     // read table schema
     // sogamo
-    // sogamo   65536
-
     String cube = args[0];
     // yaml file, eg, sogamo/table.yaml
     String schemaFileName = args[1];
@@ -198,14 +196,18 @@ public class LocalLoader {
     // eg, 65536
     String chunkSizeArg = args[5];
 
+    // read the table.yaml
     File schemaFile = new File(schemaFileName);
     TableSchema schema = TableSchema.read(new FileInputStream(schemaFile));
     File dimensionFile = new File(dimensionFileName);
     File dataFile = new File(dataFileName);
+    // generate the output path and create it
     Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v1");
     Files.createDirectories(outputCubeVersionDir);
     File outputDir = outputCubeVersionDir.toFile();
+    // read the chunk size
     int chunkSize = Integer.parseInt(chunkSizeArg);
+    // load the data into dz
     load(schema, dimensionFile, dataFile, outputDir, chunkSize);
     Files.copy(Paths.get(schemaFileName), 
       Paths.get(cubeRepo, cube, "table.yaml"), 
