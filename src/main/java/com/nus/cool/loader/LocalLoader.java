@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -84,6 +85,7 @@ public class LocalLoader {
     DataOutputStream out = newCublet(outputDir, metaChunk);
     int userKeyIndex = tableSchema.getUserKeyField();
     String lastUser = null;
+    // read from data ( eg, test.csv file) and add them to chunk,
     try (TupleReader reader = new LineTupleReader(dataFile)) {
       int tuples = 0;
       ChunkWS chunk = ChunkWS.newChunk(tableSchema, metaChunk.getMetaFields(), offset);
@@ -91,9 +93,10 @@ public class LocalLoader {
         String line = (String) reader.next();
         String[] tuple = parser.parse(line);
         String curUser = tuple[userKeyIndex];
-          if (lastUser == null) {
+        if (lastUser == null) {
               lastUser = curUser;
           }
+        // from second chunk, allocate space according to it;s size.
         if (!curUser.equals(lastUser)) {
           lastUser = curUser;
           if (tuples >= chunkSize) {
