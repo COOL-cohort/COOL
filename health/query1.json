@@ -8,7 +8,7 @@
   },
   "ageSelection":[
     {
-      "cubeField":"labtest",
+      "field":"labtest",
       "fieldValue":{
         "baseEvent":-1,
         "baseField":null,
@@ -17,7 +17,7 @@
           "Labtest-C"
         ]
       },
-      "filterType":"Set"
+      "setType":"Set"
     },
     {
       "cubeField":"value",
@@ -47,7 +47,7 @@
         ],
         "eventSelection":[
           {
-            "cubeField":"prescribe",
+            "field":"prescribe",
             "fieldValue":{
               "baseEvent":-1,
               "baseField":null,
@@ -56,7 +56,7 @@
                 "Medicine-A"
               ]
             },
-            "filterType":"Set"
+            "setType":"Set"
           }
         ],
         "maxTrigger":-1,
@@ -64,7 +64,7 @@
       }
     ]
   },
-  "dataSource":"20211223205730bFSMjK49",
+  "dataSource":"health",
   "inputCohort":"loyal",
   "measure":"example"
 }

@@ -4,7 +4,7 @@
       {
         "eventSelection":[
           {
-            "cubeField":"diagnose",
+            "field":"diagnose",
             "fieldValue":{
               "baseEvent":-1,
               "baseField":null,
@@ -13,7 +13,7 @@
                 "Disease-B"
               ]
             },
-            "filterType":"Set"
+            "setType":"Set"
           }
         ],
         "maxTrigger":-1,
@@ -26,6 +26,6 @@
       }
     ]
   },
-  "dataSource":"20211223205730bFSMjK49",
+  "dataSource":"health",
   "outputCohort":"loyal"
 }
