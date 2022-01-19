@@ -21,8 +21,9 @@ We have provided an example for each of the three yaml documents in sogamo direc
 
 Before query processing, we need to load the dataset file (i.e.,csv data) with LocalLoader that is to compact the dataset with the following command:
 ```
-$ java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader sogamo sogamo/table.yaml sogamo/dim_test.csv sogamo/test.csv ./test 65536
+// Generate sogamo dz dataset
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader sogamo sogamo/table.yaml sogamo/dim_test.csv sogamo/test.csv ./test 65536
+// Generate health dz dataset
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader health health/table.yaml health/dim.csv health/raw.csv ./test 65536
 ```
 where the five arguments are as follows:
@@ -40,8 +41,12 @@ We have given an example for cohort query processing in [CohortLoader.java](src/
 
 Execute sample query on the generated sogamo cube under test local repository
 ```
-$ java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
+// run sogamo query 
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
+// run health query 
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test health health/query0.json
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test health health/query1.json
+
 ```
 where the two arguments are as follows:
 1. `test`: the output directory for the compacted dataset
