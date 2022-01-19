@@ -40,8 +40,8 @@ We have given an example for cohort query processing in [CohortLoader.java](src/
 
 Execute sample query on the generated sogamo cube under test local repository
 ```
-$ java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo
+$ java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
 ```
 where the two arguments are as follows:
 1. `test`: the output directory for the compacted dataset

@@ -18,6 +18,5 @@
   ],
   "ageSelection": [],
   "ageInterval": 1,
-  "metric": "Retention",
-  "outSource": "loyal"
+  "metric": "Retention"
 }

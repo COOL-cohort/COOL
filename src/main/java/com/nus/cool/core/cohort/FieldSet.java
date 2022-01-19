@@ -32,6 +32,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class FieldSet {
 
+  // default constructor
+  public FieldSet() {}
+
   private FieldSetType fieldSetType;
 
   private String field;
