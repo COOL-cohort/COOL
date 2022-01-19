@@ -123,9 +123,9 @@ public class CohortLoader {
       }
     }
 
-    System.out.println(" ------  checking cube maps  ------ ");
+    System.out.println(" ------  checking cube outSourceMap  ------ ");
     System.out.println(outSourceMap);
-    System.out.println(" ------  checking cube map done  ------ ");
+    System.out.println(" ------  checking cube outSourceMap done  ------ ");
 
 
     List<ResultTuple> resultTuples = executeQuery(
