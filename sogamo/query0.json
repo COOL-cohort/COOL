@@ -18,5 +18,6 @@
   ],
   "ageSelection": [],
   "ageInterval": 1,
-  "metric": "Retention"
+  "metric": "Retention",
+  "outSource": null
 }
