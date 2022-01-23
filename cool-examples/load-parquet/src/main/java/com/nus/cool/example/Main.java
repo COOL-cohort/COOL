@@ -134,6 +134,15 @@ public class Main {
     );
     writer.close(); 
   }
+  /**
+   * Please list the sogamo dataset files, because we are generating
+   *  a sample parquet file for testing according to that dataset,  
+   * @param args there are five arguments. List in input order
+   *  (1) output cube name: to be specified when loading from the repository
+   *  (2) table.yaml (3) dimension.csv (4) data.csv (5) output cube repository 
+   *  (6) chunkSize(Int) number of tuples in a chunk
+   * @throws IOException
+   */
   public static void main(String[] args) {
     String cube = args[0];
     String schemaFileName = args[1];
@@ -153,7 +162,7 @@ public class Main {
       int chunkSize = Integer.parseInt(args[5]);
       DataLoaderConfig config =
       new ParquetDataLoaderConfig(chunkSize, 1<<30);
-      DataLoader loader = DataLoader.builder("sogamo", schema,
+      DataLoader loader = DataLoader.builder(cube, schema,
         dimensionFile, dataFile, outputDir, config).build();
       loader.load();
       Files.copy(Paths.get(schemaFileName), 
