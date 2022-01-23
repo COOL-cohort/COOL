@@ -16,7 +16,7 @@ public class JsonStringTupleParser implements TupleParser {
   
   private static final String[] EMPTY_OUTPUT = {};
 
-  JsonStringTupleParser(TableSchema schema) {
+  public JsonStringTupleParser(TableSchema schema) {
     this.schema = schema;
   }
   
