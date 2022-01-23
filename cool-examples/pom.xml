@@ -16,6 +16,7 @@
 
     <modules>
         <module>load-csv</module>
+        <module>load-parquet</module>
     </modules>
 
     <dependencies>
