@@ -16,6 +16,7 @@
     <modules>
         <module>cool-core</module>
         <module>cool-extensions</module>
+        <module>cool-examples</module>
     </modules>
 
 
@@ -75,13 +76,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <transformers>
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>com.nus.coolService.Main</mainClass>
-                        </transformer>
-                    </transformers>
-                </configuration>
             </plugin>
         </plugins>
     </build>
