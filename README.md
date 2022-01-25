@@ -20,15 +20,16 @@ Currently, it is only required to specify the location of runtime directory (det
 
 We have provided an example for each of the three yaml documents in sogamo directory.
 
-Before query processing, we need to load the dataset in to COOL native format. The sample code to load csv dataset with data loader can be found under [cool-examples/load-csv](cool-examples/load-csv/src/main/java/com/nus/cool/example/Main.java)
-`java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim_test.csv sogamo/test.csv ./test 65536`
-where the five arguments are as follows:
+Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found under [cool-examples/load-csv](cool-examples/load-csv/src/main/java/com/nus/cool/example/Main.java).
+`java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim_test.csv sogamo/test.csv ./test`
+Alternatively, the same data is also in parquet format under the same folder and can be loaded using the data loader with sample code under [cool-examples/load-parquet](cool-examples/load-parquet/src/main/java/com/nus/cool/example/Main.java).
+`java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim_test.csv sogamo/test.parquet ./test`
+The five arguments in the command have the following meaning:
 1. a unique dataset name given under the output directory
 2. the table.yaml (the third required source)
 3. the dimension file (the second required source)
 4. the dataset file (the first required source)
 5. the output directory for the compacted dataset
-6. the chunk size
 
 ### HOW TO RUN - COHORT QUERY
 We have given an example for cohort query processing in [CohortLoader.java](src/main/java/com/nus/cool/loader/CohortLoader.java).
