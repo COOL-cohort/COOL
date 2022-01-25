@@ -86,9 +86,9 @@ public class DataLoader {
   @NonNull
   private final MetaFieldWS[] metaFields;
 
-  private final long chunkSize = 65536;
+  private final long chunkSize;
 
-  private final long cubletSize = 1 << 30;
+  private final long cubletSize;
 
   public static Builder builder(String dataSetName,
     TableSchema tableSchema, File dimensionFile, File dataFile,
@@ -234,7 +234,7 @@ public class DataLoader {
       return new DataLoader(dataSetName, tableSchema, outputDir,
         config.createTupleReader(dataFile),
         config.createTupleParser(tableSchema),
-        getMetaFields(dimensionFile, tableSchema));
+        getMetaFields(dimensionFile, tableSchema), config.getChunkSize(), config.getCubletSize());
     }
   }
 }

@@ -11,6 +11,11 @@ import com.nus.cool.core.util.reader.TupleReader;
 import com.nus.cool.extension.util.reader.ParquetTupleReader;
 
 public class ParquetDataLoaderConfig extends DataLoaderConfig{
+  
+  public ParquetDataLoaderConfig() {
+    super();
+  }
+
   public ParquetDataLoaderConfig(long chunkSize, long cubletSize) {
     super(chunkSize, cubletSize);
   }
