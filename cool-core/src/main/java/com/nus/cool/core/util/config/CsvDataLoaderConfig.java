@@ -10,6 +10,11 @@ import com.nus.cool.core.util.reader.LineTupleReader;
 import com.nus.cool.core.util.reader.TupleReader;
 
 public class CsvDataLoaderConfig extends DataLoaderConfig {
+    
+  public CsvDataLoaderConfig() {
+    super();
+  }
+  
   public CsvDataLoaderConfig(long chunkSize, long cubletSize) {
     super(chunkSize, cubletSize);
   }
