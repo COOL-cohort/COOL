@@ -55,9 +55,7 @@ public class Main {
       Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v1"); 
       Files.createDirectories(outputCubeVersionDir);
       File outputDir = outputCubeVersionDir.toFile();
-      int chunkSize = Integer.parseInt(args[5]);
-      DataLoaderConfig config =
-        new CsvDataLoaderConfig(chunkSize, 1<<30);
+      DataLoaderConfig config = new CsvDataLoaderConfig();
       DataLoader loader = DataLoader.builder(cube, schema,
         dimensionFile, dataFile, outputDir, config).build();
       loader.load();
