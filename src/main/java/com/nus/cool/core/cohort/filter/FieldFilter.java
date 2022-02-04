@@ -20,6 +20,7 @@
  */
 package com.nus.cool.core.cohort.filter;
 
+import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import java.util.List;
@@ -42,6 +43,13 @@ public interface FieldFilter {
    * @return the global maximum 
    */
   int getMaxKey();
+
+  /**
+   * Get the global next of the conditions
+   *
+   * @return the global maximum
+   */
+  int getNumKey();
 
   /**
    * Indicate whether the metafiled is eligible
@@ -72,5 +80,15 @@ public interface FieldFilter {
    * 
    * @return the conditions and the minimum and maximum are separated by '|'
    */
-  List<String> getValues();
+
+  int nextAcceptTuple(int start, int to);
+
+  ExtendedFieldSet getFieldSet();
+
+  void updateValues(Double v);
+
+  boolean accept(Double v);
+
+
+
 }

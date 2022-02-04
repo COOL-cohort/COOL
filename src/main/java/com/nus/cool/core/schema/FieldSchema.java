@@ -30,10 +30,15 @@ import lombok.NoArgsConstructor;
  * FieldSchema defines the schema for filed
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FieldSchema {
+
+  @NotNull
+  private String aggregator;
+
+  @NotNull
+  private String baseField;
 
   @NotNull
   private String name;
@@ -42,5 +47,49 @@ public class FieldSchema {
   private FieldType fieldType;
 
   private boolean preCal;
+
+  private DataType dataType;
+
+
+  FieldSchema() {
+
+  }
+
+  public FieldSchema(String name, FieldType fieldType, DataType dataType) {
+    this.name = name;
+    this.fieldType = fieldType;
+    this.dataType = dataType;
+  }
+
+  public FieldSchema(String name, FieldType fieldType, DataType dataType,
+                     String aggregator, String baseField) {
+    this.name = name;
+    this.fieldType = fieldType;
+    this.dataType = dataType;
+    this.aggregator = aggregator;
+    this.baseField = baseField;
+  }
+
+
+  /**
+   * @return the dataType
+   */
+  public DataType getDataType() {
+    return dataType;
+  }
+
+  /**
+   * @return the aggregator
+   */
+  public String getAggregator() {
+    return aggregator;
+  }
+
+  /**
+   * @return the baseField
+   */
+  public String getBaseField() {
+    return baseField;
+  }
 
 }

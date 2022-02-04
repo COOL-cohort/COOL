@@ -24,8 +24,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
+import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.util.ArrayUtil;
 import com.nus.cool.core.util.converter.NumericConverter;
 import com.nus.cool.core.util.parser.TupleParser;
@@ -60,23 +62,45 @@ public class RangeFieldFilter implements FieldFilter {
    */
   private int max;
 
+  private ExtendedFieldSet fieldSet;
+
+  private int[] updatedMinValues;
+
+  private int[] updatedMaxValues;
+
+  FieldSchema schema;
+
   /**
    * Get the range of the field
    *
    * @param values the values of the conditions
    * @param converter the converter to convert the values to interger
    */
-  public RangeFieldFilter(List<String> values, NumericConverter converter) {
+  public RangeFieldFilter(FieldSchema schema, List<String> values, ExtendedFieldSet set, NumericConverter converter) {
     checkNotNull(values);
     checkArgument(!values.isEmpty());
     this.minValues = new int[values.size()];
     this.maxValues = new int[values.size()];
 
+    this.updatedMaxValues = new int[values.size()];
+    this.updatedMinValues = new int[values.size()];
+
+    this.fieldSet = checkNotNull(set);
+    ExtendedFieldSet.FieldValueType valueType = fieldSet.getFieldValue().getType();
+    this.schema = schema;
+
     TupleParser parser = new VerticalTupleParser();
     for (int i = 0; i < values.size(); i++) {
       String[] range = parser.parse(values.get(i));
-      this.minValues[i] = converter.toInt(range[0]);
-      this.maxValues[i] = converter.toInt(range[1]);
+      if (valueType == ExtendedFieldSet.FieldValueType.AbsoluteValue){
+        this.minValues[i] = converter.toInt(range[0]);
+        this.maxValues[i] = converter.toInt(range[1]);
+      } else {
+        this.minValues[i] = Integer.parseInt(range[0]);
+        this.maxValues[i] = Integer.parseInt(range[1]);
+      }
+      this.updatedMaxValues[i] = maxValues[i];
+      updatedMinValues[i] = minValues[i];
       checkArgument(this.minValues[i] <= this.maxValues[i]);
     }
     this.min = ArrayUtil.min(this.minValues);

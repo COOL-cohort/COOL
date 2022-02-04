@@ -20,6 +20,7 @@
  */
 package com.nus.cool.core.cohort.filter;
 
+import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.converter.StringIntConverter;
@@ -35,17 +36,17 @@ public class FieldFilterFactory {
    * @param schema the schema of the field
    * @param values the values of the field
    */
-  public static FieldFilter create(FieldSchema schema, List<String> values) {
+  public static FieldFilter create(FieldSchema schema, ExtendedFieldSet fieldSet, List<String> values) {
     switch (schema.getFieldType()) {
       case AppKey:
       case UserKey:
       case Segment:
       case Action:
-        return new SetFieldFilter(values);
+        return new SetFieldFilter(fieldSet, values);
       case ActionTime:
-        return new RangeFieldFilter(values, new DayIntConverter());
+        return new RangeFieldFilter(schema, values, fieldSet, new DayIntConverter());
       case Metric:
-        return new RangeFieldFilter(values, new StringIntConverter());
+        return new RangeFieldFilter(schema, values, fieldSet, new StringIntConverter());
       default:
         throw new IllegalArgumentException("Unsupported field type: " + schema.getFieldType());
     }

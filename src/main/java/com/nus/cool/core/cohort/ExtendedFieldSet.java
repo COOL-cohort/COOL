@@ -93,6 +93,11 @@ public class ExtendedFieldSet {
         public void setBaseEvent(int baseEvent) {
             this.baseEvent = baseEvent;
         }
+
+        /**
+         * @return the baseField
+         */
+
     }
 
     private FieldSetType setType;

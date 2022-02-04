@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -94,7 +93,7 @@ public class ExtendedCohortQuery {
             this.range = range;
         }
 
-        public TimeUnit getUnit() {
+        public com.nus.cool.core.cohort.TimeUnit getUnit() {
             return unit;
         }
 

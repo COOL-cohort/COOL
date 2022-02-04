@@ -98,7 +98,7 @@ public class CohortSelection implements Operator {
     for (FieldSet fs : birthSelectors) {
       String fieldName = fs.getField();
       this.birthFilters.put(fieldName,
-          FieldFilterFactory.create(this.schema.getField(fieldName), fs.getValues()));
+          FieldFilterFactory.create(schema, fs, this.schema.getField(fieldName), fs.getValues()));
     }
 
     List<FieldSet> ageSelectors = query.getAgeSelection();

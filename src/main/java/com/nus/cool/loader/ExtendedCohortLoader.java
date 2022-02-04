@@ -21,21 +21,52 @@ public class ExtendedCohortLoader {
     /**
      * Local model for cool
      */
-    private static CoolModel coolModel;
 
     public static void main(String[] args) throws IOException {
-        coolModel = new CoolModel(args[0]);
 
+        String testPath = args[0];
+        String dataPath = args[1];
+        String queryPath = args[2];
+
+        CoolModel coolModel = new CoolModel(testPath);
         // load cube
-        coolModel.reload(args[1]);
+        coolModel.reload(dataPath);
 
         // load query
         ObjectMapper mapper = new ObjectMapper();
-        ExtendedCohortQuery query = mapper.readValue(new File("health/query0.json"), ExtendedCohortQuery.class);
+        ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
 
+        System.out.println(" ------  checking query info ------ ");
         System.out.println(query);
+        System.out.println(" ------  checking query info done ------ ");
 
-        List<ResultTuple> resultTuples = executeQuery(coolModel.getCube(query.getDataSource()), query);
+
+        // Load cubes from outsource, which is output of previous query if any
+        Map<String, DataOutputStream> inputCohortCuble = Maps.newHashMap();
+        if (query.getInputCohort() != null) {
+            File root = new File(dataPath, query.getInputCohort());
+            File[] versions = root.listFiles(File::isDirectory);
+            if (versions != null) {
+                // for each directory
+                for (File version : versions) {
+                    File[] cubletFiles = version.listFiles((file, s) -> s.endsWith(".dz"));
+                    if (cubletFiles != null) {
+                        // for each file under such directory
+                        for (File cubletFile : cubletFiles) {
+                            inputCohortCuble.put(cubletFile.getName(),
+                                    new DataOutputStream(new FileOutputStream(cubletFile, true)));
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(" ------  checking cube inputCohortCuble  ------ ");
+        System.out.println(inputCohortCuble);
+        System.out.println(" ------  checking cube inputCohortCuble done  ------ ");
+
+
+        List<ResultTuple> resultTuples = executeQuery(coolModel.getCube(query.getDataSource()), query, inputCohortCuble);
         QueryResult result = QueryResult.ok(resultTuples);
         System.out.println(result.toString());
         coolModel.close();
@@ -48,17 +79,18 @@ public class ExtendedCohortLoader {
      * @param query the cohort query needed to process
      * @return the result of the query
      */
-    public static List<ResultTuple> executeQuery(CubeRS cube, ExtendedCohortQuery query) throws IOException {
+    public static List<ResultTuple> executeQuery(CubeRS cube, ExtendedCohortQuery query,
+                                                 Map<String, DataOutputStream> map) throws IOException {
         List<CubletRS> cublets = cube.getCublets();
         TableSchema schema = cube.getSchema();
         List<ResultTuple> resultSet = Lists.newArrayList();
-
+        boolean tag = query.getInputCohort() != null;
         List<BitSet> bitSets = Lists.newArrayList();
         // process each cublet
         for (CubletRS cublet : cublets) {
             MetaChunkRS metaChunk = cublet.getMetaChunk();
             CohortSelection sigma = new CohortSelection();
-            CohortAggregation gamma = new CohortAggregation(sigma);
+            ExtendedCohortAggregation gamma = new ExtendedCohortAggregation(sigma);
             gamma.init(schema, query);
             gamma.process(metaChunk);
             if (sigma.isBUserActiveCublet()) {

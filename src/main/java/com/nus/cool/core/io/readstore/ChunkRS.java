@@ -96,4 +96,9 @@ public class ChunkRS implements Input {
   public FieldRS getField(int i) {
     return this.fields[i];
   }
+
+  public FieldRS getField(String fieldName) {
+    return getField(schema.getFieldID(fieldName));
+  }
+
 }

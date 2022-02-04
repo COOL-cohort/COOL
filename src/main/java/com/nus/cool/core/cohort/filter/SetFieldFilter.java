@@ -22,6 +22,8 @@ package com.nus.cool.core.cohort.filter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.nus.cool.core.cohort.ExtendedFieldSet.FieldValueType;
+import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
@@ -62,10 +64,18 @@ public class SetFieldFilter implements FieldFilter {
    */
   private InputVector chunkValues;
 
-  public SetFieldFilter(List<String> values) {
-    this.values = checkNotNull(values);
-    this.isAll = this.values.contains("ALL");
-    this.cubeIDs = this.isAll ? new int[2] : new int[values.size()];
+  /**
+   *  current used fileset
+   */
+  private ExtendedFieldSet fieldSet;
+
+  public SetFieldFilter(ExtendedFieldSet set, List<String> values) {
+    this.fieldSet = set;
+    if (fieldSet.getFieldValue().getType() == FieldValueType.AbsoluteValue) {
+      this.values = checkNotNull(values);
+      this.isAll = this.values.contains("ALL");
+      this.cubeIDs = isAll ? new int[2] : new int[values.size()];
+    }
   }
 
   /**

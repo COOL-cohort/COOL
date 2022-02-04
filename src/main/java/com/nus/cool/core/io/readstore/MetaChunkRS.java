@@ -131,4 +131,33 @@ public class MetaChunkRS implements Input {
     FieldType type = this.schema.getFieldType(fieldName);
     return (id < 0 || id >= this.fieldOffsets.length) ? null : this.getMetaField(id, type);
   }
+
+//  public synchronized MetaFieldRS getMetaField(int i) {
+//    if(fields.containsKey(i))
+//      return fields.get(i);
+//
+//    int fieldOffset = fieldOffsets[i];
+//    buffer.position(fieldOffset);
+//    FieldType ft = FieldType.fromInteger(buffer.get(fieldOffset));
+//    MetaFieldRS metaField = null;
+//    switch(ft) {
+//      case AppKey:
+//      case Action:
+//      case Segment:
+//      case UserKey:
+//        metaField = new CohortMetaFieldRS(charset);
+//        break;
+//      case ActionTime:
+//      case Metric:
+//        metaField = new RangeMetaFieldRS();
+//        break;
+//      default:
+//        throw new IllegalArgumentException("Unexpected FieldType: " + ft);
+//    }
+//
+//    metaField.readFrom(buffer);
+//    fields.put(i, metaField);
+//    return metaField;
+//  }
+
 }
