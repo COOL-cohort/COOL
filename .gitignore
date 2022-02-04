@@ -8,6 +8,7 @@ out/
 dependency-reduced-pom.xml
 
 # test
+test/
 
 .DS_Store
 NOTICE
