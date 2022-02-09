@@ -27,7 +27,6 @@ import lombok.Getter;
 /**
  * The in-memory data structure for cube.
  * 
- * @author zhongle
  * @version 0.1
  * @since 0.1
  */
