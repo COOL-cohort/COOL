@@ -43,7 +43,6 @@ import lombok.Getter;
  * #records == number of records
  * #fields == number of fields
  *
- * @author zhongle
  * @version 0.1
  * @since 0.1
  */
@@ -96,4 +95,9 @@ public class ChunkRS implements Input {
   public FieldRS getField(int i) {
     return this.fields[i];
   }
+
+  public FieldRS getField(String fieldName) {
+    return getField(schema.getFieldID(fieldName));
+  }
+
 }
