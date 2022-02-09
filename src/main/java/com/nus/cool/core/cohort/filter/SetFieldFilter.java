@@ -22,6 +22,7 @@ package com.nus.cool.core.cohort.filter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
@@ -162,4 +163,23 @@ public class SetFieldFilter implements FieldFilter {
   public List<String> getValues() {
     return this.values;
   }
+
+  @Override
+  public ExtendedFieldSet getFieldSet() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void updateValues(Double v) {
+    this.filter.clear();
+    this.filter.set(v.intValue());
+  }
+
+  @Override
+  public int nextAcceptTuple(int start, int to) {
+    chunkValues.skipTo(start);
+    while(start < to && !accept(chunkValues.next())) ++start;
+    return start;
+  }
+
 }
