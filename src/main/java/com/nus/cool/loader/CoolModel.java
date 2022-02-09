@@ -25,14 +25,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Maps;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.schema.TableSchema;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
+
+import java.io.*;
+import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,10 +40,10 @@ import java.util.Map;
 public class CoolModel implements Closeable {
 
   // Container of loaded cubes
-  private Map<String, CubeRS> metaStore = Maps.newHashMap();
+  private final Map<String, CubeRS> metaStore = Maps.newHashMap();
 
   // Directory containing a set of cube files considered a repository
-  private File localRepo;
+  private final File localRepo;
 
   /**
    * Create a CoolModel to manage a cube repository
