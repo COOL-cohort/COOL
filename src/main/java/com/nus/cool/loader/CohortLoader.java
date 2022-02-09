@@ -82,23 +82,6 @@ public class CohortLoader {
     ObjectMapper mapper = new ObjectMapper();
     CohortQuery query = mapper.readValue(new File(queryPath), CohortQuery.class);
 
-    // cohort query by hard code
-//    CohortQuery query = new CohortQuery();
-//    query.setDataSource("sogamo");
-//    query.setAgeInterval(1);
-//    query.setMetric("Retention");
-//    String[] cohortFields = {"country"};
-//    query.setCohortFields(cohortFields);
-//    List<FieldSet> birthSelection = new ArrayList<>();
-//    List<String> values = new ArrayList<>();
-//    values.add("2013-05-20|2013-05-20");
-//    FieldSet fieldSet = new FieldSet(FieldSet.FieldSetType.Set, "eventDay", values);
-//    birthSelection.add(fieldSet);
-//    query.setBirthSelection(birthSelection);
-//    query.setBirthActions(new String[]{"launch"});
-//    query.setAppKey("fd1ec667-75a4-415d-a250-8fbb71be7cab");
-//    query.setOutSource("loyal");
-
     System.out.println(" ------  checking query info ------ ");
     System.out.println(query);
     System.out.println(" ------  checking query info done ------ ");
@@ -123,10 +106,9 @@ public class CohortLoader {
       }
     }
 
-    System.out.println(" ------  checking cube outSourceMap  ------ ");
+    System.out.println(" ------  checking outSourceMap  ------ ");
     System.out.println(outSourceMap);
-    System.out.println(" ------  checking cube outSourceMap done  ------ ");
-
+    System.out.println(" ------  checking outSourceMap done  ------ ");
 
     List<ResultTuple> resultTuples = executeQuery(
             coolModel.getCube(query.getDataSource()), query,
@@ -154,7 +136,9 @@ public class CohortLoader {
     // process each cublet
     for (CubletRS cublet : cublets) {
       MetaChunkRS metaChunk = cublet.getMetaChunk();
+      // init cohort seleciton
       CohortSelection sigma = new CohortSelection();
+      // init Aggregation
       CohortAggregation gamma = new CohortAggregation(sigma);
       gamma.init(schema, query);
       gamma.process(metaChunk);
