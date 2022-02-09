@@ -41,6 +41,20 @@ public class FieldSchema {
   @NotNull
   private FieldType fieldType;
 
+  @NotNull
+  private DataType dataType;
+
+  @NotNull
+  private String aggregator;
+
   private boolean preCal;
+
+  /**
+   * @return the aggregator
+   */
+  public String getAggregator() {
+    return aggregator;
+  }
+
 
 }
