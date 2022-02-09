@@ -59,4 +59,9 @@ public class Histogram {
    * Specific compress type
    */
   private CompressType type;
+
+  public Histogram count(int numOfValues) {
+    this.numOfValues = numOfValues;
+    return this;
+  }
 }
