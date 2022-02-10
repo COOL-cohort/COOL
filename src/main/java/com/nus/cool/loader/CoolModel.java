@@ -91,6 +91,8 @@ public class CoolModel implements Closeable {
         return s.endsWith(".dz");
       }
     });
+    System.out.println("Cube " + cube + ", versions: " + Arrays.toString(versions));
+    System.out.println("Cube " + cube + ", Use version: " + currentVersion.getName());
     
     // Load all cubes under latest version
     checkNotNull(cubletFiles);
@@ -98,6 +100,7 @@ public class CoolModel implements Closeable {
           cubeRS.addCublet(cubletFile);
       }
     this.metaStore.put(cube, cubeRS);
+    System.out.println("Cube " + cube + ", metaStore: " + this.metaStore.keySet());
   }
 
   @Override

@@ -6,7 +6,7 @@ target/
 out/
 
 # test
-src/main/java/com/Test.java
+test/
 test/
 dependency-reduced-pom.xml
 # health/

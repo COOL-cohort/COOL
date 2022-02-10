@@ -61,22 +61,24 @@ public class CreateCohort {
         System.out.println(query);
         System.out.println(" ------  checking query info done ------ ");
 
-        String cohort = query.getOutputCohort();
-        if (cohort != null){
-            throw new IOException("Output cohort exists");
-        }
+//        String cohort = query.getOutputCohort();
+//        if (cohort != null){
+//            throw new IOException("Output cohort exists");
+//        }
+
+        System.out.println("Get cube:" + coolModel.getCube(query.getDataSource()));
 
         QueryResult result = selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
 
         System.out.println(" result for query0 is  " + result);
-
-        // materialize to a cohort store
-        try {
-            createCohort(query, (List<Integer>) result.getResult(), testPath);
-
-        } catch (IOException e) {
-            throw new IOException("Output cohort exists");
-        }
+//
+//        // materialize to a cohort store
+//        try {
+//            createCohort(query, (List<Integer>) result.getResult(), testPath);
+//
+//        } catch (IOException e) {
+//            throw new IOException("Output cohort exists");
+//        }
     }
 
     public static QueryResult selectCohortUsers(CubeRS cube,
@@ -102,7 +104,7 @@ public class CreateCohort {
                 }
             }
 
-            userList.addAll(gamma.getCubletResults());
+            userList.addAll((List<Integer>)gamma.getCubletResults());
         }
 
         return QueryResult.ok(userList);

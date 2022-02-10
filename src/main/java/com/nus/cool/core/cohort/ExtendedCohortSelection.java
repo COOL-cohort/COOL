@@ -99,7 +99,7 @@ public class ExtendedCohortSelection implements Operator {
 				FieldSchema schema = tableSchema.getField(fn);
 //				checkArgument(schema.getDataType() != OutputCompressor.DataType.Aggregate);
 				filters.put(fn,
-						FieldFilterFactory.create(schema, fs.getFieldValue().getValues()));
+						FieldFilterFactory.create(schema, fs, fs.getFieldValue().getValues()));
 			}
 
 			// handle aggregate selection filters
@@ -107,7 +107,7 @@ public class ExtendedCohortSelection implements Operator {
 				String fn = fs.getCubeField();
 				FieldSchema schema = tableSchema.getField(fn);
 				aggrFilters.put(fn,
-						FieldFilterFactory.create(schema, fs.getFieldValue().getValues()));
+						FieldFilterFactory.create(schema, fs, fs.getFieldValue().getValues()));
 			}
 
 			this.birthFilters.add(filters);
@@ -153,7 +153,7 @@ public class ExtendedCohortSelection implements Operator {
 			for (ExtendedFieldSet fs : selectors) {
 				String field = fs.getCubeField();                                       
 				filterMap.put(field,
-						FieldFilterFactory.create(tableSchema.getField(field),  fs.getFieldValue().getValues()));
+						FieldFilterFactory.create(tableSchema.getField(field), fs, fs.getFieldValue().getValues()));
 			}
 		}
 	}

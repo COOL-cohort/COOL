@@ -58,9 +58,9 @@ public class CohortLoader {
   /**
    * Local model for cool
    *
-   * @param args[0] the output data dir (eg, dir of .dz fiel)
-   * @param args[1] application name, also the folder name under above folder
-   * @param args[2] query's path, eg sogamo/query0.json
+   * @param args [0] the output data dir (eg, dir of .dz fiel)
+   *        args [1] application name, also the folder name under above folder
+   *        args [2] query's path, eg sogamo/query0.json
    * @throws IOException
    */
   public static void main(String[] args) throws IOException {

@@ -61,7 +61,10 @@ public class SetFieldFilter implements FieldFilter {
    */
   private InputVector chunkValues;
 
-  public SetFieldFilter(List<String> values) {
+  private ExtendedFieldSet fieldSet;
+
+  public SetFieldFilter(ExtendedFieldSet set, List<String> values) {
+    this.fieldSet = set;
     this.values = checkNotNull(values);
     this.isAll = this.values.contains("ALL");
     this.cubeIDs = this.isAll ? new int[2] : new int[values.size()];
@@ -112,7 +115,7 @@ public class SetFieldFilter implements FieldFilter {
   /**
    * Indicate whether the filed is eligible i.e. whether we can find eligible vlaues in the field
    * 
-   * @param metaField the field to be checked
+   * @param field the field to be checked
    * @return false indicates the field is not eligible and true indicates the field is eligible
    */
   @Override
@@ -141,7 +144,7 @@ public class SetFieldFilter implements FieldFilter {
   /**
    * Indicate whether the interger is eligible
    * 
-   * @param metaField the interger to be checked
+   * @param v the interger to be checked
    * @return false indicates the interger is not eligible and true indicates the interger is eligible
    */
   @Override
@@ -164,7 +167,7 @@ public class SetFieldFilter implements FieldFilter {
 
   @Override
   public ExtendedFieldSet getFieldSet() {
-    throw new UnsupportedOperationException();
+    return this.fieldSet;
   }
 
   @Override
