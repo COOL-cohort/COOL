@@ -71,14 +71,14 @@ public class CreateCohort {
         QueryResult result = selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
 
         System.out.println(" result for query0 is  " + result);
-//
-//        // materialize to a cohort store
-//        try {
-//            createCohort(query, (List<Integer>) result.getResult(), testPath);
-//
-//        } catch (IOException e) {
-//            throw new IOException("Output cohort exists");
-//        }
+
+        // materialize to a cohort store
+        try {
+            createCohort(query, (List<Integer>) result.getResult(), testPath+"/"+dataPath);
+
+        } catch (IOException e) {
+            throw new IOException("Output cohort exists");
+        }
     }
 
     public static QueryResult selectCohortUsers(CubeRS cube,
@@ -130,8 +130,8 @@ public class CreateCohort {
         Compressor compressor = new ZIntBitCompressor(
                 Histogram.builder()
                         .max(max(userArray))
-//                        .count(userArray.length)
-//                        .uniqueValues(userArray.length)
+                        .numOfValues(userArray.length)
+                        .uniqueValues(userArray.length)
                         .build());
         byte[] compressed = new byte[compressor.maxCompressedLength()];
         int nbytes = compressor.compress(userArray, 0, userArray.length,

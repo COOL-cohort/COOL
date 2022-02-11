@@ -114,4 +114,8 @@ public class CoolModel implements Closeable {
   public synchronized CubeRS getCube(String cube) {
     return this.metaStore.get(cube);
   }
+
+  public void loadCohorts(String inputCohorts) {
+    return ;
+  }
 }

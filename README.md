@@ -45,8 +45,7 @@ Execute sample query on the generated sogamo cube under test local repository
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
 // run health query 
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CreateCohort test health health/query0.json
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test health health/query0.json
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test health health/query1.json
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query1.json
 
 ```
 where the two arguments are as follows:

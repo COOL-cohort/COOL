@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.nus.cool.core.cohort.CohortQuery;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
+import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
 
@@ -36,5 +37,46 @@ import java.util.Map;
 
 public class ExtendedCohortLoader {
 
+    public static void main(String[] args) throws IOException {
+        String testPath = args[0];
+        String dataPath = args[1];
+        String queryPath = args[2];
+
+        CoolModel coolModel = new CoolModel(testPath);
+        coolModel.reload(dataPath);
+
+        // cohort query from json
+        ObjectMapper mapper = new ObjectMapper();
+        ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
+
+        System.out.println(" ------  checking query info ------ ");
+        System.out.println(query);
+        System.out.println(" ------  checking query info done ------ ");
+
+        if(!query.isValid())
+            throw new IOException("Wrong cohort query");
+
+        System.out.println("Get cube:" + coolModel.getCube(query.getDataSource()));
+
+        long start = System.currentTimeMillis();
+
+        System.out.println("Input Cohort: " + query.getInputCohort());
+        String inputCohorts = query.getInputCohort();
+        if (inputCohorts!=null){
+            coolModel.loadCohorts(inputCohorts);
+        }
+
+
+//        InputVector userVector = coolModel.getCohortUsers(query.getInputCohort());
+
+//        QueryResult result = selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
+//
+//        System.out.println(" result for query0 is  " + result);
+
+        long end = System.currentTimeMillis();
+        System.out.println("Exe time: " + (end - start));
+
+
+    }
 
 }
