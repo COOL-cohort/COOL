@@ -21,7 +21,10 @@ package com.nus.cool.loader;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.core.io.readstore.CohortRS;
 import com.nus.cool.core.schema.TableSchema;
 
 import java.io.*;
@@ -39,6 +42,9 @@ public class CoolModel implements Closeable {
 
   // Container of loaded cubes
   private final Map<String, CubeRS> metaStore = Maps.newHashMap();
+
+  // Container of loaded cohorts
+  private Map<String, CohortRS> cohortStore = Maps.newHashMap();
 
   // Directory containing a set of cube files considered a repository
   private final File localRepo;
@@ -61,6 +67,7 @@ public class CoolModel implements Closeable {
   public synchronized void reload(String cube) throws IOException {
     // Remove the old version of the cube
     this.metaStore.remove(cube);
+    this.cohortStore.clear();
     
     // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
@@ -115,7 +122,18 @@ public class CoolModel implements Closeable {
     return this.metaStore.get(cube);
   }
 
-  public void loadCohorts(String inputCohorts) {
-    return ;
+  public void loadCohorts(String inputCohorts, String dataPath) throws IOException {
+    File cohortFile = new File(dataPath,inputCohorts);
+    System.out.println("Cohort File: " + cohortFile + ". It exists:" + cohortFile.exists());
+    CohortRS store = CohortRS.load(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
+    this.cohortStore.put(cohortFile.getName(), store);
+  }
+
+  public synchronized InputVector getCohortUsers(String cohort) {
+    if (cohortStore.containsKey(cohort)) {
+      InputVector ret = cohortStore.get(cohort).getUsers();
+      return ret;
+    }
+    return null;
   }
 }

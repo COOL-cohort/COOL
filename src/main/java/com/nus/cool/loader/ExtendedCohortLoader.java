@@ -63,11 +63,12 @@ public class ExtendedCohortLoader {
         System.out.println("Input Cohort: " + query.getInputCohort());
         String inputCohorts = query.getInputCohort();
         if (inputCohorts!=null){
-            coolModel.loadCohorts(inputCohorts);
+            coolModel.loadCohorts(inputCohorts, testPath+"/"+dataPath);
         }
 
+        InputVector userVector = coolModel.getCohortUsers(query.getInputCohort());
 
-//        InputVector userVector = coolModel.getCohortUsers(query.getInputCohort());
+        System.out.println(userVector);
 
 //        QueryResult result = selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
 //
