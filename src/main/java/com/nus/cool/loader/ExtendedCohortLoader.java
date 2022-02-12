@@ -70,8 +70,8 @@ public class ExtendedCohortLoader {
 
         System.out.println("Get cube:" + coolModel.getCube(query.getDataSource()));
 
-        CubeSchema cubeSchema = CubeSchema.read(new File(testPath+"/"+dataPath, "cube.yaml"));
-        System.out.println(cubeSchema.toString());
+//        CubeSchema cubeSchema = CubeSchema.read(new File(testPath+"/"+dataPath, "cube.yaml"));
+//        System.out.println(cubeSchema.toString());
 
         long start = System.currentTimeMillis();
 
