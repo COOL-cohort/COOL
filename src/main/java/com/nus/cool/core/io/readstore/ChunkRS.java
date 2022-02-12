@@ -65,6 +65,10 @@ public class ChunkRS implements Input {
     this.schema = schema;
   }
 
+  public int records() {
+    return this.records;
+  }
+
   @Override
   public void readFrom(ByteBuffer buffer) {
     // Get chunkType

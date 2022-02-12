@@ -27,7 +27,7 @@ import com.nus.cool.core.schema.TableSchema;
  */
 public interface Operator extends Cloneable {
 
-  void init(TableSchema schema, CohortQuery query);
+  // void init(TableSchema schema, CohortQuery query);
 
   void process(MetaChunkRS metaChunk);
 
