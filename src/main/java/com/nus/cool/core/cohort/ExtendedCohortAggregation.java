@@ -102,6 +102,11 @@ public class ExtendedCohortAggregation implements CohortOperator {
     }
 
     @Override
+    public void init(TableSchema schema, CohortQuery query) {
+
+    }
+
+    @Override
     public void process(MetaChunkRS metaChunk) {
         LOG.info("Processing metaChunk ...");
         this.metaChunk = metaChunk;
@@ -130,7 +135,8 @@ public class ExtendedCohortAggregation implements CohortOperator {
 //        Measure measure = cubeSchema.getMeasure(query.getMeasure());
 //        checkArgument(measure != null);
 //        FieldRS metricField = chunk.getField(measure.getTableFieldName());
-        FieldRS metricField = chunk.getField("id");
+//        FieldRS metricField = chunk.getField("id");
+        FieldRS metricField = userField;
 
         // Intentionally allocate one additional bit for dimension-base ageby aggregation
         BitSet bv = new BitSet(chunk.records() + 1);

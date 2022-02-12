@@ -16,20 +16,44 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.nus.cool.core.cohort;
+package com.nus.cool.loader;
 
-import com.nus.cool.core.io.readstore.ChunkRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
-import com.nus.cool.core.schema.TableSchema;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Operator is the father class for different operators
+ * ResultTuple is used to store the result, including cohort name, age,
+ * how to merge the cohorts result, and the
  */
-public interface Operator extends Cloneable {
+@Data
+@AllArgsConstructor
+public class ExtendedResultTuple {
 
-  void init(TableSchema schema, CohortQuery query);
+  /**
+   * cohort name
+   */
+  private String cohort;
 
-  void process(MetaChunkRS metaChunk);
+  /**
+   * age of the cohort
+   */
+  private int age;
 
-  void process(ChunkRS chunk);
+  /**
+   * measure of interest
+   */
+  private double measure;
+
+  private double min;
+
+  private double max;
+
+  private double sum;
+
+  private double num;
+
+  public ExtendedResultTuple() {}
+
 }

@@ -65,4 +65,8 @@ public class CubeRS {
     cubletRS.setFile(cubletFile.getName());
     this.cublets.add(cubletRS);
   }
+
+  public TableSchema getTableSchema() {
+    return this.schema;
+  }
 }
