@@ -44,9 +44,9 @@ Execute sample query on the generated sogamo cube under test local repository
 // run sogamo query 
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
 // run health query 
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CreateCohort test health health/query0.json
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query1.json
-
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CreateCohort test health health/query1-0.json
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query1-1.json
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query2.json
 ```
 where the two arguments are as follows:
 1. `test`: the output directory for the compacted dataset
