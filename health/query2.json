@@ -3,8 +3,6 @@
     "ageInterval":1,
     "eventSelection":[],
     "field":"time",
-    "fillWithLastObserved":false,
-    "fillWithNextObserved":false,
     "range":[
       "0|7"
     ],
@@ -72,7 +70,7 @@
   },
   "dataSource":"health",
   "inputCohort":null,
-  "measure":"example",
+  "measure":"retention",
   "outputCohort":null,
   "userId":null
 }

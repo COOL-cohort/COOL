@@ -210,7 +210,7 @@ public class ExtendedCohortAggregation implements CohortOperator {
                 // updateStats(sigma.selectAgeActivities(ageOff, end, bv, ageDelimiter), cohortCells.get(0));
                 EventAggregator aggr = BirthAggregatorFactory.getAggregator(
                         //cubeSchema.getMeasure(query.getMeasure()).getAggregator().name()
-                        "RETENTION"
+                        query.getMeasure().toUpperCase()
                 );
                 aggr.init(metricField.getValueVector());
 

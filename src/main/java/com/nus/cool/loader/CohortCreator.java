@@ -42,10 +42,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class CreateCohort {
+public class CohortCreator {
 
     public static void main(String[] args) throws IOException {
-
         String testPath = args[0];
         String dataPath = args[1];
         String queryPath = args[2];
@@ -61,15 +60,15 @@ public class CreateCohort {
         System.out.println(query);
         System.out.println(" ------  checking query info done ------ ");
 
-//        String cohort = query.getOutputCohort();
-//        if (cohort != null){
-//            throw new IOException("Output cohort exists");
-//        }
-
+        String cohort = query.getOutputCohort();
+        File cohortFile = new File(testPath+"/"+dataPath, cohort);
+        if (cohortFile.exists()){
+            cohortFile.delete();
+            System.out.println("Cohort  " + cohort + " exists and is deleted!");
+        }
         System.out.println("Get cube:" + coolModel.getCube(query.getDataSource()));
 
         QueryResult result = selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
-
         System.out.println(" result for query0 is  " + result);
 
         // materialize to a cohort store
@@ -77,7 +76,7 @@ public class CreateCohort {
             createCohort(query, (List<Integer>) result.getResult(), testPath+"/"+dataPath);
 
         } catch (IOException e) {
-            throw new IOException("Output cohort exists");
+            throw new IOException();
         }
     }
 

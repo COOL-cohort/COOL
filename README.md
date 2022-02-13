@@ -29,7 +29,7 @@ java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader health h
 where the five arguments are as follows:
 1. `sogamo`: the cube name
 2. `sogamo/table.yaml`: the dataset schema file (the third required source)
-3. `sogamo/dim_test.csv`: the dimension file (the second required source)
+3. `sogamo/dim.csv`: the dimension file (the second required source)
 4. `sogamo/test.csv`: the dataset file (the first required source)
 5. `./test`: the output directory for the compacted dataset
 6. `65536`: the chunk size
@@ -44,13 +44,14 @@ Execute sample query on the generated sogamo cube under test local repository
 // run sogamo query 
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
 // run health query 
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CreateCohort test health health/query1-0.json
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator test health health/query1-0.json
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query1-1.json
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query2.json
 ```
-where the two arguments are as follows:
+where the three arguments are as follows:
 1. `test`: the output directory for the compacted dataset
-2. `sogamo`: the cube name
+2. `health`: the cube name of the compacted dataset
+3. `health/query2.json`: the json file for the cohort query
 
 The sample result is as follows
 ```

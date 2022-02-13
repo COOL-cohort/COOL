@@ -187,7 +187,7 @@ public class LocalLoader {
     String cube = args[0];
     // yaml file, eg, sogamo/table.yaml
     String schemaFileName = args[1];
-    // eg, sogamo/dim_test.csv
+    // eg, sogamo/dim.csv
     String dimensionFileName = args[2];
     // eg, sogamo/test.csv
     String dataFileName = args[3];

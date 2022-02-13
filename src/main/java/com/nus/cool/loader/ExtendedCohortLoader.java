@@ -47,17 +47,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * ExtendedCohortLoader is a higher level abstraction for cohort query.
+ * With ExtendedCohortLoader, you can easily get the cohort query result
+ */
 public class ExtendedCohortLoader {
 
+    /**
+     * Local model for cool
+     *
+     * @param args [0] dataset path: the path to all datasets, e.g., test
+     *        args [1] application path: the path to the application dataset that is under above folder, e.g., health
+     *        args [2] query path: the path to the cohort query, e.g., health/query2.json
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
-        String testPath = args[0];
-        String dataPath = args[1];
+        String datasetPath = args[0];
+        String appPath = args[1];
         String queryPath = args[2];
 
-        CoolModel coolModel = new CoolModel(testPath);
-        coolModel.reload(dataPath);
+        // reload the dataset of the application
+        CoolModel coolModel = new CoolModel(datasetPath);
+        coolModel.reload(appPath);
 
-        // cohort query from json
+        // load the cohort query from a json file
         ObjectMapper mapper = new ObjectMapper();
         ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
 
@@ -70,25 +83,19 @@ public class ExtendedCohortLoader {
 
         System.out.println("Get cube:" + coolModel.getCube(query.getDataSource()));
 
-//        CubeSchema cubeSchema = CubeSchema.read(new File(testPath+"/"+dataPath, "cube.yaml"));
-//        System.out.println(cubeSchema.toString());
-
         long start = System.currentTimeMillis();
-
         System.out.println("Input Cohort: " + query.getInputCohort());
         String inputCohorts = query.getInputCohort();
         if (inputCohorts!=null){
-            coolModel.loadCohorts(inputCohorts, testPath+"/"+dataPath);
+            coolModel.loadCohorts(inputCohorts, datasetPath+"/"+appPath);
         }
 
+        // preprocess the
         InputVector userVector = coolModel.getCohortUsers(query.getInputCohort());
-
         System.out.println(userVector);
 
         QueryResult result = executeQuery(coolModel.getCube(query.getDataSource()),userVector, query);
-
         System.out.println(" result for query1 is  " + result);
-
         long end = System.currentTimeMillis();
         System.out.println("Exe time: " + (end - start));
 

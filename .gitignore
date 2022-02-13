@@ -3,12 +3,13 @@
 
 # product
 target/
+*/target/
 out/
 
 # test
 test/
-test/
 dependency-reduced-pom.xml
+*/dependency-reduced-pom.xml
 # health/
 
 .DS_Store

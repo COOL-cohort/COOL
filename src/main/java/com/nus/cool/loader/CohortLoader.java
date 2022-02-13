@@ -65,13 +65,9 @@ public class CohortLoader {
    */
   public static void main(String[] args) throws IOException {
 
-//    String testPath = "test";
-//    String dataPath = "sogamo";
-
     String testPath = args[0];
     String dataPath = args[1];
     String queryPath = args[2];
-//    String outputPath = args[3];
 
     CoolModel coolModel = new CoolModel(testPath);
     coolModel.reload(dataPath);
