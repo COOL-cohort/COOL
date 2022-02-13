@@ -19,12 +19,13 @@ Currently, it is only required to specify the location of runtime directory (det
 
 We have provided an example for each of the three yaml documents in sogamo directory.
 
-Before query processing, we need to load the dataset file (i.e.,csv data) with LocalLoader that is to compact the dataset with the following command:
+Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found under [cool-examples/load-csv](cool-examples/load-csv/src/main/java/com/nus/cool/example/Main.java).
 ```
-// Generate sogamo dz dataset
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader sogamo sogamo/table.yaml sogamo/dim_test.csv sogamo/test.csv ./test 65536
-// Generate health dz dataset
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader health health/table.yaml health/dim.csv health/raw.csv ./test 65536
+$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv ./test
+```
+Alternatively, the same data is also in parquet format under the same folder and can be loaded using the data loader with sample code under [cool-examples/load-parquet](cool-examples/load-parquet/src/main/java/com/nus/cool/example/Main.java).
+```
+$ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.parquet ./test
 ```
 where the five arguments are as follows:
 1. `sogamo`: the cube name
@@ -36,24 +37,24 @@ where the five arguments are as follows:
 
 Then, there will be a cube generated under the `test` directory, which is named `sogamo`.
 
-### HOW TO RUN - COHORT QUERY
-We have given an example for cohort query processing in [CohortLoader.java](src/main/java/com/nus/cool/loader/CohortLoader.java).
-
-Execute sample query on the generated sogamo cube under test local repository
+Besides, we also provide another example for the `health` dataset.
 ```
-// run sogamo query 
+$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar health health/table.yaml health/dim.csv health/raw.csv ./test
+```
+
+### HOW TO RUN - COHORT QUERY
+We have given an example for cohort query processing in [CohortLoader.java](cool-core/src/main/java/com/nus/cool/loader/CohortLoader.java).
+
+Execute sample query on the generated `sogamo` cube under test local repository
+```
 java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
-// run health query 
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator test health health/query1-0.json
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query1-1.json
-java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query2.json
 ```
 where the three arguments are as follows:
 1. `test`: the output directory for the compacted dataset
-2. `health`: the cube name of the compacted dataset
-3. `health/query2.json`: the json file for the cohort query
+2. `sogamo`: the cube name of the compacted dataset
+3. `sogamo/query0.json`: the json file for the cohort query
 
-The sample result is as follows
+The sample result for the sogamo dataset is as follows
 ```
 {
   "status" : "OK",
@@ -84,6 +85,60 @@ The sample result is as follows
     "measure" : 1
   } ]
 }
+```
+
+Besides, we also provide extended cohort queries for the `health` dataset, and we provide two types of cohort queries on the `health` cube.
+
+In the first type, we first create specialized cohorts and then execute the designed cohort query on the selected cohort.
+```
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator test health health/query1-0.json
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query1-1.json
+```
+
+In the second type, we directly execute the designed cohort query on all users.
+```
+java -cp ./target/cool-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query2.json
+```
+
+Partial results for the second query on the `health` dataset is as follows
+```
+ {
+  "status" : "OK",
+  "elapsed" : 0,
+  "result" : [ {
+    "cohort" : "((1950, 1960])",
+    "age" : 0,
+    "measure" : 740.0,
+    "min" : 45.0,
+    "max" : 96.0,
+    "sum" : 4516.0,
+    "num" : 79.0
+  }, {
+    "cohort" : "((1950, 1960])",
+    "age" : 1,
+    "measure" : 49.0,
+    "min" : 46.0,
+    "max" : 72.0,
+    "sum" : 981.0,
+    "num" : 18.0
+  }, {
+    "cohort" : "((1950, 1960])",
+    "age" : 2,
+    "measure" : 57.0,
+    "min" : 45.0,
+    "max" : 81.0,
+    "sum" : 2032.0,
+    "num" : 37.0
+  }, {
+    "cohort" : "((1950, 1960])",
+    "age" : 3,
+    "measure" : 34.0,
+    "min" : 45.0,
+    "max" : 72.0,
+    "sum" : 1666.0,
+    "num" : 30.0
+  },
+  ...
 ```
 
 ## Publication
