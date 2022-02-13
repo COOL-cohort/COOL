@@ -10,6 +10,7 @@ out/
 test/
 dependency-reduced-pom.xml
 */dependency-reduced-pom.xml
+*/*/dependency-reduced-pom.xml
 # health/
 
 .DS_Store
