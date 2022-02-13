@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -23,16 +21,17 @@ package com.nus.cool.loader;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.core.io.readstore.CohortRS;
 import com.nus.cool.core.schema.TableSchema;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
+
+import java.io.*;
+import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,10 +41,13 @@ import java.util.Map;
 public class CoolModel implements Closeable {
 
   // Container of loaded cubes
-  private Map<String, CubeRS> metaStore = Maps.newHashMap();
+  private final Map<String, CubeRS> metaStore = Maps.newHashMap();
+
+  // Container of loaded cohorts
+  private Map<String, CohortRS> cohortStore = Maps.newHashMap();
 
   // Directory containing a set of cube files considered a repository
-  private File localRepo;
+  private final File localRepo;
 
   /**
    * Create a CoolModel to manage a cube repository
@@ -65,6 +67,7 @@ public class CoolModel implements Closeable {
   public synchronized void reload(String cube) throws IOException {
     // Remove the old version of the cube
     this.metaStore.remove(cube);
+    this.cohortStore.clear();
     
     // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
@@ -95,6 +98,8 @@ public class CoolModel implements Closeable {
         return s.endsWith(".dz");
       }
     });
+    System.out.println("Cube " + cube + ", versions: " + Arrays.toString(versions));
+    System.out.println("Cube " + cube + ", Use version: " + currentVersion.getName());
     
     // Load all cubes under latest version
     checkNotNull(cubletFiles);
@@ -102,6 +107,7 @@ public class CoolModel implements Closeable {
           cubeRS.addCublet(cubletFile);
       }
     this.metaStore.put(cube, cubeRS);
+    System.out.println("Cube " + cube + ", metaStore: " + this.metaStore.keySet());
   }
 
   @Override
@@ -114,5 +120,20 @@ public class CoolModel implements Closeable {
    */
   public synchronized CubeRS getCube(String cube) {
     return this.metaStore.get(cube);
+  }
+
+  public void loadCohorts(String inputCohorts, String dataPath) throws IOException {
+    File cohortFile = new File(dataPath,inputCohorts);
+    System.out.println("Cohort File: " + cohortFile + ". It exists:" + cohortFile.exists());
+    CohortRS store = CohortRS.load(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
+    this.cohortStore.put(cohortFile.getName(), store);
+  }
+
+  public synchronized InputVector getCohortUsers(String cohort) {
+    if (cohortStore.containsKey(cohort)) {
+      InputVector ret = cohortStore.get(cohort).getUsers();
+      return ret;
+    }
+    return null;
   }
 }

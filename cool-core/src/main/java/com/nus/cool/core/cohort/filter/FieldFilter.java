@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -20,6 +18,7 @@
  */
 package com.nus.cool.core.cohort.filter;
 
+import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import java.util.List;
@@ -73,4 +72,11 @@ public interface FieldFilter {
    * @return the conditions and the minimum and maximum are separated by '|'
    */
   List<String> getValues();
+
+  ExtendedFieldSet getFieldSet();
+
+  void updateValues(Double v);
+
+  int nextAcceptTuple(int start, int to);
+
 }

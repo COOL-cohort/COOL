@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -92,20 +90,20 @@ public class CohortSelection implements Operator {
     //Create AppKey, birthselectors and ageselectors
     String app = query.getAppKey();
     this.appFilter = FieldFilterFactory
-        .create(this.schema.getField(this.schema.getAppKeyField()), Arrays.asList(app));
+        .create(this.schema.getField(this.schema.getAppKeyField()), null, Arrays.asList(app));
 
     List<FieldSet> birthSelectors = query.getBirthSelection();
     for (FieldSet fs : birthSelectors) {
       String fieldName = fs.getField();
       this.birthFilters.put(fieldName,
-          FieldFilterFactory.create(this.schema.getField(fieldName), fs.getValues()));
+          FieldFilterFactory.create(this.schema.getField(fieldName), null, fs.getValues()));
     }
 
     List<FieldSet> ageSelectors = query.getAgeSelection();
     for (FieldSet fs : ageSelectors) {
       String fieldName = fs.getField();
       this.ageFilters.put(fieldName,
-          FieldFilterFactory.create(this.schema.getField(fieldName), fs.getValues()));
+          FieldFilterFactory.create(this.schema.getField(fieldName), null, fs.getValues()));
     }
   }
 

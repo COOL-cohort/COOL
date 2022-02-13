@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -31,6 +29,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class FieldSet {
+
+  // default constructor
+  public FieldSet() {}
 
   private FieldSetType fieldSetType;
 

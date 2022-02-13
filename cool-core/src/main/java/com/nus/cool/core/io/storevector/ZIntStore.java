@@ -1,6 +1,4 @@
 /*
- * Copyright 2020 Cool Squad Team
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,12 +15,6 @@ package com.nus.cool.core.io.storevector;
 
 import com.nus.cool.core.io.Input;
 
-/**
- *
- * @author zhongle
- * @version 0.1
- * @since 0.1
- */
 public interface ZIntStore extends Input {
 
 }

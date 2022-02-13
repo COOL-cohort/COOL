@@ -19,10 +19,6 @@ import java.nio.ByteBuffer;
 
 /**
  * Base interface for all read-only data structures
- *
- * @author zhongle
- * @version 0.1
- * @since 0.1
  */
 public interface Input {
 

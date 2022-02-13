@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -23,6 +21,7 @@ package com.nus.cool.core.cohort.filter;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.converter.StringIntConverter;
+import com.nus.cool.core.cohort.ExtendedFieldSet;
 import java.util.List;
 
 /**
@@ -35,13 +34,13 @@ public class FieldFilterFactory {
    * @param schema the schema of the field
    * @param values the values of the field
    */
-  public static FieldFilter create(FieldSchema schema, List<String> values) {
+  public static FieldFilter create(FieldSchema schema, ExtendedFieldSet fieldSet, List<String> values) {
     switch (schema.getFieldType()) {
       case AppKey:
       case UserKey:
       case Segment:
       case Action:
-        return new SetFieldFilter(values);
+        return new SetFieldFilter(fieldSet, values);
       case ActionTime:
         return new RangeFieldFilter(values, new DayIntConverter());
       case Metric:

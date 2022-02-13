@@ -1,6 +1,4 @@
 /*
- * Copyright 2020 Cool Squad Team
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,10 +19,6 @@ import lombok.Getter;
 
 /**
  * Properties for compress
- *
- * @author zhongle, hongbin
- * @version 0.1
- * @since 0.1
  */
 @Getter
 @Builder
@@ -59,4 +53,6 @@ public class Histogram {
    * Specific compress type
    */
   private CompressType type;
+
+  private int uniqueValues;
 }

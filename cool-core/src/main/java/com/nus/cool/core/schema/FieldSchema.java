@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -41,6 +39,20 @@ public class FieldSchema {
   @NotNull
   private FieldType fieldType;
 
+  @NotNull
+  private DataType dataType;
+
+  @NotNull
+  private String aggregator;
+
   private boolean preCal;
+
+  /**
+   * @return the aggregator
+   */
+  public String getAggregator() {
+    return aggregator;
+  }
+
 
 }

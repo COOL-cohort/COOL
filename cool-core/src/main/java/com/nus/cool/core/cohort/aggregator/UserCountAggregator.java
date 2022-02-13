@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -62,7 +60,6 @@ public class UserCountAggregator implements Aggregator {
    * Initiate UserCountAggregator with the configuration of cohort analysis
    *
    * @param metricVec the metric field
-   * @param eventDayCev the action time field
    * @param maxAges the number of ages we set up
    * @param from the start position of the user in the table
    * @param to the end position of the user in the table

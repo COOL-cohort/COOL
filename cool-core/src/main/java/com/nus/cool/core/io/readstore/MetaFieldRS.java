@@ -1,6 +1,4 @@
 /*
- * Copyright 2020 Cool Squad Team
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,10 +19,6 @@ import java.nio.ByteBuffer;
 
 /**
  * For the moment, we only support Hash based meta field.
- * TODO: add range meta field later
- * @author zhongle
- * @version 0.1
- * @since 0.1
  */
 public interface MetaFieldRS extends Input {
 
@@ -33,7 +27,7 @@ public interface MetaFieldRS extends Input {
   /**
    * Return the id of the given value
    *
-   * @param v
+   * @param key
    * @return
    */
 

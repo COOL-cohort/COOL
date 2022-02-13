@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -48,193 +46,193 @@ import lombok.RequiredArgsConstructor;
  * -------------------------------------------------------------------------
  * | metaChunk | chunk 1 | chunk 2 |....| chunk N | header | header offset |
  * -------------------------------------------------------------------------
- * 
- * Header layout: 
- * --------------------------------- 
- * | chunks | chunk header offsets | 
- * --------------------------------- 
+ *
+ * Header layout:
+ * ---------------------------------
+ * | chunks | chunk header offsets |
+ * ---------------------------------
  * where chunks == number of chunks stored in this cublet.
- * 
+ *
  * Each cubelet has a size of roughly 1G in order to be memory mapped
  */
 @RequiredArgsConstructor
 public class DataLoader {
-  /**
-   * metaChunk offset
-   */
-  private int offset = 0;
-  /**
-   * Header offsets
-   */
-  private List<Integer> chunkOffsets = Lists.newArrayList();
-
-  @NonNull
-  private String dataSetName;
-
-  @NonNull
-  private TableSchema tableSchema;
-
-  @NonNull
-  private final File outputDir;
-
-  @NonNull
-  private final TupleReader reader;
-
-  @NonNull
-  private final TupleParser parser;
-
-  @NonNull
-  private final MetaFieldWS[] metaFields;
-
-  private final long chunkSize;
-
-  private final long cubletSize;
-
-  public static Builder builder(String dataSetName,
-    TableSchema tableSchema, File dimensionFile, File dataFile,
-    File outputDir, DataLoaderConfig config) {
-    return new Builder(dataSetName, tableSchema, dimensionFile,
-      dataFile, outputDir, config);
-  }
-
-  /**
-   * Create a new cublet
-   * @return output stream to write data into new cublet
-   * @throws IOException
-   */
-  private DataOutputStream newCublet() throws IOException  {
-    File cublet = new File(outputDir,
-      dataSetName + Long.toHexString(System.currentTimeMillis())
-      + ".dz");
-    DataOutputStream out = new DataOutputStream(
-      new FileOutputStream(cublet));
-    offset = new MetaChunkWS(tableSchema, 0, metaFields)
-      .writeTo(out);
-    chunkOffsets.clear();
-    chunkOffsets.add(offset - Ints.BYTES);
-    return out;
-  }
-  /**
-   * Close current cublet. Write chunk header offsets and header offset 
-   *  into the cublet
-   * @param out The output stream tied to the current cublet
-   * @throws IOException
-   */
-  private void closeCublet(DataOutputStream out) throws IOException {
-    int headOffset = offset;
-    out.writeInt(IntegerUtil.toNativeByteOrder(chunkOffsets.size()));
-    for(int chunkOff : chunkOffsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
-    }
-    out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
-    out.flush();
-    out.close();
-  }
-  /**
-   * Change to a new chunk
-   * @param out The output stream tied to the current cublet
-   * @param chunk The current chunk to finalize
-   * @return a new chunk to write data
-   * @throws IOException
-   */
-  private ChunkWS switchChunk(DataOutputStream out, ChunkWS chunk)
-    throws IOException {
-    offset += chunk.writeTo(out);
-    chunkOffsets.add(offset - Ints.BYTES);
-    if (offset >= cubletSize) {
-      closeCublet(out);
-      out = newCublet();
-    }
-    return ChunkWS.newChunk(tableSchema, metaFields, offset);
-  }
-
-  /**
-   * load data into cool native format
-   * @throws IOException
-   */
-  public void load() throws IOException {
-    DataOutputStream out = newCublet();
-    int userKeyIndex = tableSchema.getUserKeyField();
-    String lastUser = null;
-    int tuples = 0;
-    ChunkWS chunk = ChunkWS.newChunk(tableSchema, metaFields, offset);
-    while (reader.hasNext()) {
-      String line = (String) reader.next();
-      String[] tuple = parser.parse(line);
-      String curUser = tuple[userKeyIndex];
-      if (lastUser == null) {
-          lastUser = curUser;
-      }
-      if ((!curUser.equals(lastUser)) && (tuples >= chunkSize)) {
-          chunk = switchChunk(out, chunk);
-          tuples = 0;
-      }
-      lastUser = curUser;
-      chunk.put(tuple);
-      tuples++;
-    }
-    offset += chunk.writeTo(out);
-    chunkOffsets.add(offset-Ints.BYTES);
-    closeCublet(out);
-  }
-
-  @AllArgsConstructor
-  public static class Builder {
     /**
-     * designate the dataset name in cube repository
+     * metaChunk offset
      */
+    private int offset = 0;
+    /**
+     * Header offsets
+     */
+    private List<Integer> chunkOffsets = Lists.newArrayList();
+
     @NonNull
     private String dataSetName;
-    /**
-     * table schema of the dataset
-     */
+
     @NonNull
-    private final TableSchema tableSchema;
-    /**
-     * dimension file of the dataset
-     */
-    @NonNull
-    private final File dimensionFile;
-    /**
-     * raw data
-     */
-    @NonNull
-    private final File dataFile;
-    /**
-     * output directory to store the dataset
-     */
+    private TableSchema tableSchema;
+
     @NonNull
     private final File outputDir;
-    /**
-     * configuration determines how the raw data is processed
-     */
-    @NonNull
-    private final DataLoaderConfig config;
 
-    private MetaFieldWS[] getMetaFields(File inputMetaFile,
-      TableSchema schema)
-      throws IOException {
-      TupleParser parser = new CsvTupleParser();
-      MetaChunkWS metaChunk = MetaChunkWS.newMetaChunkWS(schema, 0);
-      try (TupleReader reader = new LineTupleReader(inputMetaFile)) {
-        while (reader.hasNext()) {
-          metaChunk.put(parser.parse(reader.next()));
-        }
-      }
-      metaChunk.complete();
-      return metaChunk.getMetaFields();
+    @NonNull
+    private final TupleReader reader;
+
+    @NonNull
+    private final TupleParser parser;
+
+    @NonNull
+    private final MetaFieldWS[] metaFields;
+
+    private final long chunkSize;
+
+    private final long cubletSize;
+
+    public static Builder builder(String dataSetName,
+                                  TableSchema tableSchema, File dimensionFile, File dataFile,
+                                  File outputDir, DataLoaderConfig config) {
+        return new Builder(dataSetName, tableSchema, dimensionFile,
+                dataFile, outputDir, config);
     }
 
     /**
-     * 
-     * @return
+     * Create a new cublet
+     * @return output stream to write data into new cublet
      * @throws IOException
      */
-    public DataLoader build() throws IOException {
-      return new DataLoader(dataSetName, tableSchema, outputDir,
-        config.createTupleReader(dataFile),
-        config.createTupleParser(tableSchema),
-        getMetaFields(dimensionFile, tableSchema), config.getChunkSize(), config.getCubletSize());
+    private DataOutputStream newCublet() throws IOException  {
+        File cublet = new File(outputDir,
+                dataSetName + Long.toHexString(System.currentTimeMillis())
+                        + ".dz");
+        DataOutputStream out = new DataOutputStream(
+                new FileOutputStream(cublet));
+        offset = new MetaChunkWS(tableSchema, 0, metaFields)
+                .writeTo(out);
+        chunkOffsets.clear();
+        chunkOffsets.add(offset - Ints.BYTES);
+        return out;
     }
-  }
+    /**
+     * Close current cublet. Write chunk header offsets and header offset
+     *  into the cublet
+     * @param out The output stream tied to the current cublet
+     * @throws IOException
+     */
+    private void closeCublet(DataOutputStream out) throws IOException {
+        int headOffset = offset;
+        out.writeInt(IntegerUtil.toNativeByteOrder(chunkOffsets.size()));
+        for(int chunkOff : chunkOffsets) {
+            out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
+        }
+        out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
+        out.flush();
+        out.close();
+    }
+    /**
+     * Change to a new chunk
+     * @param out The output stream tied to the current cublet
+     * @param chunk The current chunk to finalize
+     * @return a new chunk to write data
+     * @throws IOException
+     */
+    private ChunkWS switchChunk(DataOutputStream out, ChunkWS chunk)
+            throws IOException {
+        offset += chunk.writeTo(out);
+        chunkOffsets.add(offset - Ints.BYTES);
+        if (offset >= cubletSize) {
+            closeCublet(out);
+            out = newCublet();
+        }
+        return ChunkWS.newChunk(tableSchema, metaFields, offset);
+    }
+
+    /**
+     * load data into cool native format
+     * @throws IOException
+     */
+    public void load() throws IOException {
+        DataOutputStream out = newCublet();
+        int userKeyIndex = tableSchema.getUserKeyField();
+        String lastUser = null;
+        int tuples = 0;
+        ChunkWS chunk = ChunkWS.newChunk(tableSchema, metaFields, offset);
+        while (reader.hasNext()) {
+            String line = (String) reader.next();
+            String[] tuple = parser.parse(line);
+            String curUser = tuple[userKeyIndex];
+            if (lastUser == null) {
+                lastUser = curUser;
+            }
+            if ((!curUser.equals(lastUser)) && (tuples >= chunkSize)) {
+                chunk = switchChunk(out, chunk);
+                tuples = 0;
+            }
+            lastUser = curUser;
+            chunk.put(tuple);
+            tuples++;
+        }
+        offset += chunk.writeTo(out);
+        chunkOffsets.add(offset-Ints.BYTES);
+        closeCublet(out);
+    }
+
+    @AllArgsConstructor
+    public static class Builder {
+        /**
+         * designate the dataset name in cube repository
+         */
+        @NonNull
+        private String dataSetName;
+        /**
+         * table schema of the dataset
+         */
+        @NonNull
+        private final TableSchema tableSchema;
+        /**
+         * dimension file of the dataset
+         */
+        @NonNull
+        private final File dimensionFile;
+        /**
+         * raw data
+         */
+        @NonNull
+        private final File dataFile;
+        /**
+         * output directory to store the dataset
+         */
+        @NonNull
+        private final File outputDir;
+        /**
+         * configuration determines how the raw data is processed
+         */
+        @NonNull
+        private final DataLoaderConfig config;
+
+        private MetaFieldWS[] getMetaFields(File inputMetaFile,
+                                            TableSchema schema)
+                throws IOException {
+            TupleParser parser = new CsvTupleParser();
+            MetaChunkWS metaChunk = MetaChunkWS.newMetaChunkWS(schema, 0);
+            try (TupleReader reader = new LineTupleReader(inputMetaFile)) {
+                while (reader.hasNext()) {
+                    metaChunk.put(parser.parse(reader.next()));
+                }
+            }
+            metaChunk.complete();
+            return metaChunk.getMetaFields();
+        }
+
+        /**
+         *
+         * @return
+         * @throws IOException
+         */
+        public DataLoader build() throws IOException {
+            return new DataLoader(dataSetName, tableSchema, outputDir,
+                    config.createTupleReader(dataFile),
+                    config.createTupleParser(tableSchema),
+                    getMetaFields(dimensionFile, tableSchema), config.getChunkSize(), config.getCubletSize());
+        }
+    }
 }

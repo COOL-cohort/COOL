@@ -4,11 +4,15 @@
 
 # product
 target/
+*/target/
 out/
 dependency-reduced-pom.xml
 
 # test
 test/
+dependency-reduced-pom.xml
+*/dependency-reduced-pom.xml
+*/*/dependency-reduced-pom.xml
 
 .DS_Store
 NOTICE

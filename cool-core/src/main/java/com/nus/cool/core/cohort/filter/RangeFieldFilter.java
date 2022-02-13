@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -24,6 +22,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
+import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.util.ArrayUtil;
@@ -156,4 +155,20 @@ public class RangeFieldFilter implements FieldFilter {
       }
     return values;
   }
+
+  @Override
+  public ExtendedFieldSet getFieldSet() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void updateValues(Double v) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int nextAcceptTuple(int start, int to) {
+    throw new UnsupportedOperationException();
+  }
+
 }
