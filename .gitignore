@@ -14,5 +14,9 @@ dependency-reduced-pom.xml
 */dependency-reduced-pom.xml
 */*/dependency-reduced-pom.xml
 
+*.iml
+*/*.iml
+*/*/*.iml
+
 .DS_Store
 NOTICE
