@@ -140,6 +140,13 @@ Partial results for the second query on the `health` dataset is as follows
   ...
 ```
 
+
+### HOW TO RUN WITH A SERVER
+We can start a server with the following command
+```
+java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar
+```
+
 ## Publication
 * Z. Xie, H. Ying, C. Yue, M. Zhang, G. Chen, B. C. Ooi. [Cool: a COhort OnLine analytical processing system](https://www.comp.nus.edu.sg/~ooibc/icde20cool.pdf) IEEE International Conference on Data Engineering, 2020
 * Q. Cai, Z. Xie, M. Zhang, G. Chen, H.V. Jagadish and B.C. Ooi. [Effective Temporal Dependence Discovery in Time Series Data](http://www.comp.nus.edu.sg/~ooibc/cohana18.pdf) ACM International Conference on Very Large Data Bases (VLDB), 2018
