@@ -16,6 +16,7 @@
 
     <modules>
         <module>parquet-extensions</module>
+        <module>hdfs-extensions</module>
     </modules>
 
     <dependencies>
