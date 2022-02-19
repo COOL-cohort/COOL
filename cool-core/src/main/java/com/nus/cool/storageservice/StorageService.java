@@ -6,7 +6,8 @@ import java.nio.file.Path;
  * Storage Service defines external file storage services 
  *  that can be connected to COOL for loading and storing data.
  * 
- * This allows offloading the responsibility of availability, persistence, fault tolerance of data to the storage service.  
+ * This allows offloading the responsibility of availability,
+ *  persistence, fault tolerance of data to the storage service.  
  */
 public interface StorageService {
 
