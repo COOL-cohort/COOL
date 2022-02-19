@@ -43,7 +43,6 @@ public class HdfsStorageServiceIntegrationTest {
         Assert.fail(status.getMsg());
       }
     } catch (IOException | URISyntaxException e) {
-      e.printStackTrace();
       Assert.fail("Failed to connect to to hdfs service" + 
         "at local host port 20131\n");
     }
