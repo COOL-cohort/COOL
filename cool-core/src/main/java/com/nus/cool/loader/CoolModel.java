@@ -72,7 +72,7 @@ public class CoolModel implements Closeable {
     // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
       if (!cubeRoot.exists()) {
-          throw new FileNotFoundException(cube + " was not found");
+        throw new FileNotFoundException("[x] Cube " + cube + " was not found");
       }
     
     // Read schema information
@@ -118,8 +118,13 @@ public class CoolModel implements Closeable {
   /**
    * Retrive a cube by name
    */
-  public synchronized CubeRS getCube(String cube) {
-    return this.metaStore.get(cube);
+  public synchronized CubeRS getCube(String cube) throws IOException{
+    CubeRS out = this.metaStore.get(cube);
+    if(out == null){
+      throw new IOException("[*] Cube " + cube + " is not found in the system. Please reload it.");
+    }
+    else
+      return out;
   }
 
   public void loadCohorts(String inputCohorts, String dataPath) throws IOException {

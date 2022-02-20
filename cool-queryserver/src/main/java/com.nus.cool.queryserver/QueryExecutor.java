@@ -32,13 +32,9 @@ import java.util.List;
 import java.util.Map;
 
 public class QueryExecutor {
+    public QueryExecutor(){}
 
-    public List<Integer> selectCohortUsers(CubeRS cube,
-                                                InputVector users,
-                                                ExtendedCohortQuery query) throws IOException {
-        if (cube == null)
-            throw new IOException("data source is null");
-
+    public List<Integer> selectCohortUsers(CubeRS cube, InputVector users, ExtendedCohortQuery query) throws IOException {
         List<CubletRS> cublets = cube.getCublets();
         TableSchema tableSchema = cube.getSchema();
         List<Integer> userList = new ArrayList<>();
@@ -55,17 +51,12 @@ public class QueryExecutor {
                     gamma.process(dataChunk);
                 }
             }
-
             userList.addAll((List<Integer>)gamma.getCubletResults());
         }
-
         return userList;
     }
 
-
-    public void createCohort(ExtendedCohortQuery query,
-                                    List<Integer> users,
-                                    String outPath) throws IOException {
+    public void createCohort(ExtendedCohortQuery query, List<Integer> users, String outPath) throws IOException {
 
         String cohortName = query.getOutputCohort();
         File cohort = new File(new File(outPath), cohortName);
@@ -108,7 +99,7 @@ public class QueryExecutor {
         List<CubletRS> cublets = cube.getCublets();
         TableSchema tableSchema = cube.getTableSchema();
         List<ExtendedResultTuple> resultSet = new ArrayList<>();
-
+        System.out.println(users.size());
         for (CubletRS cubletRS : cublets) {
             MetaChunkRS metaChunk = cubletRS.getMetaChunk();
             ExtendedCohortSelection sigma = new ExtendedCohortSelection();
@@ -192,7 +183,7 @@ public class QueryExecutor {
                 }
             }
         }
-
+        System.out.println(resultSet);
         return resultSet;
     }
 

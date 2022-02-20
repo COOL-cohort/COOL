@@ -43,7 +43,6 @@ public class QueryServer implements Runnable {
             this.model = new QueryServerModel(this.datasetPath);
             Server httpServer = createJettyServer(8080, 100, new QueryServerController(this.model));
             httpServer.start();
-            System.out.println(httpServer);
             httpServer.join();
 //            while (!httpServer.isRunning())
 //                Thread.sleep(100);
