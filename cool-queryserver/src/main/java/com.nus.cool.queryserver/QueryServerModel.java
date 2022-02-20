@@ -64,6 +64,7 @@ public class QueryServerModel {
                 throw new IOException("[x] Invalid cohort query.");
 
             String inputSource = query.getDataSource();
+            this.coolModel.reload(inputSource);
             CubeRS inputCube = this.coolModel.getCube(inputSource);
             String inputCohort = query.getInputCohort();
             if (inputCohort != null) {

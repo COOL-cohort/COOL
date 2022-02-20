@@ -32,9 +32,18 @@ public class QueryServer implements Runnable {
 
     private QueryServerModel model;
 
-    private String datasetPath = "test/";
+    private String datasetPath;
 
-    public QueryServer(){}
+    public QueryServer(String path){
+        this.datasetPath = path;
+        File root = new File(this.datasetPath);
+        if(!root.exists()){
+            root.mkdir();
+            System.out.println("[*] Dataset source folder " + path + " is created.");
+        } else {
+            System.out.println("[*] Dataset source folder " + path + " exists.");
+        }
+    }
 
     @Override
     public void run() {
@@ -120,7 +129,7 @@ public class QueryServer implements Runnable {
 //    }
 
     public static void main(String[] args) throws Exception {
-        QueryServer qserver = new QueryServer();
+        QueryServer qserver = new QueryServer(args[0]);
         qserver.start();
         qserver.waitForStart();
         qserver.join();

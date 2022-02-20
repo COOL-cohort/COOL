@@ -21,11 +21,11 @@ We have provided an example for each of the three yaml documents in sogamo direc
 
 Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found under [cool-examples/load-csv](cool-examples/load-csv/src/main/java/com/nus/cool/example/Main.java).
 ```
-$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv ./test
+$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv ./datasetSource
 ```
 Alternatively, the same data is also in parquet format under the same folder and can be loaded using the data loader with sample code under [cool-examples/load-parquet](cool-examples/load-parquet/src/main/java/com/nus/cool/example/Main.java).
 ```
-$ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.parquet ./test
+$ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.parquet ./datasetSource
 ```
 The five arguments in the command have the following meaning:
 1. a unique dataset name given under the output directory
@@ -34,19 +34,19 @@ The five arguments in the command have the following meaning:
 4. the dataset file (the first required source)
 5. the output directory for the compacted dataset
 
-Then, there will be a cube generated under the `test` directory, which is named `sogamo`.
+Then, there will be a cube generated under the `datasetSource` directory, which is named `sogamo`.
 
 Besides, we also provide another example for the `health` dataset.
 ```
-$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar health health/table.yaml health/dim.csv health/raw.csv ./test
+$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar health health/table.yaml health/dim.csv health/raw.csv ./datasetSource
 ```
 
 ### HOW TO RUN - COHORT QUERY
 We have given an example for cohort query processing in [CohortLoader.java](cool-core/src/main/java/com/nus/cool/loader/CohortLoader.java).
 
-Execute sample query on the generated `sogamo` cube under test local repository
+Then, we provide a sample query on the generated `sogamo` cube under the local repository `datasetSource`
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader test sogamo sogamo/query0.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader datasetSource sogamo sogamo/query0.json
 ```
 where the three arguments are as follows:
 1. `test`: the output directory for the compacted dataset
@@ -90,13 +90,13 @@ Besides, we also provide extended cohort queries for the `health` dataset, and w
 
 In the first type, we first create specialized cohorts and then execute the designed cohort query on the selected cohort.
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator test health health/query1-0.json
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query1-1.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator datasetSource health health/query1-0.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader datasetSource health health/query1-1.json
 ```
 
 In the second type, we directly execute the designed cohort query on all users.
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader test health health/query2.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader datasetSource health health/query2.json
 ```
 
 Partial results for the second query on the `health` dataset is as follows
@@ -142,10 +142,23 @@ Partial results for the second query on the `health` dataset is as follows
 
 
 ### HOW TO RUN WITH A SERVER
-We can start a server with the following command
+We can start the COOL's query server with the following command
 ```
-java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar
+java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar datasetSource
 ```
+where the argument is as follows:
+1. `datasetSource`: the path to the directory for the compacted dataset. 
+
+In this server, we implement many APIs and list their corresponding urls as follows:
+- \[server]:v1
+  - List all workable urls
+- \[server]:v1/reload?cube=[cube_name]
+  - Reload the cube
+- \[server]:v1/cohort/create 
+  - Create Cohorts
+- \[server]:v1/cohort/analysis
+  - Perform cohort analysis
+
 
 ## Publication
 * Z. Xie, H. Ying, C. Yue, M. Zhang, G. Chen, B. C. Ooi. [Cool: a COhort OnLine analytical processing system](https://www.comp.nus.edu.sg/~ooibc/icde20cool.pdf) IEEE International Conference on Data Engineering, 2020

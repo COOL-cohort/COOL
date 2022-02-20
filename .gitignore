@@ -1,15 +1,11 @@
 # idea
 .idea/
-*.iml
 
 # product
 target/
 */target/
+*/*/target/
 out/
-dependency-reduced-pom.xml
-
-# test
-test/
 dependency-reduced-pom.xml
 */dependency-reduced-pom.xml
 */*/dependency-reduced-pom.xml
@@ -17,6 +13,9 @@ dependency-reduced-pom.xml
 *.iml
 */*.iml
 */*/*.iml
+
+# dataset source files
+datasetSource/
 
 .DS_Store
 NOTICE

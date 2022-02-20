@@ -35,7 +35,10 @@ public class QueryServerController {
 		String text = "This is the backend for the COOL system.\n";
 		text += "COOL system is a cohort OLAP system specialized for cohort analysis with extremely low latency.\n";
 		text += "Workkable urls: \n";
+		text += " - [server]:v1\n";
 		text += " - [server]:v1/reload?cube=[cube_name]\n";
+		text += " - [server]:v1/cohort/create\n";
+		text += " - [server]:v1/cohort/analysis\n";
 		return text;
 	}
 
