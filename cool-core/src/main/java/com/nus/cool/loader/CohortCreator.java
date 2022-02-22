@@ -45,12 +45,12 @@ import java.util.List;
 public class CohortCreator {
 
     public static void main(String[] args) throws IOException {
-        String testPath = args[0];
-        String dataPath = args[1];
+        String datasetPath = args[0];
+        String appPath = args[1];
         String queryPath = args[2];
 
-        CoolModel coolModel = new CoolModel(testPath);
-        coolModel.reload(dataPath);
+        CoolModel coolModel = new CoolModel(datasetPath);
+        coolModel.reload(appPath);
 
         // cohort query from json
         ObjectMapper mapper = new ObjectMapper();
@@ -61,7 +61,7 @@ public class CohortCreator {
         System.out.println(" ------  checking query info done ------ ");
 
         String cohort = query.getOutputCohort();
-        File cohortFile = new File(testPath+"/"+dataPath, cohort);
+        File cohortFile = new File(datasetPath +"/"+appPath, cohort);
         if (cohortFile.exists()){
             cohortFile.delete();
             System.out.println("Cohort  " + cohort + " exists and is deleted!");
@@ -73,7 +73,7 @@ public class CohortCreator {
 
         // materialize to a cohort store
         try {
-            createCohort(query, (List<Integer>) result.getResult(), testPath+"/"+dataPath);
+            createCohort(query, (List<Integer>) result.getResult(), datasetPath +"/"+appPath);
 
         } catch (IOException e) {
             throw new IOException();
@@ -110,12 +110,14 @@ public class CohortCreator {
     }
 
 
-    public static void createCohort(ExtendedCohortQuery query,
-                                          List<Integer> users,
-                                          String testPath) throws IOException {
-
+    public static void createCohort(ExtendedCohortQuery query, List<Integer> users, String outPath) throws IOException {
         String cohortName = query.getOutputCohort();
-        File cohort = new File(new File(testPath), cohortName);
+        File cohort_root = new File(outPath + "/cohort");
+        if(!cohort_root.exists()){
+            cohort_root.mkdir();
+            System.out.println("[*] Cohort Fold " + outPath + "/cohort is created.");
+        }
+        File cohort = new File(cohort_root, cohortName);
 
         cohort.createNewFile();
 

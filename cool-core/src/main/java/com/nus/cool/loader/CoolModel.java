@@ -29,10 +29,7 @@ import com.nus.cool.core.schema.TableSchema;
 
 import java.io.*;
 import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * CoolModel is a higher level abstraction of cubes for data. CoolModel can load
@@ -127,8 +124,8 @@ public class CoolModel implements Closeable {
       return out;
   }
 
-  public void loadCohorts(String inputCohorts, String dataPath) throws IOException {
-    File cohortFile = new File(dataPath,inputCohorts);
+  public synchronized void loadCohorts(String inputCohorts, String dataPath) throws IOException {
+    File cohortFile = new File(dataPath+"/cohort/"+inputCohorts);
     System.out.println("Cohort File: " + cohortFile + ". It exists:" + cohortFile.exists());
     CohortRS store = CohortRS.load(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
     this.cohortStore.put(cohortFile.getName(), store);
