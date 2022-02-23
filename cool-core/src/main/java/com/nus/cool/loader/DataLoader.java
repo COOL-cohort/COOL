@@ -157,8 +157,7 @@ public class DataLoader {
         int tuples = 0;
         ChunkWS chunk = ChunkWS.newChunk(tableSchema, metaFields, offset);
         while (reader.hasNext()) {
-            String line = (String) reader.next();
-            String[] tuple = parser.parse(line);
+            String[] tuple = parser.parse(reader.next());
             String curUser = tuple[userKeyIndex];
             if (lastUser == null) {
                 lastUser = curUser;

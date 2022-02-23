@@ -65,7 +65,7 @@ public class ParquetTupleReader implements TupleReader {
    * @return the original line
    */
   @Override
-  public Object next() throws IOException{
+  public Object next() throws IOException {
     String old = this.record.orElse("");
     this.record = converter.convert(Optional.ofNullable(this.reader.read()));
     return old;

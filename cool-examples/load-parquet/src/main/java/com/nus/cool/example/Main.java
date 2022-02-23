@@ -40,7 +40,6 @@ public class Main {
    * @param args there are five arguments. List in input order
    *  (1) output cube name: to be specified when loading from the repository
    *  (2) table.yaml (3) dimension.csv (4) data.csv (5) output cube repository 
-   *  (6) chunkSize(Int) number of tuples in a chunk
    * @throws IOException
    */
   public static void main(String[] args) {
@@ -48,10 +47,8 @@ public class Main {
     String schemaFileName = args[1];
     File schemaFile = new File(schemaFileName);
     File dimensionFile = new File(args[2]);
-    // we create a sample parquet with the first three record from sogamo
     try {
       File dataFile = new File(args[3]);
-      // File dataFile = new File("tmp/parquet-sample-data/test.parquet");
       String cubeRepo = args[4];
       TableSchema schema = TableSchema.read(
         new FileInputStream(schemaFile));
