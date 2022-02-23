@@ -4,7 +4,7 @@ COOL is an online cohort analytical processing system that supports various type
 The objective of COOL is to provide high performance (near real-time) analytical response for emerging data warehouse domain.
 
 ### BUILD
-Simply run `mvn package`
+Simply run `mvn clean package`
 
 ### BEFORE QUERY
 Required sources:
@@ -154,6 +154,10 @@ In this server, we implement many APIs and list their corresponding urls as foll
   - List all workable urls
 - \[server]:v1/reload?cube=[cube_name]
   - Reload the cube
+- \[server]:v1/list
+  - List existing cubes
+- \[server]:v1/cohort/list?cube=[cube_name]
+  - List all cohorts from the selected cube
 - \[server]:v1/cohort/create 
   - Create Cohorts
 - \[server]:v1/cohort/analysis

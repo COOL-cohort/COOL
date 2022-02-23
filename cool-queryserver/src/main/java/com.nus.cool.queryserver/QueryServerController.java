@@ -37,6 +37,8 @@ public class QueryServerController {
 		text += "Workkable urls: \n";
 		text += " - [server]:v1\n";
 		text += " - [server]:v1/reload?cube=[cube_name]\n";
+		text += " - [server]:v1/list\n";
+		text += " - [server]:v1/cohort/list?cube=[cube_name]\n";
 		text += " - [server]:v1/cohort/create\n";
 		text += " - [server]:v1/cohort/analysis\n";
 		return text;
@@ -49,6 +51,26 @@ public class QueryServerController {
 		getTimeClock();
 		System.out.println("[*] Server is reloading the cube: " + cube );
 		Response res = qsModel.reloadCube(cube);
+		return res;
+	}
+
+	@Path("list")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listCubes() throws IOException {
+		getTimeClock();
+		System.out.println("[*] Server is listing all cohorts.");
+		Response res = qsModel.listCubes();
+		return res;
+	}
+
+	@Path("cohort/list")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response listCohorts(@QueryParam("cube") String cube) throws IOException {
+		getTimeClock();
+		System.out.println("[*] Server is listing all cohorts.");
+		Response res = qsModel.listCohorts(cube);
 		return res;
 	}
 

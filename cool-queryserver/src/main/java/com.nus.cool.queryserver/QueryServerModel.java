@@ -80,4 +80,12 @@ public class QueryServerModel {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
+
+    public Response listCubes() {
+        return Response.ok().entity(this.coolModel.listCubes()).build();
+    }
+
+    public Response listCohorts(String cube) {
+        return Response.ok().entity(this.coolModel.listCohorts(cube)).build();
+    }
 }

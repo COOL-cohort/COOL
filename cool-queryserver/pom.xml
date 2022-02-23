@@ -8,7 +8,7 @@
         <groupId>org.nus</groupId>
         <artifactId>cool</artifactId>
         <version>0.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>cool-queryserver</artifactId>
