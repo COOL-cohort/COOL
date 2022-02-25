@@ -101,13 +101,11 @@ public class DataLoader {
      * @throws IOException
      */
     private DataOutputStream newCublet() throws IOException  {
-        File cublet = new File(outputDir,
-                dataSetName + Long.toHexString(System.currentTimeMillis())
-                        + ".dz");
-        DataOutputStream out = new DataOutputStream(
-                new FileOutputStream(cublet));
-        offset = new MetaChunkWS(tableSchema, 0, metaFields)
-                .writeTo(out);
+        String file_name = Long.toHexString(System.currentTimeMillis()) + ".dz";
+        System.out.println("[*] A new cublet "+ file_name + " is created!");
+        File cublet = new File(outputDir, file_name);
+        DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));
+        offset = new MetaChunkWS(tableSchema, 0, metaFields).writeTo(out);
         chunkOffsets.clear();
         chunkOffsets.add(offset - Ints.BYTES);
         return out;
@@ -209,9 +207,7 @@ public class DataLoader {
         @NonNull
         private final DataLoaderConfig config;
 
-        private MetaFieldWS[] getMetaFields(File inputMetaFile,
-                                            TableSchema schema)
-                throws IOException {
+        private MetaFieldWS[] getMetaFields(File inputMetaFile, TableSchema schema) throws IOException {
             TupleParser parser = new CsvTupleParser();
             MetaChunkWS metaChunk = MetaChunkWS.newMetaChunkWS(schema, 0);
             try (TupleReader reader = new LineTupleReader(inputMetaFile)) {
