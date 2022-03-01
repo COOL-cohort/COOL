@@ -153,8 +153,7 @@ public class DataLoader {
 
         // store the dataset file into cool native format
         while (reader.hasNext()) {
-            String line = (String) reader.next();
-            String[] tuple = parser.parse(line);
+            String[] tuple = parser.parse(reader.next());
             String curUser = tuple[userKeyIndex];
             if (lastUser == null) {
                 lastUser = curUser;

@@ -49,7 +49,7 @@ Then, we provide a sample query on the generated `sogamo` cube under the local r
 $ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortLoader datasetSource sogamo sogamo/query0.json
 ```
 where the three arguments are as follows:
-1. `test`: the output directory for the compacted dataset
+1. `datasetSource`: the output directory for the compacted dataset
 2. `sogamo`: the cube name of the compacted dataset
 3. `sogamo/query0.json`: the json file for the cohort query
 
@@ -140,7 +140,6 @@ Partial results for the second query on the `health` dataset is as follows
   ...
 ```
 
-
 ### HOW TO RUN WITH A SERVER
 We can start the COOL's query server with the following command
 ```
@@ -163,6 +162,9 @@ In this server, we implement many APIs and list their corresponding urls as foll
 - \[server]:v1/cohort/analysis
   - Perform cohort analysis
 
+
+### CONNECT TO EXTERNAL STORAGE SERVICES
+COOL has an [StorageService](cool-core/src/main/java/com/nus/cool/storageservice/StorageService.java) interface, which will allow COOL standalone server/workers (coming soon) to handle data movement between local and an external storage service. A sample implementation for HDFS connection can be found under the [hdfs-extensions](cool-extensions/hdfs-extensions/).
 
 ## Publication
 * Z. Xie, H. Ying, C. Yue, M. Zhang, G. Chen, B. C. Ooi. [Cool: a COhort OnLine analytical processing system](https://www.comp.nus.edu.sg/~ooibc/icde20cool.pdf) IEEE International Conference on Data Engineering, 2020

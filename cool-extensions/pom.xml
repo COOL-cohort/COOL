@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.nus</groupId>
+        <groupId>com.nus</groupId>
         <artifactId>cool</artifactId>
         <version>0.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
@@ -16,11 +16,12 @@
 
     <modules>
         <module>parquet-extensions</module>
+        <module>hdfs-extensions</module>
     </modules>
 
     <dependencies>
         <dependency>
-          <groupId>org.nus</groupId>
+          <groupId>com.nus</groupId>
           <artifactId>cool-core</artifactId>
           <version>${project.parent.version}</version>
         </dependency>

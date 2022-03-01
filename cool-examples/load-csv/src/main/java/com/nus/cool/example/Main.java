@@ -39,7 +39,6 @@ public class Main {
    * @param args there are five arguments. List in input order
    *  (1) output cube name: to be specified when loading from the repository
    *  (2) table.yaml (3) dimension.csv (4) data.csv (5) output cube repository 
-   *  (6) chunkSize(Int) number of tuples in a chunk
    * @throws IOException
    */
   public static void main(String[] args) {
