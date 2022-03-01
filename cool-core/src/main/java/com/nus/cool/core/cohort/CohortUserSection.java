@@ -154,7 +154,7 @@ public class CohortUserSection implements CohortOperator {
 			}
 			
 			int uid = userKey.get(userBlock.value);
-			cubletResults.add(uid);
+            cubletResults.add(uid);
 		}
 
 		if (totalCorruptedUsers > 0)

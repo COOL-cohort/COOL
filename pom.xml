@@ -17,6 +17,7 @@
         <module>cool-core</module>
         <module>cool-extensions</module>
         <module>cool-examples</module>
+        <module>cool-queryserver</module>
     </modules>
 
 

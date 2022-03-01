@@ -101,13 +101,11 @@ public class DataLoader {
      * @throws IOException
      */
     private DataOutputStream newCublet() throws IOException  {
-        File cublet = new File(outputDir,
-                dataSetName + Long.toHexString(System.currentTimeMillis())
-                        + ".dz");
-        DataOutputStream out = new DataOutputStream(
-                new FileOutputStream(cublet));
-        offset = new MetaChunkWS(tableSchema, 0, metaFields)
-                .writeTo(out);
+        String file_name = Long.toHexString(System.currentTimeMillis()) + ".dz";
+        System.out.println("[*] A new cublet "+ file_name + " is created!");
+        File cublet = new File(outputDir, file_name);
+        DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));
+        offset = new MetaChunkWS(tableSchema, 0, metaFields).writeTo(out);
         chunkOffsets.clear();
         chunkOffsets.add(offset - Ints.BYTES);
         return out;
@@ -135,14 +133,9 @@ public class DataLoader {
      * @return a new chunk to write data
      * @throws IOException
      */
-    private ChunkWS switchChunk(DataOutputStream out, ChunkWS chunk)
-            throws IOException {
+    private ChunkWS switchChunk(DataOutputStream out, ChunkWS chunk) throws IOException {
         offset += chunk.writeTo(out);
         chunkOffsets.add(offset - Ints.BYTES);
-        if (offset >= cubletSize) {
-            closeCublet(out);
-            out = newCublet();
-        }
         return ChunkWS.newChunk(tableSchema, metaFields, offset);
     }
 
@@ -151,11 +144,14 @@ public class DataLoader {
      * @throws IOException
      */
     public void load() throws IOException {
+        // create a new cube file
         DataOutputStream out = newCublet();
         int userKeyIndex = tableSchema.getUserKeyField();
         String lastUser = null;
         int tuples = 0;
         ChunkWS chunk = ChunkWS.newChunk(tableSchema, metaFields, offset);
+
+        // store the dataset file into cool native format
         while (reader.hasNext()) {
             String[] tuple = parser.parse(reader.next());
             String curUser = tuple[userKeyIndex];
@@ -164,6 +160,11 @@ public class DataLoader {
             }
             if ((!curUser.equals(lastUser)) && (tuples >= chunkSize)) {
                 chunk = switchChunk(out, chunk);
+                // When a cublet is full, create another one
+                if (offset >= cubletSize) {
+                    closeCublet(out);
+                    out = newCublet();
+                }
                 tuples = 0;
             }
             lastUser = curUser;
@@ -208,9 +209,7 @@ public class DataLoader {
         @NonNull
         private final DataLoaderConfig config;
 
-        private MetaFieldWS[] getMetaFields(File inputMetaFile,
-                                            TableSchema schema)
-                throws IOException {
+        private MetaFieldWS[] getMetaFields(File inputMetaFile, TableSchema schema) throws IOException {
             TupleParser parser = new CsvTupleParser();
             MetaChunkWS metaChunk = MetaChunkWS.newMetaChunkWS(schema, 0);
             try (TupleReader reader = new LineTupleReader(inputMetaFile)) {

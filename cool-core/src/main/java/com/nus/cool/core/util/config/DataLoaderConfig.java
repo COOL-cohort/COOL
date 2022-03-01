@@ -25,6 +25,7 @@ public abstract class DataLoaderConfig {
   public final long cubletSize; 
 
   public DataLoaderConfig() {
+    // unit: Byte
     this.chunkSize = 65536;
     this.cubletSize = 1 << 30;
   }

@@ -65,12 +65,12 @@ public class CohortLoader {
    */
   public static void main(String[] args) throws IOException {
 
-    String testPath = args[0];
-    String dataPath = args[1];
+    String datasetPath = args[0];
+    String appPath = args[1];
     String queryPath = args[2];
 
-    CoolModel coolModel = new CoolModel(testPath);
-    coolModel.reload(dataPath);
+    CoolModel coolModel = new CoolModel(datasetPath);
+    coolModel.reload(appPath);
 
     // cohort query from json
     ObjectMapper mapper = new ObjectMapper();
@@ -83,7 +83,7 @@ public class CohortLoader {
     // Load cubes from outsource, which is output of previous query if any
     Map<String, DataOutputStream> outSourceMap = Maps.newHashMap();
     if (query.getOutSource() != null) {
-      File root = new File(dataPath, query.getOutSource());
+      File root = new File(appPath, query.getOutSource());
       File[] versions = root.listFiles(File::isDirectory);
       if (versions != null) {
         // for each directory

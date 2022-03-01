@@ -96,8 +96,7 @@ public class ChunkWS implements Output {
         case UserKey:
         case Action:
         case Segment:
-          fields[i] = new HashFieldWS(fieldType, i, metaFields[i], compressor,
-              fieldSchema.isPreCal());
+          fields[i] = new HashFieldWS(fieldType, i, metaFields[i], compressor, fieldSchema.isPreCal());
           break;
         case ActionTime:
         case Metric:

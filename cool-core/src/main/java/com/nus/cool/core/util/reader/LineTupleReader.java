@@ -25,10 +25,6 @@ import java.io.IOException;
 
 /**
  * Read line as tuple from source
- *
- * @author zhongle
- * @version 0.1
- * @since 0.1
  */
 
 /**

@@ -96,7 +96,7 @@ public class TableSchema {
     return read(new FileInputStream(inputFile));
   }
   
-  // Update the fields according to the input data
+  // Automatically update the fields according to the input data
   public void setFields(List<FieldSchema> fields) {
     this.fields = fields;
     this.name2Id.clear();

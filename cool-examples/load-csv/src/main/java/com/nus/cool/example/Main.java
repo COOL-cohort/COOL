@@ -49,8 +49,7 @@ public class Main {
     File dataFile = new File(args[3]);
     String cubeRepo = args[4];
     try {
-      TableSchema schema = TableSchema.read(
-        new FileInputStream(schemaFile));
+      TableSchema schema = TableSchema.read( new FileInputStream(schemaFile));
       Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v1"); 
       Files.createDirectories(outputCubeVersionDir);
       File outputDir = outputCubeVersionDir.toFile();

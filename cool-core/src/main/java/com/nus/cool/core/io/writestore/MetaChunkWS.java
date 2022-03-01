@@ -81,6 +81,8 @@ public class MetaChunkWS implements Output {
   public static MetaChunkWS newMetaChunkWS(TableSchema schema, int offset) {
     OutputCompressor compressor = new OutputCompressor();
     Charset charset = Charset.forName(schema.getCharset());
+
+    // n: it denotes the number of columns
     int n = schema.getFields().size();
     MetaFieldWS[] metaFields = new MetaFieldWS[n];
     for (int i = 0; i < metaFields.length; i++) {

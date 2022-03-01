@@ -48,8 +48,10 @@ public class ExtendedCohortSelection implements Operator {
 
 	private final List<Map<String, FieldFilter>> birthAggFilters = new ArrayList<>();
 
+	// Record the minimal time frequencies of birth events
 	private int[] minTriggerTime;
 
+	// Record the maximal time frequencies of birth events
 	private int[] maxTriggerTime;
 
 	private final Map<String, FieldFilter> ageFilters = new HashMap<>();
@@ -98,16 +100,14 @@ public class ExtendedCohortSelection implements Operator {
 				String fn = fs.getCubeField();
 				FieldSchema schema = tableSchema.getField(fn);
 //				checkArgument(schema.getDataType() != OutputCompressor.DataType.Aggregate);
-				filters.put(fn,
-						FieldFilterFactory.create(schema, fs, fs.getFieldValue().getValues()));
+				filters.put(fn, FieldFilterFactory.create(schema, fs, fs.getFieldValue().getValues()));
 			}
 
 			// handle aggregate selection filters
 			for (ExtendedFieldSet fs : e.getAggrSelection()) {
 				String fn = fs.getCubeField();
 				FieldSchema schema = tableSchema.getField(fn);
-				aggrFilters.put(fn,
-						FieldFilterFactory.create(schema, fs, fs.getFieldValue().getValues()));
+				aggrFilters.put(fn, FieldFilterFactory.create(schema, fs, fs.getFieldValue().getValues()));
 			}
 
 			this.birthFilters.add(filters);
@@ -202,12 +202,6 @@ public class ExtendedCohortSelection implements Operator {
 		this.maxDate = TimeUtils.getDate(
 				metaChunk.getMetaField(tableSchema.getActionTimeField(), FieldType.ActionTime).getMaxValue());
 	}
-
-//	@Override
-//	public boolean isCohortsInCublet() {
-//		// TODO Auto-generated method stub
-//		return true;
-//	}
 
 	@Override
 	public void process(ChunkRS chunk) {

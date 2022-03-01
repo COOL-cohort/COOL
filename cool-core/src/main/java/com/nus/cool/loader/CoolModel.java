@@ -29,10 +29,7 @@ import com.nus.cool.core.schema.TableSchema;
 
 import java.io.*;
 import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * CoolModel is a higher level abstraction of cubes for data. CoolModel can load
@@ -51,7 +48,7 @@ public class CoolModel implements Closeable {
 
   /**
    * Create a CoolModel to manage a cube repository
-   * 
+   *
    * @param path the repository directory
    */
   public CoolModel(String path) {
@@ -60,7 +57,7 @@ public class CoolModel implements Closeable {
 
   /**
    * Load a cube (a set of cube files) from the repository into memory
-   * 
+   *
    * @param cube the cube name
    * @throws IOException
    */
@@ -68,13 +65,13 @@ public class CoolModel implements Closeable {
     // Remove the old version of the cube
     this.metaStore.remove(cube);
     this.cohortStore.clear();
-    
+
     // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
       if (!cubeRoot.exists()) {
-          throw new FileNotFoundException(cube + " was not found");
+        throw new FileNotFoundException("[x] Cube " + cube + " was not found");
       }
-    
+
     // Read schema information
     TableSchema schema = TableSchema.read(new FileInputStream(new File(cubeRoot, "table.yaml")));
     CubeRS cubeRS = new CubeRS(schema);
@@ -100,7 +97,7 @@ public class CoolModel implements Closeable {
     });
     System.out.println("Cube " + cube + ", versions: " + Arrays.toString(versions));
     System.out.println("Cube " + cube + ", Use version: " + currentVersion.getName());
-    
+
     // Load all cubes under latest version
     checkNotNull(cubletFiles);
       for (File cubletFile : cubletFiles) {
@@ -118,12 +115,26 @@ public class CoolModel implements Closeable {
   /**
    * Retrive a cube by name
    */
-  public synchronized CubeRS getCube(String cube) {
-    return this.metaStore.get(cube);
+  public synchronized CubeRS getCube(String cube) throws IOException{
+    CubeRS out = this.metaStore.get(cube);
+    if(out == null){
+      throw new IOException("[*] Cube " + cube + " is not found in the system. Please reload it.");
+    }
+    else
+      return out;
   }
 
-  public void loadCohorts(String inputCohorts, String dataPath) throws IOException {
-    File cohortFile = new File(dataPath,inputCohorts);
+  public synchronized String[] listCubes() {
+    return this.localRepo.list();
+  }
+
+  public synchronized String[] listCohorts(String cube) {
+    File cube_cohort = new File(new File(this.localRepo,cube), "cohort");
+    return cube_cohort.list();
+  }
+
+  public synchronized void loadCohorts(String inputCohorts, String dataPath) throws IOException {
+    File cohortFile = new File(dataPath+"/cohort/"+inputCohorts);
     System.out.println("Cohort File: " + cohortFile + ". It exists:" + cohortFile.exists());
     CohortRS store = CohortRS.load(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
     this.cohortStore.put(cohortFile.getName(), store);
