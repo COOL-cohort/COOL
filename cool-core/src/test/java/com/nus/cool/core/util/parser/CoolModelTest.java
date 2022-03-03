@@ -8,11 +8,20 @@ import java.io.File;
 public class CoolModelTest {
     @Test
     public void testListFuncs(){
+        System.out.println(System.getProperty("user.dir"));
+        File root = new File("../datasetSource");
+        if(!root.exists()){
+            System.out.println("Repo[../datasetSource] does not exist.");
+            root.mkdir();
+        }
+//        String[] cubes = root.list();
+//        for (String cube : cubes) {
+//            System.out.println(cube);
+//        }
         CoolModel model = new CoolModel("../datasetSource");
-        String[] cubes = model.listCubes();
-//        System.out.println(System.getProperty("user.dir"));
-//        String[] cubes = new File("../datasetSource").list();
-        for (String cube : cubes) {
+        String[] cubes2 = model.listCubes();
+        System.out.println("Applications:");
+        for (String cube : cubes2) {
             System.out.println(cube);
         }
     }

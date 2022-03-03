@@ -1,18 +1,12 @@
 package com.nus.cool.queryserver;
 
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.jetty.JettyHttpContainer;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.jackson.JacksonFeature;
 
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jetty9.InstrumentedConnectionFactory;
 import com.codahale.metrics.jetty9.InstrumentedHandler;
 import com.codahale.metrics.jetty9.InstrumentedQueuedThreadPool;
 
@@ -65,7 +59,7 @@ public class QueryServer implements Runnable {
         }
     }
 
-    public void start() throws Exception {
+    public void start() {
         if (!started.getAndSet(true)) {
             thisThread = new Thread(this);
             thisThread.start();
@@ -104,29 +98,6 @@ public class QueryServer implements Runnable {
         server.setHandler(metricsHandler);
         return server;
     }
-
-
-//    public static void main(String[] args) throws Exception{
-//        Server server = new Server(8080);
-//
-//        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-//        context.setContextPath("/");
-//        server.setHandler(context);
-//
-//        // 配置Servlet
-//        ServletHolder holder = context.addServlet(ServletContainer.class, "/*");
-//        holder.setInitOrder(1);
-//        holder.setInitParameter("jersey.config.server.provider.packages", "com.nus.cool.queryserver");
-//
-//        try {
-//            server.start();
-//            server.join();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            server.destroy();
-//        }
-//    }
 
     public static void main(String[] args) throws Exception {
         QueryServer qserver = new QueryServer(args[0]);
