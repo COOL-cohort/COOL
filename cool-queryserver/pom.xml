@@ -16,7 +16,10 @@
     <properties>
         <junit.version>4.13</junit.version>
         <jersey.version>2.32</jersey.version>
-        <jetty.version>10.0.8</jetty.version>
+        <!--  java 8      -->
+        <jetty.version>9.4.45.v20220203</jetty.version>
+        <!--  java 11      -->
+        <!--<jetty.version>10.0.8</jetty.version>-->
         <jackson.version>2.11.3</jackson.version>
         <metrics.version>4.1.15</metrics.version>
     </properties>

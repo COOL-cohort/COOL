@@ -15,7 +15,7 @@ dependency-reduced-pom.xml
 */*/*.iml
 
 # dataset source files
-datasetSource1/
+datasetSource/
 
 .DS_Store
 NOTICE
