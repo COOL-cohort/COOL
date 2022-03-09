@@ -124,19 +124,19 @@ where the three arguments are as follows:
 2. `health`: the cube name of the compacted dataset
 3. `health/query1-0.json`: the json file for the cohort query
 
-- Executes cohort query on the selected users.
+- Execute cohort query on the selected users.
 
 ```
 $ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader datasetSource health health/query1-1.json
 ```
 
-- Executes cohort query on all the users.
+- Execute cohort query on all the users.
 
 ```
 $ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader datasetSource health health/query2.json
 ```
 
-Partial results for the second type of query on the `health` dataset is as follows
+Partial results for the second type of query on the `health` dataset are as follows
 ```
  {
   "status" : "OK",
