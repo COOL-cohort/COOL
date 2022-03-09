@@ -1,0 +1,18 @@
+{
+ "type": "record",
+ "name": "sogamo_record",
+ "fields": [
+     {"name": "sessionId", "type": "string"},
+     {"name": "playerId",  "type": "string"},
+     {"name": "role", "type": "string"},
+     {"name": "money", "type": "int"},
+     {"name": "event", "type": "string"},
+     {"name": "eventDay", "type": "string"},
+     {"name": "platform", "type": "int"},
+     {"name": "country", "type": "string"},
+     {"name": "continent", "type": "string"},
+     {"name": "city", "type": "string"},
+     {"name": "numSession", "type": "int"},
+     {"name": "sessionLength", "type": "int"}
+ ]
+}

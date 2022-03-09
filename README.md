@@ -27,7 +27,7 @@ With the support of several newly proposed operators on top of a sophisticated s
 3. **Specialized Storage Layout.** A specialized storage layout is designed for fast query processing and reduced space consumption.
 4. **Self-designed Semantics.** There are some novel self-designed semantics for the cohort query, which can simplify its complexity and improve its functionality.
 5. **Flexible Integration.** Flexible integration with other data systems via common data formats(e.g., CSV, Parquet, Avro, and Arrow).
-6. **Artificial Intelligence Model.** To be continued.
+6. **Artificial Intelligence Model.** A new neural network model will be introduced soon.
 
 ### Quickstart
 
@@ -67,7 +67,7 @@ $ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar path
 
 #### Execute queries
 
-We have given an example for cohort query processing in [CohortLoader.java](cool-core/src/main/java/com/nus/cool/loader/CohortLoader.java).
+We provide an example for cohort query processing in [CohortLoader.java](cool-core/src/main/java/com/nus/cool/loader/CohortLoader.java).
 
 There are two types of queries in COOL. The first one includes two steps.
 
@@ -111,7 +111,7 @@ Finally, there will be a cube generated under the `datasetSource` directory, whi
 
 ##### Execute queries
 
-We take the `health` dataset for example in this part.
+We use the `health` dataset for example.
 
 - Select the specific users.
 
@@ -124,19 +124,19 @@ where the three arguments are as follows:
 2. `health`: the cube name of the compacted dataset
 3. `health/query1-0.json`: the json file for the cohort query
 
-- Executes cohort query on the selected users.
+- Execute cohort query on the selected users.
 
 ```
 $ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader datasetSource health health/query1-1.json
 ```
 
-- Executes cohort query on all the users.
+- Execute cohort query on all the users.
 
 ```
 $ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader datasetSource health health/query2.json
 ```
 
-Partial results for the second type of query on the `health` dataset is as follows
+Partial results for the second type of query on the `health` dataset are as follows
 ```
  {
   "status" : "OK",
@@ -178,7 +178,7 @@ Partial results for the second type of query on the `health` dataset is as follo
 ```
 
 ## Publication
-* Z. Xie, H. Ying, C. Yue, M. Zhang, G. Chen, B. C. Ooi. [Cool: a COhort OnLine analytical processing system](https://www.comp.nus.edu.sg/~ooibc/icde20cool.pdf) IEEE International Conference on Data Engineering, 2020
-* Q. Cai, Z. Xie, M. Zhang, G. Chen, H.V. Jagadish and B.C. Ooi. [Effective Temporal Dependence Discovery in Time Series Data](http://www.comp.nus.edu.sg/~ooibc/cohana18.pdf) ACM International Conference on Very Large Data Bases (VLDB), 2018
-* Z. Xie, Q. Cai, F. He, G.Y. Ooi, W. Huang, B.C. Ooi. [Cohort Analysis with Ease](https://dl.acm.org/doi/10.1145/3183713.3193540) SIGMOD Proceedings of the 2018 International Conference on Management of Data
-* D. Jiang, Q. Cai, G. Chen, H. V. Jagadish, B. C. Ooi, K.-L. Tan, and A. K. H. Tung. [Cohort Query Processing](http://www.vldb.org/pvldb/vol10/p1-ooi.pdf) ACM International Conference on Very Large Data Bases (VLDB), 2016
+* Z. Xie, H. Ying, C. Yue, M. Zhang, G. Chen, B. C. Ooi. [Cool: a COhort OnLine analytical processing system](https://www.comp.nus.edu.sg/~ooibc/icde20cool.pdf), in 2020 IEEE 36th International Conference on Data Engineering, pp.577-588, 2020.
+* Q. Cai, Z. Xie, M. Zhang, G. Chen, H.V. Jagadish and B.C. Ooi. [Effective Temporal Dependence Discovery in Time Series Data](http://www.comp.nus.edu.sg/~ooibc/cohana18.pdf), in Proceedings of the VLDB Endowment, 11(8), pp.893-905, 2018.
+* Z. Xie, Q. Cai, F. He, G.Y. Ooi, W. Huang, B.C. Ooi. [Cohort Analysis with Ease](https://dl.acm.org/doi/10.1145/3183713.3193540), in Proceedings of the 2018 International Conference on Management of Data, pp.1737-1740, 2018.
+* D. Jiang, Q. Cai, G. Chen, H. V. Jagadish, B. C. Ooi, K.-L. Tan, and A. K. H. Tung. [Cohort Query Processing](http://www.vldb.org/pvldb/vol10/p1-ooi.pdf), in Proceedings of the VLDB Endowment, 10(1), 2016.

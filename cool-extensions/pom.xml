@@ -16,6 +16,7 @@
         <module>parquet-extensions</module>
         <module>hdfs-extensions</module>
         <module>arrow-extensions</module>
+        <module>avro-extensions</module>
     </modules>
 
     <dependencies>
