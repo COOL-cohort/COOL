@@ -27,7 +27,7 @@ With the support of several newly proposed operators on top of a sophisticated s
 3. **Specialized Storage Layout.** A specialized storage layout is designed for fast query processing and reduced space consumption.
 4. **Self-designed Semantics.** There are some novel self-designed semantics for the cohort query, which can simplify its complexity and improve its functionality.
 5. **Flexible Integration.** Flexible integration with other data systems via common data formats(e.g., CSV, Parquet, Avro, and Arrow).
-6. **Artificial Intelligence Model.** To be continued.
+6. **Artificial Intelligence Model.** A new neural network model will be introduced soon.
 
 ### Quickstart
 
