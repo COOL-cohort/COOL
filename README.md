@@ -67,7 +67,7 @@ $ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar path
 
 #### Execute queries
 
-We have given an example for cohort query processing in [CohortLoader.java](cool-core/src/main/java/com/nus/cool/loader/CohortLoader.java).
+We provide an example for cohort query processing in [CohortLoader.java](cool-core/src/main/java/com/nus/cool/loader/CohortLoader.java).
 
 There are two types of queries in COOL. The first one includes two steps.
 
@@ -111,7 +111,7 @@ Finally, there will be a cube generated under the `datasetSource` directory, whi
 
 ##### Execute queries
 
-We take the `health` dataset for example in this part.
+We use the `health` dataset for example.
 
 - Select the specific users.
 
