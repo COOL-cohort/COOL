@@ -17,7 +17,8 @@
     <modules>
         <module>load-csv</module>
         <module>load-parquet</module>
-    </modules>
+        <module>load-avro</module>
+  </modules>
 
     <dependencies>
         <dependency>
