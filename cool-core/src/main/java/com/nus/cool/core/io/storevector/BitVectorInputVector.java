@@ -27,7 +27,7 @@ public class BitVectorInputVector implements InputVector {
 
   private int[] lookupTable;
 
-  private int[] globalIDs = new int[0];
+  private int[] globalIDs;
 
   private int numOfIDs;
 
@@ -81,6 +81,7 @@ public class BitVectorInputVector implements InputVector {
       this.lookupTable[i] = Long.bitCount(this.words[i - 1]) + this.lookupTable[i - 1];
     }
     this.numOfIDs = this.lookupTable[len - 1] + Long.bitCount(this.words[len - 1]);
+    this.fillInGlobalIDs();
   }
 
   private int wordIndex(int i) {

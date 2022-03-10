@@ -23,10 +23,6 @@ Before query processing, we need to load the dataset into COOL native format. Th
 ```
 $ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv ./datasetSource
 ```
-Alternatively, the same data is also in parquet format under the same folder and can be loaded using the data loader with sample code under [cool-examples/load-parquet](cool-examples/load-parquet/src/main/java/com/nus/cool/example/Main.java).
-```
-$ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.parquet ./datasetSource
-```
 The five arguments in the command have the following meaning:
 1. a unique dataset name given under the output directory
 2. the table.yaml (the third required source)

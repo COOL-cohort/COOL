@@ -106,6 +106,7 @@ public class CohortUserSection implements CohortOperator {
     public void process(ChunkRS chunk) {
         totalDataChunks++;
 
+        // process filters
         sigma.process(chunk);
         if (sigma.isUserActiveChunk() == false) {
             totalSkippedDataChunks++;

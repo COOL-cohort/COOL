@@ -58,9 +58,9 @@ public class ZInt8Store implements InputVector, ZIntStore {
 
   @Override
   public int find(int key) {
-      if (key > Byte.MAX_VALUE || key < 0) {
-          return -1;
-      }
+    if (key > Byte.MAX_VALUE || key < 0) {
+        return -1;
+    }
     return ByteBuffers.binarySearchUnsigned(this.buffer, 0, this.buffer.limit(), (byte) key);
   }
 

@@ -75,7 +75,7 @@ public class RLECompressor implements Compressor {
     buf.put(b);
 
     writeInt(buf, val, ((b >> 4) & 3));
-    writeInt(buf, off, ((b >> 2) & 3));
+     writeInt(buf, off, ((b >> 2) & 3));
     writeInt(buf, len, ((b) & 3));
   }
 

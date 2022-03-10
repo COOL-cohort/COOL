@@ -91,7 +91,7 @@ public class SetFieldFilter implements FieldFilter {
   }
 
   /**
-   * Indicate whether the metafiled is eligible i.e. whether we can find eligible vlaues in the metafield
+   * Indicate whether the metafiled is eligible i.e. whether we can find eligible values in the metafield
    * 
    * @param metaField the metafield to be checked
    * @return false indicates the metafield is not eligible and true indicates the metafield is eligible
@@ -113,7 +113,7 @@ public class SetFieldFilter implements FieldFilter {
   }
 
   /**
-   * Indicate whether the filed is eligible i.e. whether we can find eligible vlaues in the field
+   * Indicate whether the filed is eligible i.e. whether we can find eligible values in the field
    * 
    * @param field the field to be checked
    * @return false indicates the field is not eligible and true indicates the field is eligible

@@ -411,6 +411,7 @@ public class ExtendedCohortSelection implements Operator {
 				}
 
 				if (wlen == 0) {
+					// set the wlen to the maximum day if it is set to 0
 					wlen = maxDate - startDay + 1;
 					endDay = (endDay >= startDay) ? startDay : endDay;
 				}

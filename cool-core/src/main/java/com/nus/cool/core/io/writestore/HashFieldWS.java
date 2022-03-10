@@ -103,7 +103,7 @@ public class HashFieldWS implements FieldWS {
     // Write globalIDs as values for temporary
     this.buffer.writeInt(gId);
     // Set localID as 0 for temporary
-    // It will changed while calling writeTo function
+    // It will be changed while calling writeTo function
     this.idMap.put(gId, 0);
   }
 

@@ -99,7 +99,7 @@ public class RangeMetaFieldWS implements MetaFieldWS {
     int bytesWritten = 0;
     out.writeInt(IntegerUtil.toNativeByteOrder(this.min));
     out.writeInt(IntegerUtil.toNativeByteOrder(this.max));
-    bytesWritten += 2 * Ints.BYTES;
+     bytesWritten += 2 * Ints.BYTES;
     return bytesWritten;
   }
 }
