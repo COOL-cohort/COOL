@@ -266,6 +266,7 @@ public class ExtendedCohortSelection implements Operator {
 		while (true) {
 			for (Map.Entry<String, FieldFilter> entry : birthFilters.get(event).entrySet()) {
 				nextOffset = entry.getValue().nextAcceptTuple(fromOffset, endOffset);
+				// TODO check this logic
 				if (nextOffset > fromOffset) {
 					fromOffset = nextOffset;
 					passed = 1;
@@ -368,7 +369,7 @@ public class ExtendedCohortSelection implements Operator {
 		for (Integer e : sortedEvents) {
 			offset = start;
 			BirthSequence.BirthEvent event = seq.getBirthEvents().get(e);
-
+			// check whether the filed value type is AbsoluteValue
 			for (Map.Entry<String, FieldFilter> entry : birthFilters.get(e).entrySet()) {
 				FieldFilter ageFilter = entry.getValue();
 				ExtendedFieldSet.FieldValue value = entry.getValue().getFieldSet().getFieldValue();
@@ -382,6 +383,7 @@ public class ExtendedCohortSelection implements Operator {
 			BirthSequence.TimeWindow window = event.getTimeWindow();
 			if (window == null) {
 				// no time window
+				// int minCheckTime = (minTriggerTime[e] < maxTriggerTime[e]) ? minTriggerTime[e] : maxTriggerTime[e]+1;
 				for (int i = 0; i < minTriggerTime[e]; i++) {
 					offset = skipToNextQualifiedBirthTuple(e, offset, end);
 					if (offset == end)
@@ -396,6 +398,20 @@ public class ExtendedCohortSelection implements Operator {
 					bday = TimeUtils.getDate(timeVector.get(offset - 1)) + 1;
 
 				birthDay = (birthDay < bday) ? bday : birthDay;
+
+				int count = minTriggerTime[e];
+				while(offset<end){
+					offset = skipToNextQualifiedBirthTuple(e, offset, end);
+					if(offset < end){
+						count += 1;
+						eventOffset.get(e).addLast(offset);
+						offset++;
+						if(count > maxTriggerTime[e]){
+							return -1;
+						}
+					}
+				}
+
 			} else {
 				// with time window
 				int startDay = firstDay;
@@ -457,16 +473,16 @@ public class ExtendedCohortSelection implements Operator {
 			birthOffset = (birthOffset < offset) ? offset : birthOffset;
 		}
 
-		for (Integer e : sortedEvents) {
-			// filter between [start, birthOffset] for birth events
-			// without time window
-			if (seq.getBirthEvents().get(e).getTimeWindow() == null) {
-				offset = (eventOffset.get(e).isEmpty()) ? start : eventOffset.get(e).getLast() + 1;
-				filterEvent(e, offset, birthOffset);
-				if (!checkOccurrence(e))
-					return -1;
-			}
-		}
+//		for (Integer e : sortedEvents) {
+//			// filter between [start, birthOffset] for birth events
+//			// without time window
+//			if (seq.getBirthEvents().get(e).getTimeWindow() == null) {
+//				offset = (eventOffset.get(e).isEmpty()) ? start : eventOffset.get(e).getLast() + 1;
+//				filterEvent(e, offset, birthOffset);
+//				if (!checkOccurrence(e))
+//					return -1;
+//			}
+//		}
 
 		// evaluate birth aggregation filters
 		if (filterByBirthAggregation()) {

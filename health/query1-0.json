@@ -16,13 +16,8 @@
             "filterType":"Set"
           }
         ],
-        "maxTrigger":-1,
-        "minTrigger":1,
-        "timeWindow":{
-          "length":7,
-          "slice":false,
-          "unit":"DAY"
-        }
+        "maxTrigger":2,
+        "minTrigger":2
       }
     ]
   },
