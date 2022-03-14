@@ -65,7 +65,7 @@ public class UnitTest {
         }
     }
 
-    @Test
+    //@Test
     public static void CohortCreateTest() {
         String datasetPath = "../datasetSource";
         String appPath = "health";
@@ -78,8 +78,12 @@ public class UnitTest {
             CoolModel coolModel = new CoolModel(datasetPath);
             coolModel.reload(appPath);
 
-            QueryResult result = CohortCreator.selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
-            System.out.println(" result for query0 is  " + result);
+            CubeRS cube = coolModel.getCube(query.getDataSource());
+
+            QueryResult result = CohortCreator.selectCohortUsers(cube,null, query);
+            System.out.println(" result for query0 is  " + result.getResult());
+            List<String> userIDs = CohortCreator.listCohortUsers(cube, (List<Integer>)result.getResult());
+            System.out.println(" Actual user IDs are  " + userIDs);
         } catch (IOException e){
             System.out.println(e);
             return ;

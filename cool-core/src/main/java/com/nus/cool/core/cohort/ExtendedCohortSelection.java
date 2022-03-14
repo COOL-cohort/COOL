@@ -383,7 +383,7 @@ public class ExtendedCohortSelection implements Operator {
 			BirthSequence.TimeWindow window = event.getTimeWindow();
 			if (window == null) {
 				// no time window
-				// int minCheckTime = (minTriggerTime[e] < maxTriggerTime[e]) ? minTriggerTime[e] : maxTriggerTime[e]+1;
+				// check the minimal trigger time
 				for (int i = 0; i < minTriggerTime[e]; i++) {
 					offset = skipToNextQualifiedBirthTuple(e, offset, end);
 					if (offset == end)
@@ -399,6 +399,7 @@ public class ExtendedCohortSelection implements Operator {
 
 				birthDay = (birthDay < bday) ? bday : birthDay;
 
+				// check the maximal trigger time
 				int count = minTriggerTime[e];
 				while(offset<end){
 					offset = skipToNextQualifiedBirthTuple(e, offset, end);
@@ -432,15 +433,19 @@ public class ExtendedCohortSelection implements Operator {
 					endDay = (endDay >= startDay) ? startDay : endDay;
 				}
 
+				// offset records the checked time space
 				offset = TimeUtils.skipToDate(timeVector, start, end, startDay);
+				// windowOffset records the start time offset of a certain time window
 				windowOffset = offset;
 				while (startDay <= endDay) {
 					// skip to the endOffset for the time window
 					int pos = TimeUtils.skipToDate(timeVector, offset, end, startDay + wlen);
 
-					// delete offset beyond the time window
-					occurrences = eventOffset.get(e);
+					// skip to the startOffset for the time window
 					windowOffset = TimeUtils.skipToDate(timeVector, windowOffset, end, startDay);
+
+					// delete the founded offsets that are ahead of the time window
+					occurrences = eventOffset.get(e);
 					while (!occurrences.isEmpty()) {
 						if (occurrences.getFirst() >= windowOffset)
 							break;
@@ -458,6 +463,7 @@ public class ExtendedCohortSelection implements Operator {
 					}
 
 					// not a slice window and occurrence check fails
+					// if false, then we only check once
 					if (!window.getSlice()) {
 						return -1;
 					}
@@ -508,6 +514,7 @@ public class ExtendedCohortSelection implements Operator {
 
 		cohort.clearDimension();
 
+		// TODO check the age problem
 		if (boff >= 0) {
 			// find the respective cohort for this user
 			List<BirthSequence.BirthEvent> events = q.getBirthSequence().getBirthEvents();

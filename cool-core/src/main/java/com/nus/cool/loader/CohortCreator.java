@@ -27,11 +27,9 @@ import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.ZIntBitCompressor;
-import com.nus.cool.core.io.readstore.ChunkRS;
-import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.*;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 
 import java.io.DataOutputStream;
@@ -78,6 +76,20 @@ public class CohortCreator {
         } catch (IOException e) {
             throw new IOException();
         }
+    }
+
+    public static List<String> listCohortUsers(CubeRS cube, List<Integer> inCohort){
+        List<String> outCohort = new ArrayList<>();
+
+        CubletRS cubletRS = cube.getCublets().get(0);
+        MetaChunkRS metaChunk = cubletRS.getMetaChunk();
+
+        TableSchema tableSchema = cube.getSchema();
+        MetaFieldRS metaField = metaChunk.getMetaField(tableSchema.getUserKeyField(), FieldType.UserKey);
+        for(Integer userID : inCohort){
+            outCohort.add(metaField.getString(userID));
+        }
+        return outCohort;
     }
 
     public static QueryResult selectCohortUsers(CubeRS cube,
