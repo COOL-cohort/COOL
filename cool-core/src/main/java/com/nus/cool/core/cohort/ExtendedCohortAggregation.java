@@ -183,9 +183,7 @@ public class ExtendedCohortAggregation implements CohortOperator {
                 continue;
             }
 
-
-            Map<Integer, List<Double>> cohortCells =
-                    (Map<Integer, List<Double>>) cubletResults.get(cohort);
+            Map<Integer, List<Double>> cohortCells =(Map<Integer, List<Double>>) cubletResults.get(cohort);
 
             if (cohortCells == null) {
                 cohortCells = new HashMap<>();

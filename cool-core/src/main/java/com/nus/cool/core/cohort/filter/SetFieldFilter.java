@@ -130,7 +130,7 @@ public class SetFieldFilter implements FieldFilter {
     this.chunkValues = field.getValueVector();
 
     boolean bHit = false;
-    // Set up the filters to check records
+    // build a hitset for the filters to check records
     for (int contentID : this.contentIDs) {
       if (contentID >= 0) {
         int tmp = keyVec.find(contentID);

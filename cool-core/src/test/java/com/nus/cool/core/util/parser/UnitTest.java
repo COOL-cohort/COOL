@@ -34,56 +34,19 @@ import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.loader.CoolModel;
 import com.nus.cool.loader.CohortCreator;
 import com.nus.cool.loader.DataLoader;
+import com.nus.cool.loader.ExtendedCohortLoader;
+import com.nus.cool.loader.ExtendedResultTuple;
 import org.testng.annotations.Test;
 
 
 public class UnitTest {
+    //@Test
     public static void TableSchemaTest() {
         System.out.println(System.getProperty("user.dir"));
         try {
-            File schemaFile = new File("health/table.yaml");
-            TableSchema schema = TableSchema.read( new FileInputStream(schemaFile));
+            File schemaFile = new File("../health/table.yaml");
+            TableSchema schema = TableSchema.read(new FileInputStream(schemaFile));
             System.out.println(schema);
-        } catch (IOException e){
-            System.out.println(e);
-            return ;
-        }
-    }
-
-    public static void CubeReloadTest() throws IOException {
-        String datasetPath = "datasetSource";
-        String appPath = "health";
-        String queryPath = "health/query1-0.json";
-
-        try {
-            CoolModel coolModel = new CoolModel(datasetPath);
-            coolModel.reload(appPath);
-            System.out.println(coolModel);
-        } catch (IOException e){
-            System.out.println(e);
-            return ;
-        }
-    }
-
-    //@Test
-    public static void CohortCreateTest() {
-        String datasetPath = "../datasetSource";
-        String appPath = "health";
-        String queryPath = "../health/query1-0.json";
-
-        try{
-            ObjectMapper mapper = new ObjectMapper();
-            ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
-
-            CoolModel coolModel = new CoolModel(datasetPath);
-            coolModel.reload(appPath);
-
-            CubeRS cube = coolModel.getCube(query.getDataSource());
-
-            QueryResult result = CohortCreator.selectCohortUsers(cube,null, query);
-            System.out.println(" result for query0 is  " + result.getResult());
-            List<String> userIDs = CohortCreator.listCohortUsers(cube, (List<Integer>)result.getResult());
-            System.out.println(" Actual user IDs are  " + userIDs);
         } catch (IOException e){
             System.out.println(e);
             return ;
@@ -116,6 +79,76 @@ public class UnitTest {
         } catch (IOException e){
             System.out.println(e);
             return ;
+        }
+    }
+
+    //@Test
+    public static void CubeReloadTest() {
+        String datasetPath = "../datasetSource";
+        String appPath = "health";
+        String queryPath = "../health/query1-0.json";
+
+        try {
+            CoolModel coolModel = new CoolModel(datasetPath);
+            coolModel.reload(appPath);
+            System.out.println(coolModel);
+        } catch (IOException e){
+            System.out.println(e);
+            return ;
+        }
+    }
+
+    //@Test
+    public static void CohortCreateTest() {
+        String datasetPath = "../datasetSource";
+        String appPath = "health";
+        String queryPath = "../health/query1-0.json";
+
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
+
+            CoolModel coolModel = new CoolModel(datasetPath);
+            coolModel.reload(appPath);
+
+            CubeRS cube = coolModel.getCube(query.getDataSource());
+
+            QueryResult result = CohortCreator.selectCohortUsers(cube,null, query);
+            System.out.println(" result for query is  " + result.getResult());
+            List<String> userIDs = CohortCreator.listCohortUsers(cube, (List<Integer>)result.getResult());
+            System.out.println(" Actual user IDs are  " + userIDs);
+        } catch (IOException e){
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    public static void cohortAnalysis(){
+        String datasetPath = "../datasetSource";
+        String queryPath = "../health/query2.json";
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
+
+            String inputSource = query.getDataSource();
+            CoolModel coolModel = new CoolModel(datasetPath);
+            coolModel.reload(inputSource);
+
+            if (!query.isValid())
+                throw new IOException("[x] Invalid cohort query.");
+
+            CubeRS inputCube = coolModel.getCube(query.getDataSource());
+            String inputCohort = query.getInputCohort();
+            if (inputCohort != null) {
+                coolModel.loadCohorts(inputCohort, datasetPath + File.separator + inputSource);
+            }
+            System.out.println(inputCohort);
+            InputVector userVector = coolModel.getCohortUsers(inputCohort);
+            QueryResult result = ExtendedCohortLoader.executeQuery(inputCube, userVector, query);
+            System.out.println(" result for the query is  " + result.getResult());
+        } catch (IOException e){
+            System.out.println(e);
         }
     }
 }
