@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 
 public class CoolModelTest {
-    @Test
+    //@Test
     public void testListFuncs(){
         System.out.println(System.getProperty("user.dir"));
         File root = new File("../datasetSource");

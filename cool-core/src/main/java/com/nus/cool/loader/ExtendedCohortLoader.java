@@ -174,7 +174,6 @@ public class ExtendedCohortLoader {
         return resultSet;
     }
 
-    @SuppressWarnings("unchecked")
     public static QueryResult executeQuery(CubeRS cube, InputVector users, ExtendedCohortQuery query) {
         List<CubletRS> cublets = cube.getCublets();
         TableSchema tableSchema = cube.getTableSchema();

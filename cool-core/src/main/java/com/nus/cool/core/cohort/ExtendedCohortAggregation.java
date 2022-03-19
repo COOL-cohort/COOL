@@ -188,23 +188,8 @@ public class ExtendedCohortAggregation implements CohortOperator {
             // init a new cohort cell
             if (cohortCells == null) {
                 cohortCells = new HashMap<>();
-//                    List<Double> cellValue;
-//                    if (anyMetricAgeFilter){
-//                        cellValue = new ArrayList<>(5);
-//                        cellValue.add(0.0);
-//                        cellValue.add(Double.MAX_VALUE);
-//                        cellValue.add(-1.0 * Double.MAX_VALUE);
-//                        cellValue.add(0.0);
-//                        cellValue.add(0.0);
-//                    } else{
-//                        cellValue = new ArrayList<>(1);
-//                        cellValue.add(0.0);
-//                    }
-//                    cohortCells.put(0, cellValue);
                 cubletResults.put(new ExtendedCohort(cohort), cohortCells);
             }
-            // add this user into this cohort
-//                cohortCells.get(0).set(0, cohortCells.get(0).get(0) + 1);
 
             int ageOff = cohort.getBirthOffset();
 

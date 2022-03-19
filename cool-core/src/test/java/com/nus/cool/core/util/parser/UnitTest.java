@@ -82,7 +82,7 @@ public class UnitTest {
         }
     }
 
-    //@Test
+    @Test
     public static void CubeReloadTest() {
         String datasetPath = "../datasetSource";
         String appPath = "health";
@@ -98,7 +98,7 @@ public class UnitTest {
         }
     }
 
-    //@Test
+    @Test
     public static void CohortCreateTest() {
         String datasetPath = "../datasetSource";
         String appPath = "health";
