@@ -47,6 +47,11 @@ public class TimeUtils {
 		}
 		return fromOffset;
 	}
+
+	public static int getDateFromOffset(InputVector vector, int offset){
+		vector.skipTo(offset);
+		return getDate(vector.next());
+	}
 	
 	public static int getDate(int days) {
 		return days;

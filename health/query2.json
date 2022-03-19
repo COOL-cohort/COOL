@@ -71,6 +71,5 @@
   "dataSource":"health",
   "inputCohort":null,
   "measure":"retention",
-  "outputCohort":null,
-  "userId":null
+  "outputCohort":null
 }

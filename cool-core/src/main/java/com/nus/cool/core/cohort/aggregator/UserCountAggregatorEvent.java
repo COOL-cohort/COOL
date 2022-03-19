@@ -22,6 +22,7 @@ import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.TimeUtils;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldType;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -96,30 +97,102 @@ public class UserCountAggregatorEvent implements EventAggregator{
 	}
 
 	@Override
-	public void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
+	public void ageAggregate(BitSet ageOffset, InputVector timeVec, int birthDay, int ageOff, int ageEnd, int ageInterval,
 							 TimeUnit unit, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics) {
-		//skip to the first day
-        int ageDate = TimeUtils.getDateofNextTimeUnitN(birthDay, unit, 1);
-        int toffset = TimeUtils.skipToDate(time, ageOff, ageEnd, ageDate);
-        int age = 0, offset = 0;
-        while (toffset < ageEnd && offset >= 0) {
-            // determine the age        	
+		// init the first day
+		List<Double> cellValue = new ArrayList<>(1);
+		cellValue.add(0.0);
+		ageMetrics.put(0, cellValue);
+
+		int ageDate = TimeUtils.getDateofNextTimeUnitN(birthDay, unit, 1);
+		int toffset = TimeUtils.skipToDate(timeVec, ageOff, ageEnd, ageDate);
+		int age = 0, offset = 0;
+		while (toffset < ageEnd && offset >= 0) {
+			// determine the age
 			do {
 				age++;
-				offset = ageOffset.nextSetBit(toffset);				
+				offset = ageOffset.nextSetBit(toffset);
 				if (offset < 0) return;
 				ageDate = TimeUtils.getDateofNextTimeUnitN(ageDate, unit, ageInterval);
-				toffset = TimeUtils.skipToDate(time, toffset, ageEnd, ageDate);		
+				toffset = TimeUtils.skipToDate(timeVec, toffset, ageEnd, ageDate);
 			} while (!ageFilter.accept(age) || offset >= toffset);
-			
+
 			List<Double> metric = ageMetrics.get(age);
 			if (metric == null) {
 				metric = new ArrayList<Double>(1);
 				metric.add(new Double(0));
 				ageMetrics.put(age, metric);
 			}
-			metric.set(0, metric.get(0) + 1);		
-        }		
+			metric.set(0, metric.get(0) + 1);
+		}
+	}
+
+	@Override
+	public void ageAggregateMetirc(BitSet ageOffset, InputVector timeVec, int birthDay, int ageOff, int ageEnd, int ageInterval,
+								   TimeUnit unit, FieldFilter ageFilter, InputVector filedValue, Map<Integer, List<Double>> ageMetrics){
+		// initialize the first age, i.e., the birth day
+		int age = 0;
+		List<Double> cohortCell = ageMetrics.get(age);
+		if (cohortCell == null) {
+			cohortCell = initCohortCell();
+			ageMetrics.put(age, cohortCell);
+		}
+		cohortCell.set(0, cohortCell.get(0) + 1);
+
+		// start from the birthday
+		int ageDate = TimeUtils.getDateofNextTimeUnitN(birthDay, unit, age);
+		int toffset = TimeUtils.skipToDate(timeVec, ageOff, ageEnd, ageDate);
+		int offset, nextAgeDate, nextToffset;
+		while (toffset < ageEnd) {
+			// determine the age
+			nextAgeDate = TimeUtils.getDateofNextTimeUnitN(ageDate, unit, ageInterval);
+			nextToffset = TimeUtils.skipToDate(timeVec, toffset, ageEnd, nextAgeDate);
+			offset = ageOffset.nextSetBit(toffset);
+			if (offset < 0) return;
+
+			boolean hasActivity = false;
+			age = TimeUtils.getDateFromOffset(timeVec, offset)-birthDay;
+			cohortCell = ageMetrics.get(age);
+			// init the cohort cell
+			// if the cohort cell is for the metric, it consists of "measure", "max", "min", "sum", "num"
+			// else, it only consists of "measure"
+			if (cohortCell == null) {
+				cohortCell = initCohortCell();
+				ageMetrics.put(age, cohortCell);
+			}
+			// update the cohort cell
+			while(offset>0 && offset<nextToffset){
+				hasActivity = true;
+				filedValue.skipTo(offset);
+				int val = filedValue.next();
+				updateStats(val, cohortCell);
+				offset = ageOffset.nextSetBit(offset+1);
+			}
+			// add the measure by 1
+			if (hasActivity)  ageMetrics.get(age).set(0,  ageMetrics.get(age).get(0) + 1);
+
+			ageDate = nextAgeDate;
+			toffset = nextToffset;
+		}
+	}
+
+	private List<Double> initCohortCell(){
+		List<Double> cohortCell = new ArrayList<>(5);
+		cohortCell.add(0.0);
+		cohortCell.add(Double.MAX_VALUE);
+		cohortCell.add(-1.0 * Double.MAX_VALUE);
+		cohortCell.add(0.0);
+		cohortCell.add(0.0);
+		return cohortCell;
+	}
+
+	private void updateStats(int val, List<Double> cohortCell) {
+		if (val <cohortCell.get(1))
+			cohortCell.set(1, (double)val);
+		if (val > cohortCell.get(2))
+			cohortCell.set(2, (double)val);
+		cohortCell.set(3, cohortCell.get(3) + val);
+		cohortCell.set(4, cohortCell.get(4) + 1);
 	}
 
 }

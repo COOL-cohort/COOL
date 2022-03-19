@@ -28,10 +28,7 @@ import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.cohort.ExtendedCohortSelection;
 import com.nus.cool.core.cohort.ExtendedCohortAggregation;
-import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
-import com.nus.cool.core.io.readstore.ChunkRS;
+import com.nus.cool.core.io.readstore.*;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.schema.CubeSchema;
@@ -121,11 +118,12 @@ public class ExtendedCohortLoader {
                     if (schema.getDataType() == DataType.String) {
                         key.addDimensionName(metaChunk.getMetaField(fieldName).getString(key.getDimensions().get(cnt)));
                     } else {
+                        MetaFieldRS filed = metaChunk.getMetaField(fieldName);
                         StringBuilder builder = new StringBuilder();
                         builder.append("(");
                         int level = key.getDimensions().get(cnt);
                         if (cf.getMinLevel() == level) {
-                            builder.append("-inf, ");
+                            builder.append(Integer.toString(filed.getMinValue())+", ");
                         } else {
                             if (cf.isLogScale()) {
                                 builder.append((new Double(Math.pow(cf.getScale(), level - 1))).longValue());
@@ -136,7 +134,7 @@ public class ExtendedCohortLoader {
                         }
 
                         if (cf.getMinLevel() + cf.getNumLevel() == level) {
-                            builder.append("inf)");
+                            builder.append(Integer.toString(filed.getMaxValue())+")");
                         } else {
                             if (cf.isLogScale()) {
                                 builder.append((new Double(Math.pow(cf.getScale(), level))).longValue());
@@ -165,6 +163,10 @@ public class ExtendedCohortLoader {
                     max = ageMetric.getValue().get(2);
                     sum = ageMetric.getValue().get(3);
                     num = ageMetric.getValue().get(4);
+                }
+                if (num==0) {
+                    min = 0.0;
+                    max = 0.0;
                 }
                 resultSet.add(new ExtendedResultTuple(key.toString(), age, measure, min, max, sum, num));
             }

@@ -120,5 +120,9 @@ public class BirthSumAggregator implements EventAggregator {
             metric.set(0, (double) v);
         }		
 	}
-	
+	@Override
+	public void ageAggregateMetirc(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
+								   TimeUnit unit, FieldFilter ageFilter, InputVector filedValue, Map<Integer, List<Double>> ageMetrics){
+		// TODO Auto-generated method stub
+	}
 }

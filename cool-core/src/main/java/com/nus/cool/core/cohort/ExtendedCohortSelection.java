@@ -597,8 +597,7 @@ public class ExtendedCohortSelection implements Operator {
 		}
 	}
 
-	private void filterAgeActivity(int ageOff, int ageEnd, BitSet bs, InputVector fieldIn, 
-			FieldFilter ageFilter, Map<Integer, List<Double>> cohortCells, boolean updateStats) {
+	private void filterAgeActivity(int ageOff, int ageEnd, BitSet bs, InputVector fieldIn, FieldFilter ageFilter) {
 		// update value for this column if necessary
 //		ExtendedFieldSet.FieldValue value = ageFilter.getFieldSet().getFieldValue();
 //		if (value.getType() != FieldValueType.AbsoluteValue) {
@@ -614,10 +613,10 @@ public class ExtendedCohortSelection implements Operator {
 					bs.clear(i);
 					// deleteStats(i - ageOff, cohortCells);
 				}
-				else {
-					if (updateStats)
-						updateStats(i - ageOff, val, cohortCells);
-				}
+//				else {
+//					if (updateStats)
+//						updateStats(i - ageOff, val, cohortCells);
+//				}
 			}
 		} else {            
 			int pos = bs.nextSetBit(ageOff);
@@ -627,10 +626,10 @@ public class ExtendedCohortSelection implements Operator {
 					bs.clear(pos);
 					// deleteStats(pos - ageOff, cohortCells);
 				}
-				else {
-					if (updateStats)
-						updateStats(pos - ageOff, val, cohortCells);
-				}
+//				else {
+//					if (updateStats)
+//						updateStats(pos - ageOff, val, cohortCells);
+//				}
 				pos = bs.nextSetBit(pos + 1);
 			}
 		}        
@@ -641,7 +640,7 @@ public class ExtendedCohortSelection implements Operator {
 
 		for (Map.Entry<String, FieldFilter> entry : ageByFilters.entrySet()) {
 			this.filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(),
-					entry.getValue(), null, false);
+					entry.getValue());
 		}
 
 		// age by dimension
@@ -680,9 +679,9 @@ public class ExtendedCohortSelection implements Operator {
 	 *            the end position of age tuples
 	 * @param bs
 	 *            the hit position list of all qualified tuples
+	 * @return the name of the metric field, if it exists.
 	 */
-	public void selectAgeActivities(int ageOff, int ageEnd, BitSet bs, 
-			BitSet ageDelimiters, Map<Integer, List<Double>> cohortCells) {
+	public String selectAgeActivities(int ageOff, int ageEnd, BitSet bs, BitSet ageDelimiters) {
 		checkArgument(ageOff < ageEnd);
 		// enable the dimension-based ageby operator to be processed in the same way
 		// as event-based ageby operator
@@ -720,12 +719,13 @@ public class ExtendedCohortSelection implements Operator {
 		}
 
 		// Columnar processing strategy ...
-		// TODO: now we update the stats (min, max, avg) only if the field is "value"
+		String metricAgeFilterName = null;
 		for (Map.Entry<String, FieldFilter> entry : ageFilters.entrySet()) {
 			FieldFilter ageFilter = entry.getValue();
-			filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(), 
-					ageFilter, cohortCells, (entry.getKey().equals("value")));            
-		}      
+			if(tableSchema.getField(entry.getKey()).getFieldType()==FieldType.Metric) metricAgeFilterName = entry.getKey();
+			filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(), ageFilter);
+		}
+		return metricAgeFilterName;
 	}
 
 	private Double getBirthAttribute(int baseEvent, int fieldID) {
@@ -754,7 +754,7 @@ public class ExtendedCohortSelection implements Operator {
 		return this.bAgeActiveChunk;
 	}
 
-	public FieldFilter getAgeFieldFilter(String atFieldName) {
+	public FieldFilter getAgeFieldFilters(String atFieldName) {
 		return this.ageFilters.get(atFieldName);
 	}
 

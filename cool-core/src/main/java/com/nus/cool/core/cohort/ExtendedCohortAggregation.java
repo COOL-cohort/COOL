@@ -183,17 +183,28 @@ public class ExtendedCohortAggregation implements CohortOperator {
                 continue;
             }
 
-            Map<Integer, List<Double>> cohortCells =(Map<Integer, List<Double>>) cubletResults.get(cohort);
+            Map<Integer, List<Double>> cohortCells = (Map<Integer, List<Double>>) cubletResults.get(cohort);
 
+            // init a new cohort cell
             if (cohortCells == null) {
                 cohortCells = new HashMap<>();
-                List<Double> cellValue = new ArrayList<>(1);
-                cellValue.add(0.0);
-                cohortCells.put(0, cellValue);
+//                    List<Double> cellValue;
+//                    if (anyMetricAgeFilter){
+//                        cellValue = new ArrayList<>(5);
+//                        cellValue.add(0.0);
+//                        cellValue.add(Double.MAX_VALUE);
+//                        cellValue.add(-1.0 * Double.MAX_VALUE);
+//                        cellValue.add(0.0);
+//                        cellValue.add(0.0);
+//                    } else{
+//                        cellValue = new ArrayList<>(1);
+//                        cellValue.add(0.0);
+//                    }
+//                    cohortCells.put(0, cellValue);
                 cubletResults.put(new ExtendedCohort(cohort), cohortCells);
             }
-
-            cohortCells.get(0).set(0, cohortCells.get(0).get(0) + 1);
+            // add this user into this cohort
+//                cohortCells.get(0).set(0, cohortCells.get(0).get(0) + 1);
 
             int ageOff = cohort.getBirthOffset();
 
@@ -203,22 +214,28 @@ public class ExtendedCohortAggregation implements CohortOperator {
                     sigma.selectAgeByActivities(ageOff, end, ageDelimiter);
                 }
                 bv.set(ageOff, end);
-                sigma.selectAgeActivities(ageOff, end, bv, ageDelimiter, cohortCells);
+                // process activities by age
+                String MetricAgeFilterName = sigma.selectAgeActivities(ageOff, end, bv, ageDelimiter);
                 // updateStats(sigma.selectAgeActivities(ageOff, end, bv, ageDelimiter), cohortCells.get(0));
-                EventAggregator aggr = BirthAggregatorFactory.getAggregator(
-                        //cubeSchema.getMeasure(query.getMeasure()).getAggregator().name()
-                        query.getMeasure().toUpperCase()
-                );
-                aggr.init(metricField.getValueVector());
 
+                EventAggregator aggr = BirthAggregatorFactory.getAggregator(query.getMeasure().toUpperCase());
+                aggr.init(metricField.getValueVector());
                 if (tableSchema.getFieldID(query.getAgeField().getField()) != tableSchema.getActionTimeField()) {
                     aggr.ageAggregate(bv, ageDelimiter, ageOff, end, this.query.getAgeField().getAgeInterval(),
                             sigma.getAgeFieldFilter(), cohortCells);
                     ageDelimiter.clear(ageOff, end + 1);
                 }
-                else
+                else if (MetricAgeFilterName!=null){
+                    InputVector fieldIn = chunk.getField(MetricAgeFilterName).getValueVector();
+                    aggr.ageAggregateMetirc(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
+                            query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
+                            sigma.getAgeFieldFilter(), fieldIn, cohortCells);
+                } else{
                     aggr.ageAggregate(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
-                            query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(), sigma.getAgeFieldFilter(), cohortCells);
+                            query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
+                            sigma.getAgeFieldFilter(), cohortCells);
+                }
+
                 bv.clear(ageOff, end + 1);
             }
         }
