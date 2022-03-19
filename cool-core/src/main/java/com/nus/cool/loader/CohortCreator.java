@@ -58,20 +58,25 @@ public class CohortCreator {
         System.out.println(query);
         System.out.println(" ------  checking query info done ------ ");
 
-        String cohort = query.getOutputCohort();
-        File cohortFile = new File(datasetPath +"/"+appPath, cohort);
+        String outputCohort = query.getOutputCohort();
+        File cohortRoot =  new File(coolModel.getCubeStorePath(appPath), "cohort");
+        if(!cohortRoot.exists()){
+            cohortRoot.mkdir();
+            System.out.println("[*] Cohort Fold " + cohortRoot.getName() + " is created.");
+        }
+        File cohortFile = new File(cohortRoot, outputCohort);
         if (cohortFile.exists()){
             cohortFile.delete();
-            System.out.println("Cohort  " + cohort + " exists and is deleted!");
+            System.out.println("[*] Cohort " + outputCohort + " exists and is deleted!");
         }
         System.out.println("Get cube:" + coolModel.getCube(query.getDataSource()));
 
-        QueryResult result = selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
-        System.out.println(" result for query0 is  " + result);
+        List<Integer> cohortResults = selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
+        System.out.println("Result for query0 is  " + cohortResults);
 
         // materialize to a cohort store
         try {
-            createCohort(query, (List<Integer>) result.getResult(), datasetPath +"/"+appPath);
+            createCohort(query, cohortResults, cohortRoot);
 
         } catch (IOException e) {
             throw new IOException();
@@ -92,7 +97,7 @@ public class CohortCreator {
         return outCohort;
     }
 
-    public static QueryResult selectCohortUsers(CubeRS cube,
+    public static List<Integer> selectCohortUsers(CubeRS cube,
                                                 InputVector users,
                                                 ExtendedCohortQuery query) throws IOException {
         if (cube == null)
@@ -118,18 +123,13 @@ public class CohortCreator {
             userList.addAll((List<Integer>)gamma.getCubletResults());
         }
 
-        return QueryResult.ok(userList);
+        return userList;
     }
 
 
-    public static void createCohort(ExtendedCohortQuery query, List<Integer> users, String outPath) throws IOException {
+    public static void createCohort(ExtendedCohortQuery query, List<Integer> users, File cohortRoot) throws IOException {
         String cohortName = query.getOutputCohort();
-        File cohort_root = new File(outPath + "/cohort");
-        if(!cohort_root.exists()){
-            cohort_root.mkdir();
-            System.out.println("[*] Cohort Fold " + outPath + "/cohort is created.");
-        }
-        File cohort = new File(cohort_root, cohortName);
+        File cohort = new File(cohortRoot, cohortName);
 
         cohort.createNewFile();
 

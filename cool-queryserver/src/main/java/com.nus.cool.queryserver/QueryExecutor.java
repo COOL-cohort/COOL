@@ -53,14 +53,9 @@ public class QueryExecutor {
         return userList;
     }
 
-    public void createCohort(ExtendedCohortQuery query, List<Integer> users, String outPath) throws IOException {
+    public void createCohort(ExtendedCohortQuery query, List<Integer> users, File cohortRoot) throws IOException {
         String cohortName = query.getOutputCohort();
-        File cohort_root = new File(outPath + "/cohort");
-        if(!cohort_root.exists()){
-            cohort_root.mkdir();
-            System.out.println("[*] Cohort Fold " + outPath + "/cohort is created.");
-        }
-        File cohort = new File(cohort_root, cohortName);
+        File cohort = new File(cohortRoot, cohortName);
 
         cohort.createNewFile();
 
