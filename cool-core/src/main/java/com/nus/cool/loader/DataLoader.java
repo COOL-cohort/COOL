@@ -145,6 +145,7 @@ public class DataLoader {
      */
     public void load() throws IOException {
         // create a new cube file
+        // meta data are stored internal
         DataOutputStream out = newCublet();
         int userKeyIndex = tableSchema.getUserKeyField();
         String lastUser = null;

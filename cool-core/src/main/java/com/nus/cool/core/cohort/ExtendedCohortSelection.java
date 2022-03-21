@@ -99,7 +99,6 @@ public class ExtendedCohortSelection implements Operator {
 			for (ExtendedFieldSet fs : e.getEventSelection()) {
 				String fn = fs.getCubeField();
 				FieldSchema schema = tableSchema.getField(fn);
-//				checkArgument(schema.getDataType() != OutputCompressor.DataType.Aggregate);
 				filters.put(fn, FieldFilterFactory.create(schema, fs, fs.getFieldValue().getValues()));
 			}
 
@@ -124,34 +123,37 @@ public class ExtendedCohortSelection implements Operator {
 		// Process age-by and age selectors
 		if (q.getAgeField() == null) return;
 
-		for (int i = 0; i < 2; i++) {
-			List<ExtendedFieldSet> selectors;
-			Map<String, FieldFilter> filterMap;
-			if (i == 0) {
-				int fieldID = tableSchema.getFieldID(q.getAgeField().getField());       
-//				checkArgument(fieldID >= 0 &&
-//						tableSchema.getField(fieldID).getDataType() != DataType.Aggregate);
-				selectors = q.getAgeField().getEventSelection();
-				List<String> ageRange = q.getAgeField().getRange();
-				if (ageRange == null || ageRange.isEmpty()) {
-					//hardcode an AgeFieldFilter
-					ageRange = new ArrayList<>();
-					ageRange.add(String.valueOf(Integer.MIN_VALUE)
-							+ "|" + String.valueOf(Integer.MAX_VALUE));
-				}
-				this.ageFilter = new AgeFieldFilter(ageRange);
+		List<ExtendedFieldSet> selectors;
+		Map<String, FieldFilter> filterMap;
 
-				//                if (fieldID == tableSchema.getActionTimeField())
-				//                	continue;
-				filterMap = this.ageByFilters;
-			} else {
-				selectors = q.getAgeSelection();
-				filterMap = this.ageFilters;
-			}
+		// process ageField
+		int fieldID = tableSchema.getFieldID(q.getAgeField().getField());
+		checkArgument(fieldID >= 0);
+		selectors = q.getAgeField().getEventSelection();
+		List<String> ageRange = q.getAgeField().getRange();
+		if (ageRange == null || ageRange.isEmpty()) {
+			//hardcode an AgeFieldFilter
+			ageRange = new ArrayList<>();
+			ageRange.add(String.valueOf(Integer.MIN_VALUE)
+					+ "|" + String.valueOf(Integer.MAX_VALUE));
+		}
+		this.ageFilter = new AgeFieldFilter(ageRange);
 
-			if (selectors == null) continue;
+		filterMap = this.ageByFilters;
+		if (selectors != null) {
 			for (ExtendedFieldSet fs : selectors) {
-				String field = fs.getCubeField();                                       
+				String field = fs.getCubeField();
+				filterMap.put(field,
+						FieldFilterFactory.create(tableSchema.getField(field), fs, fs.getFieldValue().getValues()));
+			}
+		}
+
+		// process ageSelection
+		selectors = q.getAgeSelection();
+		filterMap = this.ageFilters;
+		if (selectors != null) {
+			for (ExtendedFieldSet fs : selectors) {
+				String field = fs.getCubeField();
 				filterMap.put(field,
 						FieldFilterFactory.create(tableSchema.getField(field), fs, fs.getFieldValue().getValues()));
 			}
@@ -185,7 +187,7 @@ public class ExtendedCohortSelection implements Operator {
 			for (Map.Entry<String, FieldFilter> entry : birthFilter.entrySet()) {
 				bUserActiveCublet &= entry.getValue().accept(metaChunk.getMetaField(entry.getKey()));
 			}
-		}
+ 		}
 
 		// Process age by and age filter
 		for (Map.Entry<String, FieldFilter> entry : ageFilters.entrySet()) {
@@ -223,19 +225,21 @@ public class ExtendedCohortSelection implements Operator {
 			}
 		}
 
-		// process birth aggregation filter
+		// Process birth aggregation filter
 		for (Map<String, FieldFilter> birthFilter : this.birthAggFilters) {
 			for (Map.Entry<String, FieldFilter> entry : birthFilter.entrySet()) {
 				bUserActiveChunk &= entry.getValue().accept(chunk.getField(entry.getKey()));
 			}
 		}
 
+		// Process ageSelection filter
 		for (Map.Entry<String, FieldFilter> entry : ageFilters.entrySet()) {
 			FieldRS field = chunk.getField(entry.getKey());
 			bAgeActiveChunk &= entry.getValue().accept(field);
 			// ageFilterFields.put(entry.getKey(), field);
 		}
 
+		// Process ageField filter
 		for (Map.Entry<String, FieldFilter> entry : ageByFilters.entrySet()) {
 			FieldRS field = chunk.getField(entry.getKey());
 			bAgeActiveChunk &= entry.getValue().accept(field);
@@ -266,6 +270,7 @@ public class ExtendedCohortSelection implements Operator {
 		while (true) {
 			for (Map.Entry<String, FieldFilter> entry : birthFilters.get(event).entrySet()) {
 				nextOffset = entry.getValue().nextAcceptTuple(fromOffset, endOffset);
+				// TODO check this logic
 				if (nextOffset > fromOffset) {
 					fromOffset = nextOffset;
 					passed = 1;
@@ -368,7 +373,7 @@ public class ExtendedCohortSelection implements Operator {
 		for (Integer e : sortedEvents) {
 			offset = start;
 			BirthSequence.BirthEvent event = seq.getBirthEvents().get(e);
-
+			// check whether the filed value type is AbsoluteValue
 			for (Map.Entry<String, FieldFilter> entry : birthFilters.get(e).entrySet()) {
 				FieldFilter ageFilter = entry.getValue();
 				ExtendedFieldSet.FieldValue value = entry.getValue().getFieldSet().getFieldValue();
@@ -382,6 +387,7 @@ public class ExtendedCohortSelection implements Operator {
 			BirthSequence.TimeWindow window = event.getTimeWindow();
 			if (window == null) {
 				// no time window
+				// check the minimal trigger time
 				for (int i = 0; i < minTriggerTime[e]; i++) {
 					offset = skipToNextQualifiedBirthTuple(e, offset, end);
 					if (offset == end)
@@ -396,6 +402,23 @@ public class ExtendedCohortSelection implements Operator {
 					bday = TimeUtils.getDate(timeVector.get(offset - 1)) + 1;
 
 				birthDay = (birthDay < bday) ? bday : birthDay;
+
+				// check the maximal trigger time
+				if(maxTriggerTime[e]!=-1){
+					int count = minTriggerTime[e];
+					while(offset<end){
+						offset = skipToNextQualifiedBirthTuple(e, offset, end);
+						if(offset < end){
+							count += 1;
+							eventOffset.get(e).addLast(offset);
+							offset++;
+							if(count > maxTriggerTime[e]){
+								return -1;
+							}
+						}
+					}
+				}
+
 			} else {
 				// with time window
 				int startDay = firstDay;
@@ -411,19 +434,24 @@ public class ExtendedCohortSelection implements Operator {
 				}
 
 				if (wlen == 0) {
+					// set the wlen to the maximum day if it is set to 0
 					wlen = maxDate - startDay + 1;
 					endDay = (endDay >= startDay) ? startDay : endDay;
 				}
 
+				// offset records the checked time space
 				offset = TimeUtils.skipToDate(timeVector, start, end, startDay);
+				// windowOffset records the start time offset of a certain time window
 				windowOffset = offset;
 				while (startDay <= endDay) {
 					// skip to the endOffset for the time window
 					int pos = TimeUtils.skipToDate(timeVector, offset, end, startDay + wlen);
 
-					// delete offset beyond the time window
-					occurrences = eventOffset.get(e);
+					// skip to the startOffset for the time window
 					windowOffset = TimeUtils.skipToDate(timeVector, windowOffset, end, startDay);
+
+					// delete the founded offsets that are ahead of the time window
+					occurrences = eventOffset.get(e);
 					while (!occurrences.isEmpty()) {
 						if (occurrences.getFirst() >= windowOffset)
 							break;
@@ -441,6 +469,7 @@ public class ExtendedCohortSelection implements Operator {
 					}
 
 					// not a slice window and occurrence check fails
+					// if false, then we only check once
 					if (!window.getSlice()) {
 						return -1;
 					}
@@ -456,16 +485,16 @@ public class ExtendedCohortSelection implements Operator {
 			birthOffset = (birthOffset < offset) ? offset : birthOffset;
 		}
 
-		for (Integer e : sortedEvents) {
-			// filter between [start, birthOffset] for birth events
-			// without time window
-			if (seq.getBirthEvents().get(e).getTimeWindow() == null) {
-				offset = (eventOffset.get(e).isEmpty()) ? start : eventOffset.get(e).getLast() + 1;
-				filterEvent(e, offset, birthOffset);
-				if (!checkOccurrence(e))
-					return -1;
-			}
-		}
+//		for (Integer e : sortedEvents) {
+//			// filter between [start, birthOffset] for birth events
+//			// without time window
+//			if (seq.getBirthEvents().get(e).getTimeWindow() == null) {
+//				offset = (eventOffset.get(e).isEmpty()) ? start : eventOffset.get(e).getLast() + 1;
+//				filterEvent(e, offset, birthOffset);
+//				if (!checkOccurrence(e))
+//					return -1;
+//			}
+//		}
 
 		// evaluate birth aggregation filters
 		if (filterByBirthAggregation()) {
@@ -491,6 +520,7 @@ public class ExtendedCohortSelection implements Operator {
 
 		cohort.clearDimension();
 
+		// TODO check the age problem
 		if (boff >= 0) {
 			// find the respective cohort for this user
 			List<BirthSequence.BirthEvent> events = q.getBirthSequence().getBirthEvents();
@@ -567,8 +597,7 @@ public class ExtendedCohortSelection implements Operator {
 		}
 	}
 
-	private void filterAgeActivity(int ageOff, int ageEnd, BitSet bs, InputVector fieldIn, 
-			FieldFilter ageFilter, Map<Integer, List<Double>> cohortCells, boolean updateStats) {
+	private void filterAgeActivity(int ageOff, int ageEnd, BitSet bs, InputVector fieldIn, FieldFilter ageFilter) {
 		// update value for this column if necessary
 //		ExtendedFieldSet.FieldValue value = ageFilter.getFieldSet().getFieldValue();
 //		if (value.getType() != FieldValueType.AbsoluteValue) {
@@ -584,10 +613,10 @@ public class ExtendedCohortSelection implements Operator {
 					bs.clear(i);
 					// deleteStats(i - ageOff, cohortCells);
 				}
-				else {
-					if (updateStats)
-						updateStats(i - ageOff, val, cohortCells);
-				}
+//				else {
+//					if (updateStats)
+//						updateStats(i - ageOff, val, cohortCells);
+//				}
 			}
 		} else {            
 			int pos = bs.nextSetBit(ageOff);
@@ -597,10 +626,10 @@ public class ExtendedCohortSelection implements Operator {
 					bs.clear(pos);
 					// deleteStats(pos - ageOff, cohortCells);
 				}
-				else {
-					if (updateStats)
-						updateStats(pos - ageOff, val, cohortCells);
-				}
+//				else {
+//					if (updateStats)
+//						updateStats(pos - ageOff, val, cohortCells);
+//				}
 				pos = bs.nextSetBit(pos + 1);
 			}
 		}        
@@ -611,7 +640,7 @@ public class ExtendedCohortSelection implements Operator {
 
 		for (Map.Entry<String, FieldFilter> entry : ageByFilters.entrySet()) {
 			this.filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(),
-					entry.getValue(), null, false);
+					entry.getValue());
 		}
 
 		// age by dimension
@@ -650,9 +679,9 @@ public class ExtendedCohortSelection implements Operator {
 	 *            the end position of age tuples
 	 * @param bs
 	 *            the hit position list of all qualified tuples
+	 * @return the name of the metric field, if it exists.
 	 */
-	public void selectAgeActivities(int ageOff, int ageEnd, BitSet bs, 
-			BitSet ageDelimiters, Map<Integer, List<Double>> cohortCells) {
+	public String selectAgeActivities(int ageOff, int ageEnd, BitSet bs, BitSet ageDelimiters) {
 		checkArgument(ageOff < ageEnd);
 		// enable the dimension-based ageby operator to be processed in the same way
 		// as event-based ageby operator
@@ -690,12 +719,13 @@ public class ExtendedCohortSelection implements Operator {
 		}
 
 		// Columnar processing strategy ...
-		// TODO: now we update the stats (min, max, avg) only if the field is "value"
+		String metricAgeFilterName = null;
 		for (Map.Entry<String, FieldFilter> entry : ageFilters.entrySet()) {
 			FieldFilter ageFilter = entry.getValue();
-			filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(), 
-					ageFilter, cohortCells, (entry.getKey().equals("value")));            
-		}      
+			if(tableSchema.getField(entry.getKey()).getFieldType()==FieldType.Metric) metricAgeFilterName = entry.getKey();
+			filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(), ageFilter);
+		}
+		return metricAgeFilterName;
 	}
 
 	private Double getBirthAttribute(int baseEvent, int fieldID) {
@@ -724,7 +754,7 @@ public class ExtendedCohortSelection implements Operator {
 		return this.bAgeActiveChunk;
 	}
 
-	public FieldFilter getAgeFieldFilter(String atFieldName) {
+	public FieldFilter getAgeFieldFilters(String atFieldName) {
 		return this.ageFilters.get(atFieldName);
 	}
 

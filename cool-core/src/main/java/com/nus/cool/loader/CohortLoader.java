@@ -113,7 +113,7 @@ public class CohortLoader {
   }
 
   /**
-   * ececute quety
+   * execute query
    * 
    * @param cube the cube that stores the data we need
    * @param query the cohort query needed to process

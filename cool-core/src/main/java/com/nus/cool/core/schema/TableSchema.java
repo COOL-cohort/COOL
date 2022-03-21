@@ -125,7 +125,7 @@ public class TableSchema {
 
 
   /**
-   * Get the field by it's id
+   * Get the field by its id
    *
    * @param id the id of the field
    * @return the corresponding field of the id
@@ -135,7 +135,7 @@ public class TableSchema {
   }
 
   /**
-   * Get the field by it's name
+   * Get the field by its name
    *
    * @param name the name of the field
    * @return the corresponding field of the name
@@ -145,7 +145,7 @@ public class TableSchema {
   }
 
   /**
-   * Get the field type by it's name
+   * Get the field type by its name
    *
    * @param name the name of the field
    * @return the corresponding field type of the name
@@ -155,7 +155,7 @@ public class TableSchema {
   }
 
   /**
-   * Get the field id by it's name
+   * Get the field id by its name
    *
    * @param name the name of the field
    * @return the corresponding field id of the name

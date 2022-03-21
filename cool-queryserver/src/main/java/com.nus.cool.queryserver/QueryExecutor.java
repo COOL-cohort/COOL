@@ -9,10 +9,7 @@ import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.ZIntBitCompressor;
-import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
-import com.nus.cool.core.io.readstore.ChunkRS;
+import com.nus.cool.core.io.readstore.*;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.schema.CubeSchema;
@@ -56,14 +53,9 @@ public class QueryExecutor {
         return userList;
     }
 
-    public void createCohort(ExtendedCohortQuery query, List<Integer> users, String outPath) throws IOException {
+    public void createCohort(ExtendedCohortQuery query, List<Integer> users, File cohortRoot) throws IOException {
         String cohortName = query.getOutputCohort();
-        File cohort_root = new File(outPath + "/cohort");
-        if(!cohort_root.exists()){
-            cohort_root.mkdir();
-            System.out.println("[*] Cohort Fold " + outPath + "/cohort is created.");
-        }
-        File cohort = new File(cohort_root, cohortName);
+        File cohort = new File(cohortRoot, cohortName);
 
         cohort.createNewFile();
 
@@ -98,17 +90,96 @@ public class QueryExecutor {
         return max;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<ExtendedResultTuple> executeCohortQuery(CubeRS cube, InputVector users, ExtendedCohortQuery query) {
+    public static List<ExtendedResultTuple> processCohortResult(ExtendedCohortQuery query,
+                                                                TableSchema tableSchema,
+                                                                MetaChunkRS metaChunk,
+                                                                ExtendedCohortSelection sigma,
+                                                                Map<ExtendedCohort, Map<Integer, List<Double>>> resultMap){
+        List<ExtendedResultTuple> resultSet = new ArrayList<>();
+        for (Map.Entry<ExtendedCohort, Map<Integer, List<Double>>> entry:resultMap.entrySet()) {
+            ExtendedCohort key = entry.getKey();
+
+            // update dimension names
+            List<BirthEvent> events = query.getBirthSequence().getBirthEvents();
+            int cnt = 0;
+            for (int idx = 0; idx < events.size(); ++idx) {
+                BirthEvent be = events.get(idx);
+                for (CohortField cf : be.getCohortFields()) {
+                    String fieldName = cf.getField();
+                    int fieldID = tableSchema.getFieldID(cf.getField());
+                    FieldSchema schema = tableSchema.getField(fieldID);
+                    if (schema.getDataType() == DataType.String) {
+                        key.addDimensionName(metaChunk.getMetaField(fieldName).getString(key.getDimensions().get(cnt)));
+                    } else {
+                        MetaFieldRS filed = metaChunk.getMetaField(fieldName);
+                        StringBuilder builder = new StringBuilder();
+                        builder.append("(");
+                        int level = key.getDimensions().get(cnt);
+                        if (cf.getMinLevel() == level) {
+                            builder.append(Integer.toString(filed.getMinValue())+", ");
+                        } else {
+                            if (cf.isLogScale()) {
+                                builder.append((new Double(Math.pow(cf.getScale(), level - 1))).longValue());
+                            } else {
+                                builder.append((new Double(cf.getScale() * (level - 1))).longValue());
+                            }
+                            builder.append(", ");
+                        }
+
+                        if (cf.getMinLevel() + cf.getNumLevel() == level) {
+                            builder.append(Integer.toString(filed.getMaxValue())+")");
+                        } else {
+                            if (cf.isLogScale()) {
+                                builder.append((new Double(Math.pow(cf.getScale(), level))).longValue());
+                            } else {
+                                builder.append((new Double(cf.getScale() * level)).longValue());
+                            }
+                            builder.append("]");
+                        }
+                        key.addDimensionName(builder.toString());
+                    }
+                    ++cnt;
+                }
+            }
+
+            for (Map.Entry<Integer, List<Double>> ageMetric : entry.getValue().entrySet()) {
+                int age = ageMetric.getKey();
+                if (!sigma.getAgeFieldFilter().accept(age))
+                    continue;
+                double measure = ageMetric.getValue().get(0);
+                double min = 0.0;
+                double max = 0.0;
+                double sum = 0.0;
+                double num = 0.0;
+                if (ageMetric.getValue().size() >= 5) {
+                    min = ageMetric.getValue().get(1);
+                    max = ageMetric.getValue().get(2);
+                    sum = ageMetric.getValue().get(3);
+                    num = ageMetric.getValue().get(4);
+                }
+                if (num==0) {
+                    min = 0.0;
+                    max = 0.0;
+                }
+                resultSet.add(new ExtendedResultTuple(key.toString(), age, measure, min, max, sum, num));
+            }
+        }
+        return resultSet;
+    }
+
+    public static List<ExtendedResultTuple> executeCohortQuery(CubeRS cube, InputVector users, ExtendedCohortQuery query) {
         List<CubletRS> cublets = cube.getCublets();
         TableSchema tableSchema = cube.getTableSchema();
         List<ExtendedResultTuple> resultSet = new ArrayList<>();
-        System.out.println(users.size());
+
         for (CubletRS cubletRS : cublets) {
             MetaChunkRS metaChunk = cubletRS.getMetaChunk();
             ExtendedCohortSelection sigma = new ExtendedCohortSelection();
             ExtendedCohortAggregation gamma = new ExtendedCohortAggregation(sigma);
+
+            // Initialize the birth events and trigger times
             gamma.init(tableSchema, users, query);
+            // Check the validity of fields (e.g., the existences of field names and their values)
             gamma.process(metaChunk);
             if (sigma.isUserActiveCublet()) {
                 List<ChunkRS> dataChunks = cubletRS.getDataChunks();
@@ -119,76 +190,9 @@ public class QueryExecutor {
 
             Object results = gamma.getCubletResults();
 
-            Map<ExtendedCohort, Map<Integer, List<Double>>> resultMap =
-                    (Map<ExtendedCohort, Map<Integer, List<Double>>>) results;
-
-            for (Map.Entry<ExtendedCohort, Map<Integer, List<Double>>> entry :
-                    resultMap.entrySet()) {
-                ExtendedCohort key = entry.getKey();
-
-                // update dimension names
-                List<BirthEvent> events = query.getBirthSequence().getBirthEvents();
-                int cnt = 0;
-                for (int idx = 0; idx < events.size(); ++idx) {
-                    BirthEvent be = events.get(idx);
-                    for (CohortField cf : be.getCohortFields()) {
-                        String fieldName = cf.getField();
-                        int fieldID = tableSchema.getFieldID(cf.getField());
-                        FieldSchema schema = tableSchema.getField(fieldID);
-                        if (schema.getDataType() == DataType.String) {
-                            key.addDimensionName(metaChunk.getMetaField(fieldName).getString(key.getDimensions().get(cnt)));
-                        } else {
-                            StringBuilder builder = new StringBuilder();
-                            builder.append("(");
-                            int level = key.getDimensions().get(cnt);
-                            if (cf.getMinLevel() == level) {
-                                builder.append("-inf, ");
-                            } else {
-                                if (cf.isLogScale()) {
-                                    builder.append((new Double(Math.pow(cf.getScale(), level - 1))).longValue());
-                                } else {
-                                    builder.append((new Double(cf.getScale() * (level - 1))).longValue());
-                                }
-                                builder.append(", ");
-                            }
-
-                            if (cf.getMinLevel() + cf.getNumLevel() == level) {
-                                builder.append("inf)");
-                            } else {
-                                if (cf.isLogScale()) {
-                                    builder.append((new Double(Math.pow(cf.getScale(), level))).longValue());
-                                } else {
-                                    builder.append((new Double(cf.getScale() * level)).longValue());
-                                }
-                                builder.append("]");
-                            }
-                            key.addDimensionName(builder.toString());
-                        }
-                        ++cnt;
-                    }
-                }
-
-                for (Map.Entry<Integer, List<Double>> ageMetric : entry.getValue().entrySet()) {
-                    int age = ageMetric.getKey();
-                    if (!sigma.getAgeFieldFilter().accept(age))
-                        continue;
-                    double measure = ageMetric.getValue().get(0);
-                    double min = 0.0;
-                    double max = 0.0;
-                    double sum = 0.0;
-                    double num = 0.0;
-                    if (ageMetric.getValue().size() >= 5) {
-                        min = ageMetric.getValue().get(1);
-                        max = ageMetric.getValue().get(2);
-                        sum = ageMetric.getValue().get(3);
-                        num = ageMetric.getValue().get(4);
-                    }
-                    resultSet.add(new ExtendedResultTuple(key.toString(), age, measure, min, max, sum, num));
-                }
-            }
+            resultSet.addAll(processCohortResult(query,tableSchema,metaChunk,sigma,(Map<ExtendedCohort, Map<Integer, List<Double>>>) results));
         }
-        System.out.println(resultSet);
+
         return resultSet;
     }
-
 }

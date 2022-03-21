@@ -49,7 +49,7 @@ public class SetFieldFilter implements FieldFilter {
   /**
    * Which condition it contains
    */
-  private int[] cubeIDs;
+  private int[] contentIDs;
 
   /**
    * Indicate which tuple in the table is eligible
@@ -67,7 +67,7 @@ public class SetFieldFilter implements FieldFilter {
     this.fieldSet = set;
     this.values = checkNotNull(values);
     this.isAll = this.values.contains("ALL");
-    this.cubeIDs = this.isAll ? new int[2] : new int[values.size()];
+    this.contentIDs = this.isAll ? new int[2] : new int[values.size()];
   }
 
   /**
@@ -77,7 +77,7 @@ public class SetFieldFilter implements FieldFilter {
    */
   @Override
   public int getMinKey() {
-    return ArrayUtil.min(this.cubeIDs);
+    return ArrayUtil.min(this.contentIDs);
   }
 
   /**
@@ -87,11 +87,11 @@ public class SetFieldFilter implements FieldFilter {
    */
   @Override
   public int getMaxKey() {
-    return ArrayUtil.max(this.cubeIDs);
+    return ArrayUtil.max(this.contentIDs);
   }
 
   /**
-   * Indicate whether the metafiled is eligible i.e. whether we can find eligible vlaues in the metafield
+   * Indicate whether the metafield is eligible i.e. whether we can find eligible values in the metafield
    * 
    * @param metaField the metafield to be checked
    * @return false indicates the metafield is not eligible and true indicates the metafield is eligible
@@ -99,21 +99,22 @@ public class SetFieldFilter implements FieldFilter {
   @Override
   public boolean accept(MetaFieldRS metaField) {
     if (this.isAll) {
-      this.cubeIDs[1] = metaField.count() - 1;
+      this.contentIDs[1] = metaField.count() - 1;
       return true;
     }
     boolean bHit = false;
     int i = 0;
+    // Set up the contentIDs that are the selected conditions
     for (String v : this.values) {
       int tmp = metaField.find(v);
-      cubeIDs[i++] = tmp;
+      contentIDs[i++] = tmp;
       bHit |= (tmp >= 0);
     }
     return bHit || (this.values.isEmpty());
   }
 
   /**
-   * Indicate whether the filed is eligible i.e. whether we can find eligible vlaues in the field
+   * Indicate whether the filed is eligible i.e. whether we can find eligible values in the field
    * 
    * @param field the field to be checked
    * @return false indicates the field is not eligible and true indicates the field is eligible
@@ -129,9 +130,10 @@ public class SetFieldFilter implements FieldFilter {
     this.chunkValues = field.getValueVector();
 
     boolean bHit = false;
-    for (int cubeId : this.cubeIDs) {
-      if (cubeId >= 0) {
-        int tmp = keyVec.find(cubeId);
+    // build a hitset for the filters to check records
+    for (int contentID : this.contentIDs) {
+      if (contentID >= 0) {
+        int tmp = keyVec.find(contentID);
         bHit |= (tmp >= 0);
           if (tmp >= 0) {
               this.filter.set(tmp);
@@ -142,17 +144,17 @@ public class SetFieldFilter implements FieldFilter {
   }
 
   /**
-   * Indicate whether the interger is eligible
+   * Indicate whether the integer is eligible
    * 
-   * @param v the interger to be checked
-   * @return false indicates the interger is not eligible and true indicates the interger is eligible
+   * @param v the integer to be checked
+   * @return false indicates the integer is not eligible and true indicates the integer is eligible
    */
   @Override
   public boolean accept(int v) {
       if (this.isAll) {
           return true;
       }
-    return this.filter.get(v);
+      return this.filter.get(v);
   }
 
   /**

@@ -51,7 +51,16 @@ public interface EventAggregator {
      * @param time time field
      * @param ageMetrics
      */
-    void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd,
-                      int ageInterval, TimeUnit unit, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics);
+    void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
+                      TimeUnit unit, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics);
 
+    /**
+     * @brief  aggregate over @param ageOffset with age defined by time for the metric filed
+     *
+     * @param ageOffset
+     * @param time time field
+     * @param filedValue the filed value of the metric filed that is in the ageSelection filter
+     */
+    void ageAggregateMetirc(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
+                      TimeUnit unit, FieldFilter ageFilter, InputVector filedValue, Map<Integer, List<Double>> ageMetrics);
 }

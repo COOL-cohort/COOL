@@ -147,7 +147,7 @@ public class CoolFieldRS implements FieldRS {
       this.bSetField = true;
     }
 
-    codec = Codec.fromInteger(buffer.get());
+     codec = Codec.fromInteger(buffer.get());
     if (codec == Codec.PreCAL) {
       int values = buffer.get();
       this.bitSets = new BitSet[values];

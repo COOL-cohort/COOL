@@ -74,7 +74,7 @@ There are two types of queries in COOL. The first one includes two steps.
 - Select the specific users.
 
 ```
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
 ```
 
 - Executes cohort query on the selected users.

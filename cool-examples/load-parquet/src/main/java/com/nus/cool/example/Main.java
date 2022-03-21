@@ -1,6 +1,4 @@
 /*
- * Copyright 2021 Cool Squad Team
- *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -21,12 +19,14 @@
 package com.nus.cool.example;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
@@ -50,9 +50,24 @@ public class Main {
     try {
       File dataFile = new File(args[3]);
       String cubeRepo = args[4];
-      TableSchema schema = TableSchema.read(
-        new FileInputStream(schemaFile));
-      Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v1"); 
+      TableSchema schema = TableSchema.read(new FileInputStream(schemaFile));
+
+      File cubeRoot = new File(cubeRepo, cube);
+      File[] versions = cubeRoot.listFiles(new FileFilter() {
+        @Override
+        public boolean accept(File file) {
+          return file.isDirectory();
+        }
+      });
+      int currentVersion = 0;
+      assert versions != null;
+      if (versions.length!=0){
+        Arrays.sort(versions);
+        File LastVersion = versions[versions.length - 1];
+        currentVersion = Integer.parseInt(LastVersion.getName().substring(1));
+      }
+
+      Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v"+String.valueOf(currentVersion+1));
       Files.createDirectories(outputCubeVersionDir);
       File outputDir = outputCubeVersionDir.toFile();
       DataLoaderConfig config =

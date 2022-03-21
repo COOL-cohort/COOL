@@ -23,7 +23,11 @@ public class QueryServerModel {
 
     public QueryServerModel(String datasetPath){
         this.rootPath = datasetPath;
-        this.coolModel = new CoolModel(datasetPath);
+        try{
+            this.coolModel = new CoolModel(datasetPath);
+        } catch (IOException e){
+            System.out.println(e);
+        }
         this.queryExecutor = new QueryExecutor();
     }
 
@@ -45,12 +49,17 @@ public class QueryServerModel {
             List<Integer> users = queryExecutor.selectCohortUsers(inputCube, null, query);
 
             String outputCohort = query.getOutputCohort();
-            File cohortFile = new File(this.rootPath+File.separator+inputSource, outputCohort);
+            File cohortRoot =  new File(coolModel.getCubeStorePath(inputSource), "cohort");
+            if(!cohortRoot.exists()){
+                cohortRoot.mkdir();
+                System.out.println("[*] Cohort Fold " + cohortRoot.getName() + " is created.");
+            }
+            File cohortFile = new File(cohortRoot, outputCohort);
             if (cohortFile.exists()){
                 cohortFile.delete();
                 System.out.println("[*] Cohort " + outputCohort + " exists and is deleted!");
             }
-            queryExecutor.createCohort(query, users, this.rootPath+File.separator+inputSource);
+            queryExecutor.createCohort(query, users, cohortRoot);
             return Response.ok().entity(users).build();
         } catch (IOException e){
             System.out.println(e);

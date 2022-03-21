@@ -20,7 +20,7 @@
         "minTrigger":1,
         "timeWindow":{
           "length":7,
-          "slice":false,
+          "slice":true,
           "unit":"DAY"
         }
       }

@@ -43,6 +43,9 @@ public class CoolModel implements Closeable {
   // Container of loaded cohorts
   private Map<String, CohortRS> cohortStore = Maps.newHashMap();
 
+  // Store path of loaded cubes
+  private Map<String, File> storePath = Maps.newHashMap();
+
   // Directory containing a set of cube files considered a repository
   private final File localRepo;
 
@@ -51,8 +54,11 @@ public class CoolModel implements Closeable {
    *
    * @param path the repository directory
    */
-  public CoolModel(String path) {
-    this.localRepo = new File(path);
+  public CoolModel(String path) throws IOException{
+    localRepo = new File(path);
+    if (!localRepo.exists()) {
+      throw new FileNotFoundException("[x] Storage " + localRepo.getAbsolutePath() + " was not found");
+    }
   }
 
   /**
@@ -72,9 +78,6 @@ public class CoolModel implements Closeable {
         throw new FileNotFoundException("[x] Cube " + cube + " was not found");
       }
 
-    // Read schema information
-    TableSchema schema = TableSchema.read(new FileInputStream(new File(cubeRoot, "table.yaml")));
-    CubeRS cubeRS = new CubeRS(schema);
     File[] versions = cubeRoot.listFiles(new FileFilter() {
       @Override
       public boolean accept(File file) {
@@ -89,6 +92,11 @@ public class CoolModel implements Closeable {
 
     // Only load the latest version
     File currentVersion = versions[versions.length - 1];
+
+    // Read schema information
+    TableSchema schema = TableSchema.read(new FileInputStream(new File(currentVersion, "table.yaml")));
+    CubeRS cubeRS = new CubeRS(schema);
+
     File[] cubletFiles = currentVersion.listFiles(new FilenameFilter() {
       @Override
       public boolean accept(File file, String s) {
@@ -97,6 +105,7 @@ public class CoolModel implements Closeable {
     });
     System.out.println("Cube " + cube + ", versions: " + Arrays.toString(versions));
     System.out.println("Cube " + cube + ", Use version: " + currentVersion.getName());
+    storePath.put(cube, currentVersion);
 
     // Load all cubes under latest version
     checkNotNull(cubletFiles);
@@ -140,11 +149,21 @@ public class CoolModel implements Closeable {
     this.cohortStore.put(cohortFile.getName(), store);
   }
 
-  public synchronized InputVector getCohortUsers(String cohort) {
+  public InputVector getCohortUsers(String cohort) {
     if (cohortStore.containsKey(cohort)) {
       InputVector ret = cohortStore.get(cohort).getUsers();
       return ret;
     }
     return null;
+  }
+
+  public File getCubeStorePath(String cube) throws IOException{
+    File out = this.storePath.get(cube);
+    if(out == null){
+      throw new IOException("[*] Cube " + cube + " is not found in the system. Please reload it.");
+    }
+    else
+      return out;
+
   }
 }
