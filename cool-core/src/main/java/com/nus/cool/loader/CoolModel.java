@@ -78,9 +78,6 @@ public class CoolModel implements Closeable {
         throw new FileNotFoundException("[x] Cube " + cube + " was not found");
       }
 
-    // Read schema information
-    TableSchema schema = TableSchema.read(new FileInputStream(new File(cubeRoot, "table.yaml")));
-    CubeRS cubeRS = new CubeRS(schema);
     File[] versions = cubeRoot.listFiles(new FileFilter() {
       @Override
       public boolean accept(File file) {
@@ -95,6 +92,11 @@ public class CoolModel implements Closeable {
 
     // Only load the latest version
     File currentVersion = versions[versions.length - 1];
+
+    // Read schema information
+    TableSchema schema = TableSchema.read(new FileInputStream(new File(currentVersion, "table.yaml")));
+    CubeRS cubeRS = new CubeRS(schema);
+
     File[] cubletFiles = currentVersion.listFiles(new FilenameFilter() {
       @Override
       public boolean accept(File file, String s) {

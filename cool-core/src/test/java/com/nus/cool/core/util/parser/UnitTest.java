@@ -101,7 +101,7 @@ public class UnitTest {
                     dimensionFile, dataFile, outputDir, config).build();
             loader.load();
             Files.copy(Paths.get(schemaFileName),
-                    Paths.get(cubeRepo, cube, "table.yaml"),
+                    Paths.get(cubeRepo, cube, "v"+String.valueOf(currentVersion+1), "table.yaml"),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e){
             System.out.println(e);
