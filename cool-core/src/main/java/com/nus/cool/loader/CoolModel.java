@@ -54,8 +54,11 @@ public class CoolModel implements Closeable {
    *
    * @param path the repository directory
    */
-  public CoolModel(String path) {
-    this.localRepo = new File(path);
+  public CoolModel(String path) throws IOException{
+    localRepo = new File(path);
+    if (!localRepo.exists()) {
+      throw new FileNotFoundException("[x] Storage " + localRepo.getAbsolutePath() + " was not found");
+    }
   }
 
   /**

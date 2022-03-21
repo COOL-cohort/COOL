@@ -23,7 +23,11 @@ public class QueryServerModel {
 
     public QueryServerModel(String datasetPath){
         this.rootPath = datasetPath;
-        this.coolModel = new CoolModel(datasetPath);
+        try{
+            this.coolModel = new CoolModel(datasetPath);
+        } catch (IOException e){
+            System.out.println(e);
+        }
         this.queryExecutor = new QueryExecutor();
     }
 

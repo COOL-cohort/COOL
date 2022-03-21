@@ -53,22 +53,33 @@ public class UnitTest {
         }
     }
 
-    @Test
+    @Test(priority = 0)
     public static void CubeLoadTest() {
         System.out.println("======================== Cube load Test ========================");
         System.out.println(System.getProperty("user.dir"));
         String cube = "health";
         String schemaFileName = "../health/table.yaml";
+        String dimFileName = "../health/dim2.csv";
+        String dataFileName = "../health/raw2.csv";
         String cubeRepo = "../datasetSource";
+
+        File root = new File(cubeRepo);
+        if (!root.exists()){
+            if (root.mkdir()){
+                System.out.println("[*] Data storage " + root.getAbsolutePath() + " is created!");
+            } else {
+                System.out.println("[x] Data storage " + root.getAbsolutePath() + "cannot be created!");
+            }
+        }
 
         try{
             File schemaFile = new File(schemaFileName);
-            File dimensionFile = new File("../health/dim2.csv");
-            File dataFile = new File("../health/raw2.csv");
+            File dimensionFile = new File(dimFileName);
+            File dataFile = new File(dataFileName);
 
             TableSchema schema = TableSchema.read( new FileInputStream(schemaFile));
 
-            File cubeRoot = new File(cubeRepo, cube);
+            File cubeRoot = new File(root, cube);
             File[] versions = cubeRoot.listFiles(new FileFilter() {
                 @Override
                 public boolean accept(File file) {
@@ -76,8 +87,7 @@ public class UnitTest {
                 }
             });
             int currentVersion = 0;
-            assert versions != null;
-            if (versions.length!=0){
+            if (versions!=null){
                 Arrays.sort(versions);
                 File LastVersion = versions[versions.length - 1];
                 currentVersion = Integer.parseInt(LastVersion.getName().substring(1));
@@ -99,7 +109,7 @@ public class UnitTest {
         }
     }
 
-    @Test
+    @Test(priority = 1)
     public static void CubeReloadTest() {
         System.out.println("======================== Cube Reload Test ========================");
         String datasetPath = "../datasetSource";
@@ -119,7 +129,7 @@ public class UnitTest {
         }
     }
 
-    @Test
+    @Test(priority = 2)
     public static void CohortCreateTest() {
         System.out.println("======================== Cohort Create Test ========================");
         String datasetPath = "../datasetSource";
@@ -159,7 +169,7 @@ public class UnitTest {
         }
     }
 
-    @Test
+    @Test(priority = 3)
     public static void cohortAnalysis(){
         System.out.println("======================== Cohort Analysis Test ========================");
         String datasetPath = "../datasetSource";
