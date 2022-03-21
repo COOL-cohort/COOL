@@ -91,7 +91,7 @@ public class ExtendedCohortLoader {
         InputVector userVector = coolModel.getCohortUsers(query.getInputCohort());
         System.out.println(userVector);
 
-        QueryResult result = executeQuery(coolModel.getCube(query.getDataSource()),userVector, query);
+        List<ExtendedResultTuple> result = executeQuery(coolModel.getCube(query.getDataSource()),userVector, query);
         System.out.println(" result for query1 is  " + result);
         long end = System.currentTimeMillis();
         System.out.println("Exe time: " + (end - start));
@@ -174,7 +174,7 @@ public class ExtendedCohortLoader {
         return resultSet;
     }
 
-    public static QueryResult executeQuery(CubeRS cube, InputVector users, ExtendedCohortQuery query) {
+    public static List<ExtendedResultTuple> executeQuery(CubeRS cube, InputVector users, ExtendedCohortQuery query) {
         List<CubletRS> cublets = cube.getCublets();
         TableSchema tableSchema = cube.getTableSchema();
         List<ExtendedResultTuple> resultSet = new ArrayList<>();
@@ -200,6 +200,6 @@ public class ExtendedCohortLoader {
             resultSet.addAll(processCohortResult(query,tableSchema,metaChunk,sigma,(Map<ExtendedCohort, Map<Integer, List<Double>>>) results));
         }
 
-        return QueryResult.ok(resultSet);
+        return resultSet;
     }
 }

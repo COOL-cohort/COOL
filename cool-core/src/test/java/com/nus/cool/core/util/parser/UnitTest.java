@@ -183,8 +183,8 @@ public class UnitTest {
             }
             System.out.println("Input cohort: " + inputCohort);
             InputVector userVector = coolModel.getCohortUsers(inputCohort);
-            QueryResult result = ExtendedCohortLoader.executeQuery(inputCube, userVector, query);
-            System.out.println("Result for the query is  " + result.getResult());
+            List<ExtendedResultTuple> result = ExtendedCohortLoader.executeQuery(inputCube, userVector, query);
+            System.out.println("Result for the query is  " + result);
         } catch (IOException e){
             System.out.println(e);
         }

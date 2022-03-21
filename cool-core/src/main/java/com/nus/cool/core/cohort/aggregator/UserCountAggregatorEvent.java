@@ -152,6 +152,7 @@ public class UserCountAggregatorEvent implements EventAggregator{
 
 			boolean hasActivity = false;
 			age = TimeUtils.getDateFromOffset(timeVec, offset)-birthDay;
+			if (!ageFilter.accept(age)) return;
 			cohortCell = ageMetrics.get(age);
 			// init the cohort cell
 			// if the cohort cell is for the metric, it consists of "measure", "max", "min", "sum", "num"
