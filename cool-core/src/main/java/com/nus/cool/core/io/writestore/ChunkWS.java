@@ -80,7 +80,7 @@ public class ChunkWS implements Output {
    */
   public ChunkWS(int offset, FieldWS[] fields) {
     this.fields = checkNotNull(fields);
-    checkArgument(offset > 0 && fields.length > 0);
+    checkArgument(offset >= 0 && fields.length > 0);
     this.offset = offset;
   }
 

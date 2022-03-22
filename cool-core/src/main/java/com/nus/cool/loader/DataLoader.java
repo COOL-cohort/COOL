@@ -18,23 +18,12 @@
  */
 package com.nus.cool.loader;
 
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
-import com.nus.cool.core.io.writestore.ChunkWS;
-import com.nus.cool.core.io.writestore.MetaChunkWS;
-import com.nus.cool.core.io.writestore.MetaFieldWS;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.core.util.parser.CsvTupleParser;
 import com.nus.cool.core.util.parser.TupleParser;
-import com.nus.cool.core.util.reader.LineTupleReader;
 import com.nus.cool.core.util.reader.TupleReader;
 import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.core.util.writer.NativeDataWriter;

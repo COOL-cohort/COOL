@@ -112,12 +112,14 @@ public class NativeDataWriter implements DataWriter {
     }
 
     private void finishCublet() throws IOException {
-        int headOffset = offset;
+        offset += new MetaChunkWS(tableSchema, offset,
+          metaChunk.getMetaFields()).writeTo(out);
+        chunkOffsets.add(offset - Ints.BYTES);
         out.writeInt(IntegerUtil.toNativeByteOrder(chunkOffsets.size()));
         for (int chunkOff : chunkOffsets) {
-            out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
+          out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
         }
-        out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
+        out.writeInt(IntegerUtil.toNativeByteOrder(offset));
         out.flush();
         out.close();
     }
@@ -127,10 +129,8 @@ public class NativeDataWriter implements DataWriter {
         System.out.println("[*] A new cublet "+ fileName + " is created!");
         File cublet = new File(outputDir, fileName);
         DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));
-        offset = new MetaChunkWS(tableSchema, 0, metaChunk.getMetaFields())
-            .writeTo(out);
+        offset = 0;
         chunkOffsets.clear();
-        chunkOffsets.add(offset - Ints.BYTES);
         return out;
     }
 
