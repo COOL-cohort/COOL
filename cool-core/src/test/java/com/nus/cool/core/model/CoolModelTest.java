@@ -1,115 +1,58 @@
-package com.nus.cool.core.util.parser;
+package com.nus.cool.core.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.CohortUserSection;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
-import com.nus.cool.core.cohort.ExtendedCohortSelection;
-import com.nus.cool.core.cohort.QueryResult;
-import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.schema.TableSchema;
-
-import java.io.*;
-
+import com.nus.cool.core.util.config.CsvDataLoaderConfig;
+import com.nus.cool.core.util.config.DataLoaderConfig;
+import com.nus.cool.loader.ExtendedCohortLoader;
+import com.nus.cool.loader.ExtendedResultTuple;
+import com.nus.cool.model.CoolCohortEngine;
+import com.nus.cool.model.CoolLoader;
+import com.nus.cool.model.CoolModel;
+import org.testng.annotations.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.config.CsvDataLoaderConfig;
-import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.loader.CoolModel;
-import com.nus.cool.loader.CohortCreator;
-import com.nus.cool.loader.DataLoader;
-import com.nus.cool.loader.ExtendedCohortLoader;
-import com.nus.cool.loader.ExtendedResultTuple;
-import org.testng.annotations.Test;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-
-public class UnitTest {
-    //@Test
-    public static void TableSchemaTest() {
-        System.out.println(System.getProperty("user.dir"));
-        try {
-            File schemaFile = new File("../health/table.yaml");
-            TableSchema schema = TableSchema.read(new FileInputStream(schemaFile));
-            System.out.println(schema);
-        } catch (IOException e){
-            System.out.println(e);
-            return ;
-        }
-    }
+public class CoolModelTest {
+    private CoolCohortEngine coolCohortEngine = new CoolCohortEngine();
 
     @Test(priority = 0)
-    public static void CubeLoadTest() {
-        System.out.println("======================== Cube load Test ========================");
-        System.out.println(System.getProperty("user.dir"));
+    public static void CsvLoaderTest() {
+        System.out.println("======================== Csv data loader Test ========================");
+        // System.out.println(System.getProperty("user.dir"));
         String cube = "health";
         String schemaFileName = "../health/table.yaml";
         String dimFileName = "../health/dim2.csv";
         String dataFileName = "../health/raw2.csv";
         String cubeRepo = "../datasetSource";
 
-        File root = new File(cubeRepo);
-        if (!root.exists()){
-            if (root.mkdir()){
-                System.out.println("[*] Data storage " + root.getAbsolutePath() + " is created!");
-            } else {
-                System.out.println("[x] Data storage " + root.getAbsolutePath() + "cannot be created!");
-            }
-        }
+        DataLoaderConfig config = new CsvDataLoaderConfig();
 
         try{
-            File schemaFile = new File(schemaFileName);
-            File dimensionFile = new File(dimFileName);
-            File dataFile = new File(dataFileName);
-
-            TableSchema schema = TableSchema.read( new FileInputStream(schemaFile));
-
-            File cubeRoot = new File(root, cube);
-            File[] versions = cubeRoot.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return file.isDirectory();
-                }
-            });
-            int currentVersion = 0;
-            if (versions!=null){
-                Arrays.sort(versions);
-                File LastVersion = versions[versions.length - 1];
-                currentVersion = Integer.parseInt(LastVersion.getName().substring(1));
-            }
-
-            Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v"+String.valueOf(currentVersion+1));
-            Files.createDirectories(outputCubeVersionDir);
-            File outputDir = outputCubeVersionDir.toFile();
-            DataLoaderConfig config = new CsvDataLoaderConfig();
-            DataLoader loader = DataLoader.builder(cube, schema,
-                    dimensionFile, dataFile, outputDir, config).build();
-            loader.load();
-            Files.copy(Paths.get(schemaFileName),
-                    Paths.get(cubeRepo, cube, "v"+String.valueOf(currentVersion+1), "table.yaml"),
-                    StandardCopyOption.REPLACE_EXISTING);
+            CoolLoader loader = new CoolLoader(config);
+            loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
         } catch (IOException e){
             System.out.println(e);
             return ;
         }
     }
 
-    @Test(priority = 1)
+    @Test (priority = 10)
+    public void CubeListTest() throws IOException {
+        System.out.println("======================== Cube List Test ========================");
+        // System.out.println(System.getProperty("user.dir"));
+        String datasetPath = "../datasetSource";
+        CoolModel model = new CoolModel(datasetPath);
+        String[] cubes2 = model.listCubes();
+        System.out.println("Applications: " + Arrays.toString(cubes2));
+    }
+
+    @Test (priority = 1)
     public static void CubeReloadTest() {
         System.out.println("======================== Cube Reload Test ========================");
         String datasetPath = "../datasetSource";
@@ -129,8 +72,8 @@ public class UnitTest {
         }
     }
 
-    @Test(priority = 2)
-    public static void CohortCreateTest() {
+    @Test (priority = 2)
+    public void CohortCreateTest() {
         System.out.println("======================== Cohort Create Test ========================");
         String datasetPath = "../datasetSource";
         String queryPath = "../health/query1-0.json";
@@ -145,9 +88,9 @@ public class UnitTest {
 
             CubeRS cube = coolModel.getCube(query.getDataSource());
 
-            List<Integer> cohorResults = CohortCreator.selectCohortUsers(cube,null, query);
+            List<Integer> cohorResults = coolCohortEngine.selectCohortUsers(cube,null, query);
             System.out.println("Result for query is  " + cohorResults);
-            List<String> userIDs = CohortCreator.listCohortUsers(cube, cohorResults);
+            List<String> userIDs = coolCohortEngine.listCohortUsers(cube, cohorResults);
             System.out.println("Actual user IDs are  " + userIDs);
 
             String outputCohort = query.getOutputCohort();
@@ -162,7 +105,7 @@ public class UnitTest {
                 System.out.println("[*] Cohort " + outputCohort + " exists and is deleted!");
             }
 
-            CohortCreator.createCohort(query, cohorResults, cohortRoot);
+            coolCohortEngine.createCohort(query, cohorResults, cohortRoot);
             System.out.println("[*] Cohort results are stored into " + cohortRoot.getAbsolutePath());
         } catch (IOException e){
             System.out.println(e);

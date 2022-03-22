@@ -6,7 +6,7 @@
         <groupId>com.nus</groupId>
         <artifactId>cool</artifactId>
         <version>0.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>cool-extensions</artifactId>
@@ -14,9 +14,9 @@
 
     <modules>
         <module>parquet-extensions</module>
-        <module>hdfs-extensions</module>
-        <module>arrow-extensions</module>
-        <module>avro-extensions</module>
+<!--        <module>hdfs-extensions</module>-->
+<!--        <module>arrow-extensions</module>-->
+<!--        <module>avro-extensions</module>-->
     </modules>
 
     <dependencies>
