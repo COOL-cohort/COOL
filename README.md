@@ -98,13 +98,13 @@ We have provided examples in `sogamo` directory and `health` directory. Now we t
 You can load `sogamo` dataset with the following command.
 
 ```
-$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv ./datasetSource
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.model.CoolLoader sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv datasetSource
 ```
 
 In addition, you can run the following command to load dataset in `parquet` format under the `sogamo` directory.
 
 ```
-$ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.parquet ./datasetSource
+$ java -jar cool-extensions/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.parquet datasetSource
 ```
 
 Finally, there will be a cube generated under the `datasetSource` directory, which is named `sogamo`.

@@ -20,25 +20,20 @@ package com.nus.cool.loader;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import com.nus.cool.core.cohort.BirthSequence.BirthEvent;
 import com.nus.cool.core.cohort.BirthSequence.CohortField;
 import com.nus.cool.core.cohort.ExtendedCohort;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
-import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.cohort.ExtendedCohortSelection;
 import com.nus.cool.core.cohort.ExtendedCohortAggregation;
 import com.nus.cool.core.io.readstore.*;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.schema.CubeSchema;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.DataType;
+import com.nus.cool.model.CoolModel;
 
-import javax.management.Query;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

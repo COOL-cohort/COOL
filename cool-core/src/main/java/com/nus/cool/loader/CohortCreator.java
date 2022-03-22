@@ -20,25 +20,11 @@ package com.nus.cool.loader;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.CohortUserSection;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
-import com.nus.cool.core.cohort.ExtendedCohortSelection;
-import com.nus.cool.core.cohort.QueryResult;
-import com.nus.cool.core.io.compression.Compressor;
-import com.nus.cool.core.io.compression.Histogram;
-import com.nus.cool.core.io.compression.ZIntBitCompressor;
-import com.nus.cool.core.io.readstore.*;
-import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.model.CoolModel;
 
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class CohortCreator {
 
@@ -64,104 +50,10 @@ public class CohortCreator {
             cohortRoot.mkdir();
             System.out.println("[*] Cohort Fold " + cohortRoot.getName() + " is created.");
         }
-        File cohortFile = new File(cohortRoot, outputCohort);
-        if (cohortFile.exists()){
-            cohortFile.delete();
-            System.out.println("[*] Cohort " + outputCohort + " exists and is deleted!");
-        }
-        System.out.println("Get cube:" + coolModel.getCube(query.getDataSource()));
 
-        List<Integer> cohortResults = selectCohortUsers(coolModel.getCube(query.getDataSource()),null, query);
-        System.out.println("Result for query0 is  " + cohortResults);
-
-        // materialize to a cohort store
-        try {
-            createCohort(query, cohortResults, cohortRoot);
-
-        } catch (IOException e) {
-            throw new IOException();
-        }
-    }
-
-    public static List<String> listCohortUsers(CubeRS cube, List<Integer> inCohort){
-        List<String> outCohort = new ArrayList<>();
-
-        CubletRS cubletRS = cube.getCublets().get(0);
-        MetaChunkRS metaChunk = cubletRS.getMetaChunk();
-
-        TableSchema tableSchema = cube.getSchema();
-        MetaFieldRS metaField = metaChunk.getMetaField(tableSchema.getUserKeyField(), FieldType.UserKey);
-        for(Integer userID : inCohort){
-            outCohort.add(metaField.getString(userID));
-        }
-        return outCohort;
-    }
-
-    public static List<Integer> selectCohortUsers(CubeRS cube,
-                                                InputVector users,
-                                                ExtendedCohortQuery query) throws IOException {
-        if (cube == null)
-            throw new IOException("data source is null");
-
-        List<CubletRS> cublets = cube.getCublets();
-        TableSchema tableSchema = cube.getSchema();
-        List<Integer> userList = new ArrayList<>();
-
-        for (CubletRS cubletRS : cublets) {
-            MetaChunkRS metaChunk = cubletRS.getMetaChunk();
-            ExtendedCohortSelection sigma = new ExtendedCohortSelection();
-            CohortUserSection gamma = new CohortUserSection(sigma);
-            gamma.init(tableSchema, users, query);
-            gamma.process(metaChunk);
-            if(sigma.isUserActiveCublet()) {
-                List<ChunkRS> dataChunks = cubletRS.getDataChunks();
-                for(ChunkRS dataChunk : dataChunks) {
-                    gamma.process(dataChunk);
-                }
-            }
-
-            userList.addAll((List<Integer>)gamma.getCubletResults());
-        }
-
-        return userList;
     }
 
 
-    public static void createCohort(ExtendedCohortQuery query, List<Integer> users, File cohortRoot) throws IOException {
-        String cohortName = query.getOutputCohort();
-        File cohort = new File(cohortRoot, cohortName);
 
-        cohort.createNewFile();
-
-        DataOutputStream stream =
-                new DataOutputStream(new FileOutputStream(cohort));
-        int[] userArray = new int[users.size()];
-        Iterator<Integer> iter = users.iterator();
-        for (int i = 0; i < userArray.length; i++) {
-            userArray[i] = iter.next().intValue();
-        }
-        Compressor compressor = new ZIntBitCompressor(
-                Histogram.builder()
-                        .max(max(userArray))
-                        .numOfValues(userArray.length)
-                        .uniqueValues(userArray.length)
-                        .build());
-        byte[] compressed = new byte[compressor.maxCompressedLength()];
-        int nbytes = compressor.compress(userArray, 0, userArray.length,
-                compressed, 0, compressed.length);
-        stream.write(compressed, 0, nbytes);
-        stream.writeBytes(query.toString());
-        stream.close();
-    }
-
-    public static int max(int[] vec) {
-        int max = Integer.MIN_VALUE;
-
-        for(int v : vec)
-            if(v > max)
-                max = v;
-
-        return max;
-    }
 
 }

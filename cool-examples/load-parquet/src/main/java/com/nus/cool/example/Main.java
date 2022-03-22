@@ -70,8 +70,7 @@ public class Main {
       Path outputCubeVersionDir = Paths.get(cubeRepo, cube, "v"+String.valueOf(currentVersion+1));
       Files.createDirectories(outputCubeVersionDir);
       File outputDir = outputCubeVersionDir.toFile();
-      DataLoaderConfig config =
-      new ParquetDataLoaderConfig();
+      DataLoaderConfig config = new ParquetDataLoaderConfig();
       DataLoader loader = DataLoader.builder(cube, schema,
         dimensionFile, dataFile, outputDir, config).build();
       loader.load();
