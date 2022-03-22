@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 
 public class HdfsStorageServiceIntegrationTest {
   
-  @Test
+  // @Test
   public void testSaveLoad() {
     
     java.nio.file.Path dummyDir = java.nio.file.Paths.get("dummy");
