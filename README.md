@@ -95,16 +95,27 @@ $ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.Ext
 
 We have provided examples in `sogamo` directory and `health` directory. Now we take `sogamo` for example.
 
-You can load `sogamo` dataset with the following command.
+The COOL system supports CSV data format by default, and you can load `sogamo` dataset with the following command.
 
 ```
 $ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.model.CoolLoader sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv datasetSource
 ```
 
-In addition, you can run the following command to load dataset in `parquet` format under the `sogamo` directory.
+In addition, you can run the following command to load dataset in other formats under the `sogamo` directory.
 
+- parquet format data
 ```
 $ java -jar cool-extensions/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.parquet datasetSource
+```
+
+- Arrow format data
+```
+$ java -jar cool-extensions/arrow-extensions/target/arrow-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.arrow datasetSource
+```
+
+- Avro format data
+```
+$ java -jar cool-extensions/avro-extensions/target/avro-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/avro/test.avro datasetSource sogamo/avro/schema.avsc
 ```
 
 Finally, there will be a cube generated under the `datasetSource` directory, which is named `sogamo`.
