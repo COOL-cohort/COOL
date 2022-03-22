@@ -1,18 +1,18 @@
 package com.nus.cool.extension.model;
 
 import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.extension.util.config.ParquetDataLoaderConfig;
+import com.nus.cool.extension.util.config.ArrowIPCFileDataLoaderConfig;
 import com.nus.cool.model.CoolLoader;
 
 import java.io.IOException;
 
-public class ParquetLoader {
+public class ArrowLoader {
     /**
      * Please list the sogamo dataset files, because we are generating
      *  a sample parquet file for testing according to that dataset,
      * @param args there are five arguments. List in input order
      *  (1) output cube name: to be specified when loading from the repository
-     *  (2) table.yaml (3) dimension.csv (4) data.csv (5) output cube repository
+     *  (2) table.yaml (3) dimension.csv (4) data.arrow (5) output cube repository
      * @throws IOException
      */
     public static void main(String[] args) {
@@ -23,13 +23,13 @@ public class ParquetLoader {
         String cubeRepo = args[4];
 
         try {
-            DataLoaderConfig config = new ParquetDataLoaderConfig();
+            DataLoaderConfig config = new ArrowIPCFileDataLoaderConfig();
             CoolLoader coolLoader = new CoolLoader(config);
             coolLoader.load(cube,schemaFileName,dimensionFileName,dataFileName,cubeRepo);
         } catch (IOException e){
             System.out.println("Failed to load data");
             System.out.println(e);
         }
-        System.out.println("Cube " + cube + " is loaded successfully from the Parquet format data.");
+        System.out.println("Cube " + cube + " is loaded successfully from the Arrow format data.");
     }
 }
