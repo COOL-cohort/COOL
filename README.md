@@ -74,19 +74,19 @@ There are two types of queries in COOL. The first one includes two steps.
 - Select the specific users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortSelection path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
 ```
 
 - Executes cohort query on the selected users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
 ```
 
 The second type will execute the queries on all the users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
 ```
 
 #### Example
@@ -98,7 +98,7 @@ We have provided examples in `sogamo` directory and `health` directory. Now we t
 The COOL system supports CSV data format by default, and you can load `sogamo` dataset with the following command.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.model.CoolLoader sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv datasetSource
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv datasetSource
 ```
 
 In addition, you can run the following command to load dataset in other formats under the `sogamo` directory.
@@ -127,7 +127,7 @@ We use the `health` dataset for example.
 - Select the specific users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.CohortCreator datasetSource health health/query1-0.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortSelection datasetSource health/query1-0.json
 ```
 
 where the three arguments are as follows:
@@ -138,16 +138,16 @@ where the three arguments are as follows:
 - Execute cohort query on the selected users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader datasetSource health health/query1-1.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis datasetSource health/query1-1.json
 ```
 
 - Execute cohort query on all the users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.ExtendedCohortLoader datasetSource health health/query2.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis datasetSource health/query2.json
 ```
 
-Partial results for the second type of query on the `health` dataset are as follows
+Partial results for the query `health/query2.json` on the `health` dataset are as follows
 ```
  {
   "status" : "OK",

@@ -6,8 +6,7 @@ import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.loader.ExtendedCohortLoader;
-import com.nus.cool.loader.ExtendedResultTuple;
+import com.nus.cool.result.ExtendedResultTuple;
 import com.nus.cool.model.CoolCohortEngine;
 import com.nus.cool.model.CoolLoader;
 import com.nus.cool.model.CoolModel;
@@ -113,7 +112,7 @@ public class CoolModelTest {
     }
 
     @Test(priority = 3)
-    public static void cohortAnalysis(){
+    public void cohortAnalysis(){
         System.out.println("======================== Cohort Analysis Test ========================");
         String datasetPath = "../datasetSource";
         String queryPath = "../health/query2.json";
@@ -132,11 +131,11 @@ public class CoolModelTest {
             CubeRS inputCube = coolModel.getCube(query.getDataSource());
             String inputCohort = query.getInputCohort();
             if (inputCohort != null) {
-                coolModel.loadCohorts(inputCohort, datasetPath + File.separator + inputSource);
+                coolModel.loadCohorts(inputCohort, coolModel.getCubeStorePath(inputSource));
             }
             System.out.println("Input cohort: " + inputCohort);
             InputVector userVector = coolModel.getCohortUsers(inputCohort);
-            List<ExtendedResultTuple> result = ExtendedCohortLoader.executeQuery(inputCube, userVector, query);
+            List<ExtendedResultTuple> result = CoolCohortEngine.performCohortQuery(inputCube, userVector, query);
             System.out.println("Result for the query is  " + result);
         } catch (IOException e){
             System.out.println(e);

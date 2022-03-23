@@ -1,24 +1,18 @@
 package com.nus.cool.queryserver;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import com.nus.cool.core.cohort.*;
 import com.nus.cool.core.cohort.BirthSequence.BirthEvent;
 import com.nus.cool.core.cohort.BirthSequence.CohortField;
-import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.ZIntBitCompressor;
 import com.nus.cool.core.io.readstore.*;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.schema.CubeSchema;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.DataType;
-import com.nus.cool.loader.ExtendedResultTuple;
+import com.nus.cool.result.ExtendedResultTuple;
 
-import javax.management.Query;
-import javax.ws.rs.core.Response;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;

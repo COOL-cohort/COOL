@@ -7,7 +7,7 @@ import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.model.CoolModel;
-import com.nus.cool.loader.ExtendedResultTuple;
+import com.nus.cool.result.ExtendedResultTuple;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -77,7 +77,7 @@ public class QueryServerModel {
             CubeRS inputCube = this.coolModel.getCube(inputSource);
             String inputCohort = query.getInputCohort();
             if (inputCohort != null) {
-                this.coolModel.loadCohorts(inputCohort, this.rootPath + File.separator + inputSource);
+                this.coolModel.loadCohorts(inputCohort, coolModel.getCubeStorePath(inputSource));
             }
             System.out.println(inputCohort);
             InputVector userVector = this.coolModel.getCohortUsers(inputCohort);
