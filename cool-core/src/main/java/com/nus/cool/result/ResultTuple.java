@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.nus.cool.loader;
+package com.nus.cool.result;
 
 import java.util.ArrayList;
 import java.util.HashMap;

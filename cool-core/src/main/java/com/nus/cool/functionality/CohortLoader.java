@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.nus.cool.loader;
+package com.nus.cool.functionality;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -37,6 +37,7 @@ import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.converter.NumericConverter;
+import com.nus.cool.result.ResultTuple;
 import com.nus.cool.model.CoolModel;
 
 import java.io.DataOutputStream;

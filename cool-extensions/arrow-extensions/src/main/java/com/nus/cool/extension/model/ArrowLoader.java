@@ -8,12 +8,10 @@ import java.io.IOException;
 
 public class ArrowLoader {
     /**
-     * Please list the sogamo dataset files, because we are generating
-     *  a sample arrow file for testing according to that dataset,
+     * Please list the necessary dataset files for the COOL system to load into a new cube.
      * @param args there are five arguments. List in input order
      *  (1) output cube name: to be specified when loading from the repository
      *  (2) table.yaml (3) dimension.csv (4) data.arrow (5) output cube repository
-     * @throws IOException
      */
     public static void main(String[] args) {
         String cube = args[0];

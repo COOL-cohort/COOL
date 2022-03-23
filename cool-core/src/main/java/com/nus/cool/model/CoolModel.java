@@ -52,6 +52,8 @@ public class CoolModel implements Closeable {
   // Directory containing a set of cube files considered a repository
   private final File localRepo;
 
+  public CoolCohortEngine cohortEngine = new CoolCohortEngine();
+
   /**
    * Create a CoolModel to manage a cube repository
    *
@@ -145,8 +147,8 @@ public class CoolModel implements Closeable {
     return cube_cohort.list();
   }
 
-  public synchronized void loadCohorts(String inputCohorts, String dataPath) throws IOException {
-    File cohortFile = new File(dataPath+"/cohort/"+inputCohorts);
+  public synchronized void loadCohorts(String inputCohorts, File dataPath) throws IOException {
+    File cohortFile = new File(dataPath,"/cohort/"+inputCohorts);
     System.out.println("Cohort File: " + cohortFile + ". It exists:" + cohortFile.exists());
     CohortRS store = CohortRS.load(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
     this.cohortStore.put(cohortFile.getName(), store);
