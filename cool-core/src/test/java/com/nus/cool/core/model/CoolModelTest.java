@@ -131,7 +131,7 @@ public class CoolModelTest {
             CubeRS inputCube = coolModel.getCube(query.getDataSource());
             String inputCohort = query.getInputCohort();
             if (inputCohort != null) {
-                coolModel.loadCohorts(inputCohort, coolModel.getCubeStorePath(inputSource));
+                coolModel.loadCohorts(inputCohort, inputSource);
             }
             System.out.println("Input cohort: " + inputCohort);
             InputVector userVector = coolModel.getCohortUsers(inputCohort);

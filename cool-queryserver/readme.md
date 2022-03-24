@@ -1,23 +1,24 @@
 ### HOW TO RUN WITH A SERVER
 We can start the COOL's query server with the following command
 ```
-java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar datasetSource
+$ java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar datasetSource 8080
 ```
 where the argument is as follows:
-1. `datasetSource`: the path to the directory for the compacted dataset. 
+1. `datasetSource`: the path to the repository of compacted datasets.
+2. `8080`: the port of the server.
 
 In this server, we implement many APIs and list their corresponding urls as follows:
-- \[server]:v1
+- \[server:port]:v1
   - List all workable urls
-- \[server]:v1/reload?cube=[cube_name]
+- \[server:port]:v1/reload?cube=[cube_name]
   - Reload the cube
-- \[server]:v1/list
+- \[server:port]:v1/list
   - List existing cubes
-- \[server]:v1/cohort/list?cube=[cube_name]
+- \[server:port]:v1/cohort/list?cube=[cube_name]
   - List all cohorts from the selected cube
-- \[server]:v1/cohort/create 
-  - Create Cohorts
-- \[server]:v1/cohort/analysis
+- \[server:port]:v1/cohort/selection 
+  - Cohort Selection
+- \[server:port]:v1/cohort/analysis
   - Perform cohort analysis
 
 

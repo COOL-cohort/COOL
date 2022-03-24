@@ -43,7 +43,7 @@ public class QueryServer implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("[*] Start the Query Server...");
+        System.out.println("[*] Start the Query Server (port: " + String.valueOf(this.port) + ")...");
         try {
             this.model = new QueryServerModel(this.repoPath);
             Server httpServer = createJettyServer(port, 100, new QueryServerController(this.model));
