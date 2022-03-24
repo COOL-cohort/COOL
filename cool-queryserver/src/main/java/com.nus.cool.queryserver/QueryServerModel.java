@@ -6,6 +6,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.model.CoolCohortEngine;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ExtendedResultTuple;
 
@@ -19,7 +20,7 @@ public class QueryServerModel {
 
     private String rootPath;
 
-    private QueryExecutor queryExecutor;
+    private CoolCohortEngine cohortEngine = new CoolCohortEngine();
 
     public QueryServerModel(String datasetPath){
         this.rootPath = datasetPath;
@@ -28,7 +29,6 @@ public class QueryServerModel {
         } catch (IOException e){
             System.out.println(e);
         }
-        this.queryExecutor = new QueryExecutor();
     }
 
     public Response reloadCube(String cube){
@@ -46,7 +46,7 @@ public class QueryServerModel {
             String inputSource = query.getDataSource();
             CubeRS inputCube = this.coolModel.getCube(inputSource);
 
-            List<Integer> users = queryExecutor.selectCohortUsers(inputCube, null, query);
+            List<Integer> users = cohortEngine.selectCohortUsers(inputCube, null, query);
 
             String outputCohort = query.getOutputCohort();
             File cohortRoot =  new File(coolModel.getCubeStorePath(inputSource), "cohort");
@@ -59,7 +59,7 @@ public class QueryServerModel {
                 cohortFile.delete();
                 System.out.println("[*] Cohort " + outputCohort + " exists and is deleted!");
             }
-            queryExecutor.createCohort(query, users, cohortRoot);
+            cohortEngine.createCohort(query, users, cohortRoot);
             return Response.ok().entity(users).build();
         } catch (IOException e){
             System.out.println(e);
@@ -81,7 +81,7 @@ public class QueryServerModel {
             }
             System.out.println(inputCohort);
             InputVector userVector = this.coolModel.getCohortUsers(inputCohort);
-            List<ExtendedResultTuple> results = queryExecutor.executeCohortQuery(inputCube, userVector, query);
+            List<ExtendedResultTuple> results = cohortEngine.performCohortQuery(inputCube, userVector, query);
 
             return Response.ok(results).build();
         } catch (IOException e){

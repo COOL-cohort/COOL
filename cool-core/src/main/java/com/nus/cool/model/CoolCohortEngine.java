@@ -98,7 +98,7 @@ public class CoolCohortEngine {
         stream.close();
     }
 
-    public static List<ExtendedResultTuple> processCohortResult(ExtendedCohortQuery query,
+    public List<ExtendedResultTuple> processCohortResult(ExtendedCohortQuery query,
                                                                 TableSchema tableSchema,
                                                                 MetaChunkRS metaChunk,
                                                                 ExtendedCohortSelection sigma,
@@ -175,7 +175,7 @@ public class CoolCohortEngine {
         return resultSet;
     }
 
-    public static List<ExtendedResultTuple> performCohortQuery(CubeRS cube, InputVector users, ExtendedCohortQuery query) {
+    public List<ExtendedResultTuple> performCohortQuery(CubeRS cube, InputVector users, ExtendedCohortQuery query) {
         List<CubletRS> cublets = cube.getCublets();
         TableSchema tableSchema = cube.getTableSchema();
         List<ExtendedResultTuple> resultSet = new ArrayList<>();
