@@ -13,10 +13,10 @@ import com.nus.cool.core.io.writestore.ChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.IntegerUtil;
-import com.nus.cool.core.util.parser.CsvTupleParser;
-import com.nus.cool.core.util.parser.TupleParser;
-import com.nus.cool.core.util.reader.LineTupleReader;
-import com.nus.cool.core.util.reader.TupleReader;
+// import com.nus.cool.core.util.parser.CsvTupleParser;
+// import com.nus.cool.core.util.parser.TupleParser;
+// import com.nus.cool.core.util.reader.LineTupleReader;
+// import com.nus.cool.core.util.reader.TupleReader;
 
 public class NativeDataWriter implements DataWriter {
 
@@ -61,24 +61,50 @@ public class NativeDataWriter implements DataWriter {
 
     private DataOutputStream out = null;
 
+    // public NativeDataWriter(TableSchema schema, File outputDir, long chunkSize,
+    //     long cubletSize, File inputMetaFile) throws IOException {
+    //     this.tableSchema = schema;
+    //     this.outputDir = outputDir;
+    //     this.chunkSize = chunkSize;
+    //     this.cubletSize = cubletSize;
+        
+    //     // ToDo, this shall be removed later and progressively build metachunk
+    //     TupleParser parser = new CsvTupleParser();
+    //     this.metaChunk = MetaChunkWS.newMetaChunkWS(schema, 0);
+    //     try(TupleReader reader = new LineTupleReader(inputMetaFile)) {
+    //       while (reader.hasNext()) {
+    //         metaChunk.put(parser.parse(reader.next()));
+    //       }
+    //     }
+    //     this.metaChunk.complete();
+    //     System.out.println(this.metaChunk);
+    // }
     public NativeDataWriter(TableSchema schema, File outputDir, long chunkSize,
         long cubletSize, File inputMetaFile) throws IOException {
         this.tableSchema = schema;
         this.outputDir = outputDir;
         this.chunkSize = chunkSize;
         this.cubletSize = cubletSize;
-        
-        // ToDo, this shall be removed later and progressively build metachunk
-        TupleParser parser = new CsvTupleParser();
-        this.metaChunk = MetaChunkWS.newMetaChunkWS(schema, 0);
-        try(TupleReader reader = new LineTupleReader(inputMetaFile)) {
-          while (reader.hasNext()) {
-            metaChunk.put(parser.parse(reader.next()));
-          }
-        }
-        this.metaChunk.complete();
     }
     
+    // @Override
+    // public boolean Initialize() throws IOException {
+    //     if (initalized) return true;
+    //     this.userKeyIndex = tableSchema.getUserKeyField();
+    //     // when there is no user key, using any field for the additional
+    //     //  condition on chunk switch is ok.
+    //     if (this.userKeyIndex == -1) this.userKeyIndex = 0; 
+    //     // cublet
+    //     this.offset = 0;
+    //     // this.metaChunk = MetaChunkWS.newMetaChunkWS(this.tableSchema, 0);
+    //     // current impl of reading from dimension file is done in constructor shall be removed in the future and use progressively built metachunk instead
+    //     this.out = newCublet();
+    //     // chunk
+    //     this.tupleCount = 0;
+    //     this.chunk = ChunkWS.newChunk(this.tableSchema,
+    //         this.metaChunk.getMetaFields(), this.offset);
+    //     return true;
+    // }
     @Override
     public boolean Initialize() throws IOException {
         if (initalized) return true;
@@ -88,8 +114,7 @@ public class NativeDataWriter implements DataWriter {
         if (this.userKeyIndex == -1) this.userKeyIndex = 0; 
         // cublet
         this.offset = 0;
-        // this.metaChunk = MetaChunkWS.newMetaChunkWS(this.tableSchema, 0);
-        // current impl of reading from dimension file is done in constructor shall be removed in the future and use progressively built metachunk instead
+        this.metaChunk = MetaChunkWS.newMetaChunkWS(this.tableSchema, 0);
         this.out = newCublet();
         // chunk
         this.tupleCount = 0;
@@ -140,6 +165,26 @@ public class NativeDataWriter implements DataWriter {
         out = newCublet();
     }
 
+    // @Override
+    // public boolean Add(Object tuple) throws IOException {
+    //     if (!(tuple instanceof String[])) {
+    //         System.out.println(
+    //             "Unexpected tuple type: tuple not in valid type for DataWriter");
+    //         return false;
+    //     }
+    //     String[] fields = (String[]) tuple;
+    //     String curUser = fields[userKeyIndex];
+    //     if (lastUser == null) lastUser = curUser;
+    //     // start a new chunk
+    //     if (maybeSwitchChunk(curUser)) maybeSwitchCublet();
+    //     lastUser = curUser;
+    //     // update metachunk / metafield
+
+    //     // update data chunk 
+    //     chunk.put(fields);
+    //     tupleCount++;
+    //     return true;
+    // }
     @Override
     public boolean Add(Object tuple) throws IOException {
         if (!(tuple instanceof String[])) {
@@ -154,7 +199,7 @@ public class NativeDataWriter implements DataWriter {
         if (maybeSwitchChunk(curUser)) maybeSwitchCublet();
         lastUser = curUser;
         // update metachunk / metafield
-
+        metaChunk.update(fields);
         // update data chunk 
         chunk.put(fields);
         tupleCount++;

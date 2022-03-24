@@ -20,6 +20,7 @@ package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Maps;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
 import com.nus.cool.core.io.storevector.LZ4InputVector;
@@ -27,6 +28,7 @@ import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 public class HashMetaFieldRS implements MetaFieldRS {
 
@@ -38,7 +40,13 @@ public class HashMetaFieldRS implements MetaFieldRS {
 
   private InputVector fingerVec;
 
+  private InputVector globalIDVec;
+
   private InputVector valueVec;
+
+  // inverse map from global id to the offset in values.
+  //  only populated once when getString is called to retrieve from valueVec
+  private Map<Integer, Integer> id2offset;
 
   public HashMetaFieldRS(Charset charset) {
     this.charset = checkNotNull(charset);
@@ -51,7 +59,8 @@ public class HashMetaFieldRS implements MetaFieldRS {
 
   @Override
   public int find(String key) {
-    return this.fingerVec.find(rhash.hash(key));
+    int globalIDIdx = this.fingerVec.find(rhash.hash(key));
+    return this.globalIDVec.get(globalIDIdx);
   }
 
   @Override
@@ -61,7 +70,16 @@ public class HashMetaFieldRS implements MetaFieldRS {
 
   @Override
   public String getString(int i) {
-    return ((LZ4InputVector) this.valueVec).getString(i, this.charset);
+    // TODO: a better approach is to let the globalId not using those ZIntStores which implicit assume order to support find.
+    if (this.id2offset == null) {
+      this.id2offset = Maps.newHashMap();
+      // lazily populate the inverse index only once
+      for (int j = 0; j < this.globalIDVec.size(); j++) {
+        this.id2offset.put(this.globalIDVec.get(j), j);
+      }
+    }
+    return ((LZ4InputVector) this.valueVec)
+      .getString(this.id2offset.get(i), this.charset);
   }
 
   @Override
@@ -78,6 +96,7 @@ public class HashMetaFieldRS implements MetaFieldRS {
   public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
     this.fieldType = fieldType;
     this.fingerVec = InputVectorFactory.readFrom(buffer);
+    this.globalIDVec = InputVectorFactory.readFrom(buffer);
       if (this.fieldType == FieldType.Action || this.fieldType == FieldType.Segment
           || this.fieldType == FieldType.UserKey) {
           this.valueVec = InputVectorFactory.readFrom(buffer);

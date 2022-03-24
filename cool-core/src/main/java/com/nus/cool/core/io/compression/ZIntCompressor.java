@@ -48,7 +48,7 @@ public class ZIntCompressor implements Compressor {
    */
   private int maxCompressedLength;
 
-  public ZIntCompressor(Codec codec, Histogram hist) {
+  public ZIntCompressor(Codec codec, int numValues) {
     switch (codec) {
       case INT8:
         this.width = 1;
@@ -62,7 +62,11 @@ public class ZIntCompressor implements Compressor {
       default:
         throw new IllegalArgumentException("Unsupported codec: " + codec);
     }
-    this.maxCompressedLength = this.width * hist.getNumOfValues() + HEADACC;
+    this.maxCompressedLength = this.width * numValues + HEADACC;
+  }
+
+  public ZIntCompressor(Codec codec, Histogram hist) {
+    this(codec, hist.getNumOfValues());
   }
 
   @Override
