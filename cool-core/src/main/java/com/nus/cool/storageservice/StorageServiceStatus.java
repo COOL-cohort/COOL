@@ -16,7 +16,7 @@ public class StorageServiceStatus {
    */
   public static enum StatusCode {
     /**
-     * Storage service is unavaible
+     * Storage service is unavailable
      */
     UNAVAILABLE,
     /**
@@ -24,7 +24,7 @@ public class StorageServiceStatus {
      */
     OK,
     /**
-     * Errors occured in storage service
+     * Errors occurred in storage service
      */
     ERROR
   }
@@ -50,7 +50,7 @@ public class StorageServiceStatus {
   }
 
   /**
-   * Construct a storge service status with status code and empty message
+   * Construct a storage service status with status code and empty message
    * 
    * @param code status code
    */

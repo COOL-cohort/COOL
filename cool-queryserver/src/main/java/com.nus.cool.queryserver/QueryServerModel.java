@@ -33,17 +33,20 @@ public class QueryServerModel {
 
     public Response reloadCube(String cube){
         try{
-            this.coolModel.reload(cube);
-            return Response.ok("Cube " + cube + " is reloaded.").build();
+            if (!this.coolModel.isCubeLoaded(cube)){
+                this.coolModel.reload(cube);
+                return Response.ok("Cube " + cube + " is reloaded.").build();
+            } else return Response.ok("Cube " + cube + " has already been reloaded.").build();
         } catch (IOException e){
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
 
-    public Response creatCohort(ExtendedCohortQuery query){
+    public Response cohortSelection(ExtendedCohortQuery query){
         try {
             String inputSource = query.getDataSource();
+            this.reloadCube(inputSource);
             CubeRS inputCube = this.coolModel.getCube(inputSource);
 
             List<Integer> users = cohortEngine.selectCohortUsers(inputCube, null, query);
@@ -67,7 +70,7 @@ public class QueryServerModel {
         }
     }
 
-    public Response cohrtAnalysis(ExtendedCohortQuery query){
+    public Response cohortAnalysis(ExtendedCohortQuery query){
         try {
             if (!query.isValid())
                 throw new IOException("[x] Invalid cohort query.");
@@ -77,7 +80,7 @@ public class QueryServerModel {
             CubeRS inputCube = this.coolModel.getCube(inputSource);
             String inputCohort = query.getInputCohort();
             if (inputCohort != null) {
-                this.coolModel.loadCohorts(inputCohort, coolModel.getCubeStorePath(inputSource));
+                this.coolModel.loadCohorts(inputCohort, inputSource);
             }
             System.out.println(inputCohort);
             InputVector userVector = this.coolModel.getCohortUsers(inputCohort);
@@ -95,6 +98,12 @@ public class QueryServerModel {
     }
 
     public Response listCohorts(String cube) {
-        return Response.ok().entity(this.coolModel.listCohorts(cube)).build();
+        try {
+            String[] cohorts = this.coolModel.listCohorts(cube);
+            return Response.ok().entity(cohorts).build();
+        } catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
     }
 }

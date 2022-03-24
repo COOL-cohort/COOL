@@ -62,7 +62,7 @@ public class CoolModel implements Closeable {
   public CoolModel(String path) throws IOException{
     localRepo = new File(path);
     if (!localRepo.exists()) {
-      throw new FileNotFoundException("[x] Storage " + localRepo.getAbsolutePath() + " was not found");
+      throw new FileNotFoundException("[x] Repository " + localRepo.getAbsolutePath() + " was not found");
     }
   }
 
@@ -80,7 +80,7 @@ public class CoolModel implements Closeable {
     // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
       if (!cubeRoot.exists()) {
-        throw new FileNotFoundException("[x] Cube " + cube + " was not found");
+        throw new FileNotFoundException("[x] Cube " + cube + " was not found in the repository.");
       }
 
     File[] versions = cubeRoot.listFiles(new FileFilter() {
@@ -127,12 +127,14 @@ public class CoolModel implements Closeable {
   }
 
   /**
-   * Retrive a cube by name
+   * Retrieve a cube by name
+   *
+   * @throws IOException
    */
   public synchronized CubeRS getCube(String cube) throws IOException{
     CubeRS out = this.metaStore.get(cube);
     if(out == null){
-      throw new IOException("[*] Cube " + cube + " is not found in the system. Please reload it.");
+      throw new IOException("[*] Cube " + cube + " is not loaded in the COOL system. Please reload it.");
     }
     else
       return out;
@@ -142,16 +144,24 @@ public class CoolModel implements Closeable {
     return this.localRepo.list();
   }
 
-  public synchronized String[] listCohorts(String cube) {
-    File cube_cohort = new File(new File(this.localRepo,cube), "cohort");
+  public synchronized boolean isCubeLoaded(String Cube) {
+    return this.metaStore.containsKey(Cube);
+  }
+
+  public synchronized String[] listCohorts(String cube) throws IOException {
+    File cube_cohort = new File(getCubeStorePath(cube), "cohort");
     return cube_cohort.list();
   }
 
-  public synchronized void loadCohorts(String inputCohorts, File dataPath) throws IOException {
-    File cohortFile = new File(dataPath,"/cohort/"+inputCohorts);
-    System.out.println("Cohort File: " + cohortFile + ". It exists:" + cohortFile.exists());
-    CohortRS store = CohortRS.load(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
-    this.cohortStore.put(cohortFile.getName(), store);
+  public synchronized void loadCohorts(String inputCohorts, String cube) throws IOException {
+    File cohortFile = new File(new File(getCubeStorePath(cube),"cohort"),inputCohorts);
+    if (cohortFile.exists()){
+      CohortRS store = CohortRS.load(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
+      this.cohortStore.put(cohortFile.getName(), store);
+    }
+    else{
+      throw new IOException("[x] Cohort File " + cohortFile + " does not exist.");
+    }
   }
 
   public InputVector getCohortUsers(String cohort) {
@@ -165,7 +175,7 @@ public class CoolModel implements Closeable {
   public File getCubeStorePath(String cube) throws IOException{
     File out = this.storePath.get(cube);
     if(out == null){
-      throw new IOException("[*] Cube " + cube + " is not found in the system. Please reload it.");
+      throw new IOException("[x] Cube " + cube + " is not loaded in the COOL system. Please reload it.");
     }
     else
       return out;

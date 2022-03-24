@@ -41,7 +41,7 @@ public class QueryServerController {
 		text += " - [server]:v1/list\n";
 		text += " - [server]:v1/cohort/list?cube=[cube_name]\n";
 		text += "HTTP Method: POST\n";
-		text += " - [server]:v1/cohort/create\n";
+		text += " - [server]:v1/cohort/selection\n";
 		text += " - [server]:v1/cohort/analysis\n";
 		return text;
 	}
@@ -59,9 +59,9 @@ public class QueryServerController {
 	@Path("list")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listCubes() throws IOException {
+	public Response listCubes() {
 		getTimeClock();
-		System.out.println("[*] Server is listing all cohorts.");
+		System.out.println("[*] Server is listing all cubes.");
 		Response res = qsModel.listCubes();
 		return res;
 	}
@@ -69,24 +69,24 @@ public class QueryServerController {
 	@Path("cohort/list")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response listCohorts(@QueryParam("cube") String cube) throws IOException {
+	public Response listCohorts(@QueryParam("cube") String cube) {
 		getTimeClock();
 		System.out.println("[*] Server is listing all cohorts.");
 		Response res = qsModel.listCohorts(cube);
 		return res;
 	}
 
-	@Path("cohort/create")
+	@Path("cohort/selection")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.TEXT_PLAIN)
-	public Response creatCohort(@Context Request req, String query) throws IOException {
+	public Response cohortSelection(@Context Request req, String query) throws IOException {
 		getTimeClock();
 		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
-		System.out.println("[*] This cohort query is for creating cohorts: " + query);
+		System.out.println("[*] This cohort query is for cohort selection: " + query);
 		ObjectMapper mapper = new ObjectMapper();
 		ExtendedCohortQuery q = mapper.readValue(query, ExtendedCohortQuery.class);
-		Response res = qsModel.creatCohort(q);
+		Response res = qsModel.cohortSelection(q);
 		return res;
 	}
 
@@ -100,7 +100,7 @@ public class QueryServerController {
 		System.out.println("[*] This cohort query is for cohort analysis: " + query);
 		ObjectMapper mapper = new ObjectMapper();
 		ExtendedCohortQuery q = mapper.readValue(query, ExtendedCohortQuery.class);
-		Response res = qsModel.cohrtAnalysis(q);
+		Response res = qsModel.cohortAnalysis(q);
 		return res;
 	}
 }
