@@ -135,7 +135,7 @@ public class CoolModelTest {
             }
             System.out.println("Input cohort: " + inputCohort);
             InputVector userVector = coolModel.getCohortUsers(inputCohort);
-            List<ExtendedResultTuple> result = CoolCohortEngine.performCohortQuery(inputCube, userVector, query);
+            List<ExtendedResultTuple> result = coolModel.cohortEngine.performCohortQuery(inputCube, userVector, query);
             System.out.println("Result for the query is  " + result);
         } catch (IOException e){
             System.out.println(e);

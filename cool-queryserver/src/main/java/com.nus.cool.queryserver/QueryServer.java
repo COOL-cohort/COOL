@@ -1,5 +1,6 @@
 package com.nus.cool.queryserver;
 
+import lombok.Setter;
 import org.eclipse.jetty.server.*;
 import org.glassfish.jersey.jetty.JettyHttpContainer;
 import org.glassfish.jersey.server.ContainerFactory;
@@ -22,15 +23,16 @@ public class QueryServer implements Runnable {
 
     private CountDownLatch waitForLatch = new CountDownLatch(1);
 
-    private volatile boolean bStop = false;
-
     private QueryServerModel model;
 
-    private String datasetPath;
+    private String repoPath;
+
+    @Setter
+    private Integer port = 8080;
 
     public QueryServer(String path){
-        this.datasetPath = path;
-        File root = new File(this.datasetPath);
+        this.repoPath = path;
+        File root = new File(this.repoPath);
         if(!root.exists()){
             root.mkdir();
             System.out.println("[*] Dataset source folder " + path + " is created.");
@@ -43,8 +45,8 @@ public class QueryServer implements Runnable {
     public void run() {
         System.out.println("[*] Start the Query Server...");
         try {
-            this.model = new QueryServerModel(this.datasetPath);
-            Server httpServer = createJettyServer(8080, 100, new QueryServerController(this.model));
+            this.model = new QueryServerModel(this.repoPath);
+            Server httpServer = createJettyServer(port, 100, new QueryServerController(this.model));
             httpServer.start();
             httpServer.join();
 //            while (!httpServer.isRunning())
@@ -100,7 +102,9 @@ public class QueryServer implements Runnable {
     }
 
     public static void main(String[] args) throws Exception {
-        QueryServer qserver = new QueryServer(args[0]);
+        String repoPath = args[0];
+        QueryServer qserver = new QueryServer(repoPath);
+        if (args.length==2) qserver.setPort(Integer.valueOf(args[1]));
         qserver.start();
         qserver.waitForStart();
         qserver.join();
