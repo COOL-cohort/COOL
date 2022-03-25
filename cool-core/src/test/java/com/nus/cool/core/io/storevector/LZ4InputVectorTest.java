@@ -58,10 +58,9 @@ public class LZ4InputVectorTest {
       Assert.assertEquals(in.getString(0, charset), "value0");
       Assert.assertEquals(in.getString(2, charset), "value2");
 
-      // load the bytes with
+      buffer.close();
     } catch (IOException e) {
       System.out.println("IOException encountered");
     }
-    Assert.assertTrue(true);
   }
 }

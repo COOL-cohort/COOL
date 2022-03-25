@@ -70,7 +70,6 @@ public class HashMetaFieldRS implements MetaFieldRS {
 
   @Override
   public String getString(int i) {
-    // TODO: a better approach is to let the globalId not using those ZIntStores which implicit assume order to support find.
     if (this.id2offset == null) {
       this.id2offset = Maps.newHashMap();
       // lazily populate the inverse index only once
