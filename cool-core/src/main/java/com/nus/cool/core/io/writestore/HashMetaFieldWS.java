@@ -150,7 +150,7 @@ public class HashMetaFieldWS implements MetaFieldWS {
         .max(this.dict.size())
         .numOfValues(globalIDs.length)
         .rawSize(Ints.BYTES * globalIDs.length)
-        .type(CompressType.KeyHash) // temporarily choose KeyHash, Value or FastValue may be also possible
+        .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
         .build();
     this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
     bytesWritten += this.compressor.writeTo(out);

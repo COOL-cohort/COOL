@@ -45,10 +45,13 @@ public class BitVectorCompressor implements Compressor {
    */
   private int maxLength;
 
-  public BitVectorCompressor(Histogram hist) {
-    int bitLength = IntegerUtil.numOfBits((int) hist.getMax());
+  public BitVectorCompressor(int max) {
+    int bitLength = IntegerUtil.numOfBits(max);
     this.bitSet = new BitSet(bitLength);
-    this.maxLength = (bitLength >>> 3) + 1;
+    this.maxLength = (bitLength >>> 3) + 1;  
+  }
+  public BitVectorCompressor(Histogram hist) {
+    this((int) hist.getMax());
   }
 
   @Override
