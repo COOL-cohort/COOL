@@ -1,4 +1,4 @@
-package com.nus.cool.core.funnel;
+package com.nus.cool.core.cohort.funnel;
 
 import com.nus.cool.core.cohort.BirthSequence;
 
