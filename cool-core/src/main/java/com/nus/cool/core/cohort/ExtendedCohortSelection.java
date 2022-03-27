@@ -485,17 +485,6 @@ public class ExtendedCohortSelection implements Operator {
 			birthOffset = (birthOffset < offset) ? offset : birthOffset;
 		}
 
-//		for (Integer e : sortedEvents) {
-//			// filter between [start, birthOffset] for birth events
-//			// without time window
-//			if (seq.getBirthEvents().get(e).getTimeWindow() == null) {
-//				offset = (eventOffset.get(e).isEmpty()) ? start : eventOffset.get(e).getLast() + 1;
-//				filterEvent(e, offset, birthOffset);
-//				if (!checkOccurrence(e))
-//					return -1;
-//			}
-//		}
-
 		// evaluate birth aggregation filters
 		if (filterByBirthAggregation()) {
 			// real birthday
@@ -520,7 +509,6 @@ public class ExtendedCohortSelection implements Operator {
 
 		cohort.clearDimension();
 
-		// TODO check the age problem
 		if (boff >= 0) {
 			// find the respective cohort for this user
 			List<BirthSequence.BirthEvent> events = q.getBirthSequence().getBirthEvents();

@@ -63,7 +63,7 @@ public class RangeFieldFilter implements FieldFilter {
    * Get the range of the field
    *
    * @param values the values of the conditions
-   * @param converter the converter to convert the values to interger
+   * @param converter the converter to convert the values to integer
    */
   public RangeFieldFilter(List<String> values, NumericConverter converter) {
     checkNotNull(values);
@@ -103,7 +103,7 @@ public class RangeFieldFilter implements FieldFilter {
   }
 
   /**
-   * Indicate whether the metafiled is eligible i.e. whether we can find eligible vlaues in the metafield
+   * Indicate whether the metafiled is eligible i.e. whether we can find eligible values in the metafield
    * 
    * @param metaField the metafield to be checked
    * @return false indicates the metafield is not eligible and true indicates the metafield is eligible
@@ -114,7 +114,7 @@ public class RangeFieldFilter implements FieldFilter {
   }
 
   /**
-   * Indicate whether the filed is eligible i.e. whether we can find eligible vlaues in the field
+   * Indicate whether the filed is eligible i.e. whether we can find eligible values in the field
    * 
    * @param field the field to be checked
    * @return false indicates the field is not eligible and true indicates the field is eligible
@@ -126,10 +126,10 @@ public class RangeFieldFilter implements FieldFilter {
 
 
   /**
-   * Indicate whether the interger v is eligible
+   * Indicate whether the integer v is eligible
    * 
-   * @param v the interger to be checked
-   * @return false indicates the interger is not eligible and true indicates the interger is eligible
+   * @param v the integer to be checked
+   * @return false indicates the integer is not eligible and true indicates the integer is eligible
    */
   @Override
   public boolean accept(int v) {

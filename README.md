@@ -74,19 +74,19 @@ There are two types of queries in COOL. The first one includes two steps.
 - Select the specific users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortSelection path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortSelection path/to/output/datasource/directory path/to/your/queryfile
 ```
 
-- Executes cohort query on the selected users.
+- Executes cohort query users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis path/to/output/datasource/directory path/to/your/cohortqueryfile
 ```
 
-The second type will execute the queries on all the users.
+- Executes the funnel query.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.FunnelAnalysis path/to/output/datasource/directory path/to/your/funnelqueryfile
 ```
 
 #### Example
@@ -122,7 +122,7 @@ Finally, there will be a cube generated under the `datasetSource` directory, whi
 
 ##### Execute queries
 
-We use the `health` dataset for example.
+We use the `health` dataset for example to demonstrate the cohort ananlysis.
 
 - Select the specific users.
 
@@ -186,6 +186,12 @@ Partial results for the query `health/query2.json` on the `health` dataset are a
     "num" : 30.0
   },
   ...
+```
+
+We use the `sogamo` dataset for example to demonstrate the funnel ananlysis.
+
+```
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.FunnelAnalysis datasetSource sogamo/query1.json
 ```
 
 ## Publication

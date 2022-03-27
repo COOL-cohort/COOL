@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.model.CoolCohortEngine;
 import com.nus.cool.result.ExtendedResultTuple;
 import com.nus.cool.model.CoolModel;
 
@@ -38,8 +37,8 @@ public class CohortAnalysis {
             String inputCohort = query.getInputCohort();
             if (inputCohort != null) {
                 coolModel.loadCohorts(inputCohort, inputSource);
+                System.out.println("Input cohort: " + inputCohort);
             }
-            System.out.println("Input cohort: " + inputCohort);
             InputVector userVector = coolModel.getCohortUsers(inputCohort);
             List<ExtendedResultTuple> result = coolModel.cohortEngine.performCohortQuery(inputCube, userVector, query);
             System.out.println("Result for the query is  " + result);

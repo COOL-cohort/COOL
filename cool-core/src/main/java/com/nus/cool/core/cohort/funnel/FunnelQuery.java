@@ -1,5 +1,6 @@
 package com.nus.cool.core.cohort.funnel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.BirthSequence;
 
 import java.util.ArrayList;
@@ -45,5 +46,10 @@ public class FunnelQuery {
 
 	public void setInputCohort(String inputCohort) {
 		this.inputCohort = inputCohort;
+	}
+
+	@JsonIgnore
+	public boolean isValid() {
+		return (stages != null) && (dataSource != null);
 	}
 }

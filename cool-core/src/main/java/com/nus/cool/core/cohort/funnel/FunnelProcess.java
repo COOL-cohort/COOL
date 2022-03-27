@@ -9,7 +9,6 @@ import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
-import com.nus.cool.core.schema.CubeSchema;
 import com.nus.cool.core.schema.TableSchema;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,14 +19,10 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * 
- * 
- * @author qingchao
- */
-public class FunnelAnalysis implements CohortOperator {
 
-    private static Log LOG = LogFactory.getLog(FunnelAnalysis.class);
+public class FunnelProcess implements CohortOperator {
+
+    private static Log LOG = LogFactory.getLog(FunnelProcess.class);
 
     private TableSchema tableSchema;
 
@@ -55,7 +50,7 @@ public class FunnelAnalysis implements CohortOperator {
     
     int validFunnelStages;
 
-    public FunnelAnalysis() {}
+    public FunnelProcess() {}
 
     public Object getCubletResults() {
         return this.cubletResults;
@@ -108,7 +103,7 @@ public class FunnelAnalysis implements CohortOperator {
 
     @Override
     public void init(TableSchema schema, CohortQuery query) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override

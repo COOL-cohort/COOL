@@ -52,6 +52,8 @@ public class CoolModel implements Closeable {
   // Directory containing a set of cube files considered a repository
   private final File localRepo;
 
+  private String currentCube = "";
+
   public CoolCohortEngine cohortEngine = new CoolCohortEngine();
 
   /**
@@ -76,6 +78,7 @@ public class CoolModel implements Closeable {
     // Remove the old version of the cube
     this.metaStore.remove(cube);
     this.cohortStore.clear();
+    this.currentCube = cube;
 
     // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
@@ -160,16 +163,17 @@ public class CoolModel implements Closeable {
       this.cohortStore.put(cohortFile.getName(), store);
     }
     else{
-      throw new IOException("[x] Cohort File " + cohortFile + " does not exist.");
+      throw new IOException("[x] Cohort File " + cohortFile + " does not exist in the cube " + cube + ".");
     }
   }
 
-  public InputVector getCohortUsers(String cohort) {
-    if (cohortStore.containsKey(cohort)) {
-      InputVector ret = cohortStore.get(cohort).getUsers();
-      return ret;
+  public InputVector getCohortUsers(String cohort) throws IOException {
+    if (cohort == null) return null;
+    if (!cohortStore.containsKey(cohort)) {
+      loadCohorts(cohort, this.currentCube);
     }
-    return null;
+    InputVector ret = cohortStore.get(cohort).getUsers();
+    return ret;
   }
 
   public File getCubeStorePath(String cube) throws IOException{
