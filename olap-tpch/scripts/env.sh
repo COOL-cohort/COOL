@@ -16,5 +16,6 @@
 # under the License.
 # =============================================================================
 
-$COOL_NAME=/Users/kevin/project_java/COOL
-DBGEN="path to un-zipped tpc-h dataset"
+COOL_NAME=/Users/kevin/project_java/COOL
+DBGEN=/Users/kevin/Downloads/b6aa3d2b-7eb7-49da-8cae-c3811750432f-tpc-h-tool/TPC-H_Tools_v3.0.0/dbgen
+#DBGEN="path to un-zipped tpc-h dataset"

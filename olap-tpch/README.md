@@ -47,8 +47,12 @@
    make
    ```
 
-6. In `/TPC-H_Tools_v3.0.0/dbgen` , generate 4 table namely `nation.tbl, region.tbl, orders.tbl, customer.tbl` with 
+6. In `/TPC-H_Tools_v3.0.0/dbgen` , generate  table namely with
 
    ```bash
-   ./dbgen -f -s 10
+   ./dbgen -f -s n
    ```
+   where n is size of data in GB, it can be 1, 10, 0.1
+   eg.
+   ```bash
+   ./dbgen -f -s 0.1
