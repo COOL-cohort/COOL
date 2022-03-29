@@ -563,27 +563,7 @@ public class ExtendedCohortSelection implements Operator {
 
 		return null;
 	}
-	
-	private void updateStats(int age, int val, Map<Integer, List<Double>> cohortCells) {
-		if (cohortCells != null) {
-			if (cohortCells.get(age) == null) {
-				cohortCells.put(age, new ArrayList<Double>());
-				cohortCells.get(age).add(0.0);
-			}
-			if (cohortCells.get(age).size() < 5) {
-				cohortCells.get(age).add(Double.MAX_VALUE);
-				cohortCells.get(age).add(-1.0 * Double.MAX_VALUE);
-				cohortCells.get(age).add(0.0);
-				cohortCells.get(age).add(0.0);
-			}
-			if (val < cohortCells.get(age).get(1))
-				cohortCells.get(age).set(1, (double)val);
-			if (val > cohortCells.get(age).get(2))
-				cohortCells.get(age).set(2, (double)val);
-			cohortCells.get(age).set(3, cohortCells.get(age).get(3) + val);
-			cohortCells.get(age).set(4, cohortCells.get(age).get(4) + 1);
-		}
-	}
+
 
 	private void filterAgeActivity(int ageOff, int ageEnd, BitSet bs, InputVector fieldIn, FieldFilter ageFilter) {
 		// update value for this column if necessary
@@ -599,12 +579,7 @@ public class ExtendedCohortSelection implements Operator {
 				int val = fieldIn.next();
 				if (!ageFilter.accept(val)) {
 					bs.clear(i);
-					// deleteStats(i - ageOff, cohortCells);
 				}
-//				else {
-//					if (updateStats)
-//						updateStats(i - ageOff, val, cohortCells);
-//				}
 			}
 		} else {            
 			int pos = bs.nextSetBit(ageOff);
@@ -612,12 +587,7 @@ public class ExtendedCohortSelection implements Operator {
 				int val = fieldIn.get(pos);
 				if (!ageFilter.accept(val)) {
 					bs.clear(pos);
-					// deleteStats(pos - ageOff, cohortCells);
 				}
-//				else {
-//					if (updateStats)
-//						updateStats(pos - ageOff, val, cohortCells);
-//				}
 				pos = bs.nextSetBit(pos + 1);
 			}
 		}        

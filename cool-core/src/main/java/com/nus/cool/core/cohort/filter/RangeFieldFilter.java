@@ -25,6 +25,7 @@ import com.google.common.collect.Lists;
 import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.ArrayUtil;
 import com.nus.cool.core.util.converter.NumericConverter;
 import com.nus.cool.core.util.parser.TupleParser;
@@ -60,12 +61,23 @@ public class RangeFieldFilter implements FieldFilter {
   private int max;
 
   /**
+   * Chunk value vector for hash field
+   */
+  private InputVector chunkValues;
+
+  /**
+   * the configuration of the field set
+   */
+  private ExtendedFieldSet fieldSet;
+
+  /**
    * Get the range of the field
    *
    * @param values the values of the conditions
    * @param converter the converter to convert the values to integer
    */
-  public RangeFieldFilter(List<String> values, NumericConverter converter) {
+  public RangeFieldFilter(ExtendedFieldSet fieldSet, List<String> values, NumericConverter converter) {
+    this.fieldSet = fieldSet;
     checkNotNull(values);
     checkArgument(!values.isEmpty());
     this.minValues = new int[values.size()];
@@ -121,6 +133,7 @@ public class RangeFieldFilter implements FieldFilter {
    */
   @Override
   public boolean accept(FieldRS field) {
+    this.chunkValues = field.getValueVector();
     return !(field.minKey() > this.max || field.maxKey() < this.min);
   }
 
@@ -158,7 +171,7 @@ public class RangeFieldFilter implements FieldFilter {
 
   @Override
   public ExtendedFieldSet getFieldSet() {
-    throw new UnsupportedOperationException();
+    return fieldSet;
   }
 
   @Override
@@ -168,7 +181,10 @@ public class RangeFieldFilter implements FieldFilter {
 
   @Override
   public int nextAcceptTuple(int start, int to) {
-    throw new UnsupportedOperationException();
+    // throw new UnsupportedOperationException();
+    chunkValues.skipTo(start);
+    while(start < to && !accept(chunkValues.next())) ++start;
+    return start;
   }
 
 }

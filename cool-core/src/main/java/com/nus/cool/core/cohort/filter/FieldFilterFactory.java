@@ -42,9 +42,9 @@ public class FieldFilterFactory {
       case Action:
         return new SetFieldFilter(fieldSet, values);
       case ActionTime:
-        return new RangeFieldFilter(values, new DayIntConverter());
+        return new RangeFieldFilter(fieldSet, values, new DayIntConverter());
       case Metric:
-        return new RangeFieldFilter(values, new StringIntConverter());
+        return new RangeFieldFilter(fieldSet, values, new StringIntConverter());
       default:
         throw new IllegalArgumentException("Unsupported field type: " + schema.getFieldType());
     }

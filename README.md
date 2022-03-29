@@ -46,10 +46,10 @@ Each distinct value of each column in the dataset shall appear in this dimension
 
 #### Load dataset
 
-Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found under [cool-examples/load-csv](cool-examples/load-csv/src/main/java/com/nus/cool/example/Main.java).
+Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found in [CsvLoader.java](cool-core/src/main/java/com/nus/cool/functionality/CsvLoader.java).
 
 ```
-$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar path/to/your/source/directory path/to/your/.yaml path/to/your/dimensionfile path/to/your/datafile path/to/output/datasource/directory
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader path/to/your/source/directory path/to/your/.yaml path/to/your/dimensionfile path/to/your/datafile path/to/output/datasource/directory
 ```
 
 The five arguments in the command have the following meaning:
@@ -59,15 +59,10 @@ The five arguments in the command have the following meaning:
 4. the dataset file (the first required source)
 5. the output directory for the compacted dataset
 
-Alternatively, the data in parquet format can be loaded using the data loader with sample code under [cool-examples/load-parquet](cool-examples/load-parquet/src/main/java/com/nus/cool/example/Main.java).
-
-```
-$ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar path/to/your/source/directory path/to/your/.yaml path/to/your/dimensionfile path/to/your/datafile path/to/output/datasource/directory
-```
 
 #### Execute queries
 
-We provide an example for cohort query processing in [CohortLoader.java](cool-core/src/main/java/com/nus/cool/loader/CohortLoader.java).
+We provide an example for cohort query processing in [CohortAnalysis.java](cool-core/src/main/java/com/nus/cool/functionality/CohortAnalysis.java).
 
 There are two types of queries in COOL. The first one includes two steps.
 

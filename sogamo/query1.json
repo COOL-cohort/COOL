@@ -57,6 +57,18 @@
                 ]
               },
               "filterType":"Set"
+            },
+            {
+              "cubeField":"money",
+              "fieldValue":{
+                "baseEvent":-1,
+                "baseField":null,
+                "type":"AbsoluteValue",
+                "values":[
+                  "4000|30000"
+                ]
+              },
+              "filterType":"Range"
             }
           ],
           "maxTrigger":-1,

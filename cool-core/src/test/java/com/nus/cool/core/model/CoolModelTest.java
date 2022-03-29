@@ -144,7 +144,7 @@ public class CoolModelTest {
         }
     }
 
-//    @Test(priority = 4)
+     @Test(priority = 4)
     public void FunnelAnalysis(){
         System.out.println("======================== Funnel Analysis Test ========================");
         String datasetPath = "../datasetSource";

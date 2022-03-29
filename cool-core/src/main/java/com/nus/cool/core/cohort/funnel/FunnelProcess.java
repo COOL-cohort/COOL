@@ -182,7 +182,7 @@ public class FunnelProcess implements CohortOperator {
             	cubletResults[i]++;
             	
             	if (funnelQuery.isOrdered()) {
-            		beg = cohort.getBirthOffset() + 1;
+            		beg = cohort.getBirthOffset();
             	}
             }
         }
