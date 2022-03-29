@@ -2,7 +2,10 @@ package com.nus.cool.core.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
+import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.cohort.funnel.FunnelQuery;
+import com.nus.cool.core.iceberg.query.IcebergQuery;
+import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.config.CsvDataLoaderConfig;
@@ -17,6 +20,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.nus.cool.functionality.IcebergLoader.executeQuery;
+
 public class CoolModelTest {
 
     @Test(priority = 0)
@@ -28,6 +33,12 @@ public class CoolModelTest {
         String dimFileName = "../health/dim2.csv";
         String dataFileName = "../health/raw2.csv";
         String cubeRepo = "../datasetSource";
+
+//        String cube = "tpc-h-10g";
+//        String schemaFileName = "../olap-tpch/table.yaml";
+//        String dimFileName = "../olap-tpch/scripts/dim.csv";
+//        String dataFileName = "../olap-tpch/scripts/data.csv";
+//        String cubeRepo = "../datasetSource";
 
         DataLoaderConfig config = new CsvDataLoaderConfig();
 
@@ -143,7 +154,7 @@ public class CoolModelTest {
         }
     }
 
-     @Test(priority = 4)
+    @Test(priority = 4)
     public void FunnelAnalysis(){
         System.out.println("======================== Funnel Analysis Test ========================");
         String datasetPath = "../datasetSource";
@@ -170,6 +181,43 @@ public class CoolModelTest {
             int[] result = coolModel.cohortEngine.performFunnelQuery(inputCube, userVector, query);
             System.out.println("Result for the query is  " + Arrays.toString(result));
         } catch (IOException e){
+            System.out.println(e);
+        }
+    }
+
+    @Test(priority = 5)
+    public void IceBergTest(){
+        System.out.println("======================== IceBerg Test ========================");
+
+        String dzFilePath = "../datasetSource";
+        String queryFilePath = "../olap-tpch/query.json";
+
+        try {
+            // load query
+            ObjectMapper mapper = new ObjectMapper();
+            IcebergQuery query = mapper.readValue(new File(queryFilePath), IcebergQuery.class);
+
+            // load .dz file
+            String dataSourceName = query.getDataSource();
+            CoolModel coolModel = new CoolModel(dzFilePath);
+            coolModel.reload(dataSourceName);
+
+            // execute query
+            QueryResult result;
+            try {
+                List<BaseResult> results = executeQuery(coolModel.getCube(dataSourceName), query);
+                result = QueryResult.ok(results);
+            } catch (Exception e) {
+                e.printStackTrace();
+                result = QueryResult.error("something wrong");
+            }
+
+            System.out.println("Result for the query is  " + result);
+
+        } catch (IOException e){
+            System.out.println(e);
+        } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e);
         }
     }
