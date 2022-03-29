@@ -75,6 +75,9 @@ public class CoolModel implements Closeable {
    * @throws IOException
    */
   public synchronized void reload(String cube) throws IOException {
+    // Skip the reload process if the cube is the current one
+    if (currentCube == cube) return;
+
     // Remove the old version of the cube
     this.metaStore.remove(cube);
     this.cohortStore.clear();
