@@ -149,7 +149,7 @@ public class CoolFieldRS implements FieldRS {
       buffer.position(buffer.position() - 1);
       this.keyVec = InputVectorFactory.readFrom(buffer);
       this.minKey = 0;
-      this.maxKey = this.keyVec.size()-1;
+      this.maxKey = this.keyVec.size();
       this.bSetField = true;
     }
 
