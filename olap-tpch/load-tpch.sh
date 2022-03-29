@@ -23,4 +23,4 @@ python dim.py
 cd  $COOL_NAME/olap-tpch/
 cp table.yaml cube/$1/version1/
 
-java -Xmx16384m -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.loader.LocalLoader ./table.yaml ./scripts/dim.csv ./scripts/data.csv ../cube/$1/version1 1000000
+java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar tpc-h-10g olap-tpch/table.yaml olap-tpch/dim.csv olap-tpch/data.csv datasetSource
