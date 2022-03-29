@@ -46,10 +46,10 @@ Each distinct value of each column in the dataset shall appear in this dimension
 
 #### Load dataset
 
-Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found under [cool-examples/load-csv](cool-examples/load-csv/src/main/java/com/nus/cool/example/Main.java).
+Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found in [CsvLoader.java](cool-core/src/main/java/com/nus/cool/functionality/CsvLoader.java).
 
 ```
-$ java -jar cool-examples/load-csv/target/load-csv-0.1-SNAPSHOT.jar path/to/your/source/directory path/to/your/.yaml path/to/your/dimensionfile path/to/your/datafile path/to/output/datasource/directory
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader path/to/your/source/directory path/to/your/.yaml path/to/your/dimensionfile path/to/your/datafile path/to/output/datasource/directory
 ```
 
 The five arguments in the command have the following meaning:
@@ -59,34 +59,29 @@ The five arguments in the command have the following meaning:
 4. the dataset file (the first required source)
 5. the output directory for the compacted dataset
 
-Alternatively, the data in parquet format can be loaded using the data loader with sample code under [cool-examples/load-parquet](cool-examples/load-parquet/src/main/java/com/nus/cool/example/Main.java).
-
-```
-$ java -jar cool-examples/load-parquet/target/load-parquet-0.1-SNAPSHOT.jar path/to/your/source/directory path/to/your/.yaml path/to/your/dimensionfile path/to/your/datafile path/to/output/datasource/directory
-```
 
 #### Execute queries
 
-We provide an example for cohort query processing in [CohortLoader.java](cool-core/src/main/java/com/nus/cool/loader/CohortLoader.java).
+We provide an example for cohort query processing in [CohortAnalysis.java](cool-core/src/main/java/com/nus/cool/functionality/CohortAnalysis.java).
 
 There are two types of queries in COOL. The first one includes two steps.
 
 - Select the specific users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortSelection path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortSelection path/to/output/datasource/directory path/to/your/queryfile
 ```
 
-- Executes cohort query on the selected users.
+- Executes cohort query users.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis path/to/output/datasource/directory path/to/your/cohortqueryfile
 ```
 
-The second type will execute the queries on all the users.
+- Executes the funnel query.
 
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis path/to/output/datasource/directory path/to/your/directory path/to/your/queryfile
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.FunnelAnalysis path/to/output/datasource/directory path/to/your/funnelqueryfile
 ```
 
 #### Example
@@ -122,7 +117,7 @@ Finally, there will be a cube generated under the `datasetSource` directory, whi
 
 ##### Execute queries
 
-We use the `health` dataset for example.
+We use the `health` dataset for example to demonstrate the cohort ananlysis.
 
 - Select the specific users.
 
@@ -187,6 +182,42 @@ Partial results for the query `health/query2.json` on the `health` dataset are a
   },
   ...
 ```
+
+We use the `sogamo` dataset for example to demonstrate the funnel analysis.
+
+```
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.FunnelAnalysis datasetSource sogamo/query1.json
+```
+
+
+### HOW TO RUN WITH A SERVER
+We can start the COOL's query server with the following command
+```
+$ java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar datasetSource 8080
+```
+where the argument is as follows:
+1. `datasetSource`: the path to the repository of compacted datasets.
+2. `8080`: the port of the server.
+
+In this server, we implement many APIs and list their corresponding urls as follows:
+- \[server:port]:v1
+    - List all workable urls
+- \[server:port]:v1/reload?cube=[cube_name]
+    - Reload the cube
+- \[server:port]:v1/list
+    - List existing cubes
+- \[server:port]:v1/cohort/list?cube=[cube_name]
+    - List all cohorts from the selected cube
+- \[server:port]:v1/cohort/selection
+    - Cohort Selection
+- \[server:port]:v1/cohort/analysis
+    - Perform cohort analysis
+- \[server:port]:v1/funnel/analysis
+    - Perform funnel analysis
+
+### CONNECT TO EXTERNAL STORAGE SERVICES
+COOL has an [StorageService](cool-core/src/main/java/com/nus/cool/storageservice/StorageService.java) interface, which will allow COOL standalone server/workers (coming soon) to handle data movement between local and an external storage service. A sample implementation for HDFS connection can be found under the [hdfs-extensions](cool-extensions/hdfs-extensions/).
+
 
 ## Publication
 * Z. Xie, H. Ying, C. Yue, M. Zhang, G. Chen, B. C. Ooi. [Cool: a COhort OnLine analytical processing system](https://www.comp.nus.edu.sg/~ooibc/icde20cool.pdf), in 2020 IEEE 36th International Conference on Data Engineering, pp.577-588, 2020.

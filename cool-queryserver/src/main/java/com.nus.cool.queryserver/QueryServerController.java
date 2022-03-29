@@ -12,6 +12,7 @@ import java.io.IOException;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nus.cool.core.cohort.funnel.FunnelQuery;
 import org.eclipse.jetty.server.Request;
 
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
@@ -43,6 +44,7 @@ public class QueryServerController {
 		text += "HTTP Method: POST\n";
 		text += " - [server]:v1/cohort/selection\n";
 		text += " - [server]:v1/cohort/analysis\n";
+		text += " - [server]:v1/funnel/analysis\n";
 		return text;
 	}
 
@@ -83,7 +85,7 @@ public class QueryServerController {
 	public Response cohortSelection(@Context Request req, String query) throws IOException {
 		getTimeClock();
 		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
-		System.out.println("[*] This cohort query is for cohort selection: " + query);
+		System.out.println("[*] This query is for cohort selection: " + query);
 		ObjectMapper mapper = new ObjectMapper();
 		ExtendedCohortQuery q = mapper.readValue(query, ExtendedCohortQuery.class);
 		Response res = qsModel.cohortSelection(q);
@@ -97,10 +99,24 @@ public class QueryServerController {
 	public Response performCohortAnalysis(@Context Request req, String query) throws IOException {
 		getTimeClock();
 		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
-		System.out.println("[*] This cohort query is for cohort analysis: " + query);
+		System.out.println("[*] This query is for cohort analysis: " + query);
 		ObjectMapper mapper = new ObjectMapper();
 		ExtendedCohortQuery q = mapper.readValue(query, ExtendedCohortQuery.class);
 		Response res = qsModel.cohortAnalysis(q);
+		return res;
+	}
+
+	@Path("funnel/analysis")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.TEXT_PLAIN)
+	public Response performFunnelAnalysis(@Context Request req, String query) throws IOException {
+		getTimeClock();
+		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
+		System.out.println("[*] This query is for funnel analysis: " + query);
+		ObjectMapper mapper = new ObjectMapper();
+		FunnelQuery q = mapper.readValue(query, FunnelQuery.class);
+		Response res = qsModel.funnelAnalysis(q);
 		return res;
 	}
 }

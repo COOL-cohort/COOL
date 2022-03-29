@@ -485,17 +485,6 @@ public class ExtendedCohortSelection implements Operator {
 			birthOffset = (birthOffset < offset) ? offset : birthOffset;
 		}
 
-//		for (Integer e : sortedEvents) {
-//			// filter between [start, birthOffset] for birth events
-//			// without time window
-//			if (seq.getBirthEvents().get(e).getTimeWindow() == null) {
-//				offset = (eventOffset.get(e).isEmpty()) ? start : eventOffset.get(e).getLast() + 1;
-//				filterEvent(e, offset, birthOffset);
-//				if (!checkOccurrence(e))
-//					return -1;
-//			}
-//		}
-
 		// evaluate birth aggregation filters
 		if (filterByBirthAggregation()) {
 			// real birthday
@@ -520,7 +509,6 @@ public class ExtendedCohortSelection implements Operator {
 
 		cohort.clearDimension();
 
-		// TODO check the age problem
 		if (boff >= 0) {
 			// find the respective cohort for this user
 			List<BirthSequence.BirthEvent> events = q.getBirthSequence().getBirthEvents();
@@ -575,27 +563,7 @@ public class ExtendedCohortSelection implements Operator {
 
 		return null;
 	}
-	
-	private void updateStats(int age, int val, Map<Integer, List<Double>> cohortCells) {
-		if (cohortCells != null) {
-			if (cohortCells.get(age) == null) {
-				cohortCells.put(age, new ArrayList<Double>());
-				cohortCells.get(age).add(0.0);
-			}
-			if (cohortCells.get(age).size() < 5) {
-				cohortCells.get(age).add(Double.MAX_VALUE);
-				cohortCells.get(age).add(-1.0 * Double.MAX_VALUE);
-				cohortCells.get(age).add(0.0);
-				cohortCells.get(age).add(0.0);
-			}
-			if (val < cohortCells.get(age).get(1))
-				cohortCells.get(age).set(1, (double)val);
-			if (val > cohortCells.get(age).get(2))
-				cohortCells.get(age).set(2, (double)val);
-			cohortCells.get(age).set(3, cohortCells.get(age).get(3) + val);
-			cohortCells.get(age).set(4, cohortCells.get(age).get(4) + 1);
-		}
-	}
+
 
 	private void filterAgeActivity(int ageOff, int ageEnd, BitSet bs, InputVector fieldIn, FieldFilter ageFilter) {
 		// update value for this column if necessary
@@ -611,12 +579,7 @@ public class ExtendedCohortSelection implements Operator {
 				int val = fieldIn.next();
 				if (!ageFilter.accept(val)) {
 					bs.clear(i);
-					// deleteStats(i - ageOff, cohortCells);
 				}
-//				else {
-//					if (updateStats)
-//						updateStats(i - ageOff, val, cohortCells);
-//				}
 			}
 		} else {            
 			int pos = bs.nextSetBit(ageOff);
@@ -624,12 +587,7 @@ public class ExtendedCohortSelection implements Operator {
 				int val = fieldIn.get(pos);
 				if (!ageFilter.accept(val)) {
 					bs.clear(pos);
-					// deleteStats(pos - ageOff, cohortCells);
 				}
-//				else {
-//					if (updateStats)
-//						updateStats(pos - ageOff, val, cohortCells);
-//				}
 				pos = bs.nextSetBit(pos + 1);
 			}
 		}        
