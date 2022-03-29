@@ -273,7 +273,7 @@ public class IcebergSelection {
     public void process(MetaChunkRS metaChunk) {
         this.metaChunk = metaChunk;
         int actionField = this.tableSchema.getActionTimeField();
-        MetaFieldRS timeField = metaChunk.getMetaField(actionField, FieldType.Action);
+        MetaFieldRS timeField = metaChunk.getMetaField(actionField, FieldType.ActionTime);
         // min and max must be in valid range
         boolean isAccepted = accept(timeField.getMinValue(), timeField.getMaxValue());
         // must have and
