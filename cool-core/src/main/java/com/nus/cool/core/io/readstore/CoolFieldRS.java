@@ -105,6 +105,11 @@ public class CoolFieldRS implements FieldRS {
   }
 
   @Override
+  public FieldType getFieldType() {
+    return fieldType;
+  }
+
+  @Override
   public InputVector getKeyVector() {
     return this.keyVec;
   }
