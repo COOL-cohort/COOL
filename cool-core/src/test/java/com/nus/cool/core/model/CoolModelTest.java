@@ -8,7 +8,6 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.result.ExtendedResultTuple;
-import com.nus.cool.model.CoolCohortEngine;
 import com.nus.cool.model.CoolLoader;
 import com.nus.cool.model.CoolModel;
 import org.testng.annotations.Test;
