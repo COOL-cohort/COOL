@@ -161,6 +161,9 @@ public class TableSchema {
    * @return the corresponding field id of the name
    */
   public int getFieldID(String name) {
+    if (!this.name2Id.containsKey(name)){
+      throw new IllegalArgumentException("name="+name+" is not in name2Id mapper="+this.name2Id);
+    }
     Integer id = this.name2Id.get(name);
     return id == null ? -1 : id;
   }
@@ -172,5 +175,13 @@ public class TableSchema {
    */
   public String getActionTimeFieldName() {
     return this.fields.get(this.getActionTimeField()).getName();
+  }
+
+  public FieldSchema getFieldSchema(int i) {
+    return fields.get(i);
+  }
+
+  public FieldSchema getFieldSchema(String name) {
+    return getFieldSchema(getFieldID(name));
   }
 }
