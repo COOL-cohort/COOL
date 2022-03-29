@@ -59,22 +59,20 @@ public class IcebergLoader {
 
         // the path of dz file eg "COOL/cube"
         String dzFilePath = args[0];
-        // data source name it should be the same as dataSource in query.json file, eg. tpc-h-10g
-        String dataSourceName = args[1];
         // query path  eg. tmp/2/query.json
-        String queryFilePath = args[2];
-
-        // load .dz file
-        CoolModel coolModel = new CoolModel(dzFilePath);
-        coolModel.reload(dataSourceName);
-
-//        coolModel.init(dataSourceName);
+        String queryFilePath = args[1];
 
         // load query
         ObjectMapper mapper = new ObjectMapper();
         IcebergQuery query = mapper.readValue(new File(queryFilePath), IcebergQuery.class);
 
-        QueryResult result = wrapResult(coolModel.getCube(query.getDataSource()), query);
+        // load .dz file
+        String dataSourceName = query.getDataSource();
+        CoolModel coolModel = new CoolModel(dzFilePath);
+        coolModel.reload(dataSourceName);
+
+        // execute query
+        QueryResult result = wrapResult(coolModel.getCube(dataSourceName), query);
         System.out.println(result.toString());
     }
 
