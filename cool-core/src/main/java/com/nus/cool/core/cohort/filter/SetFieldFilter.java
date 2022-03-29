@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * SetFieldFilter is used to check whether the input is eligible
- * If the condition doesnot exist, then all the input are eligible
+ * If the condition does not exist, then all the input are eligible
  * Usage: first check whether the metafield is eligible
  * Then find the eligible tuples of the field
  */
@@ -61,6 +61,9 @@ public class SetFieldFilter implements FieldFilter {
    */
   private InputVector chunkValues;
 
+  /**
+   * the configuration of the field set
+   */
   private ExtendedFieldSet fieldSet;
 
   public SetFieldFilter(ExtendedFieldSet set, List<String> values) {

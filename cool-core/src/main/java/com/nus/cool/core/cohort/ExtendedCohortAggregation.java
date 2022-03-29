@@ -228,23 +228,4 @@ public class ExtendedCohortAggregation implements CohortOperator {
         if (totalCorruptedUsers > 0)
             LOG.info("Total corrupted users: " + totalCorruptedUsers + " " + totalDataChunks);
     }
-
-    private void updateStats(List<Double> newStats, List<Double> cohortCellsStats) {
-        // 4 values: min, max, avg, num
-        if (cohortCellsStats.size() < 5) {
-            for (Double val : newStats)
-                cohortCellsStats.add(val);
-        }
-        else {
-            // min
-            if (cohortCellsStats.get(1) > newStats.get(0))
-                cohortCellsStats.set(1, newStats.get(0));
-            // max
-            if (cohortCellsStats.get(2) > newStats.get(1))
-                cohortCellsStats.set(2, newStats.get(1));
-            // avg and num
-            cohortCellsStats.set(3, cohortCellsStats.get(3) + newStats.get(2));
-            cohortCellsStats.set(4, cohortCellsStats.get(4) + newStats.get(3));
-        }
-    }
 }
