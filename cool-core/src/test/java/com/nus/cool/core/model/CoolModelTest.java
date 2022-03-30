@@ -34,14 +34,22 @@ public class CoolModelTest {
         String dataFileName = "../health/raw2.csv";
         String cubeRepo = "../datasetSource";
 
-//        String cube = "tpc-h-10g";
-//        String schemaFileName = "../olap-tpch/table.yaml";
-//        String dimFileName = "../olap-tpch/scripts/dim.csv";
-//        String dataFileName = "../olap-tpch/scripts/data.csv";
-//        String cubeRepo = "../datasetSource";
-
         DataLoaderConfig config = new CsvDataLoaderConfig();
         CoolLoader loader = new CoolLoader(config);
+        loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
+
+        cube = "tpc-h-10g";
+        schemaFileName = "../olap-tpch/table.yaml";
+        dimFileName = "../olap-tpch/scripts/dim.csv";
+        dataFileName = "../olap-tpch/scripts/data.csv";
+        cubeRepo = "../datasetSource";
+        loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
+
+        cube = "sogamo";
+        schemaFileName = "../sogamo/table.yaml";
+        dimFileName = "../sogamo/dim.csv";
+        dataFileName = "../sogamo/test.csv";
+        cubeRepo = "../datasetSource";
         loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
     }
 
