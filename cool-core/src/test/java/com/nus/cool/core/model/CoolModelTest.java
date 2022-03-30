@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.nus.cool.functionality.CohortProfiling.Profiling;
 import static com.nus.cool.functionality.IcebergLoader.executeQuery;
+import static com.nus.cool.functionality.IcebergLoader.wrapResult;
+import static com.nus.cool.functionality.RelationalAlgebra.generateQuery;
 
 public class CoolModelTest {
 
@@ -196,5 +199,28 @@ public class CoolModelTest {
             result = QueryResult.error("something wrong");
         }
         System.out.println("Result for the query is  " + result);
+    }
+
+    @Test(priority = 6)
+    public void RelationalAlgebraTest() throws IOException {
+        System.out.println("======================== RelationalAlgebraTest Test ========================");
+
+        String dzFilePath = "../datasetSource";
+        String dataSourceName = "tpc-h-10g";
+        // currently only support 'select'
+        String operation = "select, O_ORDERPRIORITY, 2-HIGH";
+
+        IcebergQuery query = generateQuery(operation, dataSourceName);
+        if (query == null){
+            return;
+        }
+
+        // load .dz file
+        CoolModel coolModel = new CoolModel(dzFilePath);
+        coolModel.reload(dataSourceName);
+
+        // execute query
+        QueryResult result = wrapResult(coolModel.getCube(dataSourceName), query);
+        System.out.println(result.toString());
     }
 }
