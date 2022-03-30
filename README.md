@@ -180,7 +180,7 @@ Now we could execute OLAP query on the generated datasets. eg, if we want to run
 
 ```sql
 SELECT cout(*), sum(O_TOTALPRICE) 
-FROM TPC-H WHERE O_ORDERPRIORITY = 2-HIGH AND R_NAME = EUROPE
+FROM TPC_H WHERE O_ORDERPRIORITY = 2-HIGH AND R_NAME = EUROPE
 GROUP BY N_NAME,R_NAME 
 HAVING O_ORDERDATE >= '1993-01-01' AND O_ORDERDATE <= '1994-01-01' 
 ```
