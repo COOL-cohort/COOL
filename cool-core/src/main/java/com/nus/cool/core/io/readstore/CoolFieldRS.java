@@ -105,6 +105,11 @@ public class CoolFieldRS implements FieldRS {
   }
 
   @Override
+  public FieldType getFieldType() {
+    return fieldType;
+  }
+
+  @Override
   public InputVector getKeyVector() {
     return this.keyVec;
   }
@@ -132,7 +137,8 @@ public class CoolFieldRS implements FieldRS {
   @Override
   public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
     this.fieldType = fieldType;
-    Codec codec = Codec.fromInteger(buffer.get());
+    int bufGet = buffer.get();
+    Codec codec = Codec.fromInteger(bufGet);
     if (codec == Codec.Range) {
       // Range field case
       this.minKey = buffer.getInt();
@@ -147,7 +153,8 @@ public class CoolFieldRS implements FieldRS {
       this.bSetField = true;
     }
 
-     codec = Codec.fromInteger(buffer.get());
+    bufGet = buffer.get();
+    codec = Codec.fromInteger(bufGet);
     if (codec == Codec.PreCAL) {
       int values = buffer.get();
       this.bitSets = new BitSet[values];

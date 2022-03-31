@@ -25,6 +25,8 @@ import java.nio.ByteBuffer;
 
 public interface FieldRS extends Input {
 
+  FieldType getFieldType();
+
   /**
    * Return the hash index vector. If the field is
    * indexed by range indexing, an IllegalStateException
@@ -65,4 +67,7 @@ public interface FieldRS extends Input {
   boolean isSetField();
 
   void readFromWithFieldType(ByteBuffer buf, FieldType fieldType);
+
+  // todo check if need isPreCal() and getBitSets()
+
 }

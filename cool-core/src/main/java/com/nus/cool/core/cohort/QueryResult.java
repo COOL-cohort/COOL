@@ -49,6 +49,10 @@ public class QueryResult {
     return new QueryResult(QueryStatus.OK, null, result);
   }
 
+  public static QueryResult error(String msg) {
+    return new QueryResult(QueryStatus.ERROR, msg, null);
+  }
+
   @Override
   public String toString() {
     ObjectMapper mapper = new ObjectMapper();

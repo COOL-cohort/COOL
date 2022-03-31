@@ -22,6 +22,8 @@ import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.TableSchema;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+
 import lombok.Getter;
 
 /**
@@ -86,9 +88,11 @@ public class ChunkRS implements Input {
       for (int i = 0; i < fields; i++) {
           fieldOffsets[i] = buffer.getInt();
       }
+    System.out.println("#Records="+this.records + ", # fields="+fields+", fieldOffsets="+ Arrays.toString(fieldOffsets));
 
     this.fields = new FieldRS[fields];
     for (int i = 0; i < fields; i++) {
+      System.out.println("Reading data chunk's field ="+i+".....");
       buffer.position(fieldOffsets[i]);
       FieldRS field = new CoolFieldRS();
       field.readFromWithFieldType(buffer, this.schema.getField(i).getFieldType());

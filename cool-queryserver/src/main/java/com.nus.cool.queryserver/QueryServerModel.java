@@ -3,8 +3,11 @@ package com.nus.cool.queryserver;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.cohort.funnel.FunnelQuery;
+import com.nus.cool.core.iceberg.query.IcebergQuery;
+import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.writer.DataWriter;
@@ -138,6 +141,7 @@ public class QueryServerModel {
         }
     }
 
+
     public Response cohortExploration(String cube, String cohort) {
         try{
             // load cube
@@ -157,6 +161,20 @@ public class QueryServerModel {
             coolModel.close();
             return Response.ok(results).build();
         }catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+
+    public Response precessIcebergQuery(IcebergQuery query) {
+        try{
+            String inputSource = query.getDataSource();
+            this.coolModel.reload(inputSource);
+
+            List<BaseResult> results = coolModel.olapEngine.performOlapQuery(coolModel.getCube(inputSource), query);
+            System.out.println(results);
+
+            return Response.ok(results).build();
+        } catch (Exception e){
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
