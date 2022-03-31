@@ -119,6 +119,7 @@ public class CubletRS implements Input {
 
     // Read data chunk
     for (int i = 1; i < chunks; i++) {
+      System.out.println("Reading data chunk="+i+".....");
       ChunkRS chunk = new ChunkRS(this.schema);
       buffer.position(chunkOffsets[i]);
       chunkHeadOffset = buffer.getInt();
