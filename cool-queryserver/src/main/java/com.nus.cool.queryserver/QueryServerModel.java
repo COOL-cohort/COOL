@@ -153,7 +153,6 @@ public class QueryServerModel {
             InputVector userVector = coolModel.getCohortUsers(cohort);
 
             // export cohort
-            boolean printLog = false;
             List<String> results = new ArrayList<String>();
             DataWriter writer = new ListDataWriter(results);
             coolModel.cohortEngine.exportCohort(inputCube, userVector, writer);
@@ -164,6 +163,8 @@ public class QueryServerModel {
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
+
+    }
 
     public Response precessIcebergQuery(IcebergQuery query) {
         try{

@@ -220,6 +220,8 @@ In this server, we implement many APIs and list their corresponding urls as foll
     - List all cohorts from the selected cube
 - \[server:port]:v1/cohort/selection
     - Cohort Selection
+- \[server:port]:v1/cohort/exploration
+  - Cohort Exploration
 - \[server:port]:v1/cohort/analysis
     - Perform cohort analysis
 - \[server:port]:v1/funnel/analysis

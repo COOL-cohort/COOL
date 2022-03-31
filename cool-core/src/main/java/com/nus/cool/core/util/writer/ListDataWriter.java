@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * ListDataWriter write the serialized representation of the records to a list
- *  (It is currently used to generate the respones of cohort exploration
+ *  (It is currently used to generate the responses of cohort exploration
  *  in query server) 
  */
 public class ListDataWriter implements DataWriter {
