@@ -56,6 +56,8 @@ public class CoolModel implements Closeable {
 
   public CoolCohortEngine cohortEngine = new CoolCohortEngine();
 
+  public CoolOlapEngine olapEngine = new CoolOlapEngine();
+
   /**
    * Create a CoolModel to manage a cube repository
    *

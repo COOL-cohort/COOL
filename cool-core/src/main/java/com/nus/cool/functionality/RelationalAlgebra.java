@@ -21,97 +21,37 @@ package com.nus.cool.functionality;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
 import com.nus.cool.core.iceberg.query.Aggregation;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.query.SelectionQuery;
+import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.model.CoolModel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.nus.cool.functionality.IcebergLoader.wrapResult;
 
 public class RelationalAlgebra {
 
-    public static final String jsonString = "{\n" +
-            "  \"dataSource\": \"default\",\n" +
-            "  \"selection\": {\n" +
-            "    \"type\": \"filter\",\n" +
-            "    \"dimension\": \"default\",\n" +
-            "    \"values\": [ \"default\" ],\n" +
-            "    \"fields\":[]\n" +
-            "  },\n" +
-            "  \"aggregations\":[\n" +
-            "    {\"fieldName\":\"default\",\n" +
-            "      \"operators\":[\"COUNT\"]}]\n" +
-            "}";
-
-   public static void main(String[] args) throws IOException{
+   public static void main(String[] args) throws Exception {
        // the path of dz file eg "COOL/cube"
        String dzFilePath = args[0];
        String dataSourceName = args[1];
        String operation = args[2];
 
-       IcebergQuery query = generateQuery(operation, dataSourceName);
-       if (query == null){
-           return;
-       }
-
        // load .dz file
        CoolModel coolModel = new CoolModel(dzFilePath);
        coolModel.reload(dataSourceName);
 
-       // execute query
-       QueryResult result = wrapResult(coolModel.getCube(dataSourceName), query);
-       System.out.println(result.toString());
-   }
-
-   public static IcebergQuery generateQuery(String operation, String dataSourceName) throws IOException {
-
-       String[] parsedOpe = operation.split(", ");
-
-       if (!parsedOpe[0].equals("select")){
-           System.out.println(Arrays.toString(parsedOpe) +", operation Not supported");
-           return null;
+       IcebergQuery query = coolModel.olapEngine.generateQuery(operation, dataSourceName);
+       if (query == null){
+           return;
        }
 
-       String filed = parsedOpe[1];
-       String value = parsedOpe[2];
-
-       List<String> values = new ArrayList<>();
-       values.add(value);
-
-       // init query
-       ObjectMapper mapper = new ObjectMapper();
-       IcebergQuery query = mapper.readValue(jsonString, IcebergQuery.class);
-
-       // update query
-       query.setDataSource(dataSourceName);
-
-       SelectionQuery sq = query.getSelection();
-       sq.setType(SelectionQuery.SelectionType.filter);
-       sq.setDimension(filed);
-       sq.setValues(values);
-
-       query.setSelection(sq);
-
-       List<Aggregation> aggregations = new ArrayList<>();
-       Aggregation agg = new Aggregation();
-
-       List<AggregatorFactory.AggregatorType> opt = new ArrayList<>();
-       opt.add(AggregatorFactory.AggregatorType.COUNT);
-
-       agg.setOperators(opt);
-       agg.setFieldName(filed);
-
-       aggregations.add(agg);
-
-       query.setAggregations(aggregations);
-
-       return query;
+       // execute query
+       List<BaseResult> result = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
+       System.out.println(result.toString());
    }
-
 }

@@ -30,9 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static com.nus.cool.functionality.IcebergLoader.executeQuery;
-
-
 public class CohortProfiling {
 
     /**
@@ -57,39 +54,10 @@ public class CohortProfiling {
         CoolModel coolModel = new CoolModel(dzFilePath);
         coolModel.reload(dataSourceName);
         CubeRS cube = coolModel.getCube(dataSourceName);
-        Profiling(cube, query);
-    }
-
-    public static void Profiling(CubeRS cube, IcebergQuery query) throws Exception {
         // execute query
-        List<BaseResult> results = executeQuery(cube, query);
+        List<BaseResult> results = coolModel.olapEngine.performOlapQuery(cube, query);
 
-        HashMap<String, Float> profilingCount = new HashMap<>();
-        HashMap<String, Long> profilingSum = new HashMap<>();
-
-        Float totalCount = (float) 0;
-        Float totalSum = (float) 0;
-        for (BaseResult res: results){
-            String k = res.getKey();
-            profilingCount.put(k, res.getAggregatorResult().getCount());
-            profilingSum.put(k, res.getAggregatorResult().getSum());
-            totalCount += res.getAggregatorResult().getCount();;
-            totalSum += res.getAggregatorResult().getSum();
-        }
-
-        for (String key : profilingCount.keySet()){
-            Float value = profilingCount.get(key)/totalCount;
-            profilingCount.put(key, value);
-            value = value*100;
-            System.out.println("Key = "+ key +", percentage of matched records = " + value.toString().substring(0,4)+"%");
-        }
-
-        for (String key : profilingSum.keySet()){
-            long sumValue = profilingSum.get(key);
-            float value = sumValue/totalSum;
-            value = value*100;
-            System.out.println("Key = "+ key +", percentage of aggregation = " + Float.toString(value).substring(0,4)+"%");
-        }
+        coolModel.olapEngine.profiling(results);
     }
 
 

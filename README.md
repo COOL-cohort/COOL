@@ -219,6 +219,8 @@ In this server, we implement many APIs and list their corresponding urls as foll
     - Perform cohort analysis
 - \[server:port]:v1/funnel/analysis
     - Perform funnel analysis
+- \[server:port]:v1/olap/iceberg
+    - Perform iceberg query
 
 ## CONNECT TO EXTERNAL STORAGE SERVICES
 COOL has an [StorageService](cool-core/src/main/java/com/nus/cool/storageservice/StorageService.java) interface, which will allow COOL standalone server/workers (coming soon) to handle data movement between local and an external storage service. A sample implementation for HDFS connection can be found under the [hdfs-extensions](cool-extensions/hdfs-extensions/).

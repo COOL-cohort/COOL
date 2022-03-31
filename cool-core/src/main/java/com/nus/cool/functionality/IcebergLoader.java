@@ -54,7 +54,7 @@ public class IcebergLoader {
      *        args [1] query's path, eg olap-tpch/query0.json
      * @throws IOException
      */
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws Exception {
 
         // the path of dz file eg "COOL/cube"
         String dzFilePath = args[0];
@@ -71,80 +71,8 @@ public class IcebergLoader {
         coolModel.reload(dataSourceName);
 
         // execute query
-        QueryResult result = wrapResult(coolModel.getCube(dataSourceName), query);
-        System.out.println(result.toString());
+        List<BaseResult> result = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
+        System.out.println(result);
     }
-
-    /**
-     * execute query
-     *
-     * @param cube the cube that stores the data we need
-     * @param query the cohort query needed to process
-     * @return the result of the query
-     */
-
-    public static List<BaseResult> executeQuery(CubeRS cube, IcebergQuery query) throws Exception{
-        long beg;
-        long end;
-        List<CubletRS> cublets = cube.getCublets();
-        TableSchema tableSchema = cube.getTableSchema();
-        List<BaseResult> results = new ArrayList<>();
-
-        beg = System.currentTimeMillis();
-        IcebergSelection selection = new IcebergSelection();
-        selection.init(tableSchema, query);
-        end = System.currentTimeMillis();
-        //System.out.println("selection init elapsed: " + (end - beg));
-        for (CubletRS cubletRS : cublets) {
-            MetaChunkRS metaChunk = cubletRS.getMetaChunk();
-            beg = System.currentTimeMillis();
-            selection.process(metaChunk);
-            end = System.currentTimeMillis();
-            //System.out.println("selection process meta chunk elapsed: " + (end - beg));
-            if (selection.isbActivateCublet()) {
-                List<ChunkRS> datachunks = cubletRS.getDataChunks();
-                for (ChunkRS dataChunk : datachunks) {
-                    beg = System.currentTimeMillis();
-                    Map<String, BitSet> map = selection.process(dataChunk);
-                    end = System.currentTimeMillis();
-                    //System.out.println("selection process data chunk elapsed: " + (end - beg));
-                    if (map == null) {
-                        continue;
-                    }
-                    for (Map.Entry<String, BitSet> entry : map.entrySet()) {
-                        String timeRange = entry.getKey();
-                        BitSet bs = entry.getValue();
-                        beg = System.currentTimeMillis();
-                        IcebergAggregation icebergAggregation = new IcebergAggregation();
-                        icebergAggregation.init(bs, query.getGroupFields(), metaChunk, dataChunk, timeRange);
-                        end = System.currentTimeMillis();
-                        //System.out.println("init aggregation elapsed: " + (end - beg));
-                        for (Aggregation aggregation : query.getAggregations()) {
-                            beg = System.currentTimeMillis();
-                            List<BaseResult> res = icebergAggregation.process(aggregation);
-                            end = System.currentTimeMillis();
-                            //System.out.println("aggregation process elapsed: " + (end - beg));
-                            results.addAll(res);
-                        }
-                    }
-                }
-            }
-        }
-        results = BaseResult.merge(results);
-        return results;
-    }
-
-    public static QueryResult wrapResult(CubeRS cube, IcebergQuery query) {
-        try {
-            List<BaseResult> results = executeQuery(cube, query);
-            return QueryResult.ok(results);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return QueryResult.error("something wrong");
-        }
-    }
-
-
-
 
 }

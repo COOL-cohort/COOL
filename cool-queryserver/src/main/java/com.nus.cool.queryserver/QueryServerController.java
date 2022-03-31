@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.funnel.FunnelQuery;
+import com.nus.cool.core.iceberg.query.IcebergQuery;
 import org.eclipse.jetty.server.Request;
 
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
@@ -117,6 +118,20 @@ public class QueryServerController {
 		ObjectMapper mapper = new ObjectMapper();
 		FunnelQuery q = mapper.readValue(query, FunnelQuery.class);
 		Response res = qsModel.funnelAnalysis(q);
+		return res;
+	}
+
+	@Path("olap/iceberg")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.TEXT_PLAIN)
+	public Response performIcebergQuery(@Context Request req, String query) throws IOException {
+		getTimeClock();
+		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
+		System.out.println("[*] This query is for funnel analysis: " + query);
+		ObjectMapper mapper = new ObjectMapper();
+		IcebergQuery q = mapper.readValue(query, IcebergQuery.class);
+		Response res = qsModel.precessIcebergQuery(q);
 		return res;
 	}
 }

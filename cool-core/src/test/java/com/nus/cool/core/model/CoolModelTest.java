@@ -20,11 +20,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.nus.cool.functionality.CohortProfiling.Profiling;
-import static com.nus.cool.functionality.IcebergLoader.executeQuery;
-import static com.nus.cool.functionality.IcebergLoader.wrapResult;
-import static com.nus.cool.functionality.RelationalAlgebra.generateQuery;
-
 public class CoolModelTest {
 
     @Test(priority = 0)
@@ -192,7 +187,7 @@ public class CoolModelTest {
         // execute query
         QueryResult result;
         try {
-            List<BaseResult> results = executeQuery(coolModel.getCube(dataSourceName), query);
+            List<BaseResult> results = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
             result = QueryResult.ok(results);
         } catch (Exception e) {
             e.printStackTrace();
@@ -201,8 +196,8 @@ public class CoolModelTest {
         System.out.println("Result for the query is  " + result);
     }
 
-    @Test(priority = 6)
-    public void RelationalAlgebraTest() throws IOException {
+    // @Test(priority = 6)
+    public void RelationalAlgebraTest() throws Exception {
         System.out.println("======================== RelationalAlgebraTest Test ========================");
 
         String dzFilePath = "../datasetSource";
@@ -210,17 +205,17 @@ public class CoolModelTest {
         // currently only support 'select'
         String operation = "select, O_ORDERPRIORITY, 2-HIGH";
 
-        IcebergQuery query = generateQuery(operation, dataSourceName);
-        if (query == null){
-            return;
-        }
-
         // load .dz file
         CoolModel coolModel = new CoolModel(dzFilePath);
         coolModel.reload(dataSourceName);
 
+        IcebergQuery query = coolModel.olapEngine.generateQuery(operation, dataSourceName);
+        if (query == null){
+            return;
+        }
+
         // execute query
-        QueryResult result = wrapResult(coolModel.getCube(dataSourceName), query);
-        System.out.println(result.toString());
+        List<BaseResult> result = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
+        System.out.println(result);
     }
 }
