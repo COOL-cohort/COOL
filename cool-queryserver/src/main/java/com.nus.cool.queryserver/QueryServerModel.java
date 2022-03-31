@@ -7,8 +7,8 @@ import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.cohort.funnel.FunnelQuery;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.util.writer.CliDataWriter;
 import com.nus.cool.core.util.writer.DataWriter;
+import com.nus.cool.core.util.writer.ListDataWriter;
 import com.nus.cool.model.CoolCohortEngine;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ExtendedResultTuple;
@@ -150,8 +150,8 @@ public class QueryServerModel {
 
             // export cohort
             boolean printLog = false;
-            ArrayList<String> results = new ArrayList<String>();
-            DataWriter writer = new CliDataWriter(results, printLog);
+            List<String> results = new ArrayList<String>();
+            DataWriter writer = new ListDataWriter(results);
             coolModel.cohortEngine.exportCohort(inputCube, userVector, writer);
 
             coolModel.close();

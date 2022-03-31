@@ -1,7 +1,6 @@
 package com.nus.cool.functionality;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
@@ -26,14 +25,10 @@ public class CohortExploration {
       InputVector userVector = coolModel.getCohortUsers(cohortName);
 
       // export cohort
-      boolean printLog = true;
-      ArrayList<String> results = new ArrayList<String>();
-      DataWriter writer = new CliDataWriter(results, printLog);
+      DataWriter writer = new CliDataWriter();
       coolModel.cohortEngine.exportCohort(inputCube, userVector, writer);
+
       coolModel.close();
-
-      System.out.println(results);
-
     } catch (IOException e) {
       System.out.println(e);
     }
