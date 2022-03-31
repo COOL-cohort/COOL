@@ -236,8 +236,7 @@ public class CoolCohortEngine {
         return result;
     }
 
-    public boolean exportCohort(CubeRS cube, InputVector users,
-        DataWriter writer) throws IOException {
+    public boolean exportCohort(CubeRS cube, InputVector users, DataWriter writer) throws IOException {
         CoolTupleReader reader = new CoolTupleReader(cube, users);
         writer.Initialize();
         while (reader.hasNext()) {
