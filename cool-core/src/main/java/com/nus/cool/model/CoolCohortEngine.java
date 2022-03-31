@@ -12,6 +12,8 @@ import com.nus.cool.core.schema.DataType;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.core.util.reader.CoolTupleReader;
+import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.result.ExtendedResultTuple;
 
 import java.io.DataOutputStream;
@@ -234,4 +236,14 @@ public class CoolCohortEngine {
         return result;
     }
 
+    public boolean exportCohort(CubeRS cube, InputVector users, DataWriter writer) throws IOException {
+        CoolTupleReader reader = new CoolTupleReader(cube, users);
+        writer.Initialize();
+        while (reader.hasNext()) {
+            writer.Add(reader.next());
+        }
+        writer.Finish();
+        reader.close();
+        return true;
+    }
 }

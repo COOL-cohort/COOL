@@ -140,6 +140,11 @@ where the three arguments are as follows:
 2. `health`: the cube name of the compacted dataset
 3. `health/query1-0.json`: the json file for the cohort query
 
+- Display the selected all records of the cohort in terminal for exploration
+```
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortExploration datasetSource health loyal
+```
+
 - Execute cohort query on the selected users.
 
 ```bash
@@ -215,6 +220,8 @@ In this server, we implement many APIs and list their corresponding urls as foll
     - List all cohorts from the selected cube
 - \[server:port]:v1/cohort/selection
     - Cohort Selection
+- \[server:port]:v1/cohort/exploration
+  - Cohort Exploration
 - \[server:port]:v1/cohort/analysis
     - Perform cohort analysis
 - \[server:port]:v1/funnel/analysis

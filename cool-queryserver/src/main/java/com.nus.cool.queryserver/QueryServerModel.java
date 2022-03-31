@@ -10,6 +10,8 @@ import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.util.writer.DataWriter;
+import com.nus.cool.core.util.writer.ListDataWriter;
 import com.nus.cool.model.CoolCohortEngine;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ExtendedResultTuple;
@@ -17,6 +19,7 @@ import com.nus.cool.result.ExtendedResultTuple;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -136,6 +139,31 @@ public class QueryServerModel {
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
+    }
+
+
+    public Response cohortExploration(String cube, String cohort) {
+        try{
+            // load cube
+            coolModel.reload(cube);
+            CubeRS inputCube = coolModel.getCube(cube);
+
+            // load cohort
+            coolModel.loadCohorts(cohort, cube);
+            InputVector userVector = coolModel.getCohortUsers(cohort);
+
+            // export cohort
+            List<String> results = new ArrayList<String>();
+            DataWriter writer = new ListDataWriter(results);
+            coolModel.cohortEngine.exportCohort(inputCube, userVector, writer);
+
+            coolModel.close();
+            return Response.ok(results).build();
+        }catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+
     }
 
     public Response precessIcebergQuery(IcebergQuery query) {

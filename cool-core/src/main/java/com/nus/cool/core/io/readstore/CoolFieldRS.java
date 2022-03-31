@@ -60,17 +60,17 @@ public class CoolFieldRS implements FieldRS {
   /**
    * key vector for hash field
    */
-  private InputVector keyVec;
+  private InputVector keyVec = null;
 
   /**
    * value vector for hash field
    */
-  private InputVector valueVec;
+  private InputVector valueVec = null;
 
   /**
    * BitSet array if this field has been pre-calculated
    */
-  private BitSet[] bitSets;
+  private BitSet[] bitSets = null;
 
   @Override
   public void readFrom(ByteBuffer buffer) {

@@ -93,6 +93,18 @@ public class QueryServerController {
 		return res;
 	}
 
+	@Path("cohort/exploration")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.TEXT_PLAIN)
+	public Response cohortExploration(@Context Request req, String cube, String cohort) throws IOException {
+		getTimeClock();
+		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
+		System.out.println(String.format("[*] This query is for cohort exploration: %s %s", cube, cohort));
+		Response res = qsModel.cohortExploration(cube, cohort);
+		return res;
+	}
+
 	@Path("cohort/analysis")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
