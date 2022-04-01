@@ -1,6 +1,8 @@
 package com.nus.cool.model;
 
 import com.nus.cool.core.cohort.*;
+import com.nus.cool.core.cohort.funnel.FunnelProcess;
+import com.nus.cool.core.cohort.funnel.FunnelQuery;
 import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.ZIntBitCompressor;
@@ -10,6 +12,8 @@ import com.nus.cool.core.schema.DataType;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.core.util.reader.CoolTupleReader;
+import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.result.ExtendedResultTuple;
 
 import java.io.DataOutputStream;
@@ -202,5 +206,44 @@ public class CoolCohortEngine {
         }
 
         return resultSet;
+    }
+
+    public int[] performFunnelQuery(CubeRS cube, InputVector users, FunnelQuery query){
+        List<CubletRS> cublets = cube.getCublets();
+        TableSchema tableSchema = cube.getTableSchema();
+        int[] result = new int[query.getStages().size()];
+
+        for (int i = 0; i < result.length; i++) {
+            result[i] = 0;
+        }
+
+        for (CubletRS cubletRS : cublets) {
+            MetaChunkRS metaChunk = cubletRS.getMetaChunk();
+            FunnelProcess gamma = new FunnelProcess();
+            gamma.init(tableSchema, users, query);
+            gamma.process(metaChunk);
+            List<ChunkRS> dataChunks = cubletRS.getDataChunks();
+            for (ChunkRS dataChunk : dataChunks) {
+                gamma.process(dataChunk);
+            }
+
+            int[] cubletResult = (int[]) gamma.getCubletResults();
+            for (int i = 0; i < result.length; i++) {
+                result[i] += cubletResult[i];
+            }
+        }
+
+        return result;
+    }
+
+    public boolean exportCohort(CubeRS cube, InputVector users, DataWriter writer) throws IOException {
+        CoolTupleReader reader = new CoolTupleReader(cube, users);
+        writer.Initialize();
+        while (reader.hasNext()) {
+            writer.Add(reader.next());
+        }
+        writer.Finish();
+        reader.close();
+        return true;
     }
 }

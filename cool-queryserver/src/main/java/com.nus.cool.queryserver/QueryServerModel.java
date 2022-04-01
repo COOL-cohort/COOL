@@ -3,9 +3,15 @@ package com.nus.cool.queryserver;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
+import com.nus.cool.core.cohort.funnel.FunnelQuery;
+import com.nus.cool.core.iceberg.query.IcebergQuery;
+import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.util.writer.DataWriter;
+import com.nus.cool.core.util.writer.ListDataWriter;
 import com.nus.cool.model.CoolCohortEngine;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ExtendedResultTuple;
@@ -13,6 +19,8 @@ import com.nus.cool.result.ExtendedResultTuple;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class QueryServerModel {
@@ -80,11 +88,37 @@ public class QueryServerModel {
             CubeRS inputCube = this.coolModel.getCube(inputSource);
             String inputCohort = query.getInputCohort();
             if (inputCohort != null) {
+                System.out.println("Input cohort: " + inputCohort);
                 this.coolModel.loadCohorts(inputCohort, inputSource);
             }
-            System.out.println(inputCohort);
             InputVector userVector = this.coolModel.getCohortUsers(inputCohort);
             List<ExtendedResultTuple> results = cohortEngine.performCohortQuery(inputCube, userVector, query);
+            System.out.println("Result for the query is  " + results);
+
+            return Response.ok(results).build();
+        } catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+    public Response funnelAnalysis(FunnelQuery query){
+        try {
+            if (!query.isValid())
+                throw new IOException("[x] Invalid cohort query.");
+
+            String inputSource = query.getDataSource();
+            this.coolModel.reload(inputSource);
+
+            CubeRS inputCube = coolModel.getCube(query.getDataSource());
+            String inputCohort = query.getInputCohort();
+            if (inputCohort != null) {
+                System.out.println("Input cohort: " + inputCohort);
+                coolModel.loadCohorts(inputCohort, inputSource);
+            }
+            InputVector userVector = coolModel.getCohortUsers(inputCohort);
+            int[] results = coolModel.cohortEngine.performFunnelQuery(inputCube, userVector, query);
+            System.out.println("Result for the query is  " + Arrays.toString(results));
 
             return Response.ok(results).build();
         } catch (IOException e){
@@ -102,6 +136,46 @@ public class QueryServerModel {
             String[] cohorts = this.coolModel.listCohorts(cube);
             return Response.ok().entity(cohorts).build();
         } catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+
+    public Response cohortExploration(String cube, String cohort) {
+        try{
+            // load cube
+            coolModel.reload(cube);
+            CubeRS inputCube = coolModel.getCube(cube);
+
+            // load cohort
+            coolModel.loadCohorts(cohort, cube);
+            InputVector userVector = coolModel.getCohortUsers(cohort);
+
+            // export cohort
+            List<String> results = new ArrayList<String>();
+            DataWriter writer = new ListDataWriter(results);
+            coolModel.cohortEngine.exportCohort(inputCube, userVector, writer);
+
+            coolModel.close();
+            return Response.ok(results).build();
+        }catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+
+    }
+
+    public Response precessIcebergQuery(IcebergQuery query) {
+        try{
+            String inputSource = query.getDataSource();
+            this.coolModel.reload(inputSource);
+
+            List<BaseResult> results = coolModel.olapEngine.performOlapQuery(coolModel.getCube(inputSource), query);
+            System.out.println(results);
+
+            return Response.ok(results).build();
+        } catch (Exception e){
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
