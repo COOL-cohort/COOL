@@ -31,6 +31,13 @@ public interface MetaFieldWS extends Output {
   void put(String v);
 
   /**
+   * Update the meta with value
+   * 
+   * @param v value
+   */
+  void update(String v);
+
+  /**
    * Find the index of value in this meta field, return -1 if no such value exists
    *
    * @param v target value

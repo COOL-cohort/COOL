@@ -32,6 +32,8 @@ import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+
 import lombok.Getter;
 
 /**
@@ -118,6 +120,25 @@ public class MetaChunkWS implements Output {
   }
 
   /**
+   * update the field with a value
+   * 
+   * @param field the field to update
+   * @param value value used for update
+   */
+  public void update(String field, String value) {
+    checkNotNull(value);
+    checkNotNull(field);
+    checkArgument(this.schema.getFieldID(field) != -1);
+    this.metaFields[this.schema.getFieldID(field)].update(value);
+  }
+
+  public void update(String[] tuple) {
+    for (int i = 0; i < tuple.length; i++) {
+      this.metaFields[i].update(tuple[i]);
+    }
+  }
+
+  /**
    * Complete MetaFields
    */
   public void complete() {
@@ -165,5 +186,11 @@ public class MetaChunkWS implements Output {
     out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
     bytesWritten += Ints.BYTES;
     return bytesWritten;
+  }
+
+  @Override
+  public String toString() {
+    return "MetaChunk: " + Arrays.asList(metaFields).stream()
+      .map(Object::toString).reduce((x, y) -> x + ", " + y);
   }
 }

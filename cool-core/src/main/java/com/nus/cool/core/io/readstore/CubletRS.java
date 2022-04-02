@@ -110,16 +110,14 @@ public class CubletRS implements Input {
           chunkOffsets[i] = buffer.getInt();
       }
 
-    // Read meta chunk
+    // place the metachunk at the end
     this.metaChunk = new MetaChunkRS(this.schema);
-    buffer.position(chunkOffsets[0]);
+    buffer.position(chunkOffsets[chunks-1]);
     int chunkHeadOffset = buffer.getInt();
     buffer.position(chunkHeadOffset);
     this.metaChunk.readFrom(buffer);
 
-    // Read data chunk
-    for (int i = 1; i < chunks; i++) {
-      System.out.println("Reading data chunk="+i+".....");
+    for (int i = 0; i < chunks-1; i++) {
       ChunkRS chunk = new ChunkRS(this.schema);
       buffer.position(chunkOffsets[i]);
       chunkHeadOffset = buffer.getInt();

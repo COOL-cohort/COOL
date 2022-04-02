@@ -88,11 +88,14 @@ public class LZ4InputVector implements InputVector {
       this.buffer.get(compressed);
       this.decompressor.decompress(compressed, raw, this.rawLen);
       ByteBuffer buffer = ByteBuffer.wrap(raw);
+      // get # values
       int values = buffer.getInt();
+      // get offsets
       this.offsets = new int[values];
         for (int i = 0; i < values; i++) {
             this.offsets[i] = buffer.getInt();
         }
+      // place the remaining bytes (values) in data
       this.data = new byte[rawLen - 4 - values * 4];
       buffer.get(this.data);
     }

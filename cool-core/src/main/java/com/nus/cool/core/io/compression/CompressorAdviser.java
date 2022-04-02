@@ -49,7 +49,9 @@ public class CompressorAdviser {
         throw new IllegalArgumentException("Unsupported compress type: " + type);
     }
   }
-
+  // This assumes the values in the bytes buffer stored to be in ascending order
+  //  because the use of bitvector will implicitly sort the data during read
+  //  the value retrieved from small to big to populate a vector.
   private static Codec adviseForKeyHash(Histogram hist) {
     // max value determine which numeric type is better
     // including INT8, INT16, INT32.
@@ -89,6 +91,8 @@ public class CompressorAdviser {
   }
 
   // TODO: NEED docs
+  // this does not implicit assume the values are being sorted.
+  //  RLE and INtBit readstore does not support find. 
   private static Codec adviseForValue(Histogram hist) {
       if (hist.isSorted()) {
           return Codec.RLE;

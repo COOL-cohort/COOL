@@ -29,7 +29,10 @@ import com.rabinhash.RabinHashFunction32;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Hash MetaField write store
@@ -58,6 +61,10 @@ public class HashMetaFieldWS implements MetaFieldWS {
    */
   private Map<Integer, Term> dict = Maps.newTreeMap();
 
+  private List<Integer> gid_to_hash = new ArrayList<Integer>();
+
+  private int nextgid = 0;
+
   public HashMetaFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
     this.fieldType = type;
     this.charset = charset;
@@ -68,7 +75,17 @@ public class HashMetaFieldWS implements MetaFieldWS {
   public void put(String v) {
     // Set globalID as 0 for temporary
     // It will changed after calling complete function
-    this.dict.put(rhash.hash(v), new Term(v, 0));
+    // this.dict.put(rhash.hash(v), new Term(v, 0));
+    this.dict.put(rhash.hash(v), new Term(v, nextgid++));
+  }
+  
+  @Override
+  public void update(String v) {
+    int hashKey = rhash.hash(v);
+    if (!this.dict.containsKey(hashKey)) {
+      this.dict.put(hashKey, new Term(v, nextgid++));
+        this.gid_to_hash.add(rhash.hash(v));
+    }
   }
 
   @Override
@@ -93,7 +110,8 @@ public class HashMetaFieldWS implements MetaFieldWS {
     int gID = 0;
     // Set globalIDs
     for (Map.Entry<Integer, Term> en : this.dict.entrySet()) {
-      en.getValue().globalId = gID++;
+      // temp fix to not delete complete logic, while preserving correctness of using update.
+      if (en.getValue().globalId == 0) en.getValue().globalId = gID++;
     }
   }
 
@@ -104,10 +122,15 @@ public class HashMetaFieldWS implements MetaFieldWS {
     // Write fingers, i.e., the hash values of the original string, into the array
     // fingers contain data's hash value
     int[] fingers = new int[this.dict.size()];
+    // globalIDs contain the global ids in the hash order
+    int[] globalIDs = new int[this.dict.size()];
     int i = 0;
     for (Map.Entry<Integer, Term> en : this.dict.entrySet()) {
+      globalIDs[i] = en.getValue().globalId;
       fingers[i++] = en.getKey();
     }
+
+    // generate finger bytes
     Histogram hist = Histogram.builder()
         .min(fingers[0])
         .max(fingers[fingers.length - 1])
@@ -119,6 +142,17 @@ public class HashMetaFieldWS implements MetaFieldWS {
     // Compress and write the fingers
     // Codec is written internal
     // Actually data is not compressed here
+    bytesWritten += this.compressor.writeTo(out);
+
+    // generate globalID bytes
+    hist = Histogram.builder()
+        .min(0)
+        .max(this.dict.size())
+        .numOfValues(globalIDs.length)
+        .rawSize(Ints.BYTES * globalIDs.length)
+        .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
+        .build();
+    this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
     bytesWritten += this.compressor.writeTo(out);
 
     // Write values
@@ -134,7 +168,7 @@ public class HashMetaFieldWS implements MetaFieldWS {
           off += en.getValue().term.getBytes(this.charset).length;
         }
 
-        //Store String values into the buffer
+        // Store String values into the buffer
         for (Map.Entry<Integer, Term> en : this.dict.entrySet()) {
           buffer.write(en.getValue().term.getBytes(this.charset));
         }
@@ -152,6 +186,11 @@ public class HashMetaFieldWS implements MetaFieldWS {
     return bytesWritten;
   }
 
+  @Override
+  public String toString() {
+    return "HashMetaField: " + dict.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
+  }
+
   /**
    * Convert string to globalIDs
    */
@@ -163,6 +202,11 @@ public class HashMetaFieldWS implements MetaFieldWS {
     public Term(String term, int globalId) {
       this.term = term;
       this.globalId = globalId;
+    }
+
+    @Override
+    public String toString() {
+      return "{term: " + term + ", globalId: " + globalId + "}";
     }
   }
 }

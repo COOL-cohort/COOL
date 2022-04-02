@@ -117,7 +117,7 @@ public class SetFieldFilter implements FieldFilter {
   }
 
   /**
-   * Indicate whether the filed is eligible i.e. whether we can find eligible values in the field
+   * Indicate whether the field is eligible i.e. whether we can find eligible values in the field
    * 
    * @param field the field to be checked
    * @return false indicates the field is not eligible and true indicates the field is eligible

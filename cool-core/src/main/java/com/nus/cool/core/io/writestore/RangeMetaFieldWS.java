@@ -75,6 +75,25 @@ public class RangeMetaFieldWS implements MetaFieldWS {
   }
 
   @Override
+  public void update(String v) {
+    v = checkNotNull(v);
+    switch (this.fieldType) {
+      case Metric:
+        this.min = Math.min(this.min, Integer.parseInt(v));
+        this.max = Math.max(this.max, Integer.parseInt(v));
+        break;
+      case ActionTime:
+        DayIntConverter converter = new DayIntConverter();
+        this.min = Math.min(this.min, converter.toInt(v));
+        this.max = Math.max(this.max, converter.toInt(v));
+        break;
+      default:
+        throw new IllegalArgumentException("Unable to index: " + this.fieldType);
+    }
+    checkArgument(this.min <= this.max);
+  }
+
+  @Override
   public int find(String v) {
     throw new UnsupportedOperationException();
   }
@@ -101,5 +120,9 @@ public class RangeMetaFieldWS implements MetaFieldWS {
     out.writeInt(IntegerUtil.toNativeByteOrder(this.max));
      bytesWritten += 2 * Ints.BYTES;
     return bytesWritten;
+  }
+  @Override
+  public String toString() {
+    return "RangeMetaField(min,max): (" + min + ", " + max + ")"; 
   }
 }
