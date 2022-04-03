@@ -10,6 +10,7 @@ import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
+import com.nus.cool.model.CoolOlapEngine;
 import com.nus.cool.result.ExtendedResultTuple;
 import com.nus.cool.model.CoolLoader;
 import com.nus.cool.model.CoolModel;
@@ -218,4 +219,25 @@ public class CoolModelTest {
         List<BaseResult> result = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
         System.out.println(result);
     }
+
+    @Test(priority = 7)
+    public void CohortProfilingTest() throws Exception {
+        System.out.println("======================== CohortProfilingTest Test ========================");
+
+        String dzFilePath = "../datasetSource";
+        String queryFilePath = "../olap-tpch/query.json";
+
+        // load query
+        ObjectMapper mapper = new ObjectMapper();
+        IcebergQuery query = mapper.readValue(new File(queryFilePath), IcebergQuery.class);
+
+        // load .dz file
+        String dataSourceName = query.getDataSource();
+        CoolModel coolModel = new CoolModel(dzFilePath);
+        coolModel.reload(dataSourceName);
+        CubeRS cube = coolModel.getCube(dataSourceName);
+        List<BaseResult> result = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
+        CoolOlapEngine.profiling(result);
+    }
+
 }
