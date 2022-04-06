@@ -10,9 +10,16 @@ import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.util.config.CsvDataLoaderConfig;
+import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.core.util.writer.ListDataWriter;
+import com.nus.cool.extension.util.config.ParquetDataLoaderConfig;
+//import com.nus.cool.extension.util.config.ArrowIPCFileDataLoaderConfig;
+//import com.nus.cool.extension.util.config.AvroDataLoaderConfig;
+import com.nus.cool.loader.LoadQuery;
 import com.nus.cool.model.CoolCohortEngine;
+import com.nus.cool.model.CoolLoader;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ExtendedResultTuple;
 
@@ -36,6 +43,36 @@ public class QueryServerModel {
             this.coolModel = new CoolModel(datasetPath);
         } catch (IOException e){
             System.out.println(e);
+        }
+    }
+
+    public Response loadCube(LoadQuery q) {
+        try {
+            q.isValid();
+            String fileType = q.getDataFileType().toUpperCase();
+            DataLoaderConfig config;
+            switch (fileType){
+                case "CSV":
+                    config = new CsvDataLoaderConfig();
+                    break;
+                case "PARQUET":
+                    config = new ParquetDataLoaderConfig();
+                    break;
+//                case "ARROW":
+//                    config = new ArrowIPCFileDataLoaderConfig();
+//                    break;
+//                case "AVRO":
+//                    config = new AvroDataLoaderConfig(new File(q.getConfigPath()));
+//                    break;
+                default:
+                    throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
+            }
+            CoolLoader coolLoader = new CoolLoader(config);
+            coolLoader.load(q.getCubeName(),q.getSchemaPath(),q.getDimPath(),q.getDataPath(),q.getOutputPath());
+            return Response.ok("Cube " + q.getCubeName() + " has already been loaded.").build();
+        } catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
 
