@@ -14,9 +14,9 @@ import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.core.util.writer.ListDataWriter;
+import com.nus.cool.extension.util.config.ArrowIPCFileDataLoaderConfig;
+import com.nus.cool.extension.util.config.AvroDataLoaderConfig;
 import com.nus.cool.extension.util.config.ParquetDataLoaderConfig;
-//import com.nus.cool.extension.util.config.ArrowIPCFileDataLoaderConfig;
-//import com.nus.cool.extension.util.config.AvroDataLoaderConfig;
 import com.nus.cool.loader.LoadQuery;
 import com.nus.cool.model.CoolCohortEngine;
 import com.nus.cool.model.CoolLoader;
@@ -58,12 +58,12 @@ public class QueryServerModel {
                 case "PARQUET":
                     config = new ParquetDataLoaderConfig();
                     break;
-//                case "ARROW":
-//                    config = new ArrowIPCFileDataLoaderConfig();
-//                    break;
-//                case "AVRO":
-//                    config = new AvroDataLoaderConfig(new File(q.getConfigPath()));
-//                    break;
+                case "ARROW":
+                    config = new ArrowIPCFileDataLoaderConfig();
+                    break;
+                case "AVRO":
+                    config = new AvroDataLoaderConfig(new File(q.getConfigPath()));
+                    break;
                 default:
                     throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
             }

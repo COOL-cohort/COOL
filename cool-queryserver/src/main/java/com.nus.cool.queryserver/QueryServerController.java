@@ -37,7 +37,7 @@ public class QueryServerController {
 		getTimeClock();
 		String text = "This is the backend for the COOL system.\n";
 		text += "COOL system is a cohort OLAP system specialized for cohort analysis with extremely low latency.\n";
-		text += "Workkable urls: \n";
+		text += "Workable urls: \n";
 		text += "HTTP Method: GET\n";
 		text += " - [server]:v1\n";
 		text += " - [server]:v1/reload?cube=[cube_name]\n";
