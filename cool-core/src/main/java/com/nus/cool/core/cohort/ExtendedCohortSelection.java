@@ -423,7 +423,10 @@ public class ExtendedCohortSelection implements Operator {
 				// with time window
 				int startDay = firstDay;
 				int wlen = window.getLength();
-				int endDay = TimeUtils.getDate(timeVector.get(end - 1)); // it is open for the time window to overflow to date not seen in dataset. We don't search beyong the last date user record appears
+				// int endDay = maxDate - (wlen - 1); // at least one time window
+				int endDay = TimeUtils.getDateFromOffset(timeVector,end);
+				// remove users without records for at least wlen day
+				if ((endDay-startDay)<wlen) return -1;
 				int windowOffset;
 
 				for (BirthSequence.Anchor anc : window.getAnchors()) {
