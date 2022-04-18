@@ -36,6 +36,12 @@ public class BirthMaxAggregator implements EventAggregator {
         values = vec;
     }
 
+
+    /**
+     * @brief  get the maximum value of a list which is the cohort result at a specific age
+     *
+     * @param offset the list to get the maximum value
+     */
     @Override
     public Double birthAggregate(List<Integer> offset) {
     	if (offset.isEmpty()) return null;
