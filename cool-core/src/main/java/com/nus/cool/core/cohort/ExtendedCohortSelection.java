@@ -424,7 +424,7 @@ public class ExtendedCohortSelection implements Operator {
 				int startDay = firstDay;
 				int wlen = window.getLength();
 				// int endDay = maxDate - (wlen - 1); // at least one time window
-				int endDay = TimeUtils.getDateFromOffset(timeVector,end);
+				int endDay = TimeUtils.getDateFromOffset(timeVector,end-1);
 				// remove users without records for at least wlen day
 				if ((endDay-startDay)<wlen) return -1;
 				int windowOffset;
