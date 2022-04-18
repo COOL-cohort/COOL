@@ -35,6 +35,11 @@ public class BirthAvgAggregator implements EventAggregator {
         values = vec;
     }
 
+    /**
+     * @brief  get the average value of a list which is the cohort result at a specific age
+     *
+     * @param offset the list to get the average value
+     */
     @Override
     public Double birthAggregate(List<Integer> offset) {
     	if (offset.isEmpty()) return null;
