@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.funnel.FunnelQuery;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
+import com.nus.cool.loader.LoadQuery;
 import org.eclipse.jetty.server.Request;
 
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
@@ -36,7 +37,7 @@ public class QueryServerController {
 		getTimeClock();
 		String text = "This is the backend for the COOL system.\n";
 		text += "COOL system is a cohort OLAP system specialized for cohort analysis with extremely low latency.\n";
-		text += "Workkable urls: \n";
+		text += "Workable urls: \n";
 		text += "HTTP Method: GET\n";
 		text += " - [server]:v1\n";
 		text += " - [server]:v1/reload?cube=[cube_name]\n";
@@ -47,6 +48,20 @@ public class QueryServerController {
 		text += " - [server]:v1/cohort/analysis\n";
 		text += " - [server]:v1/funnel/analysis\n";
 		return text;
+	}
+
+	@Path("load")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.TEXT_PLAIN)
+	public Response load(@Context Request req, String query) throws IOException {
+		getTimeClock();
+		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
+		System.out.println("[*] This query is for loading a new cube: " + query);
+		ObjectMapper mapper = new ObjectMapper();
+		LoadQuery q = mapper.readValue(query, LoadQuery.class);
+		Response res = qsModel.loadCube(q);
+		return res;
 	}
 
 	@Path("reload")
@@ -93,17 +108,17 @@ public class QueryServerController {
 		return res;
 	}
 
-	@Path("cohort/exploration")
-	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.TEXT_PLAIN)
-	public Response cohortExploration(@Context Request req, String cube, String cohort) throws IOException {
-		getTimeClock();
-		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
-		System.out.println(String.format("[*] This query is for cohort exploration: %s %s", cube, cohort));
-		Response res = qsModel.cohortExploration(cube, cohort);
-		return res;
-	}
+//	@Path("cohort/exploration")
+//	@POST
+//	@Produces(MediaType.APPLICATION_JSON)
+//	@Consumes(MediaType.TEXT_PLAIN)
+//	public Response cohortExploration(@Context Request req, String cube, String cohort) throws IOException {
+//		getTimeClock();
+//		System.out.println("[*] Server is performing the cohort query form IP: " + req.getRemoteAddr());
+//		System.out.println(String.format("[*] This query is for cohort exploration: %s %s", cube, cohort));
+//		Response res = qsModel.cohortExploration(cube, cohort);
+//		return res;
+//	}
 
 	@Path("cohort/analysis")
 	@POST
