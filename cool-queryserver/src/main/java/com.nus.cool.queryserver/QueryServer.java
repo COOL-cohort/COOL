@@ -87,7 +87,7 @@ public class QueryServer implements Runnable {
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
         ResourceConfig restConfig = new ResourceConfig();
-         restConfig.registerClasses(QueryServerController.class);
+        //restConfig.registerClasses(QueryServerController.class);
         restConfig.registerInstances(controller);
         restConfig.register(JacksonFeature.class);
 

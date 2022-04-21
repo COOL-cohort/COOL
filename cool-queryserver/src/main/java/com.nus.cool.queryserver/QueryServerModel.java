@@ -70,7 +70,7 @@ public class QueryServerModel {
             CoolLoader coolLoader = new CoolLoader(config);
             coolLoader.load(q.getCubeName(),q.getSchemaPath(),q.getDataPath(),q.getOutputPath());
             return Response.ok("Cube " + q.getCubeName() + " has already been loaded.").build();
-        } catch (IOException e){
+        } catch (Exception e){
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }

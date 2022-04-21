@@ -16,8 +16,8 @@ public class ArrowLoader {
     public static void main(String[] args) {
         String cube = args[0];
         String schemaFileName = args[1];
-        String dataFileName = args[3];
-        String cubeRepo = args[4];
+        String dataFileName = args[2];
+        String cubeRepo = args[3];
 
         try {
             DataLoaderConfig config = new ArrowIPCFileDataLoaderConfig();
