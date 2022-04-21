@@ -29,7 +29,7 @@ public class CoolModelTest {
         // System.out.println(System.getProperty("user.dir"));
         String cube = "health";
         String schemaFileName = "../health/table.yaml";
-        String dataFileName = "../health/raw2.csv";
+        String dataFileName = "../health/raw.csv";
         String cubeRepo = "../datasetSource";
 
         DataLoaderConfig config = new CsvDataLoaderConfig();

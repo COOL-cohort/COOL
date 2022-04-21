@@ -20,8 +20,7 @@ public class CsvDataLoaderConfig extends DataLoaderConfig {
   }
   
   @Override
-  public TupleReader createTupleReader(File dataFile)
-    throws IOException {
+  public TupleReader createTupleReader(File dataFile) throws IOException {
     return new LineTupleReader(dataFile);
   }
 

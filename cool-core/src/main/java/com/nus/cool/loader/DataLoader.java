@@ -72,9 +72,12 @@ public class DataLoader {
      */
     public void load() throws IOException {
         writer.Initialize();
-      while (reader.hasNext()) {
-        writer.Add(parser.parse(reader.next()));
-      }
+        // read the csv column
+        if(reader.hasNext()) reader.next();
+        // read the csv data
+        while (reader.hasNext()) {
+            writer.Add(parser.parse(reader.next()));
+        }
         writer.Finish();
     }
     @AllArgsConstructor
@@ -111,7 +114,8 @@ public class DataLoader {
          * @throws IOException
          */
         public DataLoader build() throws IOException {
-            return new DataLoader(dataSetName, config.createTupleReader(dataFile), config.createTupleParser(tableSchema), new NativeDataWriter(tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()));
+            return new DataLoader(dataSetName, config.createTupleReader(dataFile), config.createTupleParser(tableSchema),
+                    new NativeDataWriter(tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()));
         }
     }
 }

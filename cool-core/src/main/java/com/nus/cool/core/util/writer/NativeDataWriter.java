@@ -77,8 +77,7 @@ public class NativeDataWriter implements DataWriter {
         this.out = newCublet();
         // chunk
         this.tupleCount = 0;
-        this.chunk = ChunkWS.newChunk(this.tableSchema,
-            this.metaChunk.getMetaFields(), this.offset);
+        this.chunk = ChunkWS.newChunk(this.tableSchema, this.metaChunk.getMetaFields(), this.offset);
         return true;
     }
 
@@ -96,8 +95,7 @@ public class NativeDataWriter implements DataWriter {
     }
 
     private void finishCublet() throws IOException {
-        offset += new MetaChunkWS(tableSchema, offset,
-          metaChunk.getMetaFields()).writeTo(out);
+        offset += new MetaChunkWS(tableSchema, offset, metaChunk.getMetaFields()).writeTo(out);
         chunkOffsets.add(offset - Ints.BYTES);
         out.writeInt(IntegerUtil.toNativeByteOrder(chunkOffsets.size()));
         for (int chunkOff : chunkOffsets) {
