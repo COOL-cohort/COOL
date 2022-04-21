@@ -40,7 +40,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Hash-like indexed field, used to store chunk data for four fieldTypes, including AppKey, UserKey,
+ * Hash-like indexed field, used to store chunk data for four fieldTypes,
+ * including AppKey, UserKey,
  * Action, Segment
  * <p>
  * Data Layout
@@ -94,12 +95,23 @@ public class HashFieldWS implements FieldWS {
 
   @Override
   public void put(String[] tuple) throws IOException {
-    int gId = this.metaField.find(tuple[i]);
-      if (gId == -1)
-      // The data may be corrupted
-      {
-          throw new IllegalArgumentException("Value not exist in dimension: " + tuple[i]);
-      }
+    put(tuple[i]);
+  }
+
+  /**
+   * Directly Input a value
+   * 
+   * @param v
+   * @throws IOException
+   *                     Used for UnitTest
+   */
+  public void put(String v) throws IOException {
+    int gId = this.metaField.find(v);
+    if (gId == -1)
+    // The data may be corrupted
+    {
+      throw new IllegalArgumentException("Value not exist in dimension: " + v);
+    }
     // Write globalIDs as values for temporary
     this.buffer.writeInt(gId);
     // Set localID as 0 for temporary
@@ -188,4 +200,5 @@ public class HashFieldWS implements FieldWS {
     }
     return bytesWritten;
   }
+
 }
