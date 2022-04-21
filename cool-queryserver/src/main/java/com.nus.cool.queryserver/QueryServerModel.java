@@ -68,7 +68,7 @@ public class QueryServerModel {
                     throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
             }
             CoolLoader coolLoader = new CoolLoader(config);
-            coolLoader.load(q.getCubeName(),q.getSchemaPath(),q.getDimPath(),q.getDataPath(),q.getOutputPath());
+            coolLoader.load(q.getCubeName(),q.getSchemaPath(),q.getDataPath(),q.getOutputPath());
             return Response.ok("Cube " + q.getCubeName() + " has already been loaded.").build();
         } catch (IOException e){
             System.out.println(e);
