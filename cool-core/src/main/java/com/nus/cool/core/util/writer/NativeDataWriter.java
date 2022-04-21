@@ -57,8 +57,7 @@ public class NativeDataWriter implements DataWriter {
 
     private DataOutputStream out = null;
 
-    public NativeDataWriter(TableSchema schema, File outputDir, long chunkSize,
-        long cubletSize, File inputMetaFile) throws IOException {
+    public NativeDataWriter(TableSchema schema, File outputDir, long chunkSize, long cubletSize) throws IOException {
         this.tableSchema = schema;
         this.outputDir = outputDir;
         this.chunkSize = chunkSize;

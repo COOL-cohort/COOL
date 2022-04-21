@@ -25,12 +25,11 @@ public class CoolLoader {
      *
      * @param cube output cube name. Need to be specified when loading from the repository
      * @param schemaFileName path to the table.yaml
-     * @param dimFileName path to the dimension.csv
      * @param dataFileName path to the data.csv
      * @param cubeRepo the name of the output cube repository
      * @throws IOException
      */
-    public synchronized void load(String cube, String schemaFileName, String dimFileName, String dataFileName, String cubeRepo) throws IOException{
+    public synchronized void load(String cube, String schemaFileName, String dataFileName, String cubeRepo) throws IOException{
         // check the existence of the data repository
         File root = new File(cubeRepo);
         if (!root.exists()){
@@ -41,7 +40,6 @@ public class CoolLoader {
             }
         }
         File schemaFile = new File(schemaFileName);
-        File dimensionFile = new File(dimFileName);
         File dataFile = new File(dataFileName);
         TableSchema schema = TableSchema.read( new FileInputStream(schemaFile));
 
@@ -73,7 +71,7 @@ public class CoolLoader {
         if (outputCubeVersionDir.mkdir()){
             System.out.println("[*] New version " + outputCubeVersionDir.getName() + " is created!");
         }
-        DataLoader loader = DataLoader.builder(cube, schema, dimensionFile, dataFile, outputCubeVersionDir, this.loaderConfig).build();
+        DataLoader loader = DataLoader.builder(cube, schema, dataFile, outputCubeVersionDir, this.loaderConfig).build();
         loader.load();
         Files.copy(schemaFile, new File(outputCubeVersionDir, "table.yaml"));
     }
