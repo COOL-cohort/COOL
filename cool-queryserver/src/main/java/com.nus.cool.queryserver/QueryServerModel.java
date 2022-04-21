@@ -58,16 +58,15 @@ public class QueryServerModel {
                 case "PARQUET":
                     config = new ParquetDataLoaderConfig();
                     break;
-                case "ARROW":
-                    config = new ArrowIPCFileDataLoaderConfig();
-                    break;
+                // case "ARROW":
+                //     config = new ArrowIPCFileDataLoaderConfig();
+                //     break;
                 case "AVRO":
                     config = new AvroDataLoaderConfig(new File(q.getConfigPath()));
                     break;
                 default:
                     throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
             }
-            System.out.println(config.getClass().getName());
             CoolLoader coolLoader = new CoolLoader(config);
             coolLoader.load(q.getCubeName(),q.getSchemaPath(),q.getDimPath(),q.getDataPath(),q.getOutputPath());
             return Response.ok("Cube " + q.getCubeName() + " has already been loaded.").build();

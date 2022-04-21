@@ -30,6 +30,9 @@ public class QueryServerController {
 	private void getTimeClock(){
 		System.out.println("======================== " + new Date() + " ========================");
 	}
+	private void outEnd(){
+		System.out.println("============================= END ==================================");
+	}
 
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
@@ -44,6 +47,7 @@ public class QueryServerController {
 		text += " - [server]:v1/list\n";
 		text += " - [server]:v1/cohort/list?cube=[cube_name]\n";
 		text += "HTTP Method: POST\n";
+		text += " - [server]:v1/load\n";
 		text += " - [server]:v1/cohort/selection\n";
 		text += " - [server]:v1/cohort/analysis\n";
 		text += " - [server]:v1/funnel/analysis\n";
@@ -61,6 +65,7 @@ public class QueryServerController {
 		ObjectMapper mapper = new ObjectMapper();
 		LoadQuery q = mapper.readValue(query, LoadQuery.class);
 		Response res = qsModel.loadCube(q);
+		outEnd();
 		return res;
 	}
 
@@ -71,6 +76,7 @@ public class QueryServerController {
 		getTimeClock();
 		System.out.println("[*] Server is reloading the cube: " + cube );
 		Response res = qsModel.reloadCube(cube);
+		outEnd();
 		return res;
 	}
 
@@ -81,6 +87,7 @@ public class QueryServerController {
 		getTimeClock();
 		System.out.println("[*] Server is listing all cubes.");
 		Response res = qsModel.listCubes();
+		outEnd();
 		return res;
 	}
 
@@ -91,6 +98,7 @@ public class QueryServerController {
 		getTimeClock();
 		System.out.println("[*] Server is listing all cohorts.");
 		Response res = qsModel.listCohorts(cube);
+		outEnd();
 		return res;
 	}
 
@@ -105,6 +113,7 @@ public class QueryServerController {
 		ObjectMapper mapper = new ObjectMapper();
 		ExtendedCohortQuery q = mapper.readValue(query, ExtendedCohortQuery.class);
 		Response res = qsModel.cohortSelection(q);
+		outEnd();
 		return res;
 	}
 
@@ -131,6 +140,7 @@ public class QueryServerController {
 		ObjectMapper mapper = new ObjectMapper();
 		ExtendedCohortQuery q = mapper.readValue(query, ExtendedCohortQuery.class);
 		Response res = qsModel.cohortAnalysis(q);
+		outEnd();
 		return res;
 	}
 
@@ -145,6 +155,7 @@ public class QueryServerController {
 		ObjectMapper mapper = new ObjectMapper();
 		FunnelQuery q = mapper.readValue(query, FunnelQuery.class);
 		Response res = qsModel.funnelAnalysis(q);
+		outEnd();
 		return res;
 	}
 
@@ -159,6 +170,7 @@ public class QueryServerController {
 		ObjectMapper mapper = new ObjectMapper();
 		IcebergQuery q = mapper.readValue(query, IcebergQuery.class);
 		Response res = qsModel.precessIcebergQuery(q);
+		outEnd();
 		return res;
 	}
 }
