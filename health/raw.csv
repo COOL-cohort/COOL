@@ -1,4 +1,4 @@
-id,age,gender,race,event,position,disease,labtest,medicine,value,time
+id,birthyear,event,diagnose,prescribe,labtest,value,time
 P-0,1954,diagnose,Disease-B,None,None,0,2012-01-01
 P-0,1954,prescribe,None,Medicine-C,None,0,2012-01-01
 P-0,1954,labtest,None,None,Labtest-C,44,2012-01-01
