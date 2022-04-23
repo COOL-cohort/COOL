@@ -76,32 +76,7 @@ public class CoolFieldRS implements FieldRS {
   public void readFrom(ByteBuffer buffer) {
     // Get field type
     this.fieldType = FieldType.fromInteger(buffer.get());
-    Codec codec = Codec.fromInteger(buffer.get());
-    if (codec == Codec.Range) {
-      // Range field case
-      this.minKey = buffer.getInt();
-      this.maxKey = buffer.getInt();
-      this.bRangeField = true;
-    } else {
-      // Hash field case
-      buffer.position(buffer.position() - 1);
-      this.keyVec = InputVectorFactory.readFrom(buffer);
-      this.minKey = 0;
-      this.maxKey = this.keyVec.size();
-      this.bSetField = true;
-    }
-
-    codec = Codec.fromInteger(buffer.get());
-    if (codec == Codec.PreCAL) {
-      int values = buffer.get();
-      this.bitSets = new BitSet[values];
-        for (int i = 0; i < values; i++) {
-            this.bitSets[i] = SimpleBitSetCompressor.read(buffer);
-        }
-    } else {
-      buffer.position(buffer.position() - 1);
-      this.valueVec = InputVectorFactory.readFrom(buffer);
-    }
+    readFromWithFieldType(buffer, this.fieldType);
   }
 
   @Override
