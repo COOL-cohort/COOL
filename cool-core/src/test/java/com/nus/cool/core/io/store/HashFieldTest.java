@@ -27,7 +27,7 @@ import org.testng.annotations.Test;
  * @author lingze
  */
 public class HashFieldTest {
-
+    private String sourcePath;
     private TestTable table;
     private Charset charset;
     private OutputCompressor compressor;
@@ -37,7 +37,16 @@ public class HashFieldTest {
         System.out.println("HashField Test SetUp");
         this.charset = Charset.defaultCharset();
         this.compressor = new OutputCompressor();
-        String filepath = Paths.get("../TestData/test.csv").toAbsolutePath().toString();
+        sourcePath = Paths.get(System.getProperty("user.dir"),
+             "src",
+             "test",
+             "java",
+             "com",
+             "nus",
+             "cool",
+             "core",
+             "resources").toString();
+        String filepath = Paths.get(sourcePath,"TestData","test.csv").toString();
         table = TestTable.readFromCSV(filepath);
     }
 
