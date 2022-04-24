@@ -27,6 +27,7 @@ import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.parser.VerticalTupleParser;
+
 import java.io.DataOutput;
 import java.io.IOException;
 
@@ -52,6 +53,15 @@ public class RangeMetaFieldWS implements MetaFieldWS {
     this.max = Integer.MIN_VALUE;
   }
 
+  public int getMin() {
+    return min;
+  }
+
+  public int getMax() {
+    return max;
+  }
+
+  // TODO (lingze) : Does this method make any sense ?
   @Override
   public void put(String v) {
     v = checkNotNull(v);
@@ -118,11 +128,12 @@ public class RangeMetaFieldWS implements MetaFieldWS {
     int bytesWritten = 0;
     out.writeInt(IntegerUtil.toNativeByteOrder(this.min));
     out.writeInt(IntegerUtil.toNativeByteOrder(this.max));
-     bytesWritten += 2 * Ints.BYTES;
+    bytesWritten += 2 * Ints.BYTES;
     return bytesWritten;
   }
+
   @Override
   public String toString() {
-    return "RangeMetaField(min,max): (" + min + ", " + max + ")"; 
+    return "RangeMetaField(min,max): (" + min + ", " + max + ")";
   }
 }

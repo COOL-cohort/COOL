@@ -36,7 +36,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Range index, used to store chunk data for two fieldTypes, including ActionTime, Metric.
+ * Range index, used to store chunk data for two fieldTypes, including
+ * ActionTime, Metric.
  * <p>
  * Data layout
  * ------------------------------
@@ -72,39 +73,49 @@ public class RangeFieldWS implements FieldWS {
     return this.fieldType;
   }
 
+  /**
+   * UnitTest insert data
+   * 
+   * @param item
+   * @throws IOException
+   */
+  public void put(String item) throws IOException {
+    if (this.fieldType == FieldType.ActionTime) {
+      DayIntConverter converter = new DayIntConverter();
+      this.buffer.writeInt(converter.toInt(item));
+    } else {
+      this.buffer.writeInt(Integer.parseInt(item));
+    }
+  }
+
   @Override
   public void put(String[] tuple) throws IOException {
-      if (this.fieldType == FieldType.ActionTime) {
-          DayIntConverter converter = new DayIntConverter();
-          this.buffer.writeInt(converter.toInt(tuple[this.i]));
-      } else {
-          this.buffer.writeInt(Integer.parseInt(tuple[i]));
-      }
+    this.put(tuple[this.i]);
   }
 
   @Override
   public int writeTo(DataOutput out) throws IOException {
     int bytesWritten = 0;
-    int[] key = new int[2];
+    int[] key = { Integer.MAX_VALUE, Integer.MIN_VALUE };
+    // key[0] Min Key[1] Max
     int[] value = new int[this.buffer.size() / Ints.BYTES];
 
     // Read column data
-    // TODO: Bloated code
     try (DataInputBuffer input = new DataInputBuffer()) {
       input.reset(this.buffer);
-        for (int i = 0; i < value.length; i++) {
-            value[i] = input.readInt();
-        }
+      for (int i = 0; i < value.length; i++) {
+        value[i] = input.readInt();
+        key[0] = value[i] < key[0] ? value[i] : key[0];
+        key[1] = value[i] < key[1] ? key[1] : value[i];
+      }
     }
-
-    key[0] = ArrayUtil.min(value);
-    key[1] = ArrayUtil.max(value);
 
     // Write codec
     out.write(Codec.Range.ordinal());
     bytesWritten++;
     // Write min value
     out.writeInt(IntegerUtil.toNativeByteOrder(key[0]));
+
     bytesWritten += Ints.BYTES;
     // Write max value
     out.writeInt(IntegerUtil.toNativeByteOrder(key[1]));
