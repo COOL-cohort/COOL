@@ -28,6 +28,8 @@ import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.parser.VerticalTupleParser;
 
+import lombok.Getter;
+
 import java.io.DataOutput;
 import java.io.IOException;
 
@@ -43,8 +45,10 @@ public class RangeMetaFieldWS implements MetaFieldWS {
 
   private FieldType fieldType;
 
+  @Getter
   private int min;
 
+  @Getter
   private int max;
 
   public RangeMetaFieldWS(FieldType type) {
@@ -53,13 +57,6 @@ public class RangeMetaFieldWS implements MetaFieldWS {
     this.max = Integer.MIN_VALUE;
   }
 
-  public int getMin() {
-    return min;
-  }
-
-  public int getMax() {
-    return max;
-  }
 
   // TODO (lingze) : Does this method make any sense ?
   @Override
