@@ -80,6 +80,17 @@ public class QueryServerController {
 		return res;
 	}
 
+	@Path("cohort/remove")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response cohortRemove(@QueryParam("cohort") String cohort) throws IOException {
+		getTimeClock();
+		System.out.println("[*] Server is removing the cohort: " + cohort );
+		Response res = qsModel.cohortRemove(cohort);
+		outEnd();
+		return res;
+	}
+
 	@Path("list")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

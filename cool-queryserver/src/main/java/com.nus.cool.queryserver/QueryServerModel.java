@@ -78,11 +78,27 @@ public class QueryServerModel {
 
     public Response reloadCube(String cube){
         try{
-            if (!this.coolModel.isCubeLoaded(cube)){
-                this.coolModel.reload(cube);
-                return Response.ok("Cube " + cube + " is reloaded.").build();
-            } else return Response.ok("Cube " + cube + " has already been reloaded.").build();
+            this.coolModel.reload(cube);
+            return Response.ok("Cube " + cube + " is reloaded.").build();
         } catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+    public Response cohortRemove(String cohortName){
+        try {
+            String cubeName = this.coolModel.getCurrentCube();
+            File cubeFile = this.coolModel.getCubeStorePath(cubeName);
+            File cohortFile = new File(new File(cubeFile, "cohort"), cohortName);
+            System.out.println("Target: " + cohortFile.getAbsolutePath());
+            this.coolModel.clearCohorts();
+
+            if(!cohortFile.exists()) throw new IOException(String.format("[x] Cohort %s is not found in the cube %s", cohortName, cubeName));
+            if(!cohortFile.delete()) throw new IOException(String.format("[x] Cohort %s can not be deleted from the cube %s", cohortName, cubeName));
+            System.out.println(String.format("[x] Cohort %s is deleted from the cube %s", cohortName, cubeName));
+            return Response.ok(String.format("[x] Cohort %s is deleted from the cube %s", cohortName, cubeName)).build();
+        }catch (Exception e){
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
