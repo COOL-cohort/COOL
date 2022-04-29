@@ -8,7 +8,7 @@
         <groupId>com.nus</groupId>
         <artifactId>cool</artifactId>
         <version>0.1-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>cool-queryserver</artifactId>
@@ -26,9 +26,9 @@
 
     <dependencies>
         <dependency>
-          <groupId>com.nus</groupId>
-          <artifactId>cool-core</artifactId>
-          <version>${project.parent.version}</version>
+            <groupId>com.nus</groupId>
+            <artifactId>cool-core</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -104,6 +104,30 @@
             <artifactId>metrics-jetty9</artifactId>
             <version>${metrics.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.nus</groupId>
+            <artifactId>parquet-extensions</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nus</groupId>
+            <artifactId>arrow-extensions</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nus</groupId>
+            <artifactId>arrow-extensions</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nus</groupId>
+            <artifactId>avro-extensions</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 
@@ -112,6 +136,7 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
               <configuration>
                 <archive>
                   <manifest>

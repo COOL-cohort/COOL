@@ -73,11 +73,11 @@ public class DataLoader {
      * @throws IOException
      */
     public void load() throws IOException {
-      writer.Initialize();
+        writer.Initialize();
       while (reader.hasNext()) {
         writer.Add(parser.parse(reader.next()));
       }
-      writer.Finish();
+        writer.Finish();
     }
     @AllArgsConstructor
     public static class Builder {
