@@ -27,6 +27,10 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * BirthMaxAggregator is used to aggregate the cohort results
+ * when the maximum is needed.
+ */
 public class BirthMaxAggregator implements EventAggregator {
 
     private InputVector values;
@@ -36,11 +40,12 @@ public class BirthMaxAggregator implements EventAggregator {
         values = vec;
     }
 
-
     /**
      * @brief  get the maximum value of a list which is the cohort result at a specific age
      *
-     * @param offset the list to get the maximum value
+     * @param offset the cohort result
+     *
+     * @return the maximum of the cohort result
      */
     @Override
     public Double birthAggregate(List<Integer> offset) {
