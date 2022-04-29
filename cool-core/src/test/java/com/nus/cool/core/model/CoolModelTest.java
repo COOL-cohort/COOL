@@ -54,20 +54,6 @@ public class CoolModelTest {
         cubeRepo = "../datasetSource";
         loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
     }
-
-    @Test(expectedExceptions = { IOException.class },priority = 10, enabled = false)
-    public static void CsvFileNonExistTest() throws IOException {
-        System.out.println("======================== Csv data loader failure Test ========================");
-        // System.out.println(System.getProperty("user.dir"));
-        String cube = "healthy";
-        String schemaFileName = "../healthy/table.yaml";
-        String dimFileName = "../healthy/dim2.csv";
-        String dataFileName = "../healthy/raw2.csv";
-        String cubeRepo = "../datasetSource";
-        DataLoaderConfig config = new CsvDataLoaderConfig();
-        CoolLoader loader = new CoolLoader(config);
-        loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
-    }
     
     @Test (priority = 10)
     public void CubeListTest() throws IOException {
@@ -77,29 +63,6 @@ public class CoolModelTest {
         CoolModel model = new CoolModel(datasetPath);
         String[] cubes2 = model.listCubes();
         System.out.println("Applications: " + Arrays.toString(cubes2));
-    }
-
-    @Test (priority = 10)
-//show the CUBE list is empty
-    public void CubeEmptyListTest() throws IOException {
-        System.out.println("======================== Cube List Test ========================");
-        // System.out.println(System.getProperty("user.dir"));
-        String datasetPath = "../datasetSource2";
-        File dataSource = new File(datasetPath);
-        if (!dataSource.exists()){
-            if (dataSource.mkdir()){
-                System.out.println("[*] Data repository " + dataSource.getCanonicalPath() + " is created!");
-            } else {
-                System.out.println("[x] Data repository " + dataSource.getCanonicalPath() + "cannot be created!");
-            }
-        }
-
-        CoolModel model = new CoolModel(datasetPath);
-        String[] cubes2 = model.listCubes();
-
-        assertEquals(cubes2.length, 0);
-
-        System.out.println("Empty Applications: " + Arrays.toString(cubes2));
     }
 
     @Test (priority = 1)
