@@ -198,6 +198,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionalit
 
  Results for the query  [query.json](olap-tpch/query.json) on the `tpc-h-10g` dataset are as at [result.json](olap-tpch/result2.json)
 
+<<<<<<< HEAD
 ## HOW TO RUN WITH A SERVER
 
 We can start the COOL's query server with the following command
