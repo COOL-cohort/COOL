@@ -71,13 +71,7 @@ public class RangeFieldTest {
         bf.position(wsPos);
         rs.readFromWithFieldType(bf, fType);
 
-        // System.out.printf("MetaWriteStore Max %d Min%d\n", rmws.getMax(),
-        // rmws.getMin());
-        // System.out.printf("MetaReadStore Max %d Min%d\n", rmrs.getMaxValue(),
-        // rmrs.getMinValue());
-        // System.out.printf("ReadStore Max %d Min%d\n", rs.maxKey(), rs.minKey());
         // check Range Meta Field
-
         Assert.assertEquals(rmrs.getMinValue(), rmws.getMin());
         Assert.assertEquals(rmrs.getMaxValue(), rmws.getMax());
         Assert.assertEquals(rs.minKey(), rmws.getMin());
@@ -93,8 +87,6 @@ public class RangeFieldTest {
                 expect = Integer.toString(convertor.toInt(data.get(i)));
             }
             String actual = Integer.toString(vec.get(i));
-            // System.out.printf("expect %s\t", expect);
-            // System.out.printf("got %s\n", actual);
             Assert.assertEquals(expect, actual);
         }
 
