@@ -23,11 +23,12 @@ public class CsvProperties {
                 "com",
                 "nus",
                 "cool",
-                "functionality").toString();
+                "functionality",
+                "resources").toString();
         System.out.println(sourcePath);
         System.out.println("here.."+Paths.get(System.getProperty("user.dir")));
 
-        String filepath = Paths.get(sourcePath,"csv.properties").toString();
+        String filepath = Paths.get(sourcePath,"TestData","csv.properties").toString();
 
         InputStream input = new FileInputStream(filepath);
 
@@ -43,11 +44,5 @@ public class CsvProperties {
         System.out.println(prop.getProperty("dataFileName"));
         System.out.println(prop.getProperty("cubeRepo"));
         return prop;
-    }
-    public static void main(String[] args) throws IOException {
-        CsvProperties cvsp= new CsvProperties();
-        cvsp.getProperties();
-
-
     }
 }
