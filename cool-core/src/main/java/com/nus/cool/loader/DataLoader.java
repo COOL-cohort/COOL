@@ -72,9 +72,7 @@ public class DataLoader {
      */
     public void load() throws IOException {
         writer.Initialize();
-        // read the csv column
-        if(reader.hasNext()) reader.next();
-        // read the csv data
+        // read the data
         while (reader.hasNext()) {
             writer.Add(parser.parse(reader.next()));
         }
