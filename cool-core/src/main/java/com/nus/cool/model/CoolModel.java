@@ -22,17 +22,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import com.nus.cool.core.io.readstore.*;
+import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.core.io.readstore.CohortRS;
+import com.nus.cool.core.io.readstore.CubletRS;
+import com.nus.cool.core.io.readstore.FieldRS;
+import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.loader.DataLoader;
 import lombok.Getter;
 
 import java.io.*;
 import java.nio.ByteOrder;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 /**
