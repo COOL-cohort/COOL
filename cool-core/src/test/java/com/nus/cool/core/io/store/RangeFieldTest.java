@@ -84,7 +84,6 @@ public class RangeFieldTest {
         for (int i = 0; i < vec.size(); i++) {
             String expect = data.get(i);
             if (fType == FieldType.ActionTime) {
-
                 expect = Integer.toString(convertor.toInt(data.get(i)));
             }
             String actual = Integer.toString(vec.get(i));

@@ -16,7 +16,11 @@ import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
+<<<<<<< HEAD
 import com.nus.cool.core.io.writestore.DataChunkWS;
+=======
+import com.nus.cool.core.io.writestore.ChunkWS;
+>>>>>>> 8a64ad5... Add Chunk unit Test and Generate three sample dataset with 256 items from main dataset
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
@@ -44,20 +48,33 @@ public class ChunkTest {
         // File
         BufferedReader br = new BufferedReader(new FileReader(new File(csvFilePath)));
         String line;
+<<<<<<< HEAD
         CsvTupleParser parser = new CsvTupleParser();
         while ((line = br.readLine()) != null) {
             String[] vec = parser.parse(line);
+=======
+        while ((line = br.readLine()) != null) {
+            String[] vec = CsvTupleParser.Parse(line);
+>>>>>>> 8a64ad5... Add Chunk unit Test and Generate three sample dataset with 256 items from main dataset
             data.add(vec);
         }
 
         // Generate MetaChunkWS
         MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0);
+<<<<<<< HEAD
         DataChunkWS chunkWS = DataChunkWS.newDataChunk(schemas, metaChunkWS.getMetaFields(), 0);
+=======
+        ChunkWS chunkWS = ChunkWS.newChunk(schemas, metaChunkWS.getMetaFields(), 0);
+>>>>>>> 8a64ad5... Add Chunk unit Test and Generate three sample dataset with 256 items from main dataset
 
         for (int i = 0; i < data.size(); i++) {
             // You have to update meta first,
             // you have to update globalId first
+<<<<<<< HEAD
             metaChunkWS.put(data.get(i));
+=======
+            metaChunkWS.update(data.get(i));
+>>>>>>> 8a64ad5... Add Chunk unit Test and Generate three sample dataset with 256 items from main dataset
             chunkWS.put(data.get(i));
         }
 
