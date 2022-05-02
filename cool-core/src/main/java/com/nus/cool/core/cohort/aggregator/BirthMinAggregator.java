@@ -26,7 +26,10 @@ import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
 
-
+/**
+ * BirthMinAggregator is used to aggregate the cohort results
+ * when the minimum is needed.
+ */
 public class BirthMinAggregator implements EventAggregator {
 
     private InputVector values;
@@ -36,6 +39,13 @@ public class BirthMinAggregator implements EventAggregator {
         values = vec;
     }
 
+    /**
+     * @brief  get the minimum value of a list which is the cohort result at a specific age
+     *
+     * @param offset the cohort result
+     *
+     * @return the minimum of the cohort result
+     */
     @Override
     public Double birthAggregate(List<Integer> offset) {
     	if (offset.isEmpty()) return null;

@@ -10,7 +10,6 @@ public class LoadQuery {
     private String dataFileType;
     private String cubeName;
     private String schemaPath;
-    private String dimPath;
     private String dataPath;
     private String outputPath;
     private String configPath;
@@ -18,7 +17,7 @@ public class LoadQuery {
     public boolean isValid() throws IOException {
         boolean f = true;
         if (dataFileType == "AVRO") f = isExist(configPath);
-        return f && isExist(schemaPath) && isExist(dimPath) && isExist(dataPath) && cubeName.isEmpty() && outputPath.isEmpty();
+        return f && isExist(schemaPath) && isExist(dataPath) && cubeName.isEmpty() && outputPath.isEmpty();
     }
 
     private boolean isExist(String path) throws IOException {

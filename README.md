@@ -49,15 +49,14 @@ Each distinct value of each column in the dataset shall appear in this dimension
 Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found in [CsvLoader.java](cool-core/src/main/java/com/nus/cool/functionality/CsvLoader.java).
 
 ```bash
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader path/to/your/source/directory path/to/your/.yaml path/to/your/dimensionfile path/to/your/datafile path/to/output/datasource/directory
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader path/to/your/source/directory path/to/your/.yaml path/to/your/datafile path/to/output/datasource/directory
 ```
 
 The five arguments in the command have the following meaning:
 1. a unique dataset name given under the directory
 2. the table.yaml (the third required source)
-3. the dimension file (the second required source)
-4. the dataset file (the first required source)
-5. the output directory for the compacted dataset
+3. the dataset file (the first required source)
+4. the output directory for the compacted dataset
 
 
 ### Execute queries
@@ -103,24 +102,24 @@ We have provided examples in `sogamo` directory and `health` directory. Now we t
 The COOL system supports CSV data format by default, and you can load `sogamo` dataset with the following command.
 
 ```bash
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.csv datasetSource
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader sogamo sogamo/table.yaml sogamo/test.csv datasetSource
 ```
 
 In addition, you can run the following command to load dataset in other formats under the `sogamo` directory.
 
 - parquet format data
 ```bash
-$ java -jar cool-extensions/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.parquet datasetSource
+$ java -jar cool-extensions/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/test.parquet datasetSource
 ```
 
 - Arrow format data
 ```bash
-$ java -jar cool-extensions/arrow-extensions/target/arrow-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/test.arrow datasetSource
+$ java -jar cool-extensions/arrow-extensions/target/arrow-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/test.arrow datasetSource
 ```
 
 - Avro format data
 ```bash
-$ java -jar cool-extensions/avro-extensions/target/avro-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/dim.csv sogamo/avro/test.avro datasetSource sogamo/avro/schema.avsc
+$ java -jar cool-extensions/avro-extensions/target/avro-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/avro/test.avro datasetSource sogamo/avro/schema.avsc
 ```
 
 Finally, there will be a cube generated under the `datasetSource` directory, which is named `sogamo`.
@@ -174,7 +173,7 @@ We have provided examples in `olap-tpch` directory.
 The COOL system supports CSV data format by default, and you can load `tpc-h` dataset with the following command.
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader tpc-h-10g olap-tpch/table.yaml olap-tpch/scripts/dim.csv olap-tpch/scripts/data.csv datasetSource
+java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader tpc-h-10g olap-tpch/table.yaml olap-tpch/scripts/data.csv datasetSource
 ```
 
 Finally, there will be a cube generated under the `datasetSource` directory, which is named `tpc-h-10g`.

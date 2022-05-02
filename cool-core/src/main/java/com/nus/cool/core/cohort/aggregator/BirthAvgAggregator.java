@@ -26,6 +26,10 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * BirthAvgAggregator is used to aggregate the cohort results
+ * when the average value is needed.
+ */
 public class BirthAvgAggregator implements EventAggregator {
 
     private InputVector values;
@@ -35,6 +39,13 @@ public class BirthAvgAggregator implements EventAggregator {
         values = vec;
     }
 
+    /**
+     * @brief  get the average value of a list which is the cohort result at a specific age
+     *
+     * @param  offset the cohort result
+     *
+     * @return  the average value of the cohort result
+     */
     @Override
     public Double birthAggregate(List<Integer> offset) {
     	if (offset.isEmpty()) return null;

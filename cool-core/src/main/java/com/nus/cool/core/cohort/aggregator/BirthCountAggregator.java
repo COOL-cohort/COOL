@@ -28,17 +28,39 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * BirthCountAggregator is used to aggregate the cohort results
+ * when the count of the users is needed.
+ */
 public class BirthCountAggregator implements EventAggregator {
 
     @Override
     public void init(InputVector vec) {
     }
 
+	/**
+	 * @brief  get the count of the users of a list which is the cohort result at a specific age
+	 *
+	 * @param  offset the cohort result
+	 *
+	 * @return  the count of the cohort result
+	 */
     @Override
     public Double birthAggregate(List<Integer> offset) {
         return (double) offset.size();
-    }   
+    }
 
+	/**
+	 * @brief  calculate the count of the age records
+	 *
+	 * @param  ageOffset the bitset to indicate the index for the effective record of the user
+	 * @param  ageDelimiter the bitset to indicate the index of the age record
+	 * @param  ageOff the index of the birth record
+	 * @param  ageEnd the index of the last record of the user
+	 * @param  ageInterval the user-specified parameter which is the age interval
+	 * @param  ageFilter the filter that contains the necessary information for age
+	 * @param  ageMetrics the result for the cohort
+	 */
 	@Override
 	public void ageAggregate(BitSet ageOffset, BitSet ageDelimiter, int ageOff, int ageEnd, int ageInterval,
 							 FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics) {
@@ -74,6 +96,19 @@ public class BirthCountAggregator implements EventAggregator {
 		}
 	}
 
+	/**
+	 * @brief  calculate the count of the age records
+	 *
+	 * @param  ageOffset the bitset to indicate the index for the effective record of the user
+	 * @param  time the values of the field which denotes the action time
+	 * @param  birthDay the birth date for the user
+	 * @param  ageOff the index of the birth record
+	 * @param  ageEnd the index of the last record of the user
+	 * @param  ageInterval the user-specified parameter which is the age interval
+	 * @param  unit the time unit which is always DAY, WEEK or MONTH.
+	 * @param  ageFilter the filter that contains the necessary information for age
+	 * @param  ageMetrics the result for the cohort
+	 */
 	@Override
 	public void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
 							 TimeUnit unit, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics) {

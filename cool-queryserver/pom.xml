@@ -118,12 +118,6 @@
         </dependency>
         <dependency>
             <groupId>com.nus</groupId>
-            <artifactId>arrow-extensions</artifactId>
-            <version>0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.nus</groupId>
             <artifactId>avro-extensions</artifactId>
             <version>0.1-SNAPSHOT</version>
             <scope>compile</scope>

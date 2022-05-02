@@ -60,7 +60,7 @@ public class SumAggregator implements Aggregator {
    * Initiate SumAggregator with the configuration of cohort analysis
    *
    * @param metricVec the metric field
-   * @param eventDayCev the action time field
+   * @param eventDayVec the action time field
    * @param maxAges the number of ages we set up
    * @param from the start position of the user in the table
    * @param to the end position of the user in the table
