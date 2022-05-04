@@ -22,16 +22,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CohortRS;
+import com.nus.cool.core.io.readstore.CubletRS;
+import com.nus.cool.core.io.readstore.FieldRS;
+import com.nus.cool.core.io.readstore.ChunkRS;
+import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.loader.DataLoader;
+import lombok.Getter;
 
 import java.io.*;
 import java.nio.ByteOrder;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 /**
@@ -43,16 +45,18 @@ public class CoolModel implements Closeable {
   // Container of loaded cubes
   private final Map<String, CubeRS> metaStore = Maps.newHashMap();
 
-  // Container of loaded cohorts
-  private Map<String, CohortRS> cohortStore = Maps.newHashMap();
-
   // Store path of loaded cubes
   private Map<String, File> storePath = Maps.newHashMap();
 
   // Directory containing a set of cube files considered a repository
   private final File localRepo;
 
+  // It denotes the current cube
+  @Getter
   private String currentCube = "";
+
+  // Container of loaded cohorts in the current cube
+  private Map<String, CohortRS> cohortStore = Maps.newHashMap();
 
   public CoolCohortEngine cohortEngine = new CoolCohortEngine();
 
@@ -77,8 +81,13 @@ public class CoolModel implements Closeable {
    * @throws IOException
    */
   public synchronized void reload(String cube) throws IOException {
-    // Skip the reload process if the cube is the current one
-    if (currentCube == cube) return;
+    // Skip the reload process if the cube is loaded
+    if (isCubeLoaded(cube)) {
+      if(currentCube!=cube) this.cohortStore.clear();
+      currentCube = cube;
+      resetCube(cube);
+      return;
+    }
 
     // Remove the old version of the cube
     this.metaStore.remove(cube);
@@ -145,6 +154,7 @@ public class CoolModel implements Closeable {
       throw new IOException("[*] Cube " + cube + " is not loaded in the COOL system. Please reload it.");
     }
     else
+      currentCube = cube;
       return out;
   }
 
@@ -189,5 +199,22 @@ public class CoolModel implements Closeable {
     else
       return out;
 
+  }
+
+  public void resetCube(String cube_name) throws IOException{
+    CubeRS cube = this.metaStore.get(cube_name);
+    int userKeyId = cube.getTableSchema().getUserKeyField();
+    for (CubletRS cubletRS : cube.getCublets()) {
+      for(ChunkRS dataChunk : cubletRS.getDataChunks()) {
+        FieldRS userField = dataChunk.getField(userKeyId);
+        RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
+        userInput.skipTo(0);
+      }
+    }
+    System.out.println("Cube " + cube + " has been reset.");
+  }
+
+  public void clearCohorts() throws IOException{
+    this.cohortStore.clear();
   }
 }

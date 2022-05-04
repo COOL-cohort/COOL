@@ -1,9 +1,6 @@
 package com.nus.cool.queryserver;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkArgument;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.cohort.funnel.FunnelQuery;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
@@ -58,20 +55,19 @@ public class QueryServerModel {
                 case "PARQUET":
                     config = new ParquetDataLoaderConfig();
                     break;
-                case "ARROW":
-                    config = new ArrowIPCFileDataLoaderConfig();
-                    break;
+                // case "ARROW":
+                //     config = new ArrowIPCFileDataLoaderConfig();
+                //     break;
                 case "AVRO":
                     config = new AvroDataLoaderConfig(new File(q.getConfigPath()));
                     break;
                 default:
                     throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
             }
-            System.out.println(config.getClass().getName());
             CoolLoader coolLoader = new CoolLoader(config);
-            coolLoader.load(q.getCubeName(),q.getSchemaPath(),q.getDimPath(),q.getDataPath(),q.getOutputPath());
+            coolLoader.load(q.getCubeName(),q.getSchemaPath(),q.getDataPath(),q.getOutputPath());
             return Response.ok("Cube " + q.getCubeName() + " has already been loaded.").build();
-        } catch (IOException e){
+        } catch (Exception e){
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
@@ -79,11 +75,27 @@ public class QueryServerModel {
 
     public Response reloadCube(String cube){
         try{
-            if (!this.coolModel.isCubeLoaded(cube)){
-                this.coolModel.reload(cube);
-                return Response.ok("Cube " + cube + " is reloaded.").build();
-            } else return Response.ok("Cube " + cube + " has already been reloaded.").build();
+            this.coolModel.reload(cube);
+            return Response.ok("Cube " + cube + " is reloaded.").build();
         } catch (IOException e){
+            System.out.println(e);
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+    public Response cohortRemove(String cohortName){
+        try {
+            String cubeName = this.coolModel.getCurrentCube();
+            File cubeFile = this.coolModel.getCubeStorePath(cubeName);
+            File cohortFile = new File(new File(cubeFile, "cohort"), cohortName);
+            System.out.println("Target: " + cohortFile.getAbsolutePath());
+            this.coolModel.clearCohorts();
+
+            if(!cohortFile.exists()) throw new IOException(String.format("[x] Cohort %s is not found in the cube %s", cohortName, cubeName));
+            if(!cohortFile.delete()) throw new IOException(String.format("[x] Cohort %s can not be deleted from the cube %s", cohortName, cubeName));
+            System.out.println(String.format("[x] Cohort %s is deleted from the cube %s", cohortName, cubeName));
+            return Response.ok(String.format("[x] Cohort %s is deleted from the cube %s", cohortName, cubeName)).build();
+        }catch (Exception e){
             System.out.println(e);
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
