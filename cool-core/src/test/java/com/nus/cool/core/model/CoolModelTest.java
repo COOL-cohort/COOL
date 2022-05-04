@@ -15,7 +15,6 @@ import com.nus.cool.result.ExtendedResultTuple;
 import com.nus.cool.model.CoolLoader;
 import com.nus.cool.model.CoolModel;
 import org.testng.annotations.Test;
-import static org.testng.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
