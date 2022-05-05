@@ -25,9 +25,6 @@ import java.io.IOException;
 
 /**
  * Read line as tuple from source
- */
-
-/**
  * LineTupleReader is a high-level data loader that read contents form FileReader
  * LineTupleReader could test whether it has finished reading the file
  * and close the FileReader

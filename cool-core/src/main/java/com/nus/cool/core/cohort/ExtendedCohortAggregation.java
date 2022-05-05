@@ -21,7 +21,6 @@ package com.nus.cool.core.cohort;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,6 @@ import com.nus.cool.core.cohort.aggregator.EventAggregator;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.schema.Measure;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

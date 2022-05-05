@@ -41,12 +41,12 @@ public class ZIntCompressor implements Compressor {
   /**
    * Bytes number for compressed integer
    */
-  private int width;
+  private final int width;
 
   /**
    * Maximum size of compressed data
    */
-  private int maxCompressedLength;
+  private final int maxCompressedLength;
 
   public ZIntCompressor(Codec codec, int numValues) {
     switch (codec) {

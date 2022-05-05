@@ -12,8 +12,8 @@ import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.CoolFieldRS;
 import com.nus.cool.core.io.readstore.HashMetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.io.writestore.HashFieldWS;
-import com.nus.cool.core.io.writestore.HashMetaFieldWS;
+import com.nus.cool.core.io.writestore.DataHashFieldWS;
+import com.nus.cool.core.io.writestore.MetaHashFieldWS;
 import com.nus.cool.core.schema.FieldType;
 
 import org.testng.Assert;
@@ -69,12 +69,12 @@ public class HashFieldTest {
         ArrayList<String> data = table.cols.get(fieldidx);
 
         // Generate MetaHashFieldWS
-        HashMetaFieldWS hmws = new HashMetaFieldWS(fType, charset, compressor);
+        MetaHashFieldWS hmws = new MetaHashFieldWS(fType, charset, compressor);
         // Input col data into metaField
         for (String value : data) {
-            hmws.update(value);
+            hmws.put(value);
         }
-        HashFieldWS ws = new HashFieldWS(hmws.getFieldType(), fieldidx, hmws, compressor, false);
+        DataHashFieldWS ws = new DataHashFieldWS(hmws.getFieldType(), fieldidx, hmws, compressor, false);
         // Input col data into Field
         for (String value : data) {
             ws.put(value);

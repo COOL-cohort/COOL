@@ -41,12 +41,12 @@ public class LZ4JavaCompressor implements Compressor {
   /**
    * Maximum size of compressed data
    */
-  private int maxLen;
+  private final int maxLen;
 
   /**
    * LZ4 compressor
    */
-  private LZ4Compressor lz4;
+  private final LZ4Compressor lz4;
 
   public LZ4JavaCompressor(Histogram hist) {
     this.lz4 = LZ4Factory.fastestInstance().fastCompressor();
@@ -59,11 +59,9 @@ public class LZ4JavaCompressor implements Compressor {
   }
 
   @Override
-  public int compress(byte[] src, int srcOff, int srcLen, byte[] dest, int destOff,
-      int maxDestLen) {
+  public int compress(byte[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen) {
     ByteBuffer buffer = ByteBuffer.wrap(dest, destOff, maxDestLen).order(ByteOrder.nativeOrder());
-    int zLen = this.lz4
-        .compress(src, srcOff, srcLen, dest, destOff + HEADACC, maxDestLen - HEADACC);
+    int zLen = this.lz4.compress(src, srcOff, srcLen, dest, destOff + HEADACC, maxDestLen - HEADACC);
     // write z len and raw len for decompressing
     buffer.putInt(zLen);
     buffer.putInt(srcLen);

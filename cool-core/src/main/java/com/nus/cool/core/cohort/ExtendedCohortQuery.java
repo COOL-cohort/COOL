@@ -18,6 +18,8 @@
  */
 package com.nus.cool.core.cohort;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,6 +107,17 @@ public class ExtendedCohortQuery {
             LOG.info(e);
         }
         return null;
+    }
+
+    /**
+     * Read query from InputStream
+     * @param in InputStream
+     * @return query instance
+     * @throws IOException
+     */
+    public static ExtendedCohortQuery read(InputStream in) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(in, ExtendedCohortQuery.class);
     }
 
 }
