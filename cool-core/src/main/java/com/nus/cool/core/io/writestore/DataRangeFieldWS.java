@@ -48,22 +48,19 @@ import java.io.IOException;
  * max = max of the values
  * values = column data (compressed)
  */
-public class RangeFieldWS implements FieldWS {
+public class DataRangeFieldWS implements DataFieldWS {
 
-  /**
-   * Field index to get data from tuple
-   */
-  private int i;
+  private final FieldType fieldType;
 
-  private FieldType fieldType;
+  private final DataOutputBuffer buffer = new DataOutputBuffer();
 
-  private DataOutputBuffer buffer = new DataOutputBuffer();
+  private final OutputCompressor compressor;
 
-  private OutputCompressor compressor;
-
-  public RangeFieldWS(FieldType fieldType, int i, OutputCompressor compressor) {
-    checkArgument(i >= 0);
-    this.i = i;
+  public DataRangeFieldWS(FieldType fieldType, int fieldIndex, OutputCompressor compressor) {
+    checkArgument(fieldIndex >= 0);
+    /**
+     * Field index to get data from tuple
+     */
     this.fieldType = fieldType;
     this.compressor = checkNotNull(compressor);
   }
@@ -75,22 +72,18 @@ public class RangeFieldWS implements FieldWS {
 
   /**
    * UnitTest insert data
-   * 
-   * @param item
+   *
+   * @param TupleValue
    * @throws IOException
    */
-  public void put(String item) throws IOException {
-    if (this.fieldType == FieldType.ActionTime) {
-      DayIntConverter converter = new DayIntConverter();
-      this.buffer.writeInt(converter.toInt(item));
-    } else {
-      this.buffer.writeInt(Integer.parseInt(item));
-    }
-  }
-
   @Override
-  public void put(String[] tuple) throws IOException {
-    this.put(tuple[this.i]);
+  public void put(String TupleValue) throws IOException {
+      if (this.fieldType == FieldType.ActionTime) {
+          DayIntConverter converter = new DayIntConverter();
+          this.buffer.writeInt(converter.toInt(TupleValue));
+      } else {
+          this.buffer.writeInt(Integer.parseInt(TupleValue));
+      }
   }
 
   @Override
@@ -105,8 +98,8 @@ public class RangeFieldWS implements FieldWS {
       input.reset(this.buffer);
       for (int i = 0; i < value.length; i++) {
         value[i] = input.readInt();
-        key[0] = value[i] < key[0] ? value[i] : key[0];
-        key[1] = value[i] < key[1] ? key[1] : value[i];
+        key[0] = Math.min(value[i], key[0]);
+        key[1] = Math.max(value[i], key[1]);
       }
     }
 
@@ -115,7 +108,6 @@ public class RangeFieldWS implements FieldWS {
     bytesWritten++;
     // Write min value
     out.writeInt(IntegerUtil.toNativeByteOrder(key[0]));
-
     bytesWritten += Ints.BYTES;
     // Write max value
     out.writeInt(IntegerUtil.toNativeByteOrder(key[1]));

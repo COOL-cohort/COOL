@@ -1,0 +1,26 @@
+{
+  "dataSource": "tpc-h-10g",
+  "selection": {
+    "type": "and",
+    "dimension": null,
+    "values": null,
+    "fields": [
+      { "type": "filter",
+        "dimension": "O_ORDERPRIORITY",
+        "values": [ "2-HIGH" ],
+        "fields":[]},
+      { "type": "filter",
+        "dimension": "R_NAME",
+        "values": ["EUROPE"],
+        "fields":[]},
+      { "type": "filter",
+        "dimension": "O_ORDERDATE",
+        "values": ["1993-01-01|1993-12-31"],
+        "fields":[]}]
+  },
+  "groupFields":["N_NAME","R_NAME"],
+  "aggregations":[
+    {"fieldName":"O_TOTALPRICE","operators":["COUNT","SUM"]}
+  ],
+  "granularity":"NULL"
+}

@@ -36,10 +36,7 @@ import com.nus.cool.model.CoolModel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
 
 /**
  * IcebergLoader is a higher level abstraction for iceberg query

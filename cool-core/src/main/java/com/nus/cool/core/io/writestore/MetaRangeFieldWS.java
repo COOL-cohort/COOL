@@ -41,9 +41,9 @@ import java.io.IOException;
  * | min | max |
  * -------------
  */
-public class RangeMetaFieldWS implements MetaFieldWS {
+public class MetaRangeFieldWS implements MetaFieldWS {
 
-  private FieldType fieldType;
+  private final FieldType fieldType;
 
   @Getter
   private int min;
@@ -51,7 +51,7 @@ public class RangeMetaFieldWS implements MetaFieldWS {
   @Getter
   private int max;
 
-  public RangeMetaFieldWS(FieldType type) {
+  public MetaRangeFieldWS(FieldType type) {
     this.fieldType = type;
     this.min = Integer.MAX_VALUE;
     this.max = Integer.MIN_VALUE;
@@ -61,28 +61,6 @@ public class RangeMetaFieldWS implements MetaFieldWS {
   // TODO (lingze) : Does this method make any sense ?
   @Override
   public void put(String v) {
-    v = checkNotNull(v);
-    TupleParser parser = new VerticalTupleParser();
-    String[] range = parser.parse(v);
-    checkArgument(range.length == 2);
-    switch (this.fieldType) {
-      case Metric:
-        this.min = Integer.parseInt(range[0]);
-        this.max = Integer.parseInt(range[1]);
-        break;
-      case ActionTime:
-        DayIntConverter converter = new DayIntConverter();
-        this.min = converter.toInt(range[0]);
-        this.max = converter.toInt(range[1]);
-        break;
-      default:
-        throw new IllegalArgumentException("Unable to index: " + this.fieldType);
-    }
-    checkArgument(this.min <= this.max);
-  }
-
-  @Override
-  public void update(String v) {
     v = checkNotNull(v);
     switch (this.fieldType) {
       case Metric:
@@ -118,6 +96,11 @@ public class RangeMetaFieldWS implements MetaFieldWS {
   @Override
   public void complete() {
 
+  }
+
+  @Override
+  public void update(String v) {
+    throw new UnsupportedOperationException("Doesn't support update now");
   }
 
   @Override

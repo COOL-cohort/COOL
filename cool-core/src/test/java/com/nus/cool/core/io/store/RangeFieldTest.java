@@ -11,8 +11,8 @@ import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.CoolFieldRS;
 import com.nus.cool.core.io.readstore.RangeMetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.io.writestore.RangeFieldWS;
-import com.nus.cool.core.io.writestore.RangeMetaFieldWS;
+import com.nus.cool.core.io.writestore.DataRangeFieldWS;
+import com.nus.cool.core.io.writestore.MetaRangeFieldWS;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.converter.DayIntConverter;
 
@@ -50,11 +50,11 @@ public class RangeFieldTest {
         ArrayList<String> data = table.cols.get(fieldidx);
 
         // For RangeField, RangeMetaField and RangeField can be test seperatly.
-        RangeMetaFieldWS rmws = new RangeMetaFieldWS(fType);
-        RangeFieldWS ws = new RangeFieldWS(fType, 0, compressor);
+        MetaRangeFieldWS rmws = new MetaRangeFieldWS(fType);
+        DataRangeFieldWS ws = new DataRangeFieldWS(fType, 0, compressor);
         // put data into writeStore
         for (String v : data) {
-            rmws.update(v);
+            rmws.put(v);
             ws.put(v);
         }
         // Write into Buffer
