@@ -14,18 +14,19 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 
 
 public class IcebergSelectionTest {
 
-    @Test
-    public void DataChunkProceesTest() throws IOException, ParseException {
+    @Test (dataProvider = "IcebergQuerySelectionTestDP")
+    public void DataChunkProceesTest(String dzPath, String queryPath) throws IOException, ParseException {
         System.out.println("======================== Process Data ChunkRS Test ========================");
 
-        String dzFilePath = "../datasetSource";
-        String queryFilePath = "../olap-tpch/query.json";
+        String dzFilePath = dzPath;
+        String queryFilePath = queryPath;
 
         // load query
         ObjectMapper mapper = new ObjectMapper();
@@ -45,6 +46,13 @@ public class IcebergSelectionTest {
         Map<String, BitSet> result= icebergSec.process(dataChunks.get(0));
         System.out.println("Iceberg Selection result=" + result);
 
+    }
+
+    @DataProvider(name = "IcebergQuerySelectionTestDP")
+    public Object[][] dpArgs() {
+        return new Object[][] {
+                {"../datasetSource","../olap-tpch/query.json"}
+        };
     }
 
 }

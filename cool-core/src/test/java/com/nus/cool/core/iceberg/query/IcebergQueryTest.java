@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.FileInputStream;
 
+import com.nus.cool.core.schema.FieldType;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 
@@ -47,11 +49,18 @@ public class IcebergQueryTest {
         System.out.println("Iceberg query print to string"+ output);
     }
 
-    @Test
-    public void ReadTest() throws IOException {
-        String queryFilePath = "../olap-tpch/query.json";
+    @Test (dataProvider = "IcebergQueryTestDP")
+    public void ReadTest(String queryPath) throws IOException {
+        String queryFilePath = queryPath; //"../olap-tpch/query.json";
         FileInputStream fin=new FileInputStream(queryFilePath);
         IcebergQuery iquery=IcebergQuery.read(fin);
         System.out.println("Read Iceberg query from json" + iquery);
+    }
+
+    @DataProvider(name = "IcebergQueryTestDP")
+    public Object[][] dpArgs() {
+        return new Object[][] {
+                {"../olap-tpch/query.json"}
+        };
     }
 }
