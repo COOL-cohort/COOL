@@ -44,8 +44,9 @@ public class ChunkTest {
         // File
         BufferedReader br = new BufferedReader(new FileReader(new File(csvFilePath)));
         String line;
+        CsvTupleParser parser = new CsvTupleParser();
         while ((line = br.readLine()) != null) {
-            String[] vec = CsvTupleParser.Parse(line);
+            String[] vec = parser.parse(line);
             data.add(vec);
         }
 

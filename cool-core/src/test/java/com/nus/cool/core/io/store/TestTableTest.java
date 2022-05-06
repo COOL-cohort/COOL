@@ -21,7 +21,6 @@ public class TestTableTest {
                 "cool",
                 "core",
                 "resources").toString();
-        System.out.println("1");
     }
 
     @Test
