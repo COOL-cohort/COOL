@@ -29,27 +29,24 @@ public class CoolModelTest {
         // System.out.println(System.getProperty("user.dir"));
         String cube = "health";
         String schemaFileName = "../health/table.yaml";
-        String dimFileName = "../health/dim2.csv";
-        String dataFileName = "../health/raw2.csv";
+        String dataFileName = "../health/raw.csv";
         String cubeRepo = "../datasetSource";
 
         DataLoaderConfig config = new CsvDataLoaderConfig();
         CoolLoader loader = new CoolLoader(config);
-        loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
+        loader.load(cube, schemaFileName, dataFileName, cubeRepo);
 
         cube = "tpc-h-10g";
         schemaFileName = "../olap-tpch/table.yaml";
-        dimFileName = "../olap-tpch/scripts/dim.csv";
         dataFileName = "../olap-tpch/scripts/data.csv";
         cubeRepo = "../datasetSource";
-        loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
+        loader.load(cube, schemaFileName, dataFileName, cubeRepo);
 
         cube = "sogamo";
         schemaFileName = "../sogamo/table.yaml";
-        dimFileName = "../sogamo/dim.csv";
         dataFileName = "../sogamo/test.csv";
         cubeRepo = "../datasetSource";
-        loader.load(cube, schemaFileName, dimFileName, dataFileName, cubeRepo);
+        loader.load(cube, schemaFileName, dataFileName, cubeRepo);
     }
 
     @Test (priority = 10)

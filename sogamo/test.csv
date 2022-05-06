@@ -1,3 +1,4 @@
+sessionId,playerId,role,money,event,eventDay,platform,country,continent,city,numSession,sessionLength
 fd1ec667-75a4-415d-a250-8fbb71be7cab,43e3e0d84da1056,stonegolem,1638,launch,2013-05-20,3,Australia,OC,Sydney,1,0
 fd1ec667-75a4-415d-a250-8fbb71be7cab,43e3e0d84da1056,stonegolem,1638,fight,2013-05-20,3,Australia,OC,Sydney,1,0
 fd1ec667-75a4-415d-a250-8fbb71be7cab,43e3e0d84da1056,stonegolem,1638,fight,2013-05-20,3,Australia,OC,Sydney,1,0

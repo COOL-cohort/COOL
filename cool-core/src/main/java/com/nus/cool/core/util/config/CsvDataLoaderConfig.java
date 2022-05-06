@@ -20,9 +20,11 @@ public class CsvDataLoaderConfig extends DataLoaderConfig {
   }
   
   @Override
-  public TupleReader createTupleReader(File dataFile)
-    throws IOException {
-    return new LineTupleReader(dataFile);
+  public TupleReader createTupleReader(File dataFile) throws IOException {
+    TupleReader reader = new LineTupleReader(dataFile);
+    // read the csv column
+    if(reader.hasNext()) reader.next();
+    return reader;
   }
 
   @Override

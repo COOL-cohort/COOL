@@ -61,11 +61,9 @@ public class DataLoader {
     private final DataWriter writer;
     
 
-    public static Builder builder(String dataSetName,
-                                  TableSchema tableSchema, File dimensionFile, File dataFile,
+    public static Builder builder(String dataSetName, TableSchema tableSchema, File dataFile,
                                   File outputDir, DataLoaderConfig config) {
-        return new Builder(dataSetName, tableSchema, dimensionFile,
-                dataFile, outputDir, config);
+        return new Builder(dataSetName, tableSchema, dataFile, outputDir, config);
     }
 
     /**
@@ -74,9 +72,10 @@ public class DataLoader {
      */
     public void load() throws IOException {
         writer.Initialize();
-      while (reader.hasNext()) {
-        writer.Add(parser.parse(reader.next()));
-      }
+        // read the data
+        while (reader.hasNext()) {
+            writer.Add(parser.parse(reader.next()));
+        }
         writer.Finish();
     }
     @AllArgsConstructor
@@ -91,11 +90,6 @@ public class DataLoader {
          */
         @NonNull
         private final TableSchema tableSchema;
-        /**
-         * dimension file of the dataset
-         */
-        @NonNull
-        private final File dimensionFile;
         /**
          * raw data
          */
@@ -118,7 +112,8 @@ public class DataLoader {
          * @throws IOException
          */
         public DataLoader build() throws IOException {
-            return new DataLoader(dataSetName, config.createTupleReader(dataFile), config.createTupleParser(tableSchema), new NativeDataWriter(tableSchema, outputDir, config.getChunkSize(), config.getCubletSize(), dimensionFile));
+            return new DataLoader(dataSetName, config.createTupleReader(dataFile), config.createTupleParser(tableSchema),
+                    new NativeDataWriter(tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()));
         }
     }
 }
