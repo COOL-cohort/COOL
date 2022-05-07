@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-
-
 public class CoolModelTest {
 
     @Test(priority = 0)
@@ -50,7 +48,7 @@ public class CoolModelTest {
         cubeRepo = "../datasetSource";
         loader.load(cube, schemaFileName, dataFileName, cubeRepo);
     }
-    
+
     @Test (priority = 10)
     public void CubeListTest() throws IOException {
         System.out.println("======================== Cube List Test ========================");
