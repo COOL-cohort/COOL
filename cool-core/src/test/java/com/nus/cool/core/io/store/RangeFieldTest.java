@@ -16,19 +16,23 @@ import com.nus.cool.core.io.writestore.MetaRangeFieldWS;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.converter.DayIntConverter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class RangeFieldTest {
+    static final Logger logger = LoggerFactory.getLogger(RangeFieldTest.class);
     private String sourcePath;
     private TestTable table;
     private OutputCompressor compressor;
 
     @BeforeTest
     public void setUp() {
-        System.out.println("RangeField Test SetUp");
+        logger.info("Start UnitTest " + RangeFieldTest.class.getSimpleName());
         this.compressor = new OutputCompressor();
         sourcePath = Paths.get(System.getProperty("user.dir"),
                 "src",
@@ -43,9 +47,15 @@ public class RangeFieldTest {
         table = TestTable.readFromCSV(filepath);
     }
 
+    @AfterTest
+    public void tearDown() {
+        logger.info(String.format("Pass UnitTest %s\n", RangeFieldTest.class.getSimpleName()));
+    }
+
     @Test(dataProvider = "RangeFieldTestDP")
     public void RangeFieldUnitTest(String fieldName, FieldType fType) throws IOException {
-        System.out.printf("RangeFieldTest UnitInput: FieldName %s\tFieldType %s\n", fieldName, fType);
+        logger.info("Input HashField UnitTest Data: FieldName " + fieldName + " FiledType : " + fType.toString());
+
         int fieldidx = table.field2Ids.get(fieldName);
         ArrayList<String> data = table.cols.get(fieldidx);
 
