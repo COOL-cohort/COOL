@@ -92,14 +92,6 @@
 
         </plugins>
 
-        <resources>
-            <resource>
-                <directory>cool-core/main/java/com/resources/</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-        </resources>
     </build>
 
 </project>

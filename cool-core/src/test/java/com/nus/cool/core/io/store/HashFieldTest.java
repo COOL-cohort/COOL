@@ -68,8 +68,6 @@ public class HashFieldTest {
      */
     @Test(dataProvider = "HashFieldTestDP")
     public void HashFieldUnitTest(String fieldName, FieldType fType) throws IOException {
-        // System.out.printf("HashFieldTest UnitInput: FieldName %s\tFieldType %s\n",
-        // fieldName, fType);
         logger.info("Input HashField UnitTest Data: FieldName " + fieldName + " FiledType : " + fType.toString());
 
         int fieldidx = table.field2Ids.get(fieldName);

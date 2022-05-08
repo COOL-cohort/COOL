@@ -33,9 +33,4 @@ public class CsvTupleParser implements TupleParser {
     String record = (String) tuple;
     return record.split(",", -1);
   }
-
-  public static String[] Parse(Object tuple) {
-    String record = (String) tuple;
-    return record.split(",", -1);
-  }
 }
