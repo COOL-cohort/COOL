@@ -16,7 +16,10 @@ import com.nus.cool.core.io.writestore.DataHashFieldWS;
 import com.nus.cool.core.io.writestore.MetaHashFieldWS;
 import com.nus.cool.core.schema.FieldType;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -27,6 +30,7 @@ import org.testng.annotations.Test;
  * @author lingze
  */
 public class HashFieldTest {
+    static final Logger logger = LoggerFactory.getLogger(HashFieldTest.class);
     private String sourcePath;
     private TestTable table;
     private Charset charset;
@@ -34,7 +38,7 @@ public class HashFieldTest {
 
     @BeforeTest
     public void setUp() {
-        System.out.println("HashField Test SetUp");
+        logger.info("Start UnitTest " + HashFieldTest.class.getSimpleName());
         this.charset = Charset.defaultCharset();
         this.compressor = new OutputCompressor();
         sourcePath = Paths.get(System.getProperty("user.dir"),
@@ -50,10 +54,10 @@ public class HashFieldTest {
         table = TestTable.readFromCSV(filepath);
     }
 
-    // @AfterMethod
-    // public void tearDown(){
-    // System.out.println("An Test method is finished");
-    // }
+    @AfterTest
+    public void tearDown() {
+        logger.info(String.format("Pass UnitTest %s\n", HashFieldTest.class.getSimpleName()));
+    }
 
     /**
      * HashFiledTest : Conversion between WriteStore and ReadStore
@@ -64,7 +68,10 @@ public class HashFieldTest {
      */
     @Test(dataProvider = "HashFieldTestDP")
     public void HashFieldUnitTest(String fieldName, FieldType fType) throws IOException {
-        System.out.printf("HashFieldTest UnitInput: FieldName %s\tFieldType %s\n", fieldName, fType);
+        // System.out.printf("HashFieldTest UnitInput: FieldName %s\tFieldType %s\n",
+        // fieldName, fType);
+        logger.info("Input HashField UnitTest Data: FieldName " + fieldName + " FiledType : " + fType.toString());
+
         int fieldidx = table.field2Ids.get(fieldName);
         ArrayList<String> data = table.cols.get(fieldidx);
 

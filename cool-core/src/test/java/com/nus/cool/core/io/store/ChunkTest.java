@@ -28,14 +28,31 @@ import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.parser.CsvTupleParser;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class ChunkTest {
 
+    static final Logger logger = LoggerFactory.getLogger(ChunkTest.class);
+
+    @BeforeTest
+    public void setUp() {
+        logger.info("Start UnitTest " + ChunkTest.class.getSimpleName());
+    }
+
+    @AfterTest
+    public void tearDown() {
+        logger.info(String.format("Pass UnitTest %s\n", ChunkTest.class.getSimpleName()));
+    }
+
     @Test(dataProvider = "ChunkUnitTestDP")
     public void ChunkUnitTest(String dirPath) throws IOException {
+        logger.info("Input Chunk UnitTest Data: DataPath " + dirPath);
         // Load Yaml Config
         String yamlFilePath = Paths.get(dirPath, "table.yaml").toString();
         File yamlFile = new File(yamlFilePath);
@@ -77,7 +94,6 @@ public class ChunkTest {
 >>>>>>> 8a64ad5... Add Chunk unit Test and Generate three sample dataset with 256 items from main dataset
             chunkWS.put(data.get(i));
         }
-
         // We create two Buffer, one for chunkWS, another for metaChunkWS
         DataOutputBuffer chunkDOB = new DataOutputBuffer();
         DataOutputBuffer metaDOB = new DataOutputBuffer();

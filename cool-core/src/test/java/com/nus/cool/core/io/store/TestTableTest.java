@@ -26,7 +26,7 @@ public class TestTableTest {
     @Test
     public void BasicPrintTest() {
         String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
-        System.out.println(filepath);
+        // System.out.println(filepath);
         TestTable table = TestTable.readFromCSV(filepath);
         table.ShowTableHead();
     }
