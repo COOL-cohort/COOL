@@ -178,7 +178,6 @@ public class DistributedController {
 
         // 5. execute the query.
         QueryResult result;
-//        List<BaseResult> results;
         try {
             long begin = System.currentTimeMillis();
 
