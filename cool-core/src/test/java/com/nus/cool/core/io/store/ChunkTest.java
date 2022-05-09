@@ -16,7 +16,7 @@ import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.io.writestore.ChunkWS;
+import com.nus.cool.core.io.writestore.DataChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
@@ -52,12 +52,12 @@ public class ChunkTest {
 
         // Generate MetaChunkWS
         MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0);
-        ChunkWS chunkWS = ChunkWS.newChunk(schemas, metaChunkWS.getMetaFields(), 0);
+        DataChunkWS chunkWS = DataChunkWS.newDataChunk(schemas, metaChunkWS.getMetaFields(), 0);
 
         for (int i = 0; i < data.size(); i++) {
             // You have to update meta first,
             // you have to update globalId first
-            metaChunkWS.update(data.get(i));
+            metaChunkWS.put(data.get(i));
             chunkWS.put(data.get(i));
         }
 
