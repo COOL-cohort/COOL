@@ -218,17 +218,21 @@ public class HDFSConnection {
     public static void main(String[] args) throws URISyntaxException, IOException {
         HDFSConnection fs = HDFSConnection.getInstance();
 
-        String localPath1 = "/datasetSource/health/v00000002/1805b2fdb75.dz";
+        String localPath1 = "/Users/kevin/project_java/COOL/datasetSource/health/v00000002/1807455469c.dz";
         String dfsPath1 = "/cube/health/v1/1805b2fdb75v2.dz";
         fs.uploadToDfs(localPath1, dfsPath1);
-//
-//        String localPath3 = "/Users/kevin/project_java/COOL/health/query2.json";
-//        String dfsPath3 = "/tmp/1/query.json";
-//        fs.uploadToDfs(localPath3, dfsPath3);
 
-//        String localPath2 = "/Users/kevin/project_java/COOL/health/table.yaml";
-//        String dfsPath2 = "/cube/health/v1/table.yaml";
-//        fs.uploadToDfs(localPath2, dfsPath2);
+        String localPath5 = "/Users/kevin/project_java/COOL/datasetSource/health/v00000002/1807455469c.dz";
+        String dfsPath5 = "/cube/health/v1/1805b2fdb75v1.dz";
+        fs.uploadToDfs(localPath5, dfsPath5);
+
+        String localPath3 = "/Users/kevin/project_java/COOL/health/query2.json";
+        String dfsPath3 = "/tmp/1/query.json";
+        fs.uploadToDfs(localPath3, dfsPath3);
+
+        String localPath2 = "/Users/kevin/project_java/COOL/health/table.yaml";
+        String dfsPath2 = "/cube/health/v1/table.yaml";
+        fs.uploadToDfs(localPath2, dfsPath2);
 
 //        ByteBuffer res = fs.readCublet("/health", "/1805b2fdb75.dz");
     }
