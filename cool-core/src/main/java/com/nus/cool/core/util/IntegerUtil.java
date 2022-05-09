@@ -52,8 +52,8 @@ public class IntegerUtil {
   }
 
   /**
-   * Convert the input value into OS's native byte order
-   *
+   * Convert the input value into BIG_ENDIAN byte order
+   * The current platform only support read/write with BIG_ENDIAN order
    * @param i the integer
    * @return the @param i in native order
    */

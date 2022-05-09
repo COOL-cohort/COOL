@@ -9,21 +9,28 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import com.nus.cool.core.io.writestore.ChunkWS;
+import com.nus.cool.core.io.writestore.DataChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.IntegerUtil;
+import lombok.RequiredArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
+@RequiredArgsConstructor
 public class NativeDataWriter implements DataWriter {
 
-    private TableSchema tableSchema;
+    @NotNull
+    private final TableSchema tableSchema;
 
+    @NotNull
     private final File outputDir;
 
+    @NotNull
     private final long chunkSize;
 
+    @NotNull
     private final long cubletSize;
-
 
     /**
      * states
@@ -41,7 +48,7 @@ public class NativeDataWriter implements DataWriter {
     private int userKeyIndex;
     
     private MetaChunkWS metaChunk;
-    
+
     /**
      * updated as building progress
      */
@@ -51,71 +58,99 @@ public class NativeDataWriter implements DataWriter {
 
     private String lastUser = null;
 
-    private List<Integer> chunkOffsets = Lists.newArrayList();
+    // record the Header offset of each chunk
+    private final List<Integer> chunkHeaderOffsets = Lists.newArrayList();
 
-    private ChunkWS chunk;
+    private DataChunkWS dataChunk;
 
     private DataOutputStream out = null;
 
-    public NativeDataWriter(TableSchema schema, File outputDir, long chunkSize, long cubletSize) throws IOException {
-        this.tableSchema = schema;
-        this.outputDir = outputDir;
-        this.chunkSize = chunkSize;
-        this.cubletSize = cubletSize;
-    }
-    
     @Override
     public boolean Initialize() throws IOException {
         if (initalized) return true;
         this.userKeyIndex = tableSchema.getUserKeyField();
-        // when there is no user key, using any field for the additional
-        //  condition on chunk switch is ok.
+        // when there is no user key, using any field for the additional condition on chunk switch is ok.
         if (this.userKeyIndex == -1) this.userKeyIndex = 0; 
         // cublet
-        this.offset = 0;
+        // create metaChunk instance, default offset to be 0, update offset when write later.
         this.metaChunk = MetaChunkWS.newMetaChunkWS(this.tableSchema, 0);
         this.out = newCublet();
         // chunk
         this.tupleCount = 0;
-        this.chunk = ChunkWS.newChunk(this.tableSchema, this.metaChunk.getMetaFields(), this.offset);
+        this.offset = 0;
+        // create dataChunk instance
+        this.dataChunk = DataChunkWS.newDataChunk(this.tableSchema, this.metaChunk.getMetaFields(), this.offset);
+        this.initalized = true;
         return true;
     }
 
+    /**
+     * Update current offset, begin write to a new dataChunk
+     * @throws IOException
+     */
     private void finishChunk() throws IOException {
-        offset += chunk.writeTo(out);
-        chunkOffsets.add(offset - Ints.BYTES);
+        offset += dataChunk.writeTo(out);
+        // record the header offset in chunkHeaderOffsets.
+        chunkHeaderOffsets.add(offset - Ints.BYTES);
     }
-    
+
+    /**
+     * If chunkSize is greater 65536 or meet last user
+     * @param curUser current user id
+     * @return is chunk full or is last user
+     * @throws IOException
+     */
     private boolean maybeSwitchChunk(String curUser) throws IOException {
-        if ((tupleCount < chunkSize) || (curUser == lastUser)) return false;
+        if ((tupleCount < chunkSize) || (curUser.equals(lastUser))) return false;
         finishChunk();
-        chunk = ChunkWS.newChunk(tableSchema, metaChunk.getMetaFields(), offset);
+        // create a new data chunk, init tuple Count
+        dataChunk = DataChunkWS.newDataChunk(tableSchema, metaChunk.getMetaFields(), offset);
         tupleCount = 0;
         return true;
     }
 
+    /**
+     * Write metaChunk lastly
+     * @throws IOException
+     */
     private void finishCublet() throws IOException {
-        offset += new MetaChunkWS(tableSchema, offset, metaChunk.getMetaFields()).writeTo(out);
-        chunkOffsets.add(offset - Ints.BYTES);
-        out.writeInt(IntegerUtil.toNativeByteOrder(chunkOffsets.size()));
-        for (int chunkOff : chunkOffsets) {
+        // write metaChunk begin from current offset.
+        this.metaChunk.updateBeginOffset(this.offset);
+        offset += this.metaChunk.writeTo(out);
+        // record header offset
+        chunkHeaderOffsets.add(offset - Ints.BYTES);
+        // 1. write number of chunks
+        out.writeInt(IntegerUtil.toNativeByteOrder(chunkHeaderOffsets.size()));
+        // 2. write header of each chunk
+        for (int chunkOff : chunkHeaderOffsets) {
           out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
         }
+        // 3. write the header offset.
         out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+        // 4. flush after writing whole Cublet.
         out.flush();
         out.close();
     }
 
+    /**
+     * Create I/O stream to write data.
+     * @return DataOutputStream
+     * @throws IOException
+     */
     private DataOutputStream newCublet() throws IOException {
         String fileName = Long.toHexString(System.currentTimeMillis()) + ".dz";
         System.out.println("[*] A new cublet "+ fileName + " is created!");
         File cublet = new File(outputDir, fileName);
         DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));
         offset = 0;
-        chunkOffsets.clear();
+        chunkHeaderOffsets.clear();
         return out;
     }
 
+    /**
+     * Switch a new cublet File once meet 1GB
+     * @throws IOException
+     */
     private void maybeSwitchCublet() throws IOException {
         if (offset < cubletSize) return;
         finishCublet();
@@ -129,16 +164,16 @@ public class NativeDataWriter implements DataWriter {
                 "Unexpected tuple type: tuple not in valid type for DataWriter");
             return false;
         }
-        String[] fields = (String[]) tuple;
-        String curUser = fields[userKeyIndex];
+        String[] insertTuple = (String[]) tuple;
+        String curUser = insertTuple[userKeyIndex];
         if (lastUser == null) lastUser = curUser;
         // start a new chunk
         if (maybeSwitchChunk(curUser)) maybeSwitchCublet();
         lastUser = curUser;
         // update metachunk / metafield
-        metaChunk.update(fields);
+        metaChunk.put(insertTuple);
         // update data chunk 
-        chunk.put(fields);
+        dataChunk.put(insertTuple);
         tupleCount++;
         return true;
     }
@@ -148,10 +183,12 @@ public class NativeDataWriter implements DataWriter {
         if (finished) return;
         finishChunk();
         finishCublet();
+        finished = true;
     }
 
     @Override
     public void close() throws IOException {
+        // force close the out stream
         if (!finished) Finish();
     }
 }

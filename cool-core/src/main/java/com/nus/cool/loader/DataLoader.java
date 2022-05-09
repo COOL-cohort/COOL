@@ -61,16 +61,17 @@ public class DataLoader {
     private final DataWriter writer;
     
 
-    public static Builder builder(String dataSetName, TableSchema tableSchema, File dataFile,
+    public static Builder builder(String dataSourceName,
+                                  TableSchema tableSchema, File dataFile,
                                   File outputDir, DataLoaderConfig config) {
-        return new Builder(dataSetName, tableSchema, dataFile, outputDir, config);
+        return new Builder(dataSourceName, tableSchema, dataFile, outputDir, config);
     }
 
     /**
      * load data into cool native format
-     * @throws IOException
      */
     public void load() throws IOException {
+        // write dataChunk first
         writer.Initialize();
         // read the data
         while (reader.hasNext()) {
@@ -78,6 +79,7 @@ public class DataLoader {
         }
         writer.Finish();
     }
+
     @AllArgsConstructor
     public static class Builder {
         /**
@@ -107,13 +109,16 @@ public class DataLoader {
         private final DataLoaderConfig config;
 
         /**
-         *
-         * @return
+         * Build Data loader
+         * @return DataLoader instance
          * @throws IOException
          */
         public DataLoader build() throws IOException {
-            return new DataLoader(dataSetName, config.createTupleReader(dataFile), config.createTupleParser(tableSchema),
-                    new NativeDataWriter(tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()));
+            return new DataLoader(dataSetName,
+                    config.createTupleReader(dataFile),
+                    config.createTupleParser(tableSchema),
+                    new NativeDataWriter(
+                            tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()));
         }
     }
 }

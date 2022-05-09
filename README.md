@@ -38,9 +38,6 @@ Simply run `mvn clean package`
 ### Required sources:
 
 1. **dataset file**: a csv file with "," delimiter (normally dumped from a database table), and the table header is removed.
-2. **dimension file**: a csv file with "," delimiter.
-Each line of this file has two fields: the first field is the name of a column in the dataset, and the second field is a value of this column.
-Each distinct value of each column in the dataset shall appear in this dimension file once.
 3. **dataset schema file**: a `table.yaml` file specifying the dataset's columns and their measure fields.
 4. **query file**: a yaml file specify the parameters for running query server.
 
@@ -198,35 +195,11 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionalit
 
  Results for the query  [query.json](olap-tpch/query.json) on the `tpc-h-10g` dataset are as at [result.json](olap-tpch/result2.json)
 
-## HOW TO RUN WITH A SERVER
+Run Server
 
-We can start the COOL's query server with the following command
-```bash
-$ java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar datasetSource 8080
 ```
-where the argument is as follows:
-1. `datasetSource`: the path to the repository of compacted datasets.
-2. `8080`: the port of the server.
-
-In this server, we implement many APIs and list their corresponding urls as follows:
-- \[server:port]:v1
-    - List all workable urls
-- \[server:port]:v1/reload?cube=[cube_name]
-    - Reload the cube
-- \[server:port]:v1/list
-    - List existing cubes
-- \[server:port]:v1/cohort/list?cube=[cube_name]
-    - List all cohorts from the selected cube
-- \[server:port]:v1/cohort/selection
-    - Cohort Selection
-- \[server:port]:v1/cohort/exploration
-  - Cohort Exploration
-- \[server:port]:v1/cohort/analysis
-    - Perform cohort analysis
-- \[server:port]:v1/funnel/analysis
-    - Perform funnel analysis
-- \[server:port]:v1/olap/iceberg
-    - Perform iceberg query
+java -jar cool-queryserver/target/cool-queryserver-0.0.1-SNAPSHOT.jar datasetSource/ 9009 STANDALONE
+```bash
 
 ## CONNECT TO EXTERNAL STORAGE SERVICES
 COOL has an [StorageService](cool-core/src/main/java/com/nus/cool/storageservice/StorageService.java) interface, which will allow COOL standalone server/workers (coming soon) to handle data movement between local and an external storage service. A sample implementation for HDFS connection can be found under the [hdfs-extensions](cool-extensions/hdfs-extensions/).

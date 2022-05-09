@@ -32,7 +32,6 @@ public interface MetaFieldWS extends Output {
 
   /**
    * Update the meta with value
-   * 
    * @param v value
    */
   void update(String v);

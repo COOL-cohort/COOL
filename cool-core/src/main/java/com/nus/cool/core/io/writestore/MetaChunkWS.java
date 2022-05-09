@@ -59,27 +59,29 @@ import lombok.Getter;
  */
 public class MetaChunkWS implements Output {
 
-  private final int offset;
+  private int offset;
 
   @Getter
   private final MetaFieldWS[] metaFields;
 
-  private final TableSchema schema;
-
   /**
-   * Create a MetaChunkWS instance
+   * Constructor
    *
-   * @param schema     TableSchema
    * @param offset     Offset in out stream
-   * @param metaFields meta fields for this meta chunk
+   * @param metaFields fields type for each file of the meta chunk
    */
-  public MetaChunkWS(TableSchema schema, int offset, MetaFieldWS[] metaFields) {
+  public MetaChunkWS(int offset, MetaFieldWS[] metaFields) {
     this.metaFields = checkNotNull(metaFields);
-    this.schema = checkNotNull(schema);
     checkArgument(offset >= 0 && metaFields.length > 0);
     this.offset = offset;
   }
 
+  /**
+   * MetaChunkWS Build
+   * @param schema table schema created with table.yaml
+   * @param offset Offset begin to write metaChunk.
+   * @return MetaChunkWS instance
+   */
   public static MetaChunkWS newMetaChunkWS(TableSchema schema, int offset) {
     OutputCompressor compressor = new OutputCompressor();
     Charset charset = Charset.forName(schema.getCharset());
@@ -95,17 +97,17 @@ public class MetaChunkWS implements Output {
         case UserKey:
         case Action:
         case Segment:
-          metaFields[i] = new HashMetaFieldWS(fieldType, charset, compressor);
+          metaFields[i] = new MetaHashFieldWS(fieldType, charset, compressor);
           break;
         case ActionTime:
         case Metric:
-          metaFields[i] = new RangeMetaFieldWS(fieldType);
+          metaFields[i] = new MetaRangeFieldWS(fieldType);
           break;
         default:
           throw new IllegalArgumentException("Invalid field type: " + fieldType);
       }
     }
-    return new MetaChunkWS(schema, offset, metaFields);
+    return new MetaChunkWS(offset, metaFields);
   }
 
   /**
@@ -115,26 +117,8 @@ public class MetaChunkWS implements Output {
    */
   public void put(String[] tuple) {
     checkNotNull(tuple);
-    checkArgument(tuple.length == 2);
-    this.metaFields[this.schema.getFieldID(tuple[0])].put(tuple[1]);
-  }
-
-  /**
-   * update the field with a value
-   * 
-   * @param field the field to update
-   * @param value value used for update
-   */
-  public void update(String field, String value) {
-    checkNotNull(value);
-    checkNotNull(field);
-    checkArgument(this.schema.getFieldID(field) != -1);
-    this.metaFields[this.schema.getFieldID(field)].update(value);
-  }
-
-  public void update(String[] tuple) {
     for (int i = 0; i < tuple.length; i++) {
-      this.metaFields[i].update(tuple[i]);
+      this.metaFields[i].put(tuple[i]);
     }
   }
 
@@ -151,7 +135,7 @@ public class MetaChunkWS implements Output {
    * Write MetaChunkWS to out stream and return bytes written
    *
    * @param out stream can write data to output stream
-   * @return bytes written
+   * @return How many bytes has been written
    * @throws IOException If an I/O error occurs
    */
   @Override
@@ -168,21 +152,21 @@ public class MetaChunkWS implements Output {
     // Store header offset for MetaChunk layout
     int headOffset = this.offset + bytesWritten;
 
-    // Write ChunkType for header layout
+    // 1. Write ChunkType for header layout
     out.writeByte(ChunkType.META.ordinal());
     bytesWritten++;
 
-    // Write fields for header layout
+    // 2.1 Write fields for header layout
     out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
     bytesWritten += Ints.BYTES;
 
-    // Write field offsets for header layout
+    // 2.2 Write field offsets for header layout
     for (int offset : offsets) {
       out.writeInt(IntegerUtil.toNativeByteOrder(offset));
       bytesWritten += Ints.BYTES;
     }
 
-    // Write header offset for MetaChunk layout
+    // 3. Write header offset for MetaChunk layout
     out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
     bytesWritten += Ints.BYTES;
     return bytesWritten;
@@ -192,5 +176,13 @@ public class MetaChunkWS implements Output {
   public String toString() {
     return "MetaChunk: " + Arrays.asList(metaFields).stream()
       .map(Object::toString).reduce((x, y) -> x + ", " + y);
+  }
+
+  /**
+   * Update beginning offset to write the
+   * @param newOffset: new offset to write metaChunk
+   */
+  public void updateBeginOffset(int newOffset){
+    this.offset = newOffset;
   }
 }

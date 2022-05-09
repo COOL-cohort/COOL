@@ -44,7 +44,7 @@ public class RLECompressor implements Compressor {
    */
   public static final int HEADACC = 4 + 4;
 
-  private int maxCompressedLen;
+  private final int maxCompressedLen;
 
   public RLECompressor(Histogram hist) {
     int uncompressedSize = 3 * Integer.BYTES * hist.getNumOfValues();

@@ -43,11 +43,11 @@ public class CoolTupleReader implements TupleReader {
    */
   private boolean hasNext;
 
-  private ListIterator<ChunkRS> chunkItr;
+  private final ListIterator<ChunkRS> chunkItr;
 
   private ChunkRS curChunk;
 
-  private List<InputVector> fields;
+  private final List<InputVector> fields;
 
   private KeyFieldIterator curChunkUserItr;
 
