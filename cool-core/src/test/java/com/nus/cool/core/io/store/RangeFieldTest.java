@@ -39,7 +39,7 @@ public class RangeFieldTest {
                 "cool",
                 "core",
                 "resources").toString();
-        String filepath = Paths.get(sourcePath, "TestData", "test.csv").toString();
+        String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
         table = TestTable.readFromCSV(filepath);
     }
 
@@ -80,10 +80,11 @@ public class RangeFieldTest {
         // check Range Vector
         InputVector vec = rs.getValueVector();
         Assert.assertEquals(vec.size(), data.size());
+        DayIntConverter convertor = new DayIntConverter();
         for (int i = 0; i < vec.size(); i++) {
             String expect = data.get(i);
             if (fType == FieldType.ActionTime) {
-                DayIntConverter convertor = new DayIntConverter();
+
                 expect = Integer.toString(convertor.toInt(data.get(i)));
             }
             String actual = Integer.toString(vec.get(i));

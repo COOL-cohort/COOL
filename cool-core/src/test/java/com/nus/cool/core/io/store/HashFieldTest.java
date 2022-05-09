@@ -38,15 +38,15 @@ public class HashFieldTest {
         this.charset = Charset.defaultCharset();
         this.compressor = new OutputCompressor();
         sourcePath = Paths.get(System.getProperty("user.dir"),
-             "src",
-             "test",
-             "java",
-             "com",
-             "nus",
-             "cool",
-             "core",
-             "resources").toString();
-        String filepath = Paths.get(sourcePath,"TestData","test.csv").toString();
+                "src",
+                "test",
+                "java",
+                "com",
+                "nus",
+                "cool",
+                "core",
+                "resources").toString();
+        String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
         table = TestTable.readFromCSV(filepath);
     }
 
