@@ -50,10 +50,6 @@ public class Application {
      */
     public static void main(String[] args) throws InterruptedException, KeeperException, IOException, URISyntaxException {
 
-//        String rawDataSource = "datasetSource/";
-//        String rawPort = "9009";
-//        String rawRole = "STANDALONE";
-
         String rawDataSource = args[0];
         String rawPort = args[1];
         String rawRole = args[2];
