@@ -58,14 +58,14 @@ public class MetaHashFieldWS implements MetaFieldWS {
   private final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
   /**
-   * Global localStoreionary, keys are hashed by the indexed string
+   * Global hashToTerm, keys are hashed by the indexed string
    */
 
   // hash of one tuple field : Term {origin value of tuple filed, global ID. }
-  private final Map<Integer, Term> localStore = Maps.newTreeMap();
+  private final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
 
-  // store keys of localStore
-  private final List<Integer> gid_to_hash = new ArrayList<>();
+  // store keys of hashToTerm
+  private final List<Integer> gidToHash = new ArrayList<>();
 
   // global id
   private int nextGid = 0;
@@ -79,9 +79,9 @@ public class MetaHashFieldWS implements MetaFieldWS {
   @Override
   public void put(String tupleValue) {
     int hashKey = rhash.hash(tupleValue);
-    if (!this.localStore.containsKey(hashKey)) {
-      this.localStore.put(hashKey, new Term(tupleValue, nextGid++));
-      this.gid_to_hash.add(hashKey);
+    if (!this.hashToTerm.containsKey(hashKey)) {
+      this.hashToTerm.put(hashKey, new Term(tupleValue, nextGid++));
+      this.gidToHash.add(hashKey);
     }
   }
 
@@ -89,12 +89,12 @@ public class MetaHashFieldWS implements MetaFieldWS {
   public int find(String v) {
     // TODO: Need to handle the case where v is null
     int fp = this.rhash.hash(v);
-    return this.localStore.containsKey(fp) ? this.localStore.get(fp).globalId : -1;
+    return this.hashToTerm.containsKey(fp) ? this.hashToTerm.get(fp).globalId : -1;
   }
 
   @Override
   public int count() {
-    return this.localStore.size();
+    return this.hashToTerm.size();
   }
 
   @Override
@@ -106,7 +106,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
   public void complete() {
     int gID = 0;
     // Set globalIDs
-    for (Map.Entry<Integer, Term> en : this.localStore.entrySet()) {
+    for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
       // temp fix to not delete complete logic, while preserving correctness of using update.
       if (en.getValue().globalId == 0) en.getValue().globalId = gID++;
     }
@@ -118,11 +118,11 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
     // Write fingers, i.e., the hash values of the original string, into the array
     // fingers contain data's hash value
-    int[] fingers = new int[this.localStore.size()];
+    int[] fingers = new int[this.hashToTerm.size()];
     // globalIDs contain the global ids in the hash order
-    int[] globalIDs = new int[this.localStore.size()];
+    int[] globalIDs = new int[this.hashToTerm.size()];
     int i = 0;
-    for (Map.Entry<Integer, Term> en : this.localStore.entrySet()) {
+    for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
       globalIDs[i] = en.getValue().globalId;
       fingers[i++] = en.getKey();
     }
@@ -144,7 +144,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
     // generate globalID bytes
     hist = Histogram.builder()
         .min(0)
-        .max(this.localStore.size())
+        .max(this.hashToTerm.size())
         .numOfValues(globalIDs.length)
         .rawSize(Ints.BYTES * globalIDs.length)
         .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
@@ -157,16 +157,16 @@ public class MetaHashFieldWS implements MetaFieldWS {
         || this.fieldType == FieldType.UserKey) {
       try (DataOutputBuffer buffer = new DataOutputBuffer()) {
         // Store offsets into the buffer first
-        buffer.writeInt(this.localStore.size());
+        buffer.writeInt(this.hashToTerm.size());
         // Value offsets begin with 0
         int off = 0;
-        for (Map.Entry<Integer, Term> en : this.localStore.entrySet()) {
+        for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
           buffer.writeInt(off);
           off += en.getValue().term.getBytes(this.charset).length;
         }
 
         // Store String values into the buffer
-        for (Map.Entry<Integer, Term> en : this.localStore.entrySet()) {
+        for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
           buffer.write(en.getValue().term.getBytes(this.charset));
         }
 
@@ -185,7 +185,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
   @Override
   public String toString() {
-    return "HashMetaField: " + localStore.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
+    return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
   }
 
   @Override
