@@ -1,0 +1,39 @@
+---
+charset: "UTF-8"
+fields:
+- name: "sessionId"
+  fieldType: "AppKey"
+  preCal: false
+- name: "playerId"
+  fieldType: "UserKey"
+  preCal: false
+- name: "role"
+  fieldType: "Segment"
+  preCal: false
+- name: "money"
+  fieldType: "Metric"
+  preCal: false
+- name: "event"
+  fieldType: "Action"
+  preCal: false
+- name: "eventDay"
+  fieldType: "ActionTime"
+  preCal: false
+- name: "platform"
+  fieldType: "Segment"
+  preCal: false
+- name: "country"
+  fieldType: "Segment"
+  preCal: false
+- name: "continent"
+  fieldType: "Segment"
+  preCal: false
+- name: "city"
+  fieldType: "Segment"
+  preCal: false
+- name: "numSession"
+  fieldType: "Metric"
+  preCal: false
+- name: "sessionLength"
+  fieldType: "Metric"
+  preCal: false
