@@ -27,7 +27,6 @@ import org.testng.annotations.Test;
 /**
  * HashField UnitTest
  * 
- * @author lingze
  */
 public class HashFieldTest {
     static final Logger logger = LoggerFactory.getLogger(HashFieldTest.class);
