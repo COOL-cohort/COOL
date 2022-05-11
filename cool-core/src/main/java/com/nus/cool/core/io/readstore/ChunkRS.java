@@ -75,9 +75,9 @@ public class ChunkRS implements Input {
   public void readFrom(ByteBuffer buffer) {
     // Get chunkType
     ChunkType chunkType = ChunkType.fromInteger(buffer.get());
-      if (chunkType != ChunkType.DATA) {
-          throw new IllegalStateException("Expect DataChunk, but reads: " + chunkType);
-      }
+    if (chunkType != ChunkType.DATA) {
+      throw new IllegalStateException("Expect DataChunk, but reads: " + chunkType);
+    }
 
     // Get #records
     this.records = buffer.getInt();
@@ -85,14 +85,15 @@ public class ChunkRS implements Input {
     int fields = buffer.getInt();
     // Get field offsets
     int[] fieldOffsets = new int[fields];
-      for (int i = 0; i < fields; i++) {
-          fieldOffsets[i] = buffer.getInt();
-      }
-    System.out.println("#Records="+this.records + ", # fields="+fields+", fieldOffsets="+ Arrays.toString(fieldOffsets));
+    for (int i = 0; i < fields; i++) {
+      fieldOffsets[i] = buffer.getInt();
+    }
+    // System.out.println("#Records="+this.records + ", # fields="+fields+",
+    // fieldOffsets="+ Arrays.toString(fieldOffsets));
 
     this.fields = new FieldRS[fields];
     for (int i = 0; i < fields; i++) {
-      System.out.println("Reading data chunk's field ="+i+".....");
+      // System.out.println("Reading data chunk's field ="+i+".....");
       buffer.position(fieldOffsets[i]);
       FieldRS field = new CoolFieldRS();
       field.readFromWithFieldType(buffer, this.schema.getField(i).getFieldType());

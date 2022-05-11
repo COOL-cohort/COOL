@@ -16,7 +16,7 @@ import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.io.writestore.ChunkWS;
+import com.nus.cool.core.io.writestore.DataChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
@@ -24,14 +24,31 @@ import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.parser.CsvTupleParser;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class ChunkTest {
 
+    static final Logger logger = LoggerFactory.getLogger(ChunkTest.class);
+
+    @BeforeTest
+    public void setUp() {
+        logger.info("Start UnitTest " + ChunkTest.class.getSimpleName());
+    }
+
+    @AfterTest
+    public void tearDown() {
+        logger.info(String.format("Pass UnitTest %s\n", ChunkTest.class.getSimpleName()));
+    }
+
     @Test(dataProvider = "ChunkUnitTestDP")
     public void ChunkUnitTest(String dirPath) throws IOException {
+        logger.info("Input Chunk UnitTest Data: DataPath " + dirPath);
         // Load Yaml Config
         String yamlFilePath = Paths.get(dirPath, "table.yaml").toString();
         File yamlFile = new File(yamlFilePath);
@@ -52,15 +69,14 @@ public class ChunkTest {
 
         // Generate MetaChunkWS
         MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0);
-        ChunkWS chunkWS = ChunkWS.newChunk(schemas, metaChunkWS.getMetaFields(), 0);
+        DataChunkWS chunkWS = DataChunkWS.newDataChunk(schemas, metaChunkWS.getMetaFields(), 0);
 
         for (int i = 0; i < data.size(); i++) {
             // You have to update meta first,
             // you have to update globalId first
-            metaChunkWS.update(data.get(i));
+            metaChunkWS.put(data.get(i));
             chunkWS.put(data.get(i));
         }
-
         // We create two Buffer, one for chunkWS, another for metaChunkWS
         DataOutputBuffer chunkDOB = new DataOutputBuffer();
         DataOutputBuffer metaDOB = new DataOutputBuffer();

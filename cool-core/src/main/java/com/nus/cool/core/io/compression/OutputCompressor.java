@@ -24,15 +24,21 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * Utility class for writing a compressed integer vector into disk.
+ * Utility class for writing a compressed integer/string vector into disk.
  */
 public class OutputCompressor implements Output {
 
+  // int or string,
   private DataType dataType;
+  // Integers vector to be compressed
   private int[] vec;
+  // String vector to be compressed
   private byte[] strVec;
+  // the start offset in the data
   private int off;
+  // the number of bytes read
   private int len;
+  // statistic information of the vec / strVec
   private Histogram hist;
 
   /**
@@ -66,14 +72,18 @@ public class OutputCompressor implements Output {
   @Override
   public int writeTo(DataOutput out) throws IOException {
     int bytesWritten = 0;
+    // 1. select a compressor type
     Codec codec = CompressorAdviser.advise(this.hist);
+    // 2. create compressor instance according to the type
     Compressor compressor = CompressorFactory.newCompressor(codec, this.hist);
     int maxLen = compressor.maxCompressedLength();
+    // 3. compress it and record output to compressed array
     byte[] compressed = new byte[maxLen];
     int compressLen = this.dataType == DataType.INTEGER ?
         compressor.compress(this.vec, this.off, this.len, compressed, 0, maxLen)
         : compressor.compress(this.strVec, this.off, this.len, compressed, 0, maxLen);
-    // Write codec
+
+    // Write compressor type
     out.writeByte(codec.ordinal());
     bytesWritten++;
     // Write compressed data

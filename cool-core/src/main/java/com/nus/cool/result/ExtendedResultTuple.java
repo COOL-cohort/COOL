@@ -21,8 +21,6 @@ package com.nus.cool.result;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * ResultTuple is used to store the result, including cohort name, age,
  * how to merge the cohorts result, and the
@@ -55,5 +53,11 @@ public class ExtendedResultTuple {
   private double num;
 
   public ExtendedResultTuple() {}
+
+  @Override
+  public String toString() {
+    return String.format("cohort=%s, age=%s, measure=%s, min=%s, max=%s, sum=%s, num=%s,",
+            cohort, age, measure, min, max, sum, num);
+  }
 
 }

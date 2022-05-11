@@ -17,7 +17,7 @@ import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.FieldType;
 import java.io.IOException;
 
-public interface FieldWS extends Output {
+public interface DataFieldWS extends Output {
 
   /**
    * Get field type of this field
@@ -27,9 +27,9 @@ public interface FieldWS extends Output {
   FieldType getFieldType();
 
   /**
-   * Put tuple into this field
+   * Put a value in a tuple into this field
    *
    * @param tuple value
    */
-  void put(String[] tuple) throws IOException;
+  void put(String tuple) throws IOException;
 }
