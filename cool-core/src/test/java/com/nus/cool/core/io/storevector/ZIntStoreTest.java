@@ -33,7 +33,8 @@ public class ZIntStoreTest {
 
   @Test(dataProvider = "ZIntStoreDP")
   public void TestZIntStore(int[] numbers, Codec codeType) throws Exception {
-    logger.info("Input ZIntStore UnitTest Data: Code Type %s Input Data %s", codeType.name(), numbers.toString());
+    logger.info(String.format("Input ZIntStore UnitTest Data: Code Type %s Input Data %s", codeType.name(),
+        numbers.toString()));
 
     int min = ArrayUtil.min(numbers);
     int max = ArrayUtil.max(numbers);

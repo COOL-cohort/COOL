@@ -49,7 +49,7 @@ public class RangeFieldTest {
 
     @AfterTest
     public void tearDown() {
-        logger.info(String.format("Pass UnitTest %s\n", RangeFieldTest.class.getSimpleName()));
+        logger.info(String.format("Tear down UnitTest %s\n", RangeFieldTest.class.getSimpleName()));
     }
 
     @Test(dataProvider = "RangeFieldTestDP")
