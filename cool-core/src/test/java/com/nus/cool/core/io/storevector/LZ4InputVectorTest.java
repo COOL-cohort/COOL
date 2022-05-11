@@ -4,63 +4,93 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import java.util.Map;
 
-import com.google.common.collect.Maps;
 import com.nus.cool.core.io.DataOutputBuffer;
-import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.LZ4JavaCompressor;
 import com.nus.cool.core.schema.CompressType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class LZ4InputVectorTest {
 
-  @Test
-  public void testRead() {
-    DataOutputBuffer buffer = new DataOutputBuffer();
-    Map<Integer, String> dict = Maps.newTreeMap();
-    for (int i = 0; i < 5; i++) {
-      dict.put(i, "value" + i);
+  static final Logger logger = LoggerFactory.getLogger(LZ4InputVectorTest.class);
+  static final Charset defaultCharset = Charset.defaultCharset();
+
+  @BeforeTest
+  public void setUp() {
+    logger.info("Start UnitTest " + LZ4InputVectorTest.class.getSimpleName());
+  }
+
+  @AfterTest
+  public void tearDown() {
+    logger.info(String.format("Tear Down UnitTest %s\n", LZ4InputVectorTest.class.getSimpleName()));
+  }
+
+  @Test(dataProvider = "LZ4InputVectorDP", enabled = true)
+  public void LZ4InputVectorUnitTest(String[] valueList) throws IOException {
+    logger.info(String.format("Input LZ4InputVector UnitTest Data: ValueList Size %d", valueList.length));
+
+    DataOutputBuffer buf = new DataOutputBuffer();
+    // Write Size
+    buf.writeInt(valueList.length);
+    // Write Offset of Value and string value
+    int offset = 0;
+    for (String v : valueList) {
+      buf.writeInt(offset);
+      offset += v.getBytes().length;
     }
-    try {
-      buffer.writeInt(dict.size());
-      int off = 0;
-      for (Map.Entry<Integer, String> en: dict.entrySet()) {
-        buffer.writeInt(off);
-        off += en.getValue().getBytes().length;
-      }
-      
-      Charset charset = Charset.forName("UTF-8");
-      for (Map.Entry<Integer, String> en: dict.entrySet()) {
-        buffer.write(en.getValue().getBytes(charset));
-      }
-      
-      // build histogram
-      Histogram hist = Histogram.builder().type(CompressType.KeyString)
-                                .rawSize(buffer.size()).build();
 
-      // create compressor
-      Compressor compressor = new LZ4JavaCompressor(hist);
-
-      // compress the bytes
-      int maxLen = compressor.maxCompressedLength();
-      byte[] compressed = new byte[maxLen];
-      compressor.compress(buffer.getData(), 0, buffer.size(), compressed, 0, maxLen);
-      
-      LZ4InputVector in = new LZ4InputVector();
-      ByteBuffer compressed_buffer = ByteBuffer.wrap(compressed);
-      compressed_buffer.order(ByteOrder.nativeOrder());
-      in.readFrom(compressed_buffer);
-      
-      Assert.assertEquals(in.getString(0, charset), "value0");
-      Assert.assertEquals(in.getString(2, charset), "value2");
-
-      buffer.close();
-    } catch (IOException e) {
-      System.out.println("IOException encountered");
+    for (String v : valueList) {
+      buf.write(v.getBytes());
     }
+    // Use LZ4JavaCompressor to Compress
+    Histogram hist = Histogram.builder().type(CompressType.KeyString).rawSize(buf.size()).build();
+    LZ4JavaCompressor compressor = new LZ4JavaCompressor(hist);
+    int maxLen = compressor.maxCompressedLength();
+    byte[] compressed = new byte[maxLen];
+    compressor.compress(buf.getData(), 0, buf.size(), compressed, 0, maxLen);
+
+    buf.close();
+
+    // Decoding these readBuf
+    ByteBuffer readBuf = ByteBuffer.wrap(compressed);
+    readBuf.order(ByteOrder.nativeOrder());
+    LZ4InputVector res = new LZ4InputVector();
+    res.readFrom(readBuf);
+
+    // Validate these stringsr
+    for (int i = 0; i < valueList.length; i++) {
+      String actual = res.getString(i, defaultCharset);
+      String expect = String.valueOf(valueList[i]);
+      if (!expect.equals(actual)) {
+        logger.debug(String.format("Actual %s ,l:%d", actual, actual.length()));
+        logger.debug(String.format("Expected %s, l:%d", expect, expect.length()));
+      }
+      Assert.assertEquals(expect, actual);
+    }
+  }
+
+  @DataProvider(name = "LZ4InputVectorDP", parallel = false)
+  public Object[][] LZ4InputVectorDP() {
+    return new Object[][] {
+        { generateValueList(10) },
+        { generateValueList(100) },
+        { new String[] { "111", "222", "333", "555", "KKK", "111" } },
+    };
+  }
+
+  private String[] generateValueList(int n) {
+    String[] res = new String[n];
+    for (int i = 0; i < n; i++) {
+      res[i] = "value_" + i;
+    }
+    return res;
   }
 }
