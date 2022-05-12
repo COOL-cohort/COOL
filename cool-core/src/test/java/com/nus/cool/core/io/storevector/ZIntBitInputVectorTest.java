@@ -17,7 +17,7 @@ import java.nio.ByteOrder;
 
 public class ZIntBitInputVectorTest{
     @Test(dataProvider = "ZIntBitDP")
-    public void testRead(int[] numbers){
+    public void ZIntBitInputVectorUnitTest(int[] numbers){
         int min = ArrayUtil.min(numbers);
         int max = ArrayUtil.max(numbers);
         int count = numbers.length;
