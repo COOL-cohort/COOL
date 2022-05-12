@@ -1,4 +1,0 @@
-id,birthYear,event,attr1,attr2,attr3,attr4,time
-P-7,1990,labtest,None,None,Labtest-C,70,2012-11-23
-P-10,1972,labtest,None,None,Labtest-B,27,2012-01-21
-P-10,1972,diagnose,Disease-C,None,None,0,2012-08-01

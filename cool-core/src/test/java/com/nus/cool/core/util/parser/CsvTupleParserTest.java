@@ -30,25 +30,20 @@ public class CsvTupleParserTest {
     }
 
     @Test
-    public void parseTest(){
-        String filepath = Paths.get(sourcePath, "parsertest", "table.csv").toString();
+    public void parseTest() throws IOException{
+        String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
         System.out.println(filepath);
         CsvTupleParser csvParser = new CsvTupleParser();
-        try {
-            File file = new File(filepath);
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-            String line;
-            Boolean header = true;
-            while ((line = br.readLine()) != null) {
-                String[] vs = csvParser.parse(line);
-                String expected =Arrays.toString(vs).trim().replaceAll("\\s+","").replace("[","").replace("]","");
-                //System.out.println("expected="+expected);
-                Assert.assertEquals(line, expected);
-            }
-            fr.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        File file = new File(filepath);
+        FileReader fr = new FileReader(file);
+        BufferedReader br = new BufferedReader(fr);
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] vs = csvParser.parse(line);
+            String expected =Arrays.toString(vs).trim().replaceAll("\\s+","").replace("[","").replace("]","");
+            //System.out.println("expected="+expected);
+            Assert.assertEquals(line, expected);
         }
+        fr.close();
     }
 }
