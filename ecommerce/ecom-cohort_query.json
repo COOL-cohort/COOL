@@ -1,0 +1,31 @@
+{
+  "birthSequence":{
+    "birthEvents":[
+      {
+        "eventSelection":[
+          {
+            "cubeField":"diagnose",
+            "fieldValue":{
+              "baseEvent":-1,
+              "baseField":null,
+              "type":"AbsoluteValue",
+              "values":[
+                "Disease-B"
+              ]
+            },
+            "filterType":"Set"
+          }
+        ],
+        "maxTrigger":-1,
+        "minTrigger":1,
+        "timeWindow":{
+          "length":7,
+          "slice":true,
+          "unit":"DAY"
+        }
+      }
+    ]
+  },
+  "dataSource":"health",
+  "outputCohort":"loyal"
+}
