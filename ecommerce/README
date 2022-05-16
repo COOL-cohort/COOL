@@ -1,0 +1,14 @@
+ECommerce Use Case Scenario:
+
+The ecommerce product purchased table has the following fields:
+Vendor_Name,Product_Name,Product_Category,Brand_Name,Reported_Date,Product_ID
+Number_0f_Unit_Sold,Sold_Dollar_Amount,Avg_Unit_Price_Sold_Amt
+
+Business Question Of Interest:
+Product_ID is the unique id of the product that is sold, the management is interested to know the
+repurchase / repeat sales of the product over month basically by doing a monthly cohort analysis
+
+The sample data is shared in side the folder /datasetSource/ecommerce/sample.csv
+The Table.yaml consists of initial attempt of writing the yaml config file for cool cohort tool
+ecom-cohort_query.json consists of query compatible with cool-Cohort tool.
+
