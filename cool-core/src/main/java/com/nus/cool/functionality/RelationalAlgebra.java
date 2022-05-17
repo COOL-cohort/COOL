@@ -18,18 +18,9 @@
  */
 
 package com.nus.cool.functionality;
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
-import com.nus.cool.core.iceberg.query.Aggregation;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
-import com.nus.cool.core.iceberg.query.SelectionQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.model.CoolModel;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 

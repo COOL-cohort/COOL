@@ -65,17 +65,15 @@ public class CompressorAdviser {
     // byte size
     int byteAlignLength = bytes * hist.getNumOfValues();
 
+    // max < 2^8
     if (max < 256) {
       // TODO: Optimize this condition for better performance with INT16 and INT32
-        if (bitmapBytes <= byteAlignLength)
-        // If byte size >= bitSet size, bitVector is a better choice
-        {
-            return Codec.BitVector;
-        } else
-        // max < 2^8
-        {
-            return Codec.INT8;
-        }
+      // If byte size >= bitSet size, bitVector is a better choice
+      if (bitmapBytes <= byteAlignLength){
+        return Codec.BitVector;
+      } else {
+        return Codec.INT8;
+      }
     }
     // max < 2^16
     else if (max < 65536)
@@ -94,9 +92,9 @@ public class CompressorAdviser {
   // this does not implicit assume the values are being sorted.
   //  RLE and INtBit readstore does not support find. 
   private static Codec adviseForValue(Histogram hist) {
-      if (hist.isSorted()) {
-          return Codec.RLE;
-      }
+    if (hist.isSorted()) {
+      return Codec.RLE;
+    }
 
     int max = (int) hist.getMax();
     int bitLength = IntegerUtil.minBits(max);

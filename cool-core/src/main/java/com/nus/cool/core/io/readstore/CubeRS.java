@@ -23,6 +23,7 @@ import com.google.common.io.Files;
 import com.nus.cool.core.schema.TableSchema;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 import lombok.Getter;
@@ -36,18 +37,13 @@ public class CubeRS {
    * schema information of this cube
    */
   @Getter
-  private TableSchema schema;
-
-  /**
-   * source cublet files
-   */
-  private List<File> cubletFiles = Lists.newArrayList();
+  private final TableSchema schema;
 
   /**
    * loaded cublets
    */
   @Getter
-  private List<CubletRS> cublets = Lists.newArrayList();
+  private final List<CubletRS> cublets = Lists.newArrayList();
 
   public CubeRS(TableSchema schema) {
     this.schema = schema;
@@ -55,15 +51,25 @@ public class CubeRS {
 
   /**
    * load a cubelet from a file
-   * @param cubletFile
+   * @param cubletFile read from cubletFile
    * @throws IOException
    */
   public void addCublet(File cubletFile) throws IOException {
-    this.cubletFiles.add(cubletFile);
     CubletRS cubletRS = new CubletRS(this.schema);
     cubletRS.readFrom(Files.map(cubletFile).order(ByteOrder.nativeOrder()));
     cubletRS.setFile(cubletFile.getName());
     this.cublets.add(cubletRS);
+  }
+
+  /**
+   * Load from ByteByffer
+   * @param buffer read from byteBuffer
+   */
+  public void addCublet(ByteBuffer buffer) {
+    CubletRS cubletRS = new CubletRS(this.schema);
+    cubletRS.readFrom(buffer.order(ByteOrder.nativeOrder()));
+    this.cublets.add(cubletRS);
+
   }
 
   public TableSchema getTableSchema() {

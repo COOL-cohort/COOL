@@ -11,24 +11,28 @@ import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.CoolFieldRS;
 import com.nus.cool.core.io.readstore.RangeMetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.io.writestore.RangeFieldWS;
-import com.nus.cool.core.io.writestore.RangeMetaFieldWS;
+import com.nus.cool.core.io.writestore.DataRangeFieldWS;
+import com.nus.cool.core.io.writestore.MetaRangeFieldWS;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.converter.DayIntConverter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class RangeFieldTest {
+    static final Logger logger = LoggerFactory.getLogger(RangeFieldTest.class);
     private String sourcePath;
     private TestTable table;
     private OutputCompressor compressor;
 
     @BeforeTest
     public void setUp() {
-        System.out.println("RangeField Test SetUp");
+        logger.info("Start UnitTest " + RangeFieldTest.class.getSimpleName());
         this.compressor = new OutputCompressor();
         sourcePath = Paths.get(System.getProperty("user.dir"),
                 "src",
@@ -43,18 +47,24 @@ public class RangeFieldTest {
         table = TestTable.readFromCSV(filepath);
     }
 
+    @AfterTest
+    public void tearDown() {
+        logger.info(String.format("Pass UnitTest %s\n", RangeFieldTest.class.getSimpleName()));
+    }
+
     @Test(dataProvider = "RangeFieldTestDP")
     public void RangeFieldUnitTest(String fieldName, FieldType fType) throws IOException {
-        System.out.printf("RangeFieldTest UnitInput: FieldName %s\tFieldType %s\n", fieldName, fType);
+        logger.info("Input HashField UnitTest Data: FieldName " + fieldName + " FiledType : " + fType.toString());
+
         int fieldidx = table.field2Ids.get(fieldName);
         ArrayList<String> data = table.cols.get(fieldidx);
 
         // For RangeField, RangeMetaField and RangeField can be test seperatly.
-        RangeMetaFieldWS rmws = new RangeMetaFieldWS(fType);
-        RangeFieldWS ws = new RangeFieldWS(fType, 0, compressor);
+        MetaRangeFieldWS rmws = new MetaRangeFieldWS(fType);
+        DataRangeFieldWS ws = new DataRangeFieldWS(fType, 0, compressor);
         // put data into writeStore
         for (String v : data) {
-            rmws.update(v);
+            rmws.put(v);
             ws.put(v);
         }
         // Write into Buffer
@@ -84,7 +94,6 @@ public class RangeFieldTest {
         for (int i = 0; i < vec.size(); i++) {
             String expect = data.get(i);
             if (fType == FieldType.ActionTime) {
-
                 expect = Integer.toString(convertor.toInt(data.get(i)));
             }
             String actual = Integer.toString(vec.get(i));
