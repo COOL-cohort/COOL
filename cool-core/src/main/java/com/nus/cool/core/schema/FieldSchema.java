@@ -47,6 +47,9 @@ public class FieldSchema {
 
   private boolean preCal;
 
+  // whether the personal information
+  private boolean invariant;
+
   // /**
   //  * @return the aggregator
   //  */
