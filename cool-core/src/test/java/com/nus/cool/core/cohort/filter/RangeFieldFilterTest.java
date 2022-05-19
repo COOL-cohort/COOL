@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class RangeFieldFilterTest {
     @Test
-    public void testRangeFilterUnitTest() {
+    public void rangeFilterUnitTest() {
         String schemaStr = "charset: \"UTF-8\"\n"
                 + "fields:\n"
                 + "- name: \"money\"\n"
