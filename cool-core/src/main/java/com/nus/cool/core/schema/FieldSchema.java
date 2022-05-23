@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -47,6 +48,7 @@ public class FieldSchema {
 
   private boolean preCal;
 
+  @Getter
   // whether the personal information
   private boolean invariant;
 
@@ -56,6 +58,8 @@ public class FieldSchema {
   // public String getAggregator() {
   //   return aggregator;
   // }
-
+  public boolean getInvariant(){
+    return invariant;
+  }
 
 }
