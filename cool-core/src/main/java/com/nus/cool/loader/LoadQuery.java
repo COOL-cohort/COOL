@@ -33,6 +33,10 @@ public class LoadQuery {
     private String outputPath;
     private String configPath;
 
+    // after writing dz, table file, records the path inside the server.
+    private String dzFilePath;
+    private String TableFilePath;
+
     public boolean isValid() throws IOException {
         boolean f = true;
         if (dataFileType == "AVRO") f = isExist(configPath);

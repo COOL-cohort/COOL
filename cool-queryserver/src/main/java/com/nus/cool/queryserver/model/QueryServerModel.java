@@ -52,9 +52,10 @@ public class QueryServerModel {
     /**
      * Load a new cube
      * @param q query instance
+     * @param fileName optional, dz name.
      * @return Response
      */
-    public static ResponseEntity<String> loadCube(LoadQuery q) {
+    public static ResponseEntity<String> loadCube(LoadQuery q, String... fileName) {
         try {
             q.isValid();
             String fileType = q.getDataFileType().toUpperCase();
@@ -77,7 +78,13 @@ public class QueryServerModel {
             }
             System.out.println(config.getClass().getName());
             CoolLoader coolLoader = new CoolLoader(config);
-            coolLoader.load(q.getCubeName(),q.getSchemaPath(), q.getDataPath(),q.getOutputPath());
+            String[] dzTableNames = coolLoader.load(q.getCubeName(),q.getSchemaPath(), q.getDataPath(),q.getOutputPath(), fileName);
+
+            if (dzTableNames.length == 2){
+                q.setDzFilePath(dzTableNames[0]);
+                q.setTableFilePath(dzTableNames[1]);
+            }
+
             String resStr = "Cube " + q.getCubeName() + " has already been loaded.";
             return ResponseEntity.ok().headers(HttpHeaders.EMPTY).body(resStr);
         } catch (Exception e){
