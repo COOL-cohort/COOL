@@ -93,8 +93,8 @@ public class CoolLoader {
         String dzPath;
         String tablePath;
         if (fileName.length == 1){
-            dzPath = cubeRepo+"/"+ dataSourceName+"/"+outputCubeVersionDir.getName()+"/"+fileName[0];
-            tablePath = cubeRepo+"/"+ dataSourceName+"/"+outputCubeVersionDir.getName()+"/table.yaml";
+            dzPath = dataSourceName+"/"+outputCubeVersionDir.getName()+"/"+fileName[0];
+            tablePath = dataSourceName+"/"+outputCubeVersionDir.getName()+"/table.yaml";
             return new String[]{dzPath, tablePath};
         }else{
             return new String[]{};
