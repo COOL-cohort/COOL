@@ -63,6 +63,40 @@ public class BrokerController {
         return  null;
     }
 
+    /**
+     * Receive query file from client, and store to local as temp_query.json, and then upload to hdfs.
+     * @param queryFile query file
+     * @return response
+     * @throws URISyntaxException exception
+     * @throws IOException exception
+     */
+    @PostMapping(value = "/load-query-to-hdfs",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> loadQueryToDfs(@RequestParam("queryFile") MultipartFile queryFile) throws URISyntaxException, IOException {
+
+        // 1. connect to hdfs, get data Source Name, cohort or iceberg
+        HDFSConnection fs = HDFSConnection.getInstance();
+
+        Util.getTimeClock();
+        System.out.println("[*] This query is for iceberg query: " + queryFile);
+        String queryContent = new String(queryFile.getBytes());
+        ObjectMapper mapper = new ObjectMapper();
+        IcebergQuery q = mapper.readValue(queryContent, IcebergQuery.class);
+
+        try {
+            // Writing to a file
+            mapper.writeValue(new File("temp_query.json"), q );
+            String localPath3 = "temp_query.json";
+            String dfsPath3 = "/tmp/1/query.json";
+            fs.uploadToDfs(localPath3, dfsPath3);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
     @GetMapping(value = "/execute")
     public ResponseEntity<String> handler(@RequestParam Map<String, String> params){
         System.out.println(params);
