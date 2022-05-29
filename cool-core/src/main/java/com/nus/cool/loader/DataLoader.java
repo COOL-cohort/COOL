@@ -70,9 +70,9 @@ public class DataLoader {
     /**
      * load data into cool native format
      */
-    public void load() throws IOException {
+    public void load(String... fileName) throws IOException {
         // write dataChunk first
-        writer.Initialize();
+        writer.Initialize(fileName);
         // read the data
         while (reader.hasNext()) {
             writer.Add(parser.parse(reader.next()));

@@ -66,7 +66,7 @@ public class NativeDataWriter implements DataWriter {
     private DataOutputStream out = null;
 
     @Override
-    public boolean Initialize() throws IOException {
+    public boolean Initialize(String... fileName) throws IOException {
         if (initalized) return true;
         this.userKeyIndex = tableSchema.getUserKeyField();
         // when there is no user key, using any field for the additional condition on chunk switch is ok.
@@ -74,7 +74,7 @@ public class NativeDataWriter implements DataWriter {
         // cublet
         // create metaChunk instance, default offset to be 0, update offset when write later.
         this.metaChunk = MetaChunkWS.newMetaChunkWS(this.tableSchema, 0);
-        this.out = newCublet();
+        this.out = newCublet(fileName);
         // chunk
         this.tupleCount = 0;
         this.offset = 0;
@@ -137,8 +137,15 @@ public class NativeDataWriter implements DataWriter {
      * @return DataOutputStream
      * @throws IOException
      */
-    private DataOutputStream newCublet() throws IOException {
-        String fileName = Long.toHexString(System.currentTimeMillis()) + ".dz";
+    private DataOutputStream newCublet(String... fileNameParams) throws IOException {
+
+        // if file name is provided, then use it.
+        String fileName;
+        if (fileNameParams.length == 1){
+            fileName = fileNameParams[0];
+        }else{
+            fileName = Long.toHexString(System.currentTimeMillis()) + ".dz";
+        }
         System.out.println("[*] A new cublet "+ fileName + " is created!");
         File cublet = new File(outputDir, fileName);
         DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));

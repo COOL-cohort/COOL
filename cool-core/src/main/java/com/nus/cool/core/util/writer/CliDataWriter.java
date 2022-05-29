@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class CliDataWriter implements DataWriter {
   
   @Override
-  public boolean Initialize() throws IOException {
+  public boolean Initialize(String... fileName) throws IOException {
     System.out.println("------Display data set------");
     return true;
   }

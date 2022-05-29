@@ -35,6 +35,11 @@ public class CoolModelTest {
 
         DataLoaderConfig config = new CsvDataLoaderConfig();
         CoolLoader loader = new CoolLoader(config);
+
+        // load with dz name
+        String fileName = Long.toHexString(System.currentTimeMillis()) + ".dz";
+        loader.load(cube, schemaFileName, dataFileName, cubeRepo, fileName);
+        // load without dz name
         loader.load(cube, schemaFileName, dataFileName, cubeRepo);
 
         cube = "tpc-h-10g";

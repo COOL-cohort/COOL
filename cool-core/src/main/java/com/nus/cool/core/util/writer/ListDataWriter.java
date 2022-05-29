@@ -40,7 +40,7 @@ public class ListDataWriter implements DataWriter {
   }
   
   @Override
-  public boolean Initialize() throws IOException {
+  public boolean Initialize(String... fileName) throws IOException {
     return true;
   }
 

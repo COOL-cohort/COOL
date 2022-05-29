@@ -40,12 +40,13 @@ public class CoolLoader {
 
     /**
      *
-     * @param dataSourceName output cube name. Need to be specified when loading from the repository
-     * @param schemaFileName path to the table.yaml
-     * @param dataFileName path to the data.csv
-     * @param cubeRepo the name of the output cube repository
+     * @param dataSourceName output cube name. Need to be specified when loading from the repository, eg, sogamo
+     * @param schemaFileName path to the table.yaml, eg. sogamo/table.yaml
+     * @param dataFileName path to the data.csv, eg. sogamo/test.csv
+     * @param cubeRepo the name of the output cube repository. eg. datasetSource
+     * @return dz file path, table.yaml path.
      */
-    public synchronized void load(String dataSourceName, String schemaFileName, String dataFileName, String cubeRepo) throws IOException{
+    public synchronized String[] load(String dataSourceName, String schemaFileName, String dataFileName, String cubeRepo, String... fileName) throws IOException{
 
         // check the existence of the data repository
         File root = new File(cubeRepo);
@@ -85,9 +86,19 @@ public class CoolLoader {
             System.out.println("[*] New version " + outputCubeVersionDir.getName() + " is created!");
         }
         DataLoader loader = DataLoader.builder(dataSourceName, schema, dataFile, outputCubeVersionDir, this.loaderConfig).build();
-        loader.load();
+        loader.load(fileName);
         // copy the table.yaml to new version folder
         Files.copy(schemaFile, new File(outputCubeVersionDir, "table.yaml"));
+
+        String dzPath;
+        String tablePath;
+        if (fileName.length == 1){
+            dzPath = cubeRepo+"/"+ dataSourceName+"/"+outputCubeVersionDir.getName()+"/"+fileName[0];
+            tablePath = cubeRepo+"/"+ dataSourceName+"/"+outputCubeVersionDir.getName()+"/table.yaml";
+            return new String[]{dzPath, tablePath};
+        }else{
+            return new String[]{};
+        }
     }
 
 
