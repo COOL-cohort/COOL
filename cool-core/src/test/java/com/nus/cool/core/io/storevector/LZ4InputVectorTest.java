@@ -65,7 +65,7 @@ public class LZ4InputVectorTest {
     LZ4InputVector res = new LZ4InputVector();
     res.readFrom(readBuf);
 
-    // Validate these stringsr
+    // Validate these string
     for (int i = 0; i < valueList.length; i++) {
       String actual = res.getString(i, defaultCharset);
       String expect = String.valueOf(valueList[i]);
