@@ -28,7 +28,7 @@ public class ZIntStoreTest {
 
   @AfterTest
   public void tearDown() {
-    logger.info(String.format("Pass UnitTest %s\n", ZIntStoreTest.class.getSimpleName()));
+    logger.info(String.format("Tear Down UnitTest %s\n", ZIntStoreTest.class.getSimpleName()));
   }
 
   @Test(dataProvider = "ZIntStoreDP")
