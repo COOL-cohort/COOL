@@ -21,17 +21,14 @@ package com.nus.cool.core.io.writestore;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.io.compression.OutputCompressor;
-import com.nus.cool.core.schema.ChunkType;
-import com.nus.cool.core.schema.FieldSchema;
-import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.core.schema.*;
 import com.nus.cool.core.util.IntegerUtil;
 import lombok.Getter;
 
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,6 +44,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * MetaChunkData layout
  * -------------------------------------
  * | field 1 | field 2 | ... | field N |
+ * -------------------------------------
+ * +++++++++++++++++++++++++++++++++++++
+ * -------------------------------------
+ * invariant table
  * -------------------------------------
  * <p>
  * header layout
@@ -65,18 +66,18 @@ public class MetaChunkWS implements Output {
     private final MetaFieldWS[] metaFields;
 
     @Getter
-    private final MetaInvariantFieldWS[] metaInvariantFields;
+    private final MetaInvariantFieldWS metaInvariantField;
+
 
     /**
      * Constructor
-     *
-     * @param offset              Offset in out stream
-     * @param metaFields          fields type for each file of the meta chunk
-     * @param metaInvariantFields
+     *  @param offset     Offset in out stream
+     * @param metaFields fields type for each file of the meta chunk
+     * @param metaInvariantField
      */
-    public MetaChunkWS(int offset, MetaFieldWS[] metaFields, MetaInvariantFieldWS[] metaInvariantFields) {
+    public MetaChunkWS(int offset, MetaFieldWS[] metaFields, MetaInvariantFieldWS metaInvariantField, boolean invariant) {
         this.metaFields = checkNotNull(metaFields);
-        this.metaInvariantFields = metaInvariantFields;
+        this.metaInvariantField = metaInvariantField;
         checkArgument(offset >= 0 && metaFields.length > 0);
         this.offset = offset;
     }
@@ -93,22 +94,12 @@ public class MetaChunkWS implements Output {
         Charset charset = Charset.forName(schema.getCharset());
 
         // n: it denotes the number of columns
-        int n = schema.getFields().size();
-
-        int metaFiledSize = 0;
-        int metaInvariantFieldSize = 0;
-        for (int i = 0; i < n; i++) {
-            FieldSchema fieldSchema = schema.getField(i);
-            boolean invariant = fieldSchema.getInvariant();
-            if (invariant == true) {
-                metaInvariantFieldSize += 1;
-            }
-        }
-        metaFiledSize = n - metaInvariantFieldSize;
-        metaInvariantFieldSize += 1;
-        MetaFieldWS[] metaFields = new MetaFieldWS[metaFiledSize];
-        MetaInvariantFieldWS[] metaInvariantFields = new MetaInvariantFieldWS[metaInvariantFieldSize];
-        for (int i = 0, metaFieldIndex = 0, metaInvariantFieldIndex = 0; i < metaFields.length; i++) {
+        int metaFieldSize = schema.getFields().size();
+        boolean flag = false;
+        MetaFieldWS[] metaFields = new MetaFieldWS[metaFieldSize];
+        List<Integer>invariantIndex=new ArrayList<>();
+        List<DataType> dataType=new ArrayList<>();
+        for (int i = 0, metaFieldIndex = 0; i < metaFields.length; i++) {
             FieldSchema fieldSchema = schema.getField(i);
             FieldType fieldType = fieldSchema.getFieldType();
             boolean invariant = fieldSchema.getInvariant();
@@ -130,11 +121,13 @@ public class MetaChunkWS implements Output {
                         throw new IllegalArgumentException("Invalid field type: " + fieldType);
                 }
             } else {
-                metaInvariantFields[metaInvariantFieldIndex] = new MetaInvariantFieldWS(fieldType);
-                metaInvariantFieldIndex += 1;
+                flag = true;
+                invariantIndex.add(i);
+                dataType.add(fieldSchema.getDataType());
             }
         }
-        return new MetaChunkWS(offset, metaFields, metaInvariantFields);
+        Integer userKeyIndex=schema.getInvariantAppKeyField();
+        return new MetaChunkWS(offset, metaFields, new MetaInvariantFieldWS(invariantIndex, userKeyIndex), flag);
     }
 
     /**
@@ -144,8 +137,21 @@ public class MetaChunkWS implements Output {
      */
     public void put(String[] tuple) {
         checkNotNull(tuple);
-        for (int i = 0; i < tuple.length; i++) {
-            this.metaFields[i].put(tuple[i]);
+        List<Integer>invariantIndex=metaInvariantField.getInvariantIndex();
+        List<Object> invariantData=new ArrayList<>();
+        for (int i = 0, k=0; i < tuple.length; i++) {
+            if(invariantIndex.contains(i)){
+                invariantData.add(tuple[i]);
+            }
+            else {
+                this.metaFields[k].put(tuple[i]);
+                k++;
+            }
+        }
+        boolean flag=invariantData.size()>0?true:false;
+        if(flag){
+            String userID=tuple[this.metaInvariantField.getUserKeyIndex()];
+            this.metaInvariantField.putInvariant(userID,invariantData);
         }
     }
 
@@ -168,7 +174,8 @@ public class MetaChunkWS implements Output {
     @Override
     public int writeTo(DataOutput out) throws IOException {
         int bytesWritten = 0;
-
+        bytesWritten+=this.metaInvariantField.writeTo(out);
+        this.offset+=bytesWritten;
         // Store field offsets and write MetaFields as MetaChunkData layout
         int[] offsets = new int[this.metaFields.length];
         for (int i = 0; i < this.metaFields.length; i++) {
