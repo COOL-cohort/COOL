@@ -126,7 +126,7 @@ public class MetaChunkWS implements Output {
                 dataType.add(fieldSchema.getDataType());
             }
         }
-        Integer userKeyIndex=schema.getInvariantAppKeyField();
+        Integer userKeyIndex=schema.getInvariantUserKeyField();
         return new MetaChunkWS(offset, metaFields, new MetaInvariantFieldWS(invariantIndex, userKeyIndex), flag);
     }
 
