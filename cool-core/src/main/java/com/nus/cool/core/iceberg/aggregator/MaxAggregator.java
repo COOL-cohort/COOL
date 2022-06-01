@@ -42,7 +42,7 @@ public class MaxAggregator implements Aggregator {
             }
             if (resultMap.get(entry.getKey()).getMax() == null) {
                 BitSet bs = entry.getValue();
-                int max = 0;
+                float max = 0;
                 for (int i = 0; i < bs.size(); i++) {
                     int nextPos = bs.nextSetBit(i);
                     if (nextPos < 0) {

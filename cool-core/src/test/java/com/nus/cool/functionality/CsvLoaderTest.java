@@ -62,8 +62,10 @@ public class CsvLoaderTest {
                         Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                         "tpc-h-10g",
-                        Paths.get(sourcePath, "olap-tpch", "table.yaml").toString(),
-                        Paths.get(sourcePath, "olap-tpch", "table.csv").toString(),
+                        // Paths.get(sourcePath, "olap-tpch", "table.yaml").toString(),
+                        // Paths.get(sourcePath, "olap-tpch", "table.csv").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "olap-tpch", "table.yaml").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "olap-tpch", "scripts", "data.csv").toString(),
                         Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 },
 

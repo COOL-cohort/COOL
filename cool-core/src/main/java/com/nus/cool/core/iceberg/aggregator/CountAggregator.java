@@ -42,7 +42,7 @@ public class CountAggregator implements Aggregator {
             }
             if(resultMap.get(entry.getKey()).getCount() == null) {
                 BitSet bs = entry.getValue();
-                int count = 0;
+                float count = 0;
                 if(field.getFieldType() == FieldType.Metric) {
                     count = bs.cardinality();
                 } else {
