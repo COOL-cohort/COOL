@@ -42,7 +42,7 @@ public class MinAggregator implements Aggregator {
             }
             if (resultMap.get(entry.getKey()).getMin() == null) {
                 BitSet bs = entry.getValue();
-               int min = Integer.MAX_VALUE;
+                float min = Integer.MAX_VALUE;
                 for (int i = 0; i < bs.size(); i++) {
                     int nextPos = bs.nextSetBit(i);
                     if (nextPos < 0) {
