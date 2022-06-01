@@ -1,6 +1,5 @@
 package com.nus.cool.functionality;
 
-import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.model.CoolLoader;
@@ -24,7 +23,7 @@ public class CsvLoaderTest {
 
     @AfterTest
     public void tearDown() {
-        logger.info(String.format("Pass UnitTest %s\n", CsvLoaderTest.class.getSimpleName()));
+        logger.info(String.format("Tear down UnitTest %s\n", CsvLoaderTest.class.getSimpleName()));
     }
 
     @Test(dataProvider = "CsvLoaderTestDP")
@@ -49,19 +48,21 @@ public class CsvLoaderTest {
         return new Object[][] {
                 {
                         "health",
-                        Paths.get(sourcePath, "health", "table.yaml").toString(),
-                        Paths.get(sourcePath, "health", "table.csv").toString(),
-                        Paths.get(System.getProperty("user.dir"),  "../datasetSource").toString()
+                        // Paths.get(sourcePath, "health", "table.yaml").toString(),
+                        // Paths.get(sourcePath, "health", "table.csv").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "health", "table.yaml").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "health", "raw.csv").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                         "sogamo",
                         Paths.get(sourcePath, "sogamo", "table.yaml").toString(),
                         Paths.get(sourcePath, "sogamo", "table.csv").toString(),
-                        Paths.get(System.getProperty("user.dir"),  "../datasetSource").toString()
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                         "tpc-h-10g",
                         Paths.get(sourcePath, "olap-tpch", "table.yaml").toString(),
                         Paths.get(sourcePath, "olap-tpch", "table.csv").toString(),
-                        Paths.get(System.getProperty("user.dir"),  "../datasetSource").toString()
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 },
 
         };
