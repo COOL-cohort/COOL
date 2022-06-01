@@ -51,7 +51,6 @@ public class CohortAnalysisTest extends CohortSelectionTest {
         }
         InputVector userVector = coolModel.getCohortUsers(inputCohort);
         List<ExtendedResultTuple> result = coolModel.cohortEngine.performCohortQuery(inputCube, userVector, query);
-        logger.info(""+result);
         assert result.equals(out);
     }
 
