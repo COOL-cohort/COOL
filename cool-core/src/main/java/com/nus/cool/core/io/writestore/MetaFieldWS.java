@@ -21,9 +21,10 @@ package com.nus.cool.core.io.writestore;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.FieldType;
 
-public interface MetaFieldWS extends Output {
+import java.util.List;
 
-  /**
+public interface MetaFieldWS extends Output {
+    /**
    * Put value into this field
    *
    * @param v value
