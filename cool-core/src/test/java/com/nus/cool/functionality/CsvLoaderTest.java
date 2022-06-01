@@ -55,8 +55,10 @@ public class CsvLoaderTest {
                         Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                         "sogamo",
-                        Paths.get(sourcePath, "sogamo", "table.yaml").toString(),
-                        Paths.get(sourcePath, "sogamo", "table.csv").toString(),
+                        // Paths.get(sourcePath, "sogamo", "table.yaml").toString(),
+                        // Paths.get(sourcePath, "sogamo", "table.csv").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "sogamo", "table.yaml").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "sogamo", "test.csv").toString(),
                         Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                         "tpc-h-10g",
