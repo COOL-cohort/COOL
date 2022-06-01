@@ -53,6 +53,8 @@ public class TableSchema {
      * name2Id is the mapping of field name and the corresponding id
      */
     private Map<String, Integer> name2Id = Maps.newHashMap();
+
+    @Getter
     private Map<String, Integer> invariantName2Id = Maps.newHashMap();
 
     /**
@@ -69,6 +71,9 @@ public class TableSchema {
      */
     @Getter
     private int appKeyField = -1;
+
+    @Getter
+    private int invariantUserKeyField=-1;
 
     /**
      * ActionField index, assign -1 if this field type not exist.
@@ -112,8 +117,8 @@ public class TableSchema {
             boolean invariant = field.getInvariant();
             if (invariant == true) {
                 this.invariantFields.add(field);
-                this.invariantKeyField.add(this.invariantKeyField.size() + 1);
-                this.invariantName2Id.put(field.getName(), this.invariantName2Id.size() + 1);
+                this.invariantKeyField.add(i);
+                this.invariantName2Id.put(field.getName(), i);
             } else {
                 this.fields.add(field);
                 this.name2Id.put(field.getName(), this.name2Id.size() + 1);
@@ -123,6 +128,7 @@ public class TableSchema {
                         break;
                     case UserKey:
                         this.userKeyField = this.name2Id.size();
+                        this.invariantUserKeyField=i;
                         break;
                     case Action:
                         this.actionField = this.name2Id.size();
