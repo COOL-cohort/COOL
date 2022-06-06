@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.swing.text.StyledEditorKit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -52,6 +53,7 @@ public class TableSchema {
     /**
      * name2Id is the mapping of field name and the corresponding id
      */
+    @Getter
     private Map<String, Integer> name2Id = Maps.newHashMap();
 
     @Getter
