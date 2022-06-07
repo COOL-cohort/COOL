@@ -7,11 +7,11 @@ public interface DataWriter extends Closeable {
   
   /**
    * Initialize the writer
-   * 
+   * @Params fileName: file name of dz
    * @return successful initialization
    * @throws IOException
    */
-  boolean Initialize() throws IOException;
+  boolean Initialize(String... fileName) throws IOException;
 
   /**
    * Add a tuple to the data set

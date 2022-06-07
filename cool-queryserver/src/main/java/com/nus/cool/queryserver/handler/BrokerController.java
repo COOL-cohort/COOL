@@ -1,14 +1,24 @@
 package com.nus.cool.queryserver.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nus.cool.core.iceberg.query.IcebergQuery;
+import com.nus.cool.loader.LoadQuery;
 import com.nus.cool.queryserver.model.QueryInfo;
+import com.nus.cool.queryserver.model.QueryServerModel;
 import com.nus.cool.queryserver.singleton.HDFSConnection;
 import com.nus.cool.queryserver.singleton.QueryIndex;
 import com.nus.cool.queryserver.singleton.TaskQueue;
+import com.nus.cool.queryserver.utils.Util;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.nus.cool.queryserver.model.Parameter;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +26,74 @@ import java.util.Map;
 @RequestMapping("/broker")
 public class BrokerController {
 
-    @PostMapping(value = "/load-dfs")
-    public ResponseEntity<String> loadToDfs(){
+    /**
+     * Assume the csv file already at the server side. this
+     * Load the local CSV file and upload it to hdfs
+     * eg. input: '{"dataFileType": "CSV", "cubeName": "sogamo", "schemaPath": "sogamo/table.yaml",
+     *      "dimPath": "sogamo/dim.csv", "dataPath": "sogamo/test.csv", "outputPath": "datasetSource"}'
+     * @param req request parsed from json.
+     * @return response
+     * @throws URISyntaxException exception
+     * @throws IOException exception
+     */
+    @PostMapping(value = "/load-data-to-hdfs",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> loadDataToDfs(@RequestBody LoadQuery req) throws URISyntaxException, IOException {
+
+        Util.getTimeClock();
+
+        // file name of the .dz
+        String fileName = Long.toHexString(System.currentTimeMillis()) + ".dz";
+
+        QueryServerModel.loadCube(req, fileName);
+
+        // 1. connect to hdfs, get data Source Name, cohort or iceberg
+        HDFSConnection fs = HDFSConnection.getInstance();
+
+        String localPath1 = req.getOutputPath() + "/" + req.getDzFilePath();;
+        String dfsPath1 = "/cube/" + req.getDzFilePath();
+        fs.uploadToDfs(localPath1, dfsPath1);
+
+        String localPath2 = req.getOutputPath() + "/" + req.getTableFilePath();
+        String dfsPath2 = "/cube/" + req.getTableFilePath();
+        fs.uploadToDfs(localPath2, dfsPath2);
+
+        System.out.println("[*] Data and file loaded");
+        return  null;
+    }
+
+    /**
+     * Receive query file from client, and store to local as temp_query.json, and then upload to hdfs.
+     * @param queryFile query file
+     * @return response
+     * @throws URISyntaxException exception
+     * @throws IOException exception
+     */
+    @PostMapping(value = "/load-query-to-hdfs",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> loadQueryToDfs(@RequestParam("queryFile") MultipartFile queryFile) throws URISyntaxException, IOException {
+
+        // 1. connect to hdfs, get data Source Name, cohort or iceberg
+        HDFSConnection fs = HDFSConnection.getInstance();
+
+        Util.getTimeClock();
+        System.out.println("[*] This query is for iceberg query: " + queryFile);
+        String queryContent = new String(queryFile.getBytes());
+        ObjectMapper mapper = new ObjectMapper();
+        IcebergQuery q = mapper.readValue(queryContent, IcebergQuery.class);
+
+        try {
+            // Writing to a file
+            mapper.writeValue(new File("temp_query.json"), q );
+            String localPath3 = "temp_query.json";
+            String dfsPath3 = "/tmp/1/query.json";
+            fs.uploadToDfs(localPath3, dfsPath3);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return  null;
     }
 
