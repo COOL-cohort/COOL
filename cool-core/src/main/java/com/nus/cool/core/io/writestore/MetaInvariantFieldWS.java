@@ -1,14 +1,13 @@
 package com.nus.cool.core.io.writestore;
 
-import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
-import com.nus.cool.core.schema.DataType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.IntegerUtil;
 import lombok.Getter;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,8 @@ public class MetaInvariantFieldWS implements MetaFieldWS {
     @Getter
     private final Integer userKeyIndex;
 
+    @Getter
+    private List<Integer> invariantTypes = new ArrayList<>();
 
     public MetaInvariantFieldWS(List<Integer> invariantIndex, Integer userKeyIndex) {
 
@@ -37,19 +38,27 @@ public class MetaInvariantFieldWS implements MetaFieldWS {
     @Override
     public int writeTo(DataOutput out) throws IOException {
         int bytesWritten = 0;
-        for(String key:metaInvariantFields.keySet()){
-
+        for (int i = 0; i < invariantTypes.size(); i++) {
+            out.writeInt(invariantTypes.get(i));
+            bytesWritten += Ints.BYTES;
+        }
+        for (String key : metaInvariantFields.keySet()) {
+            out.writeInt(key.getBytes().length);
+            bytesWritten+=Ints.BYTES;
             out.writeChars(key);
             bytesWritten += key.getBytes().length;
-            List<Object> tempList=metaInvariantFields.get(key);
-            for(int i=0;i<tempList.size();i++)
-            {
-                if(tempList.get(i).getClass().toString()=="int"){
-                    out.writeInt(IntegerUtil.toNativeByteOrder((int)tempList.get(i)));
+            List<Object> tempList = metaInvariantFields.get(key);
+            for (int i = 0; i < tempList.size(); i++) {
+                if (tempList.get(i).getClass().toString() == "int") {
+//                    out.writeInt(Ints.BYTES);
+//                    bytesWritten += Ints.BYTES;
+                    out.writeInt(IntegerUtil.toNativeByteOrder((int) tempList.get(i)));
                     bytesWritten += Ints.BYTES;
-                }
-                else{
+                } else {
+                    out.writeInt(tempList.get(i).toString().getBytes().length);
                     out.writeChars(tempList.get(i).toString());
+                    bytesWritten += tempList.get(i).toString().getBytes().length;
+                    bytesWritten += Ints.BYTES;
                 }
             }
         }
@@ -57,7 +66,20 @@ public class MetaInvariantFieldWS implements MetaFieldWS {
     }
 
     public void putInvariant(String UserID, List<Object> invariantData) {
-        this.metaInvariantFields.put(UserID, invariantData);
+        if (this.metaInvariantFields.size() == 0) {
+            for (int i = 0; i < invariantData.size(); i++) {
+                if (invariantData.get(i).getClass().toString() == "int") {
+                    this.invariantTypes.add(0);
+                } else {
+                    this.invariantTypes.add(1);
+                }
+            }
+        }
+        if (this.metaInvariantFields.containsKey(UserID)) {
+            return;
+        } else {
+            this.metaInvariantFields.put(UserID, invariantData);
+        }
     }
 
     @Override
