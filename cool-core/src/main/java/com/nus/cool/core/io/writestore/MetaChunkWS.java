@@ -68,6 +68,9 @@ public class MetaChunkWS implements Output {
     @Getter
     private final MetaInvariantFieldWS metaInvariantField;
 
+    @Getter
+    private int invariantOffset;
+
 
     /**
      * Constructor
@@ -175,6 +178,7 @@ public class MetaChunkWS implements Output {
     public int writeTo(DataOutput out) throws IOException {
         int bytesWritten = 0;
         bytesWritten+=this.metaInvariantField.writeTo(out);
+        this.invariantOffset=bytesWritten;
         this.offset+=bytesWritten;
         // Store field offsets and write MetaFields as MetaChunkData layout
         int[] offsets = new int[this.metaFields.length];
@@ -199,6 +203,8 @@ public class MetaChunkWS implements Output {
             out.writeInt(IntegerUtil.toNativeByteOrder(offset));
             bytesWritten += Ints.BYTES;
         }
+
+        out.writeInt(IntegerUtil.toNativeByteOrder(this.invariantOffset));
 
         // 3. Write header offset for MetaChunk layout
         out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
