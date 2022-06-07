@@ -199,7 +199,7 @@ Run Server
 
 ```
 java -jar cool-queryserver/target/cool-queryserver-0.0.1-SNAPSHOT.jar datasetSource/ 9009 STANDALONE
-```bash
+```
 
 ## CONNECT TO EXTERNAL STORAGE SERVICES
 COOL has an [StorageService](cool-core/src/main/java/com/nus/cool/storageservice/StorageService.java) interface, which will allow COOL standalone server/workers (coming soon) to handle data movement between local and an external storage service. A sample implementation for HDFS connection can be found under the [hdfs-extensions](cool-extensions/hdfs-extensions/).
