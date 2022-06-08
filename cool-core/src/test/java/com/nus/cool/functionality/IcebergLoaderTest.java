@@ -51,13 +51,13 @@ public class IcebergLoaderTest extends CsvLoaderTest {
     public Object[][] ArgObjects() {
         List<BaseResult> out = new ArrayList<>();
         out.add(new BaseResult("1993-01-01|1994-01-01", "RUSSIA|EUROPE", "O_TOTALPRICE",
-                new AggregatorResult((float)2.0, (long)312855, null, null, null, null, null)));
+                new AggregatorResult(2, (long)312855, null, null, null, null, null)));
         out.add(new BaseResult("1993-01-01|1994-01-01", "GERMANY|EUROPE", "O_TOTALPRICE",
-                new AggregatorResult((float)1.0, (long)4820, null, null, null, null, null)));
+                new AggregatorResult(1, (long)4820, null, null, null, null, null)));
         out.add(new BaseResult("1993-01-01|1994-01-01", "ROMANIA|EUROPE", "O_TOTALPRICE",
-                new AggregatorResult((float)2.0, (long)190137, null, null, null, null, null)));
+                new AggregatorResult(2, (long)190137, null, null, null, null, null)));
         out.add(new BaseResult("1993-01-01|1994-01-01", "UNITED KINGDOM|EUROPE", "O_TOTALPRICE",
-                new AggregatorResult((float)1.0, (long)33248, null, null, null, null, null)));
+                new AggregatorResult(1, (long)33248, null, null, null, null, null)));
 
         return new Object[][] {{
                 Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),

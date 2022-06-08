@@ -30,6 +30,8 @@ import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.TableSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -41,6 +43,8 @@ import java.util.*;
  * the cubes from the corresponding path.
  */
 public class CoolModel implements Closeable {
+
+    static final Logger logger = LoggerFactory.getLogger(CoolModel.class);
 
     // Container of loaded cubes
     private final Map<String, CubeRS> metaStore = Maps.newHashMap();
@@ -115,7 +119,7 @@ public class CoolModel implements Closeable {
         CubeRS cubeRS = new CubeRS(schema);
 
         File[] cubletFiles = currentVersion.listFiles((file, s) -> s.endsWith(".dz"));
-        // System.out.println("Cube " + cube + ", Use version: " + currentVersion.getName());
+        logger.info("Cube " + cube + ", Use version: " + currentVersion.getName());
         storePath.put(cube, currentVersion);
 
         // Load all cubes under latest version
@@ -125,7 +129,6 @@ public class CoolModel implements Closeable {
         }
 
         this.metaStore.put(cube, cubeRS);
-        // System.out.println("Cube " + cube + ", metaStore: " + this.metaStore.keySet());
     }
 
     /**
