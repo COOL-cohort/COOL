@@ -32,15 +32,15 @@ import java.util.Set;
 @NoArgsConstructor
 public class AggregatorResult {
 
-    private Float count;
+    private Integer count;
 
     private Long sum;
 
     private Float average;
 
-    private Float max;
+    private Integer max;
 
-    private Float min;
+    private Integer min;
 
     private Float countDistinct;
 
@@ -56,6 +56,6 @@ public class AggregatorResult {
         if (this.min != null) this.min = this.min <= res.getMin() ? this.min : res.getMin();
         if (this.count != null) this.count += res.getCount();
         if (this.sum != null) this.sum += res.getSum();
-        if (this.average != null) this.average = this.sum / this.count;
+        if (this.average != null) this.average = this.sum / (float)this.count;
      }
 }

@@ -100,7 +100,7 @@ public class CoolOlapEngine {
         Float totalSum = (float) 0;
         for (BaseResult res: results){
             String k = res.getKey();
-            profilingCount.put(k, res.getAggregatorResult().getCount());
+            profilingCount.put(k, (float)res.getAggregatorResult().getCount());
             profilingSum.put(k, res.getAggregatorResult().getSum());
             totalCount += res.getAggregatorResult().getCount();;
             totalSum += res.getAggregatorResult().getSum();
