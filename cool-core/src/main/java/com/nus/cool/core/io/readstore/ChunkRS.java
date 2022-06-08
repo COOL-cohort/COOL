@@ -22,7 +22,6 @@ import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.TableSchema;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import lombok.Getter;
 
@@ -61,6 +60,10 @@ public class ChunkRS implements Input {
    */
   private FieldRS[] fields;
 
+
+  private int[] fieldOffsets;
+ 
+  
   private TableSchema schema;
 
   public ChunkRS(TableSchema schema) {
@@ -84,24 +87,32 @@ public class ChunkRS implements Input {
     // Get #fields
     int fields = buffer.getInt();
     // Get field offsets
-    int[] fieldOffsets = new int[fields];
+    this.fieldOffsets = new int[fields];
     for (int i = 0; i < fields; i++) {
-      fieldOffsets[i] = buffer.getInt();
+      this.fieldOffsets[i] = buffer.getInt();
     }
+
+    this.fields = new FieldRS[fields];
+
     // System.out.println("#Records="+this.records + ", # fields="+fields+",
     // fieldOffsets="+ Arrays.toString(fieldOffsets));
+    
+    /* TODO(lingze)
+     *  lazy load
+     *  no need to load all field into memory.
+     *  We only load needed field
+     */
 
     this.fields = new FieldRS[fields];
     for (int i = 0; i < fields; i++) {
       // System.out.println("Reading data chunk's field ="+i+".....");
       buffer.position(fieldOffsets[i]);
-      FieldRS field = new CoolFieldRS();
-      field.readFromWithFieldType(buffer, this.schema.getField(i).getFieldType());
-      this.fields[i] = field;
+      this.fields[i] = FieldRS.ReadFieldRS(buffer);
     }
   }
 
   public FieldRS getField(int i) {
+
     return this.fields[i];
   }
 

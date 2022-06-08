@@ -1,0 +1,51 @@
+{
+    "birthSelector":{
+        "birthEvents":[
+            {
+                "filters":[
+                    {
+                        "fieldSchema":"prescribe",
+                        "type":"SET",
+                        "acceptValue":["Disease-A"]
+
+                    }
+                ],
+                "frequency":2
+            }
+        ]
+    },
+
+    "ageSelector":{
+        "unit":"DAY",
+        "min":1,
+        "max":7,
+        "interval":1
+    },
+
+    "cohortSelector":{
+        "fieldSchema":"birthyear",
+        "type":"RANGE",
+        "min":1950,
+        "max":1990,
+        "interval":10
+    },
+
+    "valueSelector":{
+        "filters":[
+            {
+                "fieldSchema":"prescribe",
+                "type":"SET",
+                "acceptValue":["Medicine-C"]
+            },
+            {
+                "fieldSchema":"labtest",
+                "type":"RANGE",
+                "acceptValue":["MIN-45", "131-MAX"]
+            }
+        ],
+        "function":"DISTINCT",
+        "observedSchema":"id"
+    }
+
+
+}
