@@ -8,6 +8,7 @@ import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ExtendedResultTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
@@ -51,11 +52,11 @@ public class CohortAnalysisTest extends CohortSelectionTest {
         }
         InputVector userVector = coolModel.getCohortUsers(inputCohort);
         List<ExtendedResultTuple> result = coolModel.cohortEngine.performCohortQuery(inputCube, userVector, query);
-        assert result.equals(out);
+        Assert.assertEquals(result, out);
     }
 
     @DataProvider(name = "CohortAnalysisTestDP")
-    public Object[][] ArgObjects() {
+    public Object[][] CohortAnalysisTestDPArgObjects() {
         List<ExtendedResultTuple> out1 = new ArrayList<>();
         out1.add(new ExtendedResultTuple("((1970, 1980])", 0, 3.0, 22.0, 22.0, 22.0, 1.0));
         out1.add(new ExtendedResultTuple("((1970, 1980])", 1, 1.0, 31.0, 31.0, 31.0, 1.0));

@@ -7,6 +7,7 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.model.CoolModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
@@ -39,8 +40,7 @@ public class FunnulAnalysisTest extends CsvLoaderTest{
         CoolModel coolModel = new CoolModel(datasetPath);
         coolModel.reload(inputSource);
 
-        if (!query.isValid())
-            throw new IOException("[x] Invalid cohort query.");
+        Assert.assertTrue(query.isValid());
 
         CubeRS inputCube = coolModel.getCube(query.getDataSource());
         String inputCohort = query.getInputCohort();
@@ -50,11 +50,11 @@ public class FunnulAnalysisTest extends CsvLoaderTest{
         InputVector userVector = coolModel.getCohortUsers(inputCohort);
         int[] result = coolModel.cohortEngine.performFunnelQuery(inputCube, userVector, query);
 
-        assert Arrays.equals(result, out);
+        Assert.assertEquals(result, out);
     }
 
     @DataProvider(name = "FunnelAnalysisTestDP")
-    public Object[][] ArgObjects() {
+    public Object[][] FunnelAnalysisTestDPArgObjects() {
         int[] out = {5, 5, 4, 4};
         return new Object[][] {{
                 Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),

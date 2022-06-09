@@ -80,12 +80,13 @@ public class ExtendedCohortQuery {
     private String userId;
 
     @JsonIgnore
-    public boolean isValid() {
-        return (birthSequence != null) &&
-                (birthSequence.isValid()) &&
-                (dataSource != null) &&
-                (ageField != null) &&
-                (measure != null);
+    public boolean isValid() throws IOException {
+        if ((birthSequence != null) &&
+            (birthSequence.isValid()) &&
+            (dataSource != null) &&
+            (ageField != null) &&
+            (measure != null)) return true;
+        else throw new IOException("[x] Invalid cohort query.");
     }
 
     @Override
