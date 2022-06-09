@@ -7,6 +7,7 @@ import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.model.CoolModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
@@ -44,11 +45,11 @@ public class IcebergLoaderTest extends CsvLoaderTest {
         // execute query
         List<BaseResult> results = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
 
-        assert results.equals(out);
+        Assert.assertEquals(results, out);
     }
 
     @DataProvider(name = "IceBergUnitTestDP")
-    public Object[][] ArgObjects() {
+    public Object[][] IceBergUnitTestDPArgObjects() {
         List<BaseResult> out = new ArrayList<>();
         out.add(new BaseResult("1993-01-01|1994-01-01", "RUSSIA|EUROPE", "O_TOTALPRICE",
                 new AggregatorResult(2, (long)312855, null, null, null, null, null)));

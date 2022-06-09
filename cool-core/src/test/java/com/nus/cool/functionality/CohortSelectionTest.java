@@ -6,6 +6,7 @@ import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
@@ -31,7 +32,8 @@ public class CohortSelectionTest extends CsvLoaderTest {
     }
 
     @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods="CsvLoaderUnitTest")
-    public void CohortSelectionUnitTest(String datasetPath, String queryPath) throws IOException {
+    public void CohortSelectionUnitTest(String datasetPath, String queryPath, List<Integer> selectionGlobalIDs,
+                                        List<String> selectionActualIDs) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
@@ -43,11 +45,9 @@ public class CohortSelectionTest extends CsvLoaderTest {
         CubeRS cube = coolModel.getCube(query.getDataSource());
 
         List<Integer> cohortResults = coolModel.cohortEngine.selectCohortUsers(cube,null, query);
-        List<Integer> selectionGlobalIDs = Arrays.asList(0, 2, 3, 4, 5, 7, 9, 11, 12);
-        assert cohortResults.equals(selectionGlobalIDs);
+        Assert.assertEquals(selectionGlobalIDs, cohortResults);
         List<String> userIDs = coolModel.cohortEngine.listCohortUsers(cube, cohortResults);
-        List<String> selectionActualIDs = Arrays.asList("P-0", "P-2", "P-3", "P-4", "P-5", "P-7", "P-9", "P-11", "P-12");
-        assert userIDs.equals(selectionActualIDs);
+        Assert.assertEquals(userIDs,selectionActualIDs);
 
         String outputCohort = query.getOutputCohort();
         File cohortRoot =  new File(coolModel.getCubeStorePath(inputSource), "cohort");
@@ -69,7 +69,11 @@ public class CohortSelectionTest extends CsvLoaderTest {
     public Object[][] CohortSelectionTestDPArgObjects() {
         return new Object[][] {{
                 Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
-                Paths.get(System.getProperty("user.dir"),  "..", "health", "query1-0.json").toString()
+                Paths.get(System.getProperty("user.dir"),  "..", "health", "query1-0.json").toString(),
+                // output global IDs
+                Arrays.asList(0, 2, 3, 4, 5, 7, 9, 11, 12),
+                // output actual IDs
+                Arrays.asList("P-0", "P-2", "P-3", "P-4", "P-5", "P-7", "P-9", "P-11", "P-12"),
         }};
     }
 }
