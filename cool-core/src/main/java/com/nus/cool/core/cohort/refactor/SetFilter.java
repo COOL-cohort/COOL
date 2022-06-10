@@ -1,6 +1,6 @@
 package com.nus.cool.core.cohort.refactor;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.BitSet;
 import java.util.HashSet;
 
@@ -53,7 +53,7 @@ public class SetFilter implements Filter {
     }
 
     @Override
-    public BitSet accpet(ArrayList<String> values) throws RuntimeException {
+    public BitSet accpet(List<String> values) throws RuntimeException {
         BitSet res = new BitSet(values.size());
         for(int i = 0 ; i < values.size(); i++){
             if (this.accept(values.get(i))) {
@@ -64,7 +64,7 @@ public class SetFilter implements Filter {
     }
 
     @Override
-    public BitSet accept(ArrayList<Integer> values) throws RuntimeException {
+    public BitSet accept(List<Integer> values) throws RuntimeException {
         throw new UnsupportedOperationException("SetFilter dosent't implement the Integer accept method");
     }
 

@@ -1,7 +1,7 @@
 package com.nus.cool.core.cohort.refactor;
 
-import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 public interface Filter {
 
@@ -24,14 +24,14 @@ public interface Filter {
      * @param values the batch of input value to check
      * @return List of bool stored in BitSet
      */
-    public BitSet accpet(ArrayList<String> values) throws RuntimeException;
+    public BitSet accpet(List<String> values) throws RuntimeException;
     
     /**
      * Range Filter implements this function 
      * @param values the batch of input value to check
      * @return List of bool stored in BitSet
      */
-    public BitSet accept(ArrayList<Integer> values) throws RuntimeException;
+    public BitSet accept(List<Integer> values) throws RuntimeException;
 
     /**
      * @return the type of Filter
