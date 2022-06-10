@@ -1,9 +1,8 @@
 package com.nus.cool.core.cohort.refactor;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 import com.google.common.base.Preconditions;
 
@@ -18,7 +17,7 @@ public class RangeFilter implements Filter {
     private static final String splitChar = "-";
 
     // accepted range 
-    private LinkedList<RangeUnit> acceptRangeList = new LinkedList<>();
+    private ArrayList<RangeUnit> acceptRangeList = new ArrayList<>();
     
     @Getter
     private String fieldSchema;
@@ -38,9 +37,7 @@ public class RangeFilter implements Filter {
 
     @Override
     public Boolean accept(Integer value) throws RuntimeException {
-        Iterator<RangeUnit> it = acceptRangeList.iterator();
-        while(it.hasNext()){
-            RangeUnit u = it.next();
+        for(RangeUnit u : acceptRangeList) {
             if(u.IsInScope(value)){
                 return true;
             }
