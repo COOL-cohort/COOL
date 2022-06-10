@@ -1,8 +1,8 @@
 package com.nus.cool.core.cohort.refactor;
 
-import java.util.List;
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.List;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
@@ -82,5 +82,7 @@ public class SetFilter implements Filter {
     private boolean IsAccept(String value){
         return this.acceptSet != null && this.acceptSet.contains(value);
     }
+
+ 
     
 }
