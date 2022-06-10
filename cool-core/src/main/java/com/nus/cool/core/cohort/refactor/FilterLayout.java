@@ -1,5 +1,7 @@
 package com.nus.cool.core.cohort.refactor;
 
+import com.google.common.base.Preconditions;
+
 import lombok.Getter;
 
 /** Read from json file into FilterLayout 
@@ -27,11 +29,13 @@ public class FilterLayout {
 
     public Filter generateFilter(){
         if(type == FilterType.Range.toString()) {
-            
+            // For RangeFilter, rejectValue property is null 
+            Preconditions.checkArgument(rejectValue == null, 
+                "For RangeFilter, rejectValue property is null");
+            return new RangeFilter(fieldSchema, acceptValue);
         } else if (type == FilterType.Set.toString()){
             return new SetFilter(fieldSchema,acceptValue, rejectValue);
-        } else throw new IllegalArgumentException(String.format("No filter of this type named %s", type));
-        
-        return null;
+        } else throw new IllegalArgumentException(
+                String.format("No filter of this type named %s", type));   
     }
 }
