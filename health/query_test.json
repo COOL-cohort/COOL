@@ -1,0 +1,65 @@
+{
+    "birthSelection":{
+        "birthEvents":[
+            {    
+                "filters":[
+                    {
+                        "fieldSchema":"diagnose",
+                        "type":"SET",
+                        "accepctValue":["Disease-B"],
+                        "rejectValue":["Disease-ABC"]
+                    },
+                    {
+                        "fieldSchema":"birthyear",
+                        "type":"Range",
+                        "acceptValue":["1954-1999","2000-2012", "2014-MAX"]
+                    }
+                ]
+            },
+
+            {
+                "filters":[
+                    {
+                        "fieldSchema":"diagnose",
+                        "type":"SET",
+                        "acceptValue":["Disease-C"],
+                        "rejectValue":null
+                    }
+                ]
+            }
+        ],
+        "timeWindow":{
+            "length":7,
+            "unit":"DAY"
+        }
+    },
+
+    "cohortSelection":{
+        "fieldSchema":"birthyear",
+        "type":"Range",
+        "acceptValue":[],
+        "rejectValue":[],
+        "interval":10,
+        "max":2000,
+        "min":1900
+    },
+
+    "ageSelection":{
+        "fieldSchema":"time",
+        "unit":"DAY",
+        "min":2,
+        "max":10
+    },
+
+    "valueSelection":{
+        "filters":[
+            {
+                "fieldSchema":"labtest",
+                "type":"SET",
+                "acceptValue":["Labtest-C"],
+                "rejectValue":null
+            }
+        ],
+        "func":"AVERAGE"
+    }
+}
