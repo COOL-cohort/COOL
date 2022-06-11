@@ -103,23 +103,22 @@ public class CohortUserSection implements CohortOperator {
     }
 
     @Override
-    public void process(ChunkRS chunk) {
+    public void process(ChunkRS dataChunk) {
         totalDataChunks++;
 
         // process filters
-        sigma.process(chunk);
+        sigma.process(dataChunk);
         if (sigma.isUserActiveChunk() == false) {
             totalSkippedDataChunks++;
             return;
         }
 
-        FieldRS userField = chunk.getField(tableSchema.getUserKeyField());
+        FieldRS userField = dataChunk.getField(tableSchema.getUserKeyField());
         
         // Skipping non RLE compressed blocks
-        int totalCorruptedUsers = 0;
 
         if (!(userField.getValueVector() instanceof RLEInputVector)) {
-            totalCorruptedUsers++;
+            LOG.info("The user record corrupted: " + totalDataChunks);
             return;
         }
 
@@ -134,7 +133,7 @@ public class CohortUserSection implements CohortOperator {
 
 			userInput.nextBlock(userBlock); // Next user RLE block
 
-			// Find a new user
+			// Find a new user, user's id is stored continuously, each block store one user.
 			totalUsers++;
 			int beg = userBlock.off;
 			int end = userBlock.off + userBlock.len;
@@ -157,9 +156,6 @@ public class CohortUserSection implements CohortOperator {
 			int uid = userKey.get(userBlock.value);
             cubletResults.add(uid);
 		}
-
-		if (totalCorruptedUsers > 0)
-			LOG.info("Total corrupted users: " + totalCorruptedUsers + " " + totalDataChunks);
 	}
 
 }

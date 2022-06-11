@@ -101,6 +101,11 @@ public class ChunkRS implements Input {
     }
   }
 
+  /**
+   * Get the filed information according to index
+   * @param i index of filed
+   * @return
+   */
   public FieldRS getField(int i) {
     return this.fields[i];
   }
