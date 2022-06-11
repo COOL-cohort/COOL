@@ -23,7 +23,6 @@ import com.nus.cool.core.cohort.filter.AgeFieldFilter;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.cohort.filter.FieldFilterFactory;
 import com.nus.cool.core.cohort.filter.SetFieldFilter;
-import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
@@ -72,7 +71,7 @@ public class ExtendedCohortSelection implements Operator {
 
 	private FieldFilter ageFilter;
 
-	private ExtendedCohortQuery q;
+	private ExtendedCohortQuery query;
 
 	private final ArrayList<LinkedList<Integer>> eventOffset = new ArrayList<>();
 
@@ -83,7 +82,7 @@ public class ExtendedCohortSelection implements Operator {
 
 	public void init(TableSchema tableSchema, ExtendedCohortQuery q) {
 		this.tableSchema = checkNotNull(tableSchema);
-		this.q = checkNotNull(q);   
+		this.query = checkNotNull(q);
 
 		// process birth selector
 		BirthSequence seq = q.getBirthSequence();
@@ -369,7 +368,7 @@ public class ExtendedCohortSelection implements Operator {
 		int firstDay = timeVector.get(start);
 		int birthDay = firstDay;
 
-		BirthSequence seq = q.getBirthSequence();
+		BirthSequence seq = query.getBirthSequence();
 		List<Integer> sortedEvents = seq.getSortedBirthEvents();
 		LinkedList<Integer> occurrences;
 
@@ -523,7 +522,7 @@ public class ExtendedCohortSelection implements Operator {
 		cohort.clearDimension();
 		if (boff >= 0) {
 			// find the respective cohort for this user
-			List<BirthSequence.BirthEvent> events = q.getBirthSequence().getBirthEvents();
+			List<BirthSequence.BirthEvent> events = query.getBirthSequence().getBirthEvents();
 			for (int idx = 0; idx < events.size(); ++idx) {
 				BirthSequence.BirthEvent be = events.get(idx);
 				for (BirthSequence.CohortField cf : be.getCohortFields()) {
@@ -533,7 +532,7 @@ public class ExtendedCohortSelection implements Operator {
 					// However, this code block seems not to be triggered during the test.
 					if (fieldID == tableSchema.getActionTimeField()) {
 						cohort.addDimension(TimeUtils.getDateofNextTimeUnitN(cohort.getBirthDate(),
-								q.getAgeField().getUnit(), 0));
+								query.getAgeField().getUnit(), 0));
 						continue;
 					}
 
@@ -618,7 +617,7 @@ public class ExtendedCohortSelection implements Operator {
 		// age by dimension
 		// each qualified activity will make the positions of all neighbouring 
 		// activities with the same dimension value set
-		int fieldID = tableSchema.getFieldID(q.getAgeField().getField());
+		int fieldID = tableSchema.getFieldID(query.getAgeField().getField());
 		if (fieldID != tableSchema.getActionField() &&
 				fieldID != tableSchema.getActionTimeField()) {   
 			InputVector inputVector = this.chunk.getField(fieldID).getValueVector();
@@ -657,7 +656,7 @@ public class ExtendedCohortSelection implements Operator {
 		checkArgument(ageOff < ageEnd);
 		// enable the dimension-based ageby operator to be processed in the same way
 		// as event-based ageby operator
-		int fieldID = tableSchema.getFieldID(q.getAgeField().getField());
+		int fieldID = tableSchema.getFieldID(query.getAgeField().getField());
 		if (fieldID != tableSchema.getActionField() &&
 				fieldID != tableSchema.getActionTimeField()) {        	
 			bs.and(ageDelimiters);
