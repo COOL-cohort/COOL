@@ -220,6 +220,7 @@ public class ExtendedCohortSelection implements Operator {
 				if (minTriggerTime[i] > 0)
 					bUserActiveChunk &= entry.getValue().accept(field);
 				else
+					// todo: why do we need to run accept if this filed is not considered
 					entry.getValue().accept(field);
 			}
 		}
@@ -342,7 +343,6 @@ public class ExtendedCohortSelection implements Operator {
 	/**
 	 * @brief evaluate the birth filters against tuples within the given offset
 	 *        range
-	 *
 	 * @param eventId
 	 *            the id of birth event
 	 * @param fromOffset
@@ -360,7 +360,12 @@ public class ExtendedCohortSelection implements Operator {
 		}
 	}
 
-	
+	/**
+	 *
+	 * @param start start offset
+	 * @param end end offset
+	 * @return
+	 */
 	private int getUserBirthTime(int start, int end) {
 
 		int offset = start;

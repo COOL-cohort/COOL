@@ -29,7 +29,15 @@ public interface Operator extends Cloneable {
 
   void init(TableSchema schema, CohortQuery query);
 
+  /**
+   * Process MetaChunk, update isUserActiveCublet
+   * @param metaChunk
+   */
   void process(MetaChunkRS metaChunk);
 
-  void process(ChunkRS chunk);
+  /**
+   * Process MetaChunk if metaChunk return isUserActiveCublet = true
+   * @param dataChunk
+   */
+  void process(ChunkRS dataChunk);
 }
