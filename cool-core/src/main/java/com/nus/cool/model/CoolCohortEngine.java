@@ -65,15 +65,15 @@ public class CoolCohortEngine {
 
     /**
      * Cohort Users
-     * @param cube cube
-     * @param users users
-     * @param query query
-     * @return result
+     * @param cube in-memory cube,
+     * @param users users, null for default
+     * @param query query query instance, parsed from JSON
+     * @return result selected users
      * @throws IOException
      */
     public List<Integer> selectCohortUsers(CubeRS cube,
-                                                  InputVector users,
-                                                  ExtendedCohortQuery query) throws IOException {
+                                          InputVector users,
+                                          ExtendedCohortQuery query) throws IOException {
         if (cube == null)
             throw new IOException("data source is null");
 

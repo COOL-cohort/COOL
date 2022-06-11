@@ -60,7 +60,7 @@ public class IcebergQueryTest {
     @DataProvider(name = "IcebergQueryTestDP")
     public Object[][] dpArgs() {
         return new Object[][] {
-                {"../olap-tpch/query.json"}
+                {"../datesets/olap-tpch/query.json"}
         };
     }
 }
