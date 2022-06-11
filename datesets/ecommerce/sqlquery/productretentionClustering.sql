@@ -16,7 +16,7 @@ with transaction_log as (select productid,
 				when time_diff is null then 'New'
 			end as product_type			
 		from time_diff)
-select
+selectq
 	trunc_month,	
 	product_type,	
 	count(productid) as count_products

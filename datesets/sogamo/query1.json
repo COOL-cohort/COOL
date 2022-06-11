@@ -1,6 +1,8 @@
 {
-  "stages": [{
-      "birthEvents":[{
+  "stages": [
+    {
+      "birthEvents":[
+        {
           "eventSelection":[
             {
               "cubeField":"event",
@@ -20,7 +22,8 @@
           "timeWindow":null
         }
       ]
-    }, {
+    },
+    {
       "birthEvents":[
         {
           "eventSelection":[
@@ -42,7 +45,8 @@
           "timeWindow":null
         }
       ]
-    }, {
+    },
+    {
       "birthEvents":[
         {
           "eventSelection":[
@@ -76,7 +80,8 @@
           "timeWindow":null
         }
       ]
-    }, {
+    },
+    {
       "birthEvents":[
         {
           "eventSelection":[

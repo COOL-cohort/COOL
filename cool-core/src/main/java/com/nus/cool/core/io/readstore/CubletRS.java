@@ -36,7 +36,7 @@ import lombok.Setter;
  * <p>
  * cublet layout
  * ---------------------------------------------------------------------------
- * | meta chunk | data chunk 1 | ... | data chunk n | header | header offset |
+ * |data chunk 1 | ... | data chunk n |  meta chunk ｜ header | header offset |
  * ---------------------------------------------------------------------------
  * <p>
  * header layout
