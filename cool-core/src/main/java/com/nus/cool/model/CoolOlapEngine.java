@@ -52,6 +52,7 @@ public class CoolOlapEngine {
         selection.init(tableSchema, query);
         end = System.currentTimeMillis();
         //System.out.println("selection init elapsed: " + (end - beg));
+        // for each cubelet,
         for (CubletRS cubletRS : cublets) {
             MetaChunkRS metaChunk = cubletRS.getMetaChunk();
             beg = System.currentTimeMillis();

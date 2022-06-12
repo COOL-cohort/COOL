@@ -69,21 +69,30 @@ public class IcebergAggregation {
         }
     }
 
+    /**
+     * Group by one column
+     * @param field: grouped filed read form one dataChunk
+     * @param bs bitSet
+     * @param metaField grouped filed read form one metaChunk
+     * @param type group by type
+     */
     private void group(FieldRS field, BitSet bs, MetaFieldRS metaField, GroupType type) {
         long beg = System.currentTimeMillis();
         Map<String, BitSet> group = new HashMap<>();
-
+        // localID:
         Map<Integer, BitSet> id2Bs = new HashedMap();
-        InputVector value = field.getValueVector();
-        int count = 0;
-        for (int i = 0; i < value.size(); i++) {
+
+        InputVector values = field.getValueVector();
+//        int count = 0;
+
+        for (int i = 0; i < values.size(); i++) {
             int nextPos = bs.nextSetBit(i);
-            count += 1;
+//            count += 1;
             if (nextPos < 0) {
                 break;
             }
-            value.skipTo(nextPos);
-            int id = value.next();
+            values.skipTo(nextPos);
+            int id = values.next();
             if (id2Bs.get(id) == null) {
                 BitSet groupBs = new BitSet(bs.size());
                 groupBs.set(nextPos);
@@ -94,6 +103,7 @@ public class IcebergAggregation {
             }
             i = nextPos;
         }
+
         for (Map.Entry<Integer, BitSet> entry : id2Bs.entrySet()) {
             group.put(getString(field, metaField, entry.getKey(), type), entry.getValue());
         }
