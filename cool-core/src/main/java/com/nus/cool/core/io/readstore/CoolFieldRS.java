@@ -58,7 +58,7 @@ public class CoolFieldRS implements FieldRS {
   private int maxKey;
 
   /**
-   * key vector for hash field
+   * key vector for hash field, store globalIDs
    */
   private InputVector keyVec = null;
 
