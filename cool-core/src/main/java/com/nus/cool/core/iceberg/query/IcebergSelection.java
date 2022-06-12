@@ -92,6 +92,7 @@ public class IcebergSelection {
                 calendar.setTime(d1);
                 List<String> points = new ArrayList<>();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                // add all data before end of range
                 while (calendar.getTime().before(d2)) {
                     points.add(sdf.format(calendar.getTime()));
                     calendar.add(Calendar.MONTH, 1);
