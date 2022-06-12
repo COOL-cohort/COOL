@@ -1,3 +1,5 @@
+
+
 -- 2. New vs Existing Product retention clustering
 
 with transaction_log as (select productid,
