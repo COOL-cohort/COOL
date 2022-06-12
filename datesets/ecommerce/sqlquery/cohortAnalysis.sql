@@ -1,3 +1,6 @@
+
+
+
 -- 3. Cohort Analysis
 
 with min_date as (select productid, min(reporteddate) as min_reporteddate
