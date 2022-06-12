@@ -1,0 +1,9 @@
+{
+  "dataSource": "ecommerceduptime",
+  "groupFields":["Str_Reported_Date"],
+  "aggregations":[
+    {"fieldName":"Product_ID","operators":["DISTINCTCOUNT"]}
+  ],
+  "timeRange":"2021-01-01|2021-12-01",
+  "granularity":"NULL"
+}
