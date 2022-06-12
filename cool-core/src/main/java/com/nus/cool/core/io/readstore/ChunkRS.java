@@ -72,6 +72,7 @@ public class ChunkRS implements Input {
   }
 
   @Override
+  // read the dataChunk
   public void readFrom(ByteBuffer buffer) {
     // Get chunkType
     ChunkType chunkType = ChunkType.fromInteger(buffer.get());

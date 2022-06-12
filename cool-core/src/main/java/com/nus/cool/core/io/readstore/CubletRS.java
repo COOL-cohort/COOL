@@ -85,11 +85,14 @@ public class CubletRS implements Input {
     int end = buffer.limit();
     this.limit = end;
     int headOffset;
-    buffer.position(end - Ints.BYTES);
+    buffer.position(end - Ints.BYTES); //  one byte to store header offset
     int tag = buffer.getInt();
+    // if offset is got from last one byte
     if (tag != 0) {
       headOffset = tag;
-    } else {
+    }
+    // if offset is not got from last one byte, read two bytes
+    else {
       buffer.position(end - Ints.BYTES - Ints.BYTES);
       int size = buffer.getInt();
       buffer.position(end - Ints.BYTES - Ints.BYTES - Ints.BYTES);
@@ -110,13 +113,14 @@ public class CubletRS implements Input {
           chunkOffsets[i] = buffer.getInt();
       }
 
-    // place the metachunk at the end
+    // read the metaChunk, which is the last one in #chunks
     this.metaChunk = new MetaChunkRS(this.schema);
     buffer.position(chunkOffsets[chunks-1]);
     int chunkHeadOffset = buffer.getInt();
     buffer.position(chunkHeadOffset);
     this.metaChunk.readFrom(buffer);
 
+    // read the dataChunk
     for (int i = 0; i < chunks-1; i++) {
       ChunkRS chunk = new ChunkRS(this.schema);
       buffer.position(chunkOffsets[i]);
@@ -125,5 +129,6 @@ public class CubletRS implements Input {
       chunk.readFrom(buffer);
       this.dataChunks.add(chunk);
     }
+
   }
 }

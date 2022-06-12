@@ -56,9 +56,9 @@ public class IcebergSelection {
 
     private String timeRange;
 
-    private int max;
+    private int maxQueryTime;
 
-    private int min;
+    private int minQueryTime;
 
     private List<String> timeRanges;
 
@@ -74,8 +74,8 @@ public class IcebergSelection {
         DayIntConverter converter = new DayIntConverter();
         switch(granularity) {
             case DAY:
-                for (int i = 0; i < this.max - this.min; i++) {
-                    int time = this.min + i;
+                for (int i = 0; i < this.maxQueryTime - this.minQueryTime; i++) {
+                    int time = this.minQueryTime + i;
                     this.maxs.add(time);
                     this.mins.add(time);
                     this.timeRanges.add(converter.getString(time));
@@ -102,8 +102,8 @@ public class IcebergSelection {
                     this.mins.add(converter.toInt(points.get(i)));
                     this.maxs.add(converter.toInt(points.get(i + 1)) - 1);
                 }
-                this.mins.set(0, this.min);
-                this.maxs.set(this.maxs.size() - 1, this.max);
+                this.mins.set(0, this.minQueryTime);
+                this.maxs.set(this.maxs.size() - 1, this.maxQueryTime);
 
                 break;
             }
@@ -130,8 +130,8 @@ public class IcebergSelection {
                 break;
             }
             case NULL:
-                this.maxs.add(this.max);
-                this.mins.add(this.min);
+                this.maxs.add(this.maxQueryTime);
+                this.mins.add(this.minQueryTime);
                 this.timeRanges.add(this.timeRange);
                 break;
             default:
@@ -249,7 +249,7 @@ public class IcebergSelection {
 
     private boolean accept(int min, int max) {
         if (this.timeRange == null) return true;
-        return (min <= this.max) && (max >= this.min);
+        return (min <= this.maxQueryTime) && (max >= this.minQueryTime);
     }
 
     public void init(TableSchema tableSchema, IcebergQuery query) throws ParseException{
@@ -264,8 +264,8 @@ public class IcebergSelection {
             this.granularity = query.getGranularity();
             String[] timePoints = this.timeRange.split("\\|");
             DayIntConverter converter = new DayIntConverter();
-            this.min = converter.toInt(timePoints[0]);
-            this.max = converter.toInt(timePoints[1]);
+            this.minQueryTime = converter.toInt(timePoints[0]);
+            this.maxQueryTime = converter.toInt(timePoints[1]);
             splitTimeRange();
         }
     }
@@ -284,28 +284,46 @@ public class IcebergSelection {
         this.bActivateCublet = isAccepted  && isProcess;
     }
 
-    // process dataChunk
+    /**
+     * process dataChunk filter with time range
+     * @param chunk: dataChunk
+     * @return map of < time_range : bitMap >,
+     *  where each element in biteMap is one record,
+     *              true = the record meet the requirement,
+     *              false = the record don't meet the requirement.
+     */
     public Map<String, BitSet> process(ChunkRS chunk) {
         FieldRS timeField = chunk.getField(this.tableSchema.getActionTimeField());
+        // get the min max time of this dataChunk
         int minKey = timeField.minKey();
         int maxKey = timeField.maxKey();
         if (!(accept(minKey, maxKey) && process(this.filter, chunk))) {
             return null;
         }
+
         Map<String, BitSet> map = new HashMap<>();
+        // if the query don't provide timeRange, all record is true
         if (this.timeRange == null) {
             BitSet bv = new BitSet(chunk.records());
             bv.set(0, chunk.records());
             map.put("no time filter", bv);
-        } else {
+        }
+        // if the query don't provide the timeRange
+        else {
             long beg = System.currentTimeMillis();
+            // time min-max combination id
             int tag = 0;
+            // find min-max combination where min is under this range
             while (minKey > this.maxs.get(tag)) tag += 1;
+
+            // if all data in this dataChunk satisfied the current range at key=tage
             if (minKey >= this.mins.get(tag) & maxKey <= this.maxs.get(tag)) {
                 BitSet bv = new BitSet(chunk.records());
                 bv.set(0, bv.size());
                 map.put(this.timeRanges.get(tag), bv);
-            } else {
+            }
+            // traverse each record from beginning
+            else {
                 InputVector timeInput = timeField.getValueVector();
                 timeInput.skipTo(0);
                 BitSet[] bitSets = new BitSet[this.timeRanges.size()];
@@ -316,8 +334,8 @@ public class IcebergSelection {
                 int max = this.maxs.get(tag);
                 for (int i = 0; i < timeInput.size(); i++) {
                     int time = timeInput.next();
-                    if (time < this.min) continue;
-                    if (time > this.max) break;
+                    if (time < this.minQueryTime) continue; // this record is not in the range
+                    if (time > this.maxQueryTime) break; // the rest all greater than this.max. not in range, skip
                     if (time >= min && time <= max) {
                         bitSets[tag].set(i);
                     } else {
@@ -327,15 +345,18 @@ public class IcebergSelection {
                         bitSets[tag].set(i);
                     }
                 }
+
                 for (int i = 0; i < bitSets.length; i++) {
+                    // if the number of true in bitMap > 0
                     if (bitSets[i].cardinality() != 0) {
-                        map.put(this.timeRanges.get(i), bitSets[i]);
+                        map.put(this.timeRanges.get(i), bitSets[i]); //  record the corresponding records.
                     }
                 }
             }
             long end = System.currentTimeMillis();
             //System.out.println("process time filter elapsed: " + (end - beg));
         }
+
         for (Map.Entry<String, BitSet> entry : map.entrySet()) {
             BitSet bs = select(this.filter, chunk, entry.getValue());
             map.put(entry.getKey(), bs);
