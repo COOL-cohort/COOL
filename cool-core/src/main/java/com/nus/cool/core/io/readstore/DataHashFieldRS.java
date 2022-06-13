@@ -2,13 +2,10 @@ package com.nus.cool.core.io.readstore;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.BitSet;
 
 import com.google.common.base.Preconditions;
-import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
-import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.FieldType;
 
 public class DataHashFieldRS implements DataFieldRS{

@@ -22,7 +22,6 @@ import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.TableSchema;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import lombok.Getter;
 
