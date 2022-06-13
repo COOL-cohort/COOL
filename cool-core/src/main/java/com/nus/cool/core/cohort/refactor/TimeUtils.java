@@ -10,8 +10,15 @@ public class TimeUtils {
         
         WEEK("WEEK"),
         
-        MONTH("MONTH");
+        MONTH("MONTH"),
 
+        MINUTE("MINUTE"),
+
+        SECOND("SECOND"),
+
+        YEAR("YEAR");
+
+        
 
         private final String text;
         TimeUnit(final String text) {
@@ -22,12 +29,6 @@ public class TimeUtils {
         public String toString(){
             return text;
         }
-    }
-
-
-    public class TimeWindow {
-        int length;
-        TimeUnit unit;
     }
     
 }
