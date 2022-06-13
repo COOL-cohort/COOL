@@ -1,6 +1,6 @@
 {
-  "dataSource": "ecommerceduptime",
-  "groupFields":["Str_Reported_Date"],
+  "dataSource": "ecommerce1",
+  "groupFields":["Reported_Date"],
   "aggregations":[
     {"fieldName":"Product_ID","operators":["DISTINCTCOUNT"]}
   ],
