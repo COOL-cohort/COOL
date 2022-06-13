@@ -40,10 +40,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class IcebergSelection {
 
-    private static Log LOG = LogFactory.getLog(IcebergSelection.class);
-
-    private final FieldFilterFactory filterFactory = new FieldFilterFactory();
-
     private boolean bActivateCublet;
 
     private TableSchema tableSchema;
@@ -52,32 +48,36 @@ public class IcebergSelection {
 
     private IcebergQuery.granularityType granularity;
 
-    private MetaChunkRS metaChunk;
-
     private String timeRange;
 
+    // max and min query Time specified by user
     private int maxQueryTime;
-
     private int minQueryTime;
 
+    // time range split by system, used as key in map
     private List<String> timeRanges;
 
-    private List<Integer> maxs;
+    // store multiple time range, convert data into integer
+    private List<Integer> maxTimeRanges;
+    private List<Integer> minTimeRanges;
 
-    private List<Integer> mins;
-
+    /**
+     * Split time range according to user specified granularity
+     * @throws ParseException ParseException
+     */
     private void splitTimeRange() throws ParseException {
         // TODO: format time range
         this.timeRanges = new ArrayList<>();
-        this.maxs = new ArrayList<>();
-        this.mins = new ArrayList<>();
+        this.maxTimeRanges = new ArrayList<>();
+        this.minTimeRanges = new ArrayList<>();
         DayIntConverter converter = new DayIntConverter();
+
         switch(granularity) {
             case DAY:
                 for (int i = 0; i < this.maxQueryTime - this.minQueryTime; i++) {
                     int time = this.minQueryTime + i;
-                    this.maxs.add(time);
-                    this.mins.add(time);
+                    this.maxTimeRanges.add(time);
+                    this.minTimeRanges.add(time);
                     this.timeRanges.add(converter.getString(time));
                 }
                 break;
@@ -99,11 +99,11 @@ public class IcebergSelection {
                 }
                 for (int i = 0; i < points.size() - 1; i++) {
                     this.timeRanges.add(points.get(i) + "|" + points.get(i + 1));
-                    this.mins.add(converter.toInt(points.get(i)));
-                    this.maxs.add(converter.toInt(points.get(i + 1)) - 1);
+                    this.minTimeRanges.add(converter.toInt(points.get(i)));
+                    this.maxTimeRanges.add(converter.toInt(points.get(i + 1)) - 1);
                 }
-                this.mins.set(0, this.minQueryTime);
-                this.maxs.set(this.maxs.size() - 1, this.maxQueryTime);
+                this.minTimeRanges.set(0, this.minQueryTime);
+                this.maxTimeRanges.set(this.maxTimeRanges.size() - 1, this.maxQueryTime);
 
                 break;
             }
@@ -124,14 +124,14 @@ public class IcebergSelection {
                 }
                 for (int i = 0; i < points.size() - 1; i++) {
                     this.timeRanges.add(points.get(i) + "|" + points.get(i + 1));
-                    this.mins.add(converter.toInt(points.get(i)));
-                    this.maxs.add(converter.toInt(points.get(i + 1)));
+                    this.minTimeRanges.add(converter.toInt(points.get(i)));
+                    this.maxTimeRanges.add(converter.toInt(points.get(i + 1)));
                 }
                 break;
             }
             case NULL:
-                this.maxs.add(this.maxQueryTime);
-                this.mins.add(this.minQueryTime);
+                this.maxTimeRanges.add(this.maxQueryTime);
+                this.minTimeRanges.add(this.minQueryTime);
                 this.timeRanges.add(this.timeRange);
                 break;
             default:
@@ -152,16 +152,24 @@ public class IcebergSelection {
         }
     }
 
+    /**
+     * Init Filter from origin selection
+     * @param selection selection of query file.
+     * @return filter instance, parsed after checking selection type. (only supports and, or, filter)
+     */
     private SelectionFilter init(SelectionQuery selection) {
         if (selection == null) return null;
         SelectionFilter filter = new SelectionFilter();
         filter.setType(selection.getType());
+        // filter requires 'dimension', 'values'
         if (filter.getType().equals(SelectionQuery.SelectionType.filter)) {
             FieldFilter fieldFilter = FieldFilterFactory.create(
                     this.tableSchema.getFieldSchema(selection.getDimension()), null, selection.getValues());
             filter.setFilter(fieldFilter);
             filter.setDimension(selection.getDimension());
-        } else {
+        }
+        // and , or requires 'fields' .
+        else {
             for (SelectionQuery childSelection : selection.getFields()) {
                 SelectionFilter childFilter = init(childSelection);
                 filter.getFields().add(childFilter);
@@ -170,12 +178,20 @@ public class IcebergSelection {
         return filter;
     }
 
+    /**
+     * Check if current cublet requires seleciton,
+     * @param selectionFilter parsed from query.json
+     * @param metaChunk the checked metaChunk
+     * @return true: this cublet meet the requirements of seleciton, false: skip processing this.
+     */
     private boolean process(SelectionFilter selectionFilter, MetaChunkRS metaChunk) {
         if (selectionFilter == null) return true;
+        // if this is filter, then
         if (selectionFilter.getType().equals(SelectionQuery.SelectionType.filter)) {
             MetaFieldRS metaField = metaChunk.getMetaField(selectionFilter.getDimension());
             return selectionFilter.getFilter().accept(metaField);
         } else {
+            // recursively check if this cublet requires checking
             boolean flag = selectionFilter.getType().equals(SelectionQuery.SelectionType.and);
             for (SelectionFilter childFilter : selectionFilter.getFields()) {
                 if (selectionFilter.getType().equals(SelectionQuery.SelectionType.and)) {
@@ -254,11 +270,13 @@ public class IcebergSelection {
 
     public void init(TableSchema tableSchema, IcebergQuery query) throws ParseException{
         this.tableSchema = checkNotNull(tableSchema);
-        query = checkNotNull(query);
+        checkNotNull(query);
 
+        // parse selection from query.json
         SelectionQuery selection = query.getSelection();
         this.filter = init(selection);
 
+        // parse time range from query.json
         if (query.getTimeRange() != null) {
             this.timeRange = query.getTimeRange();
             this.granularity = query.getGranularity();
@@ -272,12 +290,11 @@ public class IcebergSelection {
 
     // process metaChunk
     public void process(MetaChunkRS metaChunk) {
-        this.metaChunk = metaChunk;
-        int actionField = this.tableSchema.getActionTimeField();
-        MetaFieldRS timeField = metaChunk.getMetaField(actionField, FieldType.ActionTime);
+        int actionFieldIndex = this.tableSchema.getActionTimeField();
+        MetaFieldRS timeField = metaChunk.getMetaField(actionFieldIndex, FieldType.ActionTime);
         // min and max must be in valid range
         boolean isAccepted = accept(timeField.getMinValue(), timeField.getMaxValue());
-        // must have and
+        // must have
         boolean isProcess = process(this.filter, metaChunk);
 
         // if both accepted, then it's activate
@@ -314,10 +331,10 @@ public class IcebergSelection {
             // time min-max combination id
             int tag = 0;
             // find min-max combination where min is under this range
-            while (minKey > this.maxs.get(tag)) tag += 1;
+            while (minKey > this.maxTimeRanges.get(tag)) tag += 1;
 
             // if all data in this dataChunk satisfied the current range at key=tage
-            if (minKey >= this.mins.get(tag) & maxKey <= this.maxs.get(tag)) {
+            if (minKey >= this.minTimeRanges.get(tag) & maxKey <= this.maxTimeRanges.get(tag)) {
                 BitSet bv = new BitSet(chunk.records());
                 bv.set(0, bv.size());
                 map.put(this.timeRanges.get(tag), bv);
@@ -330,8 +347,8 @@ public class IcebergSelection {
                 for (int i = 0; i < this.timeRanges.size(); i++) {
                     bitSets[i] = new BitSet(chunk.records());
                 }
-                int min = this.mins.get(tag);
-                int max = this.maxs.get(tag);
+                int min = this.minTimeRanges.get(tag);
+                int max = this.maxTimeRanges.get(tag);
                 for (int i = 0; i < timeInput.size(); i++) {
                     int time = timeInput.next();
                     if (time < this.minQueryTime) continue; // this record is not in the range
@@ -339,9 +356,9 @@ public class IcebergSelection {
                     if (time >= min && time <= max) {
                         bitSets[tag].set(i);
                     } else {
-                        while (!(time >= this.mins.get(tag) && (time <= this.maxs.get(tag)))) tag += 1;
-                        min = this.mins.get(tag);
-                        max = this.maxs.get(tag);
+                        while (!(time >= this.minTimeRanges.get(tag) && (time <= this.maxTimeRanges.get(tag)))) tag += 1;
+                        min = this.minTimeRanges.get(tag);
+                        max = this.maxTimeRanges.get(tag);
                         bitSets[tag].set(i);
                     }
                 }
