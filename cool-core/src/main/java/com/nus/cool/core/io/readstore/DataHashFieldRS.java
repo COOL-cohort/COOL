@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+import com.google.common.base.Preconditions;
 import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
@@ -15,10 +16,9 @@ public class DataHashFieldRS implements DataFieldRS{
 
     private FieldType fieldType;
 
-    private final Codec type = Codec.Set;
-
     private ArrayList<Integer> valueVector;
 
+    private boolean initialized = false;
     /**
    * BitSet array if this field has been pre-calculated
    */
@@ -30,16 +30,25 @@ public class DataHashFieldRS implements DataFieldRS{
 
     @Override
     public ArrayList<Integer> getValueVector() {
-        return null;
+        validateInitialization();
+        return this.valueVector;
     }
 
     @Override
     public boolean isSetField() {
+        validateInitialization();
         return true;
+    }
+    
+    @Override
+    public int getTupleNumber(){
+        validateInitialization();
+        return this.valueVector.size();
     }
 
     @Override
     public void readFromBuffer(ByteBuffer buf, FieldType ft) {
+        this.initialized = true;
         this.fieldType = ft;
         InputVector local2Global = InputVectorFactory.readFrom(buf);
         InputVector localInputvector = InputVectorFactory.readFrom(buf);
@@ -51,6 +60,9 @@ public class DataHashFieldRS implements DataFieldRS{
         }
     }
 
- 
+    
+    private void validateInitialization(){
+        Preconditions.checkState(this.initialized, "DataHashFieldRS is not initialized" );
+    }
     
 }
