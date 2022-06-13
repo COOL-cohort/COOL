@@ -27,8 +27,3 @@ fields:
 - preCal: false
   fieldType: UserKey
   name: Product_ID
-- preCal: false
-  fieldType: Segment
-  name: Str_Reported_Date
-
-
