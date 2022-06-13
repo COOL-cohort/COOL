@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+import com.google.common.base.Preconditions;
 import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
@@ -14,12 +15,11 @@ public class DataRangeFieldRS implements DataFieldRS {
 
     private FieldType fieldType;
     
-    private final Codec type = Codec.Range;
 
     private int minKey;
     private int maxKey;
 
-    private BitSet[] bitSets;
+    private boolean initialized = false;
     
     private ArrayList<Integer> valueVector;
 
@@ -31,24 +31,34 @@ public class DataRangeFieldRS implements DataFieldRS {
 
     @Override
     public ArrayList<Integer> getValueVector() {
+        validateInitialization();
         return this.valueVector;
     }
 
     public int minKey() {
+        validateInitialization();
         return this.minKey;
     }
 
     public int maxKey() {
+        validateInitialization();
         return this.maxKey;
     }
 
     @Override
+    public int getTupleNumber(){
+        validateInitialization();
+        return this.valueVector.size();
+    }
+    @Override
     public boolean isSetField() {
-        return type == Codec.Set;
+        validateInitialization();
+        return false;
     }
 
     @Override
     public void readFromBuffer(ByteBuffer buf, FieldType ft) {
+        this.initialized = true;
         this.fieldType = ft;
         this.minKey = buf.getInt();
         this.maxKey = buf.getInt();
@@ -60,6 +70,10 @@ public class DataRangeFieldRS implements DataFieldRS {
         while(list.hasNext()){
             this.valueVector.add(list.next());
         }
+    }
+
+    private void validateInitialization(){
+        Preconditions.checkState(this.initialized, "DataRangeFiledRS is not initialized");
     }
     
 }

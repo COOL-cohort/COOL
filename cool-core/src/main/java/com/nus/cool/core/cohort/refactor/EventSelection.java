@@ -2,9 +2,11 @@ package com.nus.cool.core.cohort.refactor;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Preconditions;
+import com.nus.cool.core.io.readstore.DataFieldRS;
 
 import lombok.Getter;
 
@@ -57,7 +59,4 @@ public class EventSelection {
         return true;
     }
 
-    public BitSet Accept(Object[][] ProjectCols) {
-        return null;
-    }
 }

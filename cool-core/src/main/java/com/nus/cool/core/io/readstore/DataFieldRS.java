@@ -1,8 +1,8 @@
 package com.nus.cool.core.io.readstore;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
-import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.FieldType;
 
@@ -12,6 +12,7 @@ public interface DataFieldRS {
     
     public ArrayList<Integer> getValueVector();
 
+    public int getTupleNumber();
     public boolean isSetField();
 
     public void readFromBuffer(ByteBuffer buf, FieldType ft);
