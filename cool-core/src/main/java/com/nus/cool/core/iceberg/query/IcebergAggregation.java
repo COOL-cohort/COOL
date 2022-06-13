@@ -59,7 +59,7 @@ public class IcebergAggregation {
         switch (type) {
             case STRING: {
                 InputVector key = field.getKeyVector();
-                return metaField.getString(key.get(value));
+                return metaField.getString(key.get(value)); // localID => globalId => the filed => string
             }
             case NUMERIC: {
                 return String.valueOf(value);
@@ -72,34 +72,34 @@ public class IcebergAggregation {
     /**
      * Group by one column
      * @param field: grouped filed read form one dataChunk
-     * @param bs bitSet
+     * @param bs bitSet, filtered by timeRange and previous
      * @param metaField grouped filed read form one metaChunk
      * @param type group by type
      */
     private void group(FieldRS field, BitSet bs, MetaFieldRS metaField, GroupType type) {
         long beg = System.currentTimeMillis();
         Map<String, BitSet> group = new HashMap<>();
-        // localID:
+        // localID: bitMap
         Map<Integer, BitSet> id2Bs = new HashedMap();
 
+        // get all local ids
         InputVector values = field.getValueVector();
-//        int count = 0;
 
         for (int i = 0; i < values.size(); i++) {
-            int nextPos = bs.nextSetBit(i);
-//            count += 1;
+            int nextPos = bs.nextSetBit(i); // get all position set to be true.
             if (nextPos < 0) {
                 break;
             }
             values.skipTo(nextPos);
-            int id = values.next();
+            int id = values.next(); // get local id
             if (id2Bs.get(id) == null) {
-                BitSet groupBs = new BitSet(bs.size());
+                BitSet groupBs = new BitSet(bs.size()); // number of records
                 groupBs.set(nextPos);
                 id2Bs.put(id, groupBs);
-            } else {
-                BitSet groupBs = id2Bs.get(id);
-                groupBs.set(nextPos);
+            }
+            // if another record matches the same globalID, set the record position (nextPos) to be true
+            else {
+                id2Bs.get(id).set(nextPos);
             }
             i = nextPos;
         }
@@ -148,6 +148,14 @@ public class IcebergAggregation {
         }
     }
 
+    /**
+     * Init aggregation instance
+     * @param bs bitMap, true means the record in time range
+     * @param groupbyFields filed ot be group by
+     * @param metaChunk current metaChunk
+     * @param dataChunk current metaChunk
+     * @param timeRange time Range
+     */
     public void init(BitSet bs, List<String> groupbyFields, MetaChunkRS metaChunk,
                      ChunkRS dataChunk, String timeRange) {
         this.timeRange = timeRange;
@@ -157,21 +165,22 @@ public class IcebergAggregation {
             this.group.put("all", bs);
             return;
         }
+        // group By multiple fields,
         for(String groupbyField : groupbyFields) {
             MetaFieldRS metaField = metaChunk.getMetaField(groupbyField);
-            FieldRS field = dataChunk.getField(groupbyField);
-            switch (field.getFieldType()) {
+            FieldRS dataField = dataChunk.getField(groupbyField);
+            switch (dataField.getFieldType()) {
                 case UserKey:
-                case ActionTime:
                 case Action:
                 case Segment:
-                    group(field, bs, metaField, GroupType.STRING);
+                    group(dataField, bs, metaField, GroupType.STRING);
                     break;
                 case Metric:
-                    group(field, bs, metaField, GroupType.NUMERIC);
+                case ActionTime:
+                    group(dataField, bs, metaField, GroupType.NUMERIC);
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unsupport field type: " + field.getFieldType());
+                    throw new UnsupportedOperationException("Unsupport field type: " + dataField.getFieldType());
             }
         }
         mergeGroups();

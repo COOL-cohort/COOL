@@ -101,9 +101,9 @@ public class MetaChunkRS implements Input {
 
   public synchronized MetaFieldRS getMetaField(int i, FieldType type) {
     // Return the meta field if it had been read before
-      if (this.fields.containsKey(i)) {
-          return this.fields.get(i);
-      }
+    if (this.fields.containsKey(i)) {
+        return this.fields.get(i);
+    }
     // Read the meta field from the buffer if it is called at the first time
     int fieldOffset = this.fieldOffsets[i];
     this.buffer.position(fieldOffset);

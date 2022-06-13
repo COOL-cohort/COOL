@@ -35,6 +35,7 @@ public class CoolOlapEngine {
 
     /**
      * execute iceberg query
+     * timeRange, selection => groupBY => aggregate on each group
      *
      * @param cube the cube that stores the data we need
      * @param query the cohort query needed to process
@@ -48,6 +49,7 @@ public class CoolOlapEngine {
         List<BaseResult> results = new ArrayList<>();
 
         beg = System.currentTimeMillis();
+        // get selection in query with fields etc
         IcebergSelection selection = new IcebergSelection();
         selection.init(tableSchema, query);
         end = System.currentTimeMillis();
@@ -59,20 +61,24 @@ public class CoolOlapEngine {
             selection.process(metaChunk);
             end = System.currentTimeMillis();
             //System.out.println("selection process meta chunk elapsed: " + (end - beg));
+            // if this metaChunk need to be checked, read all data-chunks
             if (selection.isbActivateCublet()) {
                 List<ChunkRS> datachunks = cubletRS.getDataChunks();
                 for (ChunkRS dataChunk : datachunks) {
                     beg = System.currentTimeMillis();
+                    // 1. find all records in dataChunk meet the timeRange and selection requirements.
                     Map<String, BitSet> map = selection.process(dataChunk);
                     end = System.currentTimeMillis();
                     //System.out.println("selection process data chunk elapsed: " + (end - beg));
                     if (map == null) {
                         continue;
                     }
+                    // 2. for each time range, run aggregation
                     for (Map.Entry<String, BitSet> entry : map.entrySet()) {
                         String timeRange = entry.getKey();
                         BitSet bs = entry.getValue();
                         beg = System.currentTimeMillis();
+                        // 2. run groupBy
                         IcebergAggregation icebergAggregation = new IcebergAggregation();
                         icebergAggregation.init(bs, query.getGroupFields(), metaChunk, dataChunk, timeRange);
                         end = System.currentTimeMillis();
@@ -87,6 +93,7 @@ public class CoolOlapEngine {
                     }
                 }
             }
+
         }
         results = BaseResult.merge(results);
         return results;
