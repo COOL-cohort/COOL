@@ -3,8 +3,7 @@ package com.nus.cool.core.cohort.refactor;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nus.cool.core.io.readstore.ChunkRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.CubletRS;
 
 public class BirthSelection {
 
@@ -21,11 +20,7 @@ public class BirthSelection {
         }
     }
     
-    public void process(ChunkRS chunk) {
-        
-    }
-
-    public void process(MetaChunkRS metachunk){
+    public void process(CubletRS cubelet) {
 
     }
 
