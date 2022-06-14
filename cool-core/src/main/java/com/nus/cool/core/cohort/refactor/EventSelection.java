@@ -22,6 +22,8 @@ public class EventSelection {
     @Getter
     private ArrayList<String> schemaList;
 
+    @Getter
+    private int frequency;
     /**
      * Create Filter from FilterLayout
      */
@@ -30,7 +32,6 @@ public class EventSelection {
             filterList.add(layout.generateFilter());
             schemaList.add(layout.getFieldSchema());
         }
-
         // Can free FilterLayout and GC will reclaim
         // This memory won't be used in future
         filters = null;
@@ -41,18 +42,18 @@ public class EventSelection {
      * @param ProjectTuple, row of one Tuple
      * @return whether this item can be chosen as a birthEvents
      */
-    public boolean Accept(Object[] ProjectTuple) {
-        Preconditions.checkArgument(ProjectTuple.length == schemaList.size(),
-                "Input ProjectedCol's size is equal to schemaList size");
-        for (int i = 0; i < ProjectTuple.length; i++) {
+    public boolean Accept(ProjectedTuple projectTuple) {
+        for (int i = 0; i < filterList.size(); i++) {
+            String schema = schemaList.get(i);
             if (filterList.get(i).getType() == FilterType.Set) {
-                if (!filterList.get(i).accept((String) ProjectTuple[i]))
+                if (!filterList.get(i).accept((String) projectTuple.getValueBySchema(schema)))
                     return false;
             } else {
-                if (!filterList.get(i).accept((Integer) ProjectTuple[i]))
+                if (!filterList.get(i).accept((Integer) projectTuple.getValueBySchema(schema)))
                     return false;
             }
         }
+
         return true;
     }
 
