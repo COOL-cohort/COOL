@@ -2,7 +2,6 @@ package com.nus.cool.core.cohort.refactor;
 
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Preconditions;
 
 import lombok.Getter;
 
