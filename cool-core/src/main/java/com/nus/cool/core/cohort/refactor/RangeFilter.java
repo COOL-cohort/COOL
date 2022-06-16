@@ -11,21 +11,20 @@ import lombok.Getter;
 public class RangeFilter implements Filter {
 
     // Some static defined parameter
-    private static final FilterType type = FilterType.Range; 
+    private static final FilterType type = FilterType.Range;
     private static final String MinLimit = "min";
     private static final String MaxLimit = "max";
     private static final String splitChar = "-";
 
-    // accepted range 
+    // accepted range
     private ArrayList<Scope> acceptRangeList = new ArrayList<>();
-    
+
     @Getter
     private String fieldSchema;
-    
 
-    public RangeFilter(String fieldSchema,String[] acceptValues){
+    public RangeFilter(String fieldSchema, String[] acceptValues) {
         this.fieldSchema = fieldSchema;
-        for(int i = 0; i < acceptValues.length; i++){
+        for (int i = 0; i < acceptValues.length; i++) {
             acceptRangeList.add(parse(acceptValues[i]));
         }
     }
@@ -37,8 +36,8 @@ public class RangeFilter implements Filter {
 
     @Override
     public Boolean accept(Integer value) throws RuntimeException {
-        for(Scope u : acceptRangeList) {
-            if(u.IsInScope(value)){
+        for (Scope u : acceptRangeList) {
+            if (u.IsInScope(value)) {
                 return true;
             }
         }
@@ -53,14 +52,14 @@ public class RangeFilter implements Filter {
     @Override
     public BitSet accept(List<Integer> values) throws RuntimeException {
         BitSet res = new BitSet(values.size());
-        for (int i = 0 ; i < values.size(); i++){
-            if (accept(values.get(i))){
+        for (int i = 0; i < values.size(); i++) {
+            if (accept(values.get(i))) {
                 res.set(i);
             }
         }
         return res;
     }
-    
+
     @Override
     public FilterType getType() {
         return type;
@@ -69,14 +68,15 @@ public class RangeFilter implements Filter {
     /**
      * Parse string to RangeUnit
      * Exmaple [145 - 199] = RangeUnit{left:145 , right:199}
+     * 
      * @param str
      * @return RangeUnit
      */
-    private Scope parse(String str){
-        String[] part = str.split(splitChar);     
-        Preconditions.checkArgument(part.length == 2, 
-            "Split RangeUnit failed");   
-        Integer l = null,r = null;
+    private Scope parse(String str) {
+        String[] part = str.split(splitChar);
+        Preconditions.checkArgument(part.length == 2,
+                "Split RangeUnit failed");
+        Integer l = null, r = null;
         if (part[0] != MinLimit) {
             l = Integer.parseInt(part[0]);
         }
@@ -86,5 +86,4 @@ public class RangeFilter implements Filter {
         return new Scope(l, r);
     }
 
-    
 }
