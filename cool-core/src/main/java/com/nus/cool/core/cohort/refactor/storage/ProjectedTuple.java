@@ -34,7 +34,7 @@ public class ProjectedTuple {
     public void loadTuple(Object[] tuple){
         this.tuple = tuple;
     }
-
+    
     /**
      * 
      * @return the layout of this ProjectedTuple
