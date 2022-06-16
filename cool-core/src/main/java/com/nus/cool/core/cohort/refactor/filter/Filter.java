@@ -40,6 +40,9 @@ public interface Filter {
      */
     public FilterType getType();
 
+
+    public String getFilterSchema();
+
 }
 
 
