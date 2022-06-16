@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.filter;
 
 import java.util.BitSet;
 import java.util.List;
