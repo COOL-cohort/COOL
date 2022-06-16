@@ -14,5 +14,15 @@ public class Scope {
 
     public Boolean IsInScope(Integer i){
         return i <= this.right && i >= this.left;
+    }  
+
+
+    @Override
+    public String toString(){
+        String l,r;
+        l = this.left == Integer.MIN_VALUE? "MIN": this.left.toString();
+        r = this.right == Integer.MAX_VALUE? "MAX":this.right.toString();
+        return l + "-" + r; 
     }
+
 }
