@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 import com.google.common.base.Preconditions;
-import com.nus.cool.core.cohort.refactor.Scope;
+import com.nus.cool.core.cohort.refactor.storage.Scope;
 
 import lombok.Getter;
 
@@ -15,20 +15,38 @@ public class RangeFilter implements Filter {
     private static final FilterType type = FilterType.Range;
     private static final String MinLimit = "min";
     private static final String MaxLimit = "max";
+    @Getter
     private static final String splitChar = "-";
 
     // accepted range
-    private ArrayList<Scope> acceptRangeList = new ArrayList<>();
+    protected ArrayList<Scope> acceptRangeList = new ArrayList<>();
 
     @Getter
     private String fieldSchema;
 
-    public RangeFilter(String fieldSchema, String[] acceptValues) {
+    protected RangeFilter(String fieldSchema, String[] acceptValues) {
         this.fieldSchema = fieldSchema;
         for (int i = 0; i < acceptValues.length; i++) {
             acceptRangeList.add(parse(acceptValues[i]));
         }
     }
+
+    /**
+     * Need add Scope in the next steps
+     * @param fieldSchema
+     */
+    protected RangeFilter(String fieldSchema){
+        this.fieldSchema = fieldSchema;
+    }
+
+    /**
+     * Add new scope conditions
+     * @param u
+     */
+    protected void addScope(Scope u){
+        this.acceptRangeList.add(u);
+    }
+
 
     @Override
     public Boolean accept(String value) throws RuntimeException {
