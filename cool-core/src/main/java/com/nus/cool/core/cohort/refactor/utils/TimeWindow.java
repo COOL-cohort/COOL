@@ -1,7 +1,7 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.utils;
 
 import com.google.common.base.Preconditions;
-import com.nus.cool.core.cohort.refactor.TimeUtils.TimeUnit;
+import com.nus.cool.core.cohort.refactor.utils.TimeUtils.TimeUnit;
 
 import lombok.Getter;
 

@@ -1,9 +1,11 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.birthSelect;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
+import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 public class BirthSelection {
 

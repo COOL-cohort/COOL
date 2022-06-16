@@ -1,9 +1,11 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.birthSelect;
 
 import java.util.Calendar;
 import java.util.LinkedList;
 
 import com.google.common.base.Preconditions;
+import com.nus.cool.core.cohort.refactor.utils.DateUtils;
+import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 import javafx.util.Pair;
 import lombok.Getter;

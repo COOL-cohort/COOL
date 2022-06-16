@@ -1,9 +1,6 @@
 package com.nus.cool.core.cohort.refactor.filter;
 
 import com.google.common.base.Preconditions;
-import com.nus.cool.core.cohort.refactor.filter.RangeFilter;
-import com.nus.cool.core.cohort.refactor.filter.FilterType;
-
 import lombok.Getter;
 
 /** Read from json file into FilterLayout 
