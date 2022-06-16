@@ -1,17 +1,28 @@
-package com.nus.cool.core.cohort.refactor.cohortSelection;
-
-import java.util.ArrayList;
-import com.nus.cool.core.cohort.refactor.FilterType;
+package com.nus.cool.core.cohort.refactor.cohortSelect;
+import com.nus.cool.core.cohort.refactor.filter.FilterType;
 
 public class CohortSelectionLayout {
-    
+
     private String fieldSchema;
 
     private FilterType type;
 
-    private int max,min,interval;
+    private Integer max, min, interval;
 
-    private ArrayList<String> acceptValue, rejectValue;
+    private String[] acceptValue, rejectValue;
 
-    // public 
+    public CohortSelector generateCohortSelector() {
+        switch (type) {
+            case Set:
+                // TODO(lingze): add some pre argument validation
+                return new CohortSetSelector(fieldSchema, acceptValue, rejectValue);
+            case Range:
+                // TODO(lingze): add some pre argument validation
+                return CohortRangeSelector.generateCohortRangeSelector(fieldSchema, max, min, interval);
+            default:
+                throw new IllegalArgumentException(
+                        String.format("No filter of this type named %s", type.toString()));
+
+        }
+    }
 }
