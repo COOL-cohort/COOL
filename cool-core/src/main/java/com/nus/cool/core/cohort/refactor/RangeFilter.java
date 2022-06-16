@@ -17,7 +17,7 @@ public class RangeFilter implements Filter {
     private static final String splitChar = "-";
 
     // accepted range 
-    private ArrayList<RangeUnit> acceptRangeList = new ArrayList<>();
+    private ArrayList<Scope> acceptRangeList = new ArrayList<>();
     
     @Getter
     private String fieldSchema;
@@ -37,7 +37,7 @@ public class RangeFilter implements Filter {
 
     @Override
     public Boolean accept(Integer value) throws RuntimeException {
-        for(RangeUnit u : acceptRangeList) {
+        for(Scope u : acceptRangeList) {
             if(u.IsInScope(value)){
                 return true;
             }
@@ -72,7 +72,7 @@ public class RangeFilter implements Filter {
      * @param str
      * @return RangeUnit
      */
-    private RangeUnit parse(String str){
+    private Scope parse(String str){
         String[] part = str.split(splitChar);     
         Preconditions.checkArgument(part.length == 2, 
             "Split RangeUnit failed");   
@@ -83,38 +83,8 @@ public class RangeFilter implements Filter {
         if (part[1] != MaxLimit) {
             r = Integer.parseInt(part[1]);
         }
-        return new RangeUnit(l, r);
+        return new Scope(l, r);
     }
 
-
-
-    /**
-     *  Sub class to represent a scope
-     */
-    public class RangeUnit {
-        private Integer left, right;
-
-        public RangeUnit(Integer l, Integer r){
-            Preconditions.checkArgument( !(l==null && r==null),
-                "Left and right boudary can not be null in the same time");
-            if(l!= null&&r!= null){
-                Preconditions.checkArgument(r>=l, 
-                    "Right Value should larger or equal to left Value");
-            } 
-            left = l;
-            right = r;    
-        }
-
-        public Boolean IsInScope(Integer i){
-            // left and right can not be null in the same time
-            if (left == null) {
-                return i <= right;
-            } else  if (right == null) {
-                return i >= left;
-            } else {
-                return left >= i && i <= right;
-            }
-        }
-    }
     
 }
