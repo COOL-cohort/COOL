@@ -21,7 +21,6 @@ public class RangeFilter implements Filter {
     // accepted range
     protected ArrayList<Scope> acceptRangeList = new ArrayList<>();
 
-    @Getter
     private String fieldSchema;
 
     protected RangeFilter(String fieldSchema, String[] acceptValues) {
@@ -103,6 +102,11 @@ public class RangeFilter implements Filter {
             r = Integer.parseInt(part[1]);
         }
         return new Scope(l, r);
+    }
+
+    @Override
+    public String getFilterSchema() {
+        return this.fieldSchema;
     }
 
 }

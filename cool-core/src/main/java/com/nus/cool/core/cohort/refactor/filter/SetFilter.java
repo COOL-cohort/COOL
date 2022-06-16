@@ -19,7 +19,6 @@ public class SetFilter implements Filter {
 
     private HashSet<String> rejectSet;
 
-    @Getter
     private String fieldSchema;
 
 
@@ -83,6 +82,11 @@ public class SetFilter implements Filter {
 
     private boolean IsAccept(String value){
         return this.acceptSet != null && this.acceptSet.contains(value);
+    }
+
+    @Override
+    public String getFilterSchema() {
+        return this.fieldSchema;
     }
 
  
