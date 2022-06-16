@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.filter;
 
 public enum FilterType {
     Range("Range"), Set("Set");

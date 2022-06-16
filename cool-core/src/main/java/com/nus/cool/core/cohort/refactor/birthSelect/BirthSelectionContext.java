@@ -1,9 +1,10 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.birthSelect;
 
 import java.util.Calendar;
 import java.util.HashMap;
 
 import com.google.common.base.Preconditions;
+import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 /**
  * for every user, we maintain a queue to record timewindow chosen event

@@ -1,8 +1,11 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.ageSelect;
 
 import java.util.Calendar;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nus.cool.core.cohort.refactor.utils.DateUtils;
+import com.nus.cool.core.cohort.refactor.utils.TimeUtils;
+import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 /**
  * Store Age condition and filter valid age for cohort Analysis.

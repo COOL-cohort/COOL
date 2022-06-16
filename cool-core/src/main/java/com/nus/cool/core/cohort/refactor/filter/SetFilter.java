@@ -1,10 +1,11 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.filter;
 
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
+
 import lombok.Getter;
 
 import java.lang.UnsupportedOperationException;
@@ -22,7 +23,7 @@ public class SetFilter implements Filter {
     private String fieldSchema;
 
 
-    public SetFilter(String fieldSchema,String[] acceptValues, String[] rejectedValues) {
+    protected SetFilter(String fieldSchema,String[] acceptValues, String[] rejectedValues) {
         Preconditions.checkArgument(acceptValues!=null&&rejectedValues!=null, 
             "acceptValues and rejectValue can not be null at the same time");
         
@@ -40,6 +41,7 @@ public class SetFilter implements Filter {
                 this.rejectSet.add(rejectedValues[i]);
             }
         }
+        // Precondition to check no overlap element between acceptSet and rejectSet
     }
 
     @Override

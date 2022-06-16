@@ -1,9 +1,9 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.utils;
 
 import java.util.Calendar;
 import java.util.Date;
 
-import com.nus.cool.core.cohort.refactor.TimeUtils.TimeUnit;
+import com.nus.cool.core.cohort.refactor.utils.TimeUtils.TimeUnit;
 
 
 public class DateUtils {

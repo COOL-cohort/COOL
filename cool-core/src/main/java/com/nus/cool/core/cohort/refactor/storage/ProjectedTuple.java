@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.storage;
 
 import java.util.HashMap;
 import java.util.List;

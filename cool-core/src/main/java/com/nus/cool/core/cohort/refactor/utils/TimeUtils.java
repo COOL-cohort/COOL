@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort.refactor.utils;
 
 public class TimeUtils {
 
