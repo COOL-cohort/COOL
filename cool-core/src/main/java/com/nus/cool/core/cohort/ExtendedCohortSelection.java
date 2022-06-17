@@ -264,17 +264,23 @@ public class ExtendedCohortSelection implements Operator {
 
 		int passed = 0;
 		int nextOffset;
-		int numFilter = birthFilters.get(event).entrySet().size();
+		Collection<FieldFilter> filterCollection = birthFilters.get(event).values();
+		int numFilter = filterCollection.size();
 		if (fromOffset >= endOffset || numFilter == 0)
 			return fromOffset;
+
+		// The while-loop iteratively finds the next common offset.
+		// Termination condition:
+		// If a common offset is found, i.e., passed == numFilter, then nextOffset (< endOffset) will be returned.
+		// If no common offset can be found, i.e., fromOffset >= endOffset, then nextOffset (>= endOffset) will be returned.
 		while (true) {
-			for (Map.Entry<String, FieldFilter> entry : birthFilters.get(event).entrySet()) {
-				nextOffset = entry.getValue().nextAcceptTuple(fromOffset, endOffset);
+			for (FieldFilter currentFilter : filterCollection) {
+				nextOffset = currentFilter.nextAcceptTuple(fromOffset, endOffset);
 				// TODO check this logic
 				if (nextOffset > fromOffset) {
 					fromOffset = nextOffset;
 					passed = 1;
-				} else {
+				} else { // i.e., nextOffset == fromOffset
 					passed++;
 				}
 				if (passed == numFilter || fromOffset >= endOffset)
@@ -356,27 +362,25 @@ public class ExtendedCohortSelection implements Operator {
 	}
 
 	private int getUserBirthTime(int start, int end) {
-		BirthSequence seq = q.getBirthSequence();
-		List<Integer> sortedEvents = seq.getSortedBirthEvents();
-		List<Integer> windowtDate = new ArrayList<Integer>(sortedEvents.size());
+
 		int offset = start;
 		int birthOffset = start;
-		int firstDay = TimeUtils.getDate(timeVector.get(start));
-		LinkedList<Integer> occurrences;
+		int firstDay = timeVector.get(start);
 		int birthDay = firstDay;
 
-		// starting date of each event time window
-		for (int i = 0; i < sortedEvents.size(); i++) {
-			windowtDate.add(0);
-		}
+		BirthSequence seq = q.getBirthSequence();
+		List<Integer> sortedEvents = seq.getSortedBirthEvents();
+		LinkedList<Integer> occurrences;
+
+		// starting date of each event time window, which is initialized as 0.
+		int[] windowtDate = new int[sortedEvents.size()];
 
 		for (Integer e : sortedEvents) {
 			offset = start;
 			BirthSequence.BirthEvent event = seq.getBirthEvents().get(e);
 			// check whether the filed value type is AbsoluteValue
-			for (Map.Entry<String, FieldFilter> entry : birthFilters.get(e).entrySet()) {
-				FieldFilter ageFilter = entry.getValue();
-				ExtendedFieldSet.FieldValue value = entry.getValue().getFieldSet().getFieldValue();
+			for (FieldFilter ageFilter : birthFilters.get(e).values()) {
+				ExtendedFieldSet.FieldValue value = ageFilter.getFieldSet().getFieldValue();
 				if (value.getType() != ExtendedFieldSet.FieldValueType.AbsoluteValue) {
 					ageFilter.updateValues(
 							getBirthAttribute(value.getBaseEvent(), tableSchema.getFieldID(value.getBaseField())));
@@ -390,16 +394,16 @@ public class ExtendedCohortSelection implements Operator {
 				// check the minimal trigger time
 				for (int i = 0; i < minTriggerTime[e]; i++) {
 					offset = skipToNextQualifiedBirthTuple(e, offset, end);
-					if (offset == end)
+					if (offset >= end)
 						return -1;
 					eventOffset.get(e).addLast(offset);
 					offset++;
 				}
 				int bday;
 				if (minTriggerTime[e] == 0)
-					bday = TimeUtils.getDate(timeVector.get(offset));
+					bday = timeVector.get(offset);
 				else
-					bday = TimeUtils.getDate(timeVector.get(offset - 1)) + 1;
+					bday = timeVector.get(offset - 1) + 1;
 
 				birthDay = (birthDay < bday) ? bday : birthDay;
 
@@ -430,9 +434,9 @@ public class ExtendedCohortSelection implements Operator {
 				int windowOffset;
 
 				for (BirthSequence.Anchor anc : window.getAnchors()) {
-					int day = anc.getLowOffset() + windowtDate.get(anc.getAnchor());
+					int day = anc.getLowOffset() + windowtDate[anc.getAnchor()];
 					startDay = startDay < day ? day : startDay;
-					day = anc.getHighOffset() + windowtDate.get(anc.getAnchor());
+					day = anc.getHighOffset() + windowtDate[anc.getAnchor()];
 					endDay = endDay > day ? day : endDay;
 				}
 
@@ -466,7 +470,7 @@ public class ExtendedCohortSelection implements Operator {
 					offset = pos;
 
 					if (checkOccurrence(e)) {
-						windowtDate.set(e, startDay);
+						windowtDate[e] = startDay;
 						birthDay = (birthDay < startDay + wlen) ? startDay + wlen : birthDay;
 						break;
 					}
