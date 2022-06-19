@@ -27,14 +27,20 @@ public class ProjectedTuple {
         }
     }
 
-    /**
-     * guarante the value in load tuple is ordered according to schemas' order.
-     * @param tuple
-     */
-    public void loadTuple(Object[] tuple){
-        this.tuple = tuple;
-    }
+    // public ProjectedTuple
+
+    // /**
+    //  * guarante the value in load tuple is ordered according to schemas' order.
+    //  * @param tuple
+    //  */
+    // public void loadTuple(Object[] tuple){
+    //     this.tuple = tuple;
+    // }
     
+    public void loadAttr(Object attrValue, String schema){
+        int idx = this.schema2Index.get(schema);
+        this.tuple[idx] = attrValue;
+    }
     /**
      * 
      * @return the layout of this ProjectedTuple
