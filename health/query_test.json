@@ -47,7 +47,6 @@
     },
 
     "ageSelection":{
-        "fieldSchema":"time",
         "unit":"DAY",
         "min":2,
         "max":10
