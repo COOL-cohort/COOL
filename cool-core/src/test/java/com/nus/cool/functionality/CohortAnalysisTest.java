@@ -52,7 +52,9 @@ public class CohortAnalysisTest extends CohortSelectionTest {
         }
         InputVector userVector = coolModel.getCohortUsers(inputCohort);
         List<ExtendedResultTuple> result = coolModel.cohortEngine.performCohortQuery(inputCube, userVector, query);
-        Assert.assertEquals(result, out);
+        if (!out.isEmpty()){
+            Assert.assertEquals(result, out);
+        }
     }
 
     @DataProvider(name = "CohortAnalysisTestDP")
@@ -76,12 +78,16 @@ public class CohortAnalysisTest extends CohortSelectionTest {
         return new Object[][] {
                 {
                         Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
-                        Paths.get(System.getProperty("user.dir"),  "..", "health", "query2.json").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "query2.json").toString(),
                         out1
                 },{
                         Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
-                        Paths.get(System.getProperty("user.dir"),  "..", "health", "query1-1.json").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "query1-1.json").toString(),
                         out2
+                },{
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce/test4Cool", "query_cohort.json").toString(),
+                        new ArrayList<>()
                 }
         };
     }

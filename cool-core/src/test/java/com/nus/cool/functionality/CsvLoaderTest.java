@@ -61,22 +61,22 @@ public class CsvLoaderTest {
                     "health",
                     // Paths.get(sourcePath, "health", "table.yaml").toString(),
                     // Paths.get(sourcePath, "health", "table.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "health", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "health", "raw.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "table.yaml").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "raw.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                     "sogamo",
                     // Paths.get(sourcePath, "sogamo", "table.yaml").toString(),
                     // Paths.get(sourcePath, "sogamo", "table.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "sogamo", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "sogamo", "test.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "table.yaml").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "test.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                     "tpc-h-10g",
                     // Paths.get(sourcePath, "olap-tpch", "table.yaml").toString(),
                     // Paths.get(sourcePath, "olap-tpch", "table.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "olap-tpch", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "olap-tpch", "scripts", "data.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "table.yaml").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "scripts", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 },
 
@@ -88,9 +88,9 @@ public class CsvLoaderTest {
         return new Object[][] {
                 {
                     "health",
-                    Paths.get(System.getProperty("user.dir"),  "..", "health", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "health", "raw2.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "table.yaml").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "raw2.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/datasetSource").toString()
                 },
         };
     }
