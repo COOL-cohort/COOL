@@ -62,7 +62,7 @@ public class IcebergLoaderTest extends CsvLoaderTest {
 
         return new Object[][] {{
                 Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
-                Paths.get(System.getProperty("user.dir"),  "..", "olap-tpch", "query.json").toString(),
+                Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "query.json").toString(),
                 out
         }};
     }
