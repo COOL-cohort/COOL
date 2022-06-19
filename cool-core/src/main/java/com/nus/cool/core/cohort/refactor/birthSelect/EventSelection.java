@@ -37,7 +37,7 @@ public class EventSelection {
         }
         // Can free FilterLayout and GC will reclaim
         // This memory won't be used in future
-        filters = null;
+        this.filters = null;
     }
 
     /**
