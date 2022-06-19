@@ -3,7 +3,6 @@ package com.nus.cool.core.cohort.refactor.filter;
 import java.util.BitSet;
 import java.util.List;
 
-import com.nus.cool.core.cohort.refactor.filter.FilterType;
 
 public interface Filter {
 
