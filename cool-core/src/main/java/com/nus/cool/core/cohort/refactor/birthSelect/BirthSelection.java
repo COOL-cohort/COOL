@@ -2,22 +2,26 @@ package com.nus.cool.core.cohort.refactor.birthSelect;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
+import lombok.Getter;
+
 public class BirthSelection {
 
     private ArrayList<EventSelection> birthEvents;
-
+ 
     private TimeWindow timeWindow;
 
     @JsonIgnore
     private BirthSelectionContext context;
 
     @JsonIgnore
-    private ArrayList<String> schemaList;
+    @Getter
+    private HashSet<String> relatedSchemas;
 
     /**
      * initialize a instance of BirthSelection load from json
@@ -28,7 +32,7 @@ public class BirthSelection {
         for (int i = 0; i < birthEvents.size(); i++) {
             birthEvents.get(i).init();
             eventMinFrequency[i] = birthEvents.get(i).getFrequency();
-            this.schemaList.addAll(birthEvents.get(i).getSchemaList());
+            this.relatedSchemas.addAll(birthEvents.get(i).getSchemaList());
         }
         this.context = new BirthSelectionContext(timeWindow, eventMinFrequency);
     }
