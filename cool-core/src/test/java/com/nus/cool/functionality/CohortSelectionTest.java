@@ -69,7 +69,7 @@ public class CohortSelectionTest extends CsvLoaderTest {
     public Object[][] CohortSelectionTestDPArgObjects() {
         return new Object[][] {{
                 Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
-                Paths.get(System.getProperty("user.dir"),  "..", "health", "query1-0.json").toString(),
+                Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "query1-0.json").toString(),
                 // output global IDs
                 Arrays.asList(0, 2, 3, 4, 5, 7, 9, 11, 12),
                 // output actual IDs

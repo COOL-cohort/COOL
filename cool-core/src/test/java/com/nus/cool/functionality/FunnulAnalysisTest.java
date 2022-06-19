@@ -58,7 +58,7 @@ public class FunnulAnalysisTest extends CsvLoaderTest{
         int[] out = {5, 5, 4, 4};
         return new Object[][] {{
                 Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
-                Paths.get(System.getProperty("user.dir"),  "..", "sogamo", "query1.json").toString(),
+                Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "query1.json").toString(),
                 out
         }};
     }
