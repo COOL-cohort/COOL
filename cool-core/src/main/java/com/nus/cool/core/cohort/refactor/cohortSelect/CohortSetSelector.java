@@ -14,5 +14,9 @@ public class CohortSetSelector extends SetFilter implements CohortSelector {
         if(this.accept(s)) return s;
         return null;
     }
+
+    public String getSchema(){
+        return this.getFilterSchema();
+    }
     
 }

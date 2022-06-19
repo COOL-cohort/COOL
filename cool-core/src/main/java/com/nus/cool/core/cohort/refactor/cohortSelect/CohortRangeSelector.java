@@ -29,5 +29,9 @@ public class CohortRangeSelector extends RangeFilter implements CohortSelector  
         }
         return null;
     }
+
+    public String getSchema(){
+        return this.getFilterSchema();
+    }
     
 }
