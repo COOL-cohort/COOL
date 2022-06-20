@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -46,6 +47,9 @@ public class FieldSchema {
   private String aggregator; // not used for now
 
   private boolean preCal;
+
+  @Getter
+  private boolean invariantField;
 
   // /**
   //  * @return the aggregator
