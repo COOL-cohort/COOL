@@ -97,23 +97,29 @@ public class DataChunkWS implements Output {
     assert fieldSchemaList.size() == metaFields.length;
 
     // data chunk fields.
-    DataFieldWS[] fields = new DataFieldWS[fieldSchemaList.size()];
+    DataFieldWS[] fields = new DataFieldWS[fieldSchemaList.size()-schema.getInvariantFields().size()];
+    int flag=0;
     for (int i = 0; i < fieldSchemaList.size(); i++) {
       FieldSchema fieldSchema = fieldSchemaList.get(i);
       FieldType fieldType = fieldSchema.getFieldType();
-      switch (fieldType) {
-        case AppKey:
-        case UserKey:
-        case Action:
-        case Segment:
-          fields[i] = new DataHashFieldWS(fieldType, i, metaFields[i], compressor, fieldSchema.isPreCal());
-          break;
-        case ActionTime:
-        case Metric:
-          fields[i] = new DataRangeFieldWS(fieldType, i, compressor);
-          break;
-        default:
-          throw new IllegalArgumentException("Unsupported FieldType: " + fieldType);
+      boolean invariantField=fieldSchema.isInvariantField();
+      if(!invariantField) {
+        switch (fieldType) {
+          case AppKey:
+          case UserKey:
+          case Action:
+          case Segment:
+            fields[flag] = new DataHashFieldWS(fieldType, i, metaFields[i], compressor, fieldSchema.isPreCal());
+            flag++;
+            break;
+          case ActionTime:
+          case Metric:
+            fields[flag] = new DataRangeFieldWS(fieldType, i, compressor);
+            flag++;
+            break;
+          default:
+            throw new IllegalArgumentException("Unsupported FieldType: " + fieldType);
+        }
       }
     }
     return new DataChunkWS(offset, fields);
