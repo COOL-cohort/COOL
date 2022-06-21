@@ -55,7 +55,7 @@ public class HashFieldTest {
 
     @AfterTest
     public void tearDown() {
-        logger.info(String.format("Pass UnitTest %s\n", HashFieldTest.class.getSimpleName()));
+        logger.info(String.format("Tear down UnitTest %s\n", HashFieldTest.class.getSimpleName()));
     }
 
     /**

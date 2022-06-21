@@ -43,7 +43,7 @@ public class ChunkTest {
 
     @AfterTest
     public void tearDown() {
-        logger.info(String.format("Pass UnitTest %s\n", ChunkTest.class.getSimpleName()));
+        logger.info(String.format("Tear down UnitTest %s\n", ChunkTest.class.getSimpleName()));
     }
 
     @Test(dataProvider = "ChunkUnitTestDP")

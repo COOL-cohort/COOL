@@ -2,8 +2,6 @@ package com.nus.cool.core.io.storevector;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
-
 import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.ZIntCompressor;
@@ -11,22 +9,33 @@ import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.util.ArrayUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class ZIntStoreTest {
 
+  static final Logger logger = LoggerFactory.getLogger(ZIntStoreTest.class.getSimpleName());
+
   @BeforeTest
   public void setUp() {
-    System.out.println("ZIntStore UnitTest");
+    logger.info("Start UnitTest " + ZIntStoreTest.class.getSimpleName());
+  }
+
+  @AfterTest
+  public void tearDown() {
+    logger.info(String.format("Tear Down UnitTest %s\n", ZIntStoreTest.class.getSimpleName()));
   }
 
   @Test(dataProvider = "ZIntStoreDP")
   public void TestZIntStore(int[] numbers, Codec codeType) throws Exception {
+    logger.info(String.format("Input ZIntStore UnitTest Data: Code Type %s Input Data %s", codeType.name(),
+        numbers.toString()));
 
-    System.out.printf("ZIntStoreDP UnitTest Input: numbers %s INTType %s\n", Arrays.toString(numbers), codeType);
     int min = ArrayUtil.min(numbers);
     int max = ArrayUtil.max(numbers);
     int count = numbers.length;

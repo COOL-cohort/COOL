@@ -28,21 +28,21 @@ public class RelationalAlgebra {
 
    public static void main(String[] args) throws Exception {
        // the path of dz file eg "COOL/cube"
-       String dzFilePath = args[0];
-       String dataSourceName = args[1];
-       String operation = args[2];
+       String datasetPath = args[0];         // e.g., "../datasetSource";=
+       String cubeName = args[1];     // e.g., "tpc-h-10g"
+       String operation = args[2];          // e.g., "select, O_ORDERPRIORITY, 2-HIGH"
 
        // load .dz file
-       CoolModel coolModel = new CoolModel(dzFilePath);
-       coolModel.reload(dataSourceName);
+       CoolModel coolModel = new CoolModel(datasetPath);
+       coolModel.reload(cubeName);
 
-       IcebergQuery query = coolModel.olapEngine.generateQuery(operation, dataSourceName);
+       IcebergQuery query = coolModel.olapEngine.generateQuery(operation, cubeName);
        if (query == null){
            return;
        }
 
        // execute query
-       List<BaseResult> result = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
+       List<BaseResult> result = coolModel.olapEngine.performOlapQuery(coolModel.getCube(cubeName), query);
        System.out.println(result.toString());
    }
 }
