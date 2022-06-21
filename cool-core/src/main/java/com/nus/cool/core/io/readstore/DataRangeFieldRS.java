@@ -1,14 +1,13 @@
 package com.nus.cool.core.io.readstore;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
 import com.nus.cool.core.schema.FieldType;
 
-public class DataRangeFieldRS implements DataFieldRS {
+public class DataRangeFieldRS implements FieldRS {
 
     private FieldType fieldType;
     
@@ -17,8 +16,7 @@ public class DataRangeFieldRS implements DataFieldRS {
     private int maxKey;
 
     private boolean initialized = false;
-    
-    private ArrayList<Integer> valueVector;
+    private InputVector valueVector;
 
 
     @Override
@@ -26,27 +24,19 @@ public class DataRangeFieldRS implements DataFieldRS {
         return this.fieldType;
     }
 
-    @Override
-    public ArrayList<Integer> getValueVector() {
-        validateInitialization();
-        return this.valueVector;
-    }
 
+    @Override
     public int minKey() {
         validateInitialization();
         return this.minKey;
     }
 
+    @Override
     public int maxKey() {
         validateInitialization();
         return this.maxKey;
     }
 
-    @Override
-    public int getTupleNumber(){
-        validateInitialization();
-        return this.valueVector.size();
-    }
     @Override
     public boolean isSetField() {
         validateInitialization();
@@ -54,23 +44,43 @@ public class DataRangeFieldRS implements DataFieldRS {
     }
 
     @Override
-    public void readFromBuffer(ByteBuffer buf, FieldType ft) {
+    public int getValueByIndex(int idx){
+        return this.valueVector.get(idx);
+    }
+
+    @Override
+    public void readFromWithFieldType(ByteBuffer buf, FieldType ft) {
         this.initialized = true;
         this.fieldType = ft;
-        this.minKey = buf.getInt();
-        this.maxKey = buf.getInt();
-        // Note : No calculate PreCal
-        InputVector list = InputVectorFactory.readFrom(buf);
+        this.valueVector = InputVectorFactory.readFrom(buf);
         // TODO(Lingze) There is still room for optimization
         // We can directly read from buffer to ArrayList<Integar>
-        this.valueVector = new ArrayList<>(list.size());
-        while(list.hasNext()){
-            this.valueVector.add(list.next());
-        }
+
     }
 
     private void validateInitialization(){
         Preconditions.checkState(this.initialized, "DataRangeFiledRS is not initialized");
+    }   
+
+
+    @Override
+    public void readFrom(ByteBuffer buffer) {
+        FieldType fieldType = FieldType.fromInteger(buffer.get());
+        this.readFromWithFieldType(buffer, fieldType);
     }
     
+
+    //no used, only to keep compatiable with old version code
+    @Override
+    public InputVector getKeyVector() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public InputVector getValueVector() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
