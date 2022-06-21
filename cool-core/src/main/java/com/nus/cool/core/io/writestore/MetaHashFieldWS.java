@@ -291,7 +291,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
                     off += en.getValue().term.getBytes(this.charset).length;
                     for(int j=0;j<invariantName2Id.size();j++){
                         buffer.writeInt(off);
-                        off+=this.invariantHashToTerm.get(j).get(this.userToInvariant.get(en.getKey())).term.getBytes(this.charset).length;
+                        off+=this.invariantHashToTerm.get(j).get(this.userToInvariant.get(en.getKey()).get(j)).term.getBytes(this.charset).length;
                     }
                 }
 
@@ -299,7 +299,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
                 for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
                     buffer.write(en.getValue().term.getBytes(this.charset));
                     for(int j=0;j<invariantName2Id.size();j++){
-                        buffer.write(this.invariantHashToTerm.get(j).get(this.userToInvariant.get(en.getKey())).term.getBytes(this.charset));
+                        buffer.write(this.invariantHashToTerm.get(j).get(this.userToInvariant.get(en.getKey()).get(j)).term.getBytes(this.charset));
                     }
                 }
 
