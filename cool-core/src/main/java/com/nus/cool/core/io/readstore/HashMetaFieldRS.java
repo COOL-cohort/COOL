@@ -107,4 +107,15 @@ public class HashMetaFieldRS implements MetaFieldRS {
     FieldType fieldType = FieldType.fromInteger(buffer.get());
     this.readFromWithFieldType(buffer, fieldType);
   }
+
+
+  public String[] getGidMap(){
+    // Can store it and reuse ret (suggestion)
+    String[] ret = new String[this.count()];
+    LZ4InputVector strlist = (LZ4InputVector) this.valueVec;
+    for(int i = 0; i < ret.length; i++){
+      ret[this.globalIDVec.get(i)] = strlist.getString(i, this.charset);
+    }
+    return ret;
+  }
 }
