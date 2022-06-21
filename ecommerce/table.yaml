@@ -1,0 +1,30 @@
+charset: utf-8
+fields:
+- preCal: false
+  fieldType: UserKey
+  name: Product_ID
+- preCal: false
+  fieldType: Segment
+  name: Vendor_Name
+- preCal: false
+  fieldType: Metric
+  name: Product_Name
+- preCal: false
+  fieldType: Action
+  name: Product_Category
+- preCal: false
+  fieldType: Segment
+  name: Brand_Name
+- preCal: false
+  fieldType: Metric
+  name: Number_0f_Unit_Sold
+- preCal: false
+  fieldType: Metric
+  name: Sold_Dollar_Amount
+- preCal: false
+  fieldType: Metric
+  name: Avg_Unit_Price_Sold_Amt
+- preCal: false
+  fieldType: ActionTime
+  name: Reported_Date
+
