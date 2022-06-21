@@ -71,4 +71,19 @@ public enum FieldType {
         throw new IllegalArgumentException("Invalid field type int: " + i);
     }
   }
+
+  public static boolean IsHashType(FieldType fieldType) {
+    switch (fieldType) {
+      case Action:
+      case AppKey:
+      case Segment:
+      case UserKey:
+        return true;
+      case ActionTime:
+      case Metric:
+        return false;
+      default:
+        throw new IllegalArgumentException("Invalid field" + fieldType.toString());
+    }
+  }
 }
