@@ -1,5 +1,6 @@
 package com.nus.cool.core.cohort.refactor.cohortSelect;
 import com.nus.cool.core.cohort.refactor.filter.SetFilter;
+import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 
 public class CohortSetSelector extends SetFilter implements CohortSelector {
 
@@ -8,7 +9,6 @@ public class CohortSetSelector extends SetFilter implements CohortSelector {
         super(fieldSchema, acceptValues, rejectedValues);
     }
 
-    @Override
     public String selectCohort(Object input) {
         String s = String.valueOf(input);
         if(this.accept(s)) return s;
@@ -17,6 +17,11 @@ public class CohortSetSelector extends SetFilter implements CohortSelector {
 
     public String getSchema(){
         return this.getFilterSchema();
+    }
+
+    @Override
+    public String selectCohort(ProjectedTuple tuple) {
+        return selectCohort(tuple.getValueBySchema(this.getSchema()));
     }
     
 }

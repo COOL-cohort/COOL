@@ -2,6 +2,7 @@ package com.nus.cool.core.cohort.refactor.cohortSelect;
 
 
 import com.nus.cool.core.cohort.refactor.filter.RangeFilter;
+import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
 
 
@@ -32,6 +33,11 @@ public class CohortRangeSelector extends RangeFilter implements CohortSelector  
 
     public String getSchema(){
         return this.getFilterSchema();
+    }
+
+    @Override
+    public String selectCohort(ProjectedTuple tuple) {
+        return selectCohort(tuple.getValueBySchema(this.getSchema()));
     }
     
 }
