@@ -11,8 +11,6 @@ import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
  * Store Age condition and filter valid age for cohort Analysis.
  */
 public class AgeSelection {
-    // fieldSchema should be fixed to actionTime
-    private final String fieldSchema = "actionTime";
 
     private TimeUtils.TimeUnit unit;
 
@@ -22,6 +20,8 @@ public class AgeSelection {
     @JsonIgnore
     private final int interval = 1;
 
+    @JsonIgnore
+    public final static int DefaultNullAge = -1;
     /**
      * After read from json directly
      * if min and max is null, we should initialize it with the extremum
