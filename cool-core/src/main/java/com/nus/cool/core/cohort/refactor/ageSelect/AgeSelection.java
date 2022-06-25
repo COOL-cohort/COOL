@@ -3,9 +3,12 @@ package com.nus.cool.core.cohort.refactor.ageSelect;
 import java.util.Calendar;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
+
+import lombok.Getter;
 
 /**
  * Store Age condition and filter valid age for cohort Analysis.
@@ -14,23 +17,29 @@ public class AgeSelection {
 
     private TimeUtils.TimeUnit unit;
 
+
+    @Getter
     private Integer min, max;
 
     // For current implementation, we ignore different interval for age
-    @JsonIgnore
-    private final int interval = 1;
+    // @JsonIgnore
+    @Getter
+    private int interval = 1;
 
     @JsonIgnore
     public final static int DefaultNullAge = -1;
+    
     /**
      * After read from json directly
      * if min and max is null, we should initialize it with the extremum
      */
     public void init() {
-        if (this.min == null)
-            this.min = Integer.MIN_VALUE;
-        if (this.max == null)
-            this.max = Integer.MAX_VALUE;
+        // if (this.min == null)
+        //     this.min = Integer.MIN_VALUE;
+        // if (this.max == null)
+        //     this.max = Integer.MAX_VALUE;
+        Preconditions.checkArgument(this.min!=null, "AgeSelection's min is not allowed to be missing");
+        Preconditions.checkArgument(this.max!= null, "AgeSelection's max is not allowed to be missing");   
     }
 
     /**
