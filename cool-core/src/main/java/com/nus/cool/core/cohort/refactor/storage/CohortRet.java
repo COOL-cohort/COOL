@@ -6,7 +6,7 @@ import java.util.HashMap;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelection;
 
-import javafx.util.Pair;
+import javafx.scene.chart.Axis;
 
 /**
  * Class for Cohort Analysis Result
@@ -30,21 +30,19 @@ public class CohortRet {
         this.size = (this.max - this.min) / this.interval + 1;
     }
 
-    public void put(String cohort, int age, int value) {
+    /**
+     * Initialize the missing intance
+     * Get the certain RetUnit, user can modify RetUnit in place
+     * @param cohort
+     * @param age
+     * @return
+     */
+    public RetUnit get(String cohort, int age) {
         if (!this.cohortToValueList.containsKey(cohort)) {
             this.cohortToValueList.put(cohort, new Xaxis(this.size));
         }
         int offset = calIndex(age);
-        Xaxis xaxis = this.cohortToValueList.get(cohort);
-        xaxis.put(offset, value);
-    }
-
-    public Pair<Integer, Integer> get(String cohort, int age) {
-        if (this.cohortToValueList.containsKey(cohort)) {
-            int offset = calIndex(age);
-            return this.cohortToValueList.get(cohort).get(offset);
-        }
-        return new Pair<Integer, Integer>(0, 0);
+        return this.cohortToValueList.get(cohort).get(offset);
     }
 
     /**
@@ -61,28 +59,21 @@ public class CohortRet {
         return offset;
     }
 
+    /**
+     * Typedef RetUnit[] to Xaxis
+     */
     private class Xaxis {
-        private int[] value;
-        private int[] count;
-
+        private RetUnit[] retUnits;
         Xaxis(int size) {
-            this.value = new int[size];
-            this.count = new int[size];
+            this.retUnits = new RetUnit[size];
         }
 
-        public Pair<Integer, Integer> get(int i) {
-            return new Pair<>(this.value[i], this.count[i]);
+        // Directly change the RetUnit in place
+        public RetUnit get(int i) {
+            if(this.retUnits[i] == null) this.retUnits[i] = new RetUnit(0,0); 
+            return this.retUnits[i];
         }
 
-        public void put(int i, int v) {
-            this.value[i] = v;
-            this.count[i] += 1;
-        }
-
-        // public void put(int i, Pair<Integer, Integer> v) {
-        //     this.value[i] = v.getKey();
-        //     this.count[i] = v.getValue();
-        // }
     }
 
 }
