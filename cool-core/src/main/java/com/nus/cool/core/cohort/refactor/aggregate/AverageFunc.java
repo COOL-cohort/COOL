@@ -6,12 +6,11 @@ public class AverageFunc implements AggregateFunc {
 
     private final AggregateType type = AggregateType.AVERAGE;
 
-
     @Override
-    public void calulate(RetUnit retUnit, int value) {
-        float sum = retUnit.getValue() * retUnit.getCount() + (float)value;
+    public void calulate(RetUnit retUnit, float value) {
+        float sum = retUnit.getValue() * retUnit.getCount() + value;
         retUnit.setCount(retUnit.getCount() + 1);
-        retUnit.setValue(sum/retUnit.getCount());
+        retUnit.setValue(sum / retUnit.getCount());
     }
 
     @Override
