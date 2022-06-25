@@ -18,6 +18,8 @@ public class ValueSelection {
 
     private String function;
 
+    private String observedSchema;
+
     @JsonIgnore
     @Getter
     private ArrayList<String> schemaList;
