@@ -22,7 +22,6 @@ public class CohortRangeSelector extends RangeFilter implements CohortSelector  
         return selector;
     }
 
-    @Override
     public String selectCohort(Object input) {
         Integer i = (Integer)input;
         for(Scope u : this.acceptRangeList){
