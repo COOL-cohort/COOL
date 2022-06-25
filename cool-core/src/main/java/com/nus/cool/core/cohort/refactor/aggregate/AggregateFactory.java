@@ -3,7 +3,6 @@ package com.nus.cool.core.cohort.refactor.aggregate;
 public class AggregateFactory {
 
     public static AggregateFunc generateAggregate(String str) {
-
         switch (str) {
             case "Average":
                 new AverageFunc();

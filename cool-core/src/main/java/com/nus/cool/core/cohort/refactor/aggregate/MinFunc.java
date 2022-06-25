@@ -8,9 +8,9 @@ public class MinFunc implements AggregateFunc {
 
     @Override
     public void calulate(RetUnit retUnit, float value) {
-        if(retUnit.getValue() > value){
+        if (retUnit.getValue() > value) {
             retUnit.setValue(value);
-        } 
+        }
         retUnit.setCount(retUnit.getCount() + 1);
     }
 

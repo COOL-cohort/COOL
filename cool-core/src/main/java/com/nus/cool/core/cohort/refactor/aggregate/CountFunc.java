@@ -2,10 +2,9 @@ package com.nus.cool.core.cohort.refactor.aggregate;
 
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 
+public class CountFunc implements AggregateFunc {
 
-public class CountFunc implements AggregateFunc{
-
-    private final AggregateType  type = AggregateType.COUNT;
+    private final AggregateType type = AggregateType.COUNT;
 
     @Override
     public void calulate(RetUnit retUnit, float value) {
@@ -16,5 +15,5 @@ public class CountFunc implements AggregateFunc{
     public AggregateType getType() {
         return this.type;
     }
-    
+
 }
