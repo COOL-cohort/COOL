@@ -3,6 +3,14 @@ package com.nus.cool.extension.util.arrow;
 import java.util.Optional;
 
 import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.BitVector;
+
+import org.apache.arrow.vector.types.pojo.*;
+import org.apache.arrow.vector.*;
+import java.util.Collections;
+import static java.util.Arrays.asList;
+import org.apache.arrow.memory.*;
+
 
 import lombok.AllArgsConstructor;
 
@@ -19,7 +27,11 @@ public class ArrowRowView {
   }
 
   public Optional<Object> getField(String name) {
-    return Optional.ofNullable( valid() ? root.getVector(name) : null)
-                   .map(x -> x.getObject(index));
+    return Optional.ofNullable(valid() ? root.getVector(name) : null)
+            .map(x -> x.getObject(index));
+  }
+
+  public static <T> T newVector(Class<T> c, String name, ArrowType type, BufferAllocator allocator) {
+    return c.cast(FieldType.nullable(type).createNewSingleVector(name, allocator, null));
   }
 }
