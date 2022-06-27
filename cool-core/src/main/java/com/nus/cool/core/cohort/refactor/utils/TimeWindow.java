@@ -11,7 +11,14 @@ public class TimeWindow implements Comparable<TimeWindow>{
     private long length;
     @Getter
     private TimeUnit unit;
+    
+    public TimeWindow(){
+    }
 
+    public TimeWindow(long length, String unitStr){
+        this.length = length;
+        this.unit = TimeUtils.GenerateTimeUnit(unitStr);
+    }
     public TimeWindow(long length, TimeUnit unit){
         this.length = length;
         this.unit = unit;
