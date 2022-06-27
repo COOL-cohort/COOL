@@ -1,6 +1,8 @@
 package com.nus.cool.core.cohort.refactor.birthSelect;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
@@ -14,16 +16,16 @@ import lombok.Getter;
  * json mapper to constuct EventSelection
  */
 public class EventSelection {
-
-    private ArrayList<FilterLayout> filters;
+    @Getter
+    private List<FilterLayout> filters;
 
     @JsonIgnore
-    private ArrayList<Filter> filterList;
+    private List<Filter> filterList;
 
     // Help Wrapper to input ordered tuple
     @JsonIgnore
     @Getter
-    private ArrayList<String> schemaList;
+    private List<String> schemaList;
 
     @Getter
     private int frequency;
@@ -31,6 +33,8 @@ public class EventSelection {
      * Create Filter from FilterLayout
      */
     public void init() {
+        filterList = new ArrayList<>();
+        schemaList = new ArrayList<>();
         for (FilterLayout layout : filters) {
             filterList.add(layout.generateFilter());
             schemaList.add(layout.getFieldSchema());
@@ -48,7 +52,7 @@ public class EventSelection {
     public boolean Accept(ProjectedTuple projectTuple) {
         for (int i = 0; i < filterList.size(); i++) {
             String schema = schemaList.get(i);
-            if (filterList.get(i).getType() == FilterType.Set) {
+            if (filterList.get(i).getType().equals(FilterType.Set)) {
                 if (!filterList.get(i).accept((String) projectTuple.getValueBySchema(schema)))
                     return false;
             } else {
