@@ -1,6 +1,7 @@
 package com.nus.cool.core.cohort.refactor.valueSelect;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateFactory;
@@ -13,20 +14,20 @@ import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 
 import lombok.Getter;
 
+@Getter
 public class ValueSelection {
 
-    private ArrayList<FilterLayout> filters;
+    private List<FilterLayout> filters;
 
     @JsonIgnore
-    private ArrayList<Filter> filterList;
+    private List<Filter> filterList;
 
-    private String function;
+    private AggregateType function;
 
     private String observedSchema;
 
     @JsonIgnore
-    @Getter
-    private ArrayList<String> schemaList;
+    private List<String> schemaList;
     // private
 
     @JsonIgnore

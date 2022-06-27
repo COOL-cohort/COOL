@@ -13,17 +13,15 @@ import lombok.Getter;
 /**
  * Store Age condition and filter valid age for cohort Analysis.
  */
+@Getter
 public class AgeSelection {
-
     private TimeUtils.TimeUnit unit;
 
 
-    @Getter
     private Integer min, max;
 
     // For current implementation, we ignore different interval for age
     // @JsonIgnore
-    @Getter
     private int interval = 1;
 
     @JsonIgnore

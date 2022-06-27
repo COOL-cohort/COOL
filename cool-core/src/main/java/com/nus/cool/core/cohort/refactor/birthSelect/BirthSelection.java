@@ -3,16 +3,20 @@ package com.nus.cool.core.cohort.refactor.birthSelect;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Getter
 public class BirthSelection {
-
-    private ArrayList<EventSelection> birthEvents;
+    // @Getter
+    // @Setter
+    private List<EventSelection> birthEvents;
  
     private TimeWindow timeWindow;
 
@@ -29,6 +33,7 @@ public class BirthSelection {
      */
     public void init() {
         int[] eventMinFrequency = new int[birthEvents.size()];
+        this.relatedSchemas = new HashSet<>();
         for (int i = 0; i < birthEvents.size(); i++) {
             birthEvents.get(i).init();
             eventMinFrequency[i] = birthEvents.get(i).getFrequency();
