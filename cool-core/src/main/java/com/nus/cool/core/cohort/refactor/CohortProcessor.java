@@ -1,5 +1,6 @@
 package com.nus.cool.core.cohort.refactor;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelection;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateFactory;
@@ -37,6 +39,7 @@ public class CohortProcessor {
 
     private AgeSelection ageSelector;
 
+    @JsonProperty("cohortSelector")
     private CohortSelectionLayout cohortSelectionLayout;
 
     private ValueSelection valueSelector;
@@ -95,7 +98,7 @@ public class CohortProcessor {
      * @return
      * @throws IOException
      */
-    public static CohortProcessor readFromJson(InputStream in) throws IOException {
+    public static CohortProcessor readFromJson(File in) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         CohortProcessor instance = mapper.readValue(in, CohortProcessor.class);
         instance.init();
