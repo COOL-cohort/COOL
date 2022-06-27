@@ -22,7 +22,7 @@ public class SetFilter implements Filter {
 
 
     protected SetFilter(String fieldSchema,String[] acceptValues, String[] rejectedValues) {
-        Preconditions.checkArgument(acceptValues!=null&&rejectedValues!=null, 
+        Preconditions.checkArgument(acceptValues!=null || rejectedValues !=null, 
             "acceptValues and rejectValue can not be null at the same time");
         
         this.fieldSchema = fieldSchema;

@@ -13,8 +13,8 @@ public class RangeFilter implements Filter {
 
     // Some static defined parameter
     private static final FilterType type = FilterType.Range;
-    private static final String MinLimit = "min";
-    private static final String MaxLimit = "max";
+    private static final String MinLimit = "MIN";
+    private static final String MaxLimit = "MAX";
     @Getter
     private static final String splitChar = "-";
 
@@ -90,15 +90,15 @@ public class RangeFilter implements Filter {
      * @param str
      * @return RangeUnit
      */
-    private Scope parse(String str) {
+    private  Scope parse(String str) {
         String[] part = str.split(splitChar);
         Preconditions.checkArgument(part.length == 2,
                 "Split RangeUnit failed");
         Integer l = null, r = null;
-        if (part[0] != MinLimit) {
+        if (!part[0].equals(MinLimit)) {
             l = Integer.parseInt(part[0]);
         }
-        if (part[1] != MaxLimit) {
+        if (!part[1].equals(MaxLimit)) {
             r = Integer.parseInt(part[1]);
         }
         return new Scope(l, r);
