@@ -43,7 +43,7 @@ public class ValueSelection {
         this.filters = null;
         // reclaim the FilterLayout
         // create func
-        this.aggregateFunc = AggregateFactory.generateAggregate(this.function);
+        this.aggregateFunc = AggregateFactory.generateAggregate(this.function, this.observedSchema);
     }
 
     /**
@@ -76,13 +76,7 @@ public class ValueSelection {
      * @param tuple
      */
     public void updateRetUnit(RetUnit retUnit, ProjectedTuple tuple) {
-        if (this.aggregateFunc.getType() == AggregateType.COUNT) {
-            this.aggregateFunc.calulate(retUnit, 0);
-        }
-        // TODO(lingze)
-        // add validation step, this code is dangerous
-        int v = (int) (tuple.getValueBySchema(this.observedSchema));
-        this.aggregateFunc.calulate(retUnit, v);
+        this.aggregateFunc.calulate(retUnit, tuple);
     }
 
 }
