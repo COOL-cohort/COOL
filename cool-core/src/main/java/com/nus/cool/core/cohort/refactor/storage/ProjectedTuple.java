@@ -21,6 +21,7 @@ public class ProjectedTuple {
     }
 
     public ProjectedTuple(List<String> schemaList){
+        this.schema2Index = new HashMap<>();
         int idx = 0;
         for(String schema : schemaList){
             this.schema2Index.put(schema, idx++);
