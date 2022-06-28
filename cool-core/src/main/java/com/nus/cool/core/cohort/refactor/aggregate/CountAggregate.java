@@ -24,7 +24,6 @@ public class CountAggregate implements AggregateFunc {
 
     @Override
     public String getSchema() {
-        // TODO Auto-generated method stub
         return null;
     }
 
