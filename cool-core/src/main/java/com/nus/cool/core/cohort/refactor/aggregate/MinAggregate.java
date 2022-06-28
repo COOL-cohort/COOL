@@ -7,11 +7,12 @@ public class MinAggregate implements AggregateFunc {
 
     private final AggregateType type = AggregateType.MIN;
 
-    private String schema; 
-    
-    public MinAggregate(String schema){
-        this.schema =schema;
+    private String schema;
+
+    public MinAggregate(String schema) {
+        this.schema = schema;
     }
+
     @Override
     public void calulate(RetUnit retUnit, ProjectedTuple tuple) {
         float value = (float) tuple.getValueBySchema(this.schema);
