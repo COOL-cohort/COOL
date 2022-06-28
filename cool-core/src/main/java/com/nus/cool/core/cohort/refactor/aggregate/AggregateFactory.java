@@ -2,18 +2,20 @@ package com.nus.cool.core.cohort.refactor.aggregate;
 
 public class AggregateFactory {
 
-    public static AggregateFunc generateAggregate(AggregateType type) {
+    public static AggregateFunc generateAggregate(AggregateType type, String schema) {
         switch (type) {
             case AVERAGE:
-                return new AverageFunc();
+                return new AverageAggregate(schema);
             case COUNT:
-                return new CountFunc();
+                return new CountAggregate();
             case MAX:
-                return new MaxFunc();
+                return new MaxAggregate(schema);
             case MIN:
-                return new MinFunc();
+                return new MinAggregate(schema);
             case SUM:
-                return new SumFunc();
+                return new SumAggregate(schema);
+            case DISTINCT:
+                return new DistinctCountAggregate(schema);
             default:
                 throw new IllegalArgumentException(
                         String.format("%s this type is not existed ", type.toString()));

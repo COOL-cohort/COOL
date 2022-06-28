@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AggregateType {
     AVERAGE("AVERAGE"), COUNT("COUNT"),
-    MAX("MAX"), MIN("MIN"), SUM("SUM");
+    MAX("MAX"), MIN("MIN"), SUM("SUM"), DISTINCT("DISTINCT");
 
     private final String text;
 
@@ -27,6 +27,7 @@ public enum AggregateType {
             case "MAX": return MAX;
             case "MIN": return MIN;
             case "SUM": return SUM;
+            case "DISTINCT": return DISTINCT;
             default:
                 throw new IllegalArgumentException();
         }
