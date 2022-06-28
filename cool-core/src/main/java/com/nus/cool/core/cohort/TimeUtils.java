@@ -71,7 +71,7 @@ public class TimeUtils {
                 return Days.daysBetween(DateBase.BASE,
                         now.plusMonths(nextN).withDayOfMonth(1)).getDays();
             default:
-                throw new IllegalArgumentException("Unkownn time unit: " + unit);
+                throw new IllegalArgumentException("Unknown time unit: " + unit);
         }
     }
 	
