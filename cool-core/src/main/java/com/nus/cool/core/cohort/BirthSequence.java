@@ -47,9 +47,7 @@ public class BirthSequence {
         /**
          * @param field the field to set
          */
-        public void setField(String field) {
-            this.field = field;
-        }
+        // public void setField(String field) { this.field = field; }
 
         /**
          * @return the numLevel
@@ -61,9 +59,7 @@ public class BirthSequence {
         /**
          * @param numLevel the numLevel to set
          */
-        public void setNumLevel(int numLevel) {
-            this.numLevel = numLevel;
-        }
+        // public void setNumLevel(int numLevel) { this.numLevel = numLevel; }
 
         /**
          * @return the minLevel
@@ -75,9 +71,7 @@ public class BirthSequence {
         /**
          * @param minLevel the minLevel to set
          */
-        public void setMinLevel(int minLevel) {
-            this.minLevel = minLevel;
-        }
+        // public void setMinLevel(int minLevel) { this.minLevel = minLevel; }
 
         /**
          * @return the logScale
@@ -89,9 +83,7 @@ public class BirthSequence {
         /**
          * @param logScale the logScale to set
          */
-        public void setLogScale(boolean logScale) {
-            this.logScale = logScale;
-        }
+        // public void setLogScale(boolean logScale) { this.logScale = logScale; }
 
         /**
          * @return the scale
@@ -103,9 +95,7 @@ public class BirthSequence {
         /**
          * @param scale the scale to set
          */
-        public void setScale(double scale) {
-            this.scale = scale;
-        }
+        // public void setScale(double scale) { this.scale = scale; }
 
         @JsonIgnore
         public boolean isValid() {
@@ -137,26 +127,22 @@ public class BirthSequence {
         /**
          * @param anchor the anchor to set
          */
-        public void setAnchor(int anchor) {
-            this.anchor = anchor;
-        }
+        // public void setAnchor(int anchor) { this.anchor = anchor; }
 
         /**
          * @return the offsets
          */
-        public String getOffset() {
-            return offset;
-        }
+        // public String getOffset() { return offset; }
 
         /**
          * @param offset the offsets to set
          */
-        public void setOffset(String offset) {
-            this.offset = offset;
-            String[] range = offset.split("\\|");
-            this.low = Integer.parseInt(range[0]);
-            this.high = Integer.parseInt(range[1]);
-        }
+        // public void setOffset(String offset) {
+        //     this.offset = offset;
+        //     String[] range = offset.split("\\|");
+        //     this.low = Integer.parseInt(range[0]);
+        //     this.high = Integer.parseInt(range[1]);
+        // }
 
         @JsonIgnore
         public int getLowOffset() {
@@ -195,9 +181,7 @@ public class BirthSequence {
         /**
          * @param length the duration to set
          */
-        public void setLength(int length) {
-            this.length = length;
-        }
+        // public void setLength(int length) { this.length = length; }
 
         /**
          * @return the slice
@@ -209,23 +193,17 @@ public class BirthSequence {
         /**
          * @param slice the slice to set
          */
-        public void setSlice(boolean slice) {
-            this.slice = slice;
-        }
+        // public void setSlice(boolean slice) { this.slice = slice; }
 
         /**
          * @return the unit
          */
-        public TimeWindowUnit getUnit() {
-            return unit;
-        }
+        public TimeWindowUnit getUnit() { return unit; }
 
         /**
          * @param unit the unit to set
          */
-        public void setUnit(TimeWindowUnit unit) {
-            this.unit = unit;
-        }
+        // public void setUnit(TimeWindowUnit unit) { this.unit = unit; }
 
         /**
          * @return the anchors
@@ -237,9 +215,7 @@ public class BirthSequence {
         /**
          * @param anchors the anchors to set
          */
-        public void setAnchors(List<Anchor> anchors) {
-            this.anchors = anchors;
-        }
+        // public void setAnchors(List<Anchor> anchors) { this.anchors = anchors; }
     }
 
     public static class BirthEvent {
@@ -254,9 +230,9 @@ public class BirthSequence {
             return this.aggrSelection;
         }
 
-        public void setAggrSelection(List<ExtendedFieldSet> selection) {
-            this.aggrSelection= selection;
-        }
+        // public void setAggrSelection(List<ExtendedFieldSet> selection) {
+        //     this.aggrSelection= selection;
+        // }
 
         /**
          * @return the timeWindow
@@ -268,9 +244,7 @@ public class BirthSequence {
         /**
          * @param timeWindow the timeWindow to set
          */
-        public void setTimeWindow(TimeWindow timeWindow) {
-            this.timeWindow = timeWindow;
-        }
+        //public void setTimeWindow(TimeWindow timeWindow) { this.timeWindow = timeWindow; }
 
         /**
          * @return the cohortFields
@@ -282,33 +256,25 @@ public class BirthSequence {
         /**
          * @param cohortFields the cohortFields to set
          */
-        public void setCohortFields(List<CohortField> cohortFields) {
-            this.cohortFields = cohortFields;
-        }
+        // public void setCohortFields(List<CohortField> cohortFields) { this.cohortFields = cohortFields; }
 
         public List<ExtendedFieldSet> getEventSelection() {
             return eventSelection;
         }
 
-        public void setEventSelection(List<ExtendedFieldSet> selection) {
-            this.eventSelection = selection;
-        }
+        // public void setEventSelection(List<ExtendedFieldSet> selection) { this.eventSelection = selection; }
 
         public int getMinTrigger() {
             return minTrigger;
         }
 
-        public void setMinTrigger(int num) {
-            minTrigger = num;
-        }
+        //public void setMinTrigger(int num) { minTrigger = num; }
 
         public int getMaxTrigger() {
             return maxTrigger;
         }
 
-        public void setMaxTrigger(int num) {
-            maxTrigger = num;
-        }
+        //public void setMaxTrigger(int num) { maxTrigger = num; }
     }
 
     private List<BirthEvent> birthEvents = new ArrayList<>();
@@ -372,6 +338,7 @@ public class BirthSequence {
             }
         }
     }
+
 
     @JsonIgnore
     public List<Integer> getSortedBirthEvents() {
