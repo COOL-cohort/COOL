@@ -2,7 +2,6 @@ package com.nus.cool.core.cohort.refactor;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -13,8 +12,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelection;
-import com.nus.cool.core.cohort.refactor.aggregate.AggregateFactory;
-import com.nus.cool.core.cohort.refactor.aggregate.AggregateFunc;
 import com.nus.cool.core.cohort.refactor.birthSelect.BirthSelection;
 import com.nus.cool.core.cohort.refactor.cohortSelect.CohortSelectionLayout;
 import com.nus.cool.core.cohort.refactor.cohortSelect.CohortSelector;
@@ -26,15 +23,14 @@ import com.nus.cool.core.cohort.refactor.valueSelect.ValueSelection;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.HashMetaFieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.schema.FieldType;
 
-import javafx.util.Pair;
 import lombok.Getter;
 
+@Getter
 public class CohortProcessor {
 
     private AgeSelection ageSelector;
@@ -44,10 +40,10 @@ public class CohortProcessor {
 
     private ValueSelection valueSelector;
 
+    private BirthSelection birthSelector;
+
     @JsonIgnore
     private CohortSelector cohortSelector;
-
-    private BirthSelection birthSelector;
 
     @JsonIgnore
     private List<String> projectedSchemaList;
@@ -64,17 +60,18 @@ public class CohortProcessor {
     @JsonIgnore
     private ProjectedTuple tuple;
 
-    @Getter
     @JsonIgnore
     private CohortRet result;
 
     /**
-     * Create some filter instance
+     * Create some filter instance, it's private func
+     * It will be invoked automatically, when create a new CohortProcessor from cohortQuery file
      */
-    public void init() {
+    private void init() {
         this.inilialize = true;
         this.ageSelector.init();
         this.cohortSelector = this.cohortSelectionLayout.generateCohortSelector();
+        this.valueSelector.init();
         this.birthSelector.init();
         // Merge Schema
         HashSet<String> schemaMap = new HashSet<>();
@@ -84,27 +81,14 @@ public class CohortProcessor {
         schemaMap.add(this.cohortSelector.getSchema());
         schemaMap.addAll(this.valueSelector.getSchemaList());
         schemaMap.addAll(this.birthSelector.getRelatedSchemas());
+        
         this.projectedSchemaList = new ArrayList<>(schemaMap);
         this.tuple = new ProjectedTuple(this.projectedSchemaList);
-
         // generate CohortResult to store intermediate result
         this.result = new CohortRet(this.ageSelector);
     }
 
-    /**
-     * Read from json file and create a instance of CohortProcessor
-     * 
-     * @param in
-     * @return
-     * @throws IOException
-     */
-    public static CohortProcessor readFromJson(File in) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        CohortProcessor instance = mapper.readValue(in, CohortProcessor.class);
-        instance.init();
-        return instance;
-    }
-
+   
     /**
      * Public interface, Scan whole table and return CohortResult
      * 
@@ -213,4 +197,29 @@ public class CohortProcessor {
     private boolean checkMetaChunk(MetaChunkRS meta) {
         return true;
     }
+
+
+
+
+    /**-------------------  IO Factory    ----------------------*/
+     /**
+     * Read from json file and create a instance of CohortProcessor
+     * 
+     * @param in
+     * @return
+     * @throws IOException
+     */
+    public static CohortProcessor readFromJson(File in) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        CohortProcessor instance = mapper.readValue(in, CohortProcessor.class);
+        instance.init();
+        return instance;
+    }
+
+
+    public static CohortProcessor readFromJson(String path) throws IOException{
+        return readFromJson(new File(path));
+    }
+
+
 }
