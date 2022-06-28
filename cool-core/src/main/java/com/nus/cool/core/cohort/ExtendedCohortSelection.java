@@ -361,6 +361,7 @@ public class ExtendedCohortSelection implements Operator {
 		}
 	}
 
+	
 	private int getUserBirthTime(int start, int end) {
 
 		int offset = start;
@@ -405,7 +406,8 @@ public class ExtendedCohortSelection implements Operator {
 				else
 					bday = timeVector.get(offset - 1) + 1;
 
-				birthDay = (birthDay < bday) ? bday : birthDay;
+				//birthDay = (birthDay < bday) ? bday : birthDay;
+				if (birthDay < bday) birthDay = bday ;
 
 				// check the maximal trigger time
 				if(maxTriggerTime[e]!=-1){
@@ -431,28 +433,32 @@ public class ExtendedCohortSelection implements Operator {
 				int endDay = TimeUtils.getDateFromOffset(timeVector,end-1);
 				// remove users without records for at least wlen day
 				if ((endDay-startDay)<wlen) return -1;
-				int windowOffset;
 
+				int day;
 				for (BirthSequence.Anchor anc : window.getAnchors()) {
-					int day = anc.getLowOffset() + windowtDate[anc.getAnchor()];
-					startDay = startDay < day ? day : startDay;
+					day = anc.getLowOffset() + windowtDate[anc.getAnchor()];
+					//startDay = startDay < day ? day : startDay;
+					if (startDay < day) startDay = day;
 					day = anc.getHighOffset() + windowtDate[anc.getAnchor()];
-					endDay = endDay > day ? day : endDay;
+					//endDay = endDay > day ? day : endDay;
+					if (endDay > day) endDay = day;
 				}
 
 				if (wlen == 0) {
 					// set the wlen to the maximum day if it is set to 0
 					wlen = maxDate - startDay + 1;
-					endDay = (endDay >= startDay) ? startDay : endDay;
+					//endDay = (endDay >= startDay) ? startDay : endDay;
+					if (endDay > startDay) endDay = startDay;
 				}
 
 				// offset records the checked time space
 				offset = TimeUtils.skipToDate(timeVector, start, end, startDay);
 				// windowOffset records the start time offset of a certain time window
-				windowOffset = offset;
+				int windowOffset = offset;
+				int pos;
 				while (startDay <= endDay) {
 					// skip to the endOffset for the time window
-					int pos = TimeUtils.skipToDate(timeVector, offset, end, startDay + wlen);
+					pos = TimeUtils.skipToDate(timeVector, offset, end, startDay + wlen);
 
 					// skip to the startOffset for the time window
 					windowOffset = TimeUtils.skipToDate(timeVector, windowOffset, end, startDay);
@@ -471,7 +477,8 @@ public class ExtendedCohortSelection implements Operator {
 
 					if (checkOccurrence(e)) {
 						windowtDate[e] = startDay;
-						birthDay = (birthDay < startDay + wlen) ? startDay + wlen : birthDay;
+						//birthDay = (birthDay < startDay + wlen) ? startDay + wlen : birthDay;
+						birthDay = Math.max(startDay + wlen, birthDay);
 						break;
 					}
 
@@ -489,7 +496,8 @@ public class ExtendedCohortSelection implements Operator {
 			}
 
 			// birthOffset points to the first age tuple
-			birthOffset = (birthOffset < offset) ? offset : birthOffset;
+			//birthOffset = (birthOffset < offset) ? offset : birthOffset;
+			if (birthOffset < offset) birthOffset = offset;
 		}
 
 		// evaluate birth aggregation filters
@@ -503,7 +511,7 @@ public class ExtendedCohortSelection implements Operator {
 		else
 			return -1;
 	}
-
+	
 	public ExtendedCohort selectUser(int start, int end) {
 		checkArgument(start < end);
 
@@ -511,21 +519,18 @@ public class ExtendedCohortSelection implements Operator {
 		for (LinkedList<Integer> occurrence : this.eventOffset) {
 			occurrence.clear();
 		}
-
 		int boff = this.getUserBirthTime(start, end);
-
 		cohort.clearDimension();
-
 		if (boff >= 0) {
 			// find the respective cohort for this user
 			List<BirthSequence.BirthEvent> events = q.getBirthSequence().getBirthEvents();
 			for (int idx = 0; idx < events.size(); ++idx) {
 				BirthSequence.BirthEvent be = events.get(idx);
 				for (BirthSequence.CohortField cf : be.getCohortFields()) {
-
 					int fieldID = tableSchema.getFieldID(cf.getField());                    
 
 					// cohort by the birth time
+					// However, this code block seems not to be triggered during the test.
 					if (fieldID == tableSchema.getActionTimeField()) {
 						cohort.addDimension(TimeUtils.getDateofNextTimeUnitN(cohort.getBirthDate(),
 								q.getAgeField().getUnit(), 0));
@@ -555,22 +560,24 @@ public class ExtendedCohortSelection implements Operator {
 							}
 						} else {
 							v = (value / cf.getScale());
-							level = (v > v.intValue()) ? v.intValue()+1 : v.intValue();
-							level = (level >= cf.getMinLevel()) ? level : cf.getMinLevel();
-							if (level >= cf.getMinLevel() + cf.getNumLevel())
-								level = cf.getMinLevel() + cf.getNumLevel();
+							//level = (v > v.intValue()) ? v.intValue()+1 : v.intValue();
+							//level = (level >= cf.getMinLevel()) ? level : cf.getMinLevel();
+							//if (level >= cf.getMinLevel() + cf.getNumLevel())
+								//level = cf.getMinLevel() + cf.getNumLevel();
+							int v_int = v.intValue();
+							level = Math.max(((v > v_int) ? v_int+1 : v_int), cf.getMinLevel());
+							level = Math.min(level, cf.getMinLevel() + cf.getNumLevel());
+
 						}
 						cohort.addDimension(level);
 					}
 				}
 			}
-
 			return cohort;
 		}
-
 		return null;
 	}
-
+	
 
 	private void filterAgeActivity(int ageOff, int ageEnd, BitSet bs, InputVector fieldIn, FieldFilter ageFilter) {
 		// update value for this column if necessary
