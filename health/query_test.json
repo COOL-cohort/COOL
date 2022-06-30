@@ -1,17 +1,17 @@
 {
-    "birthSelection":{
+    "birthSelector":{
         "birthEvents":[
             {    
                 "filters":[
                     {
                         "fieldSchema":"diagnose",
                         "type":"SET",
-                        "accepctValue":["Disease-B"],
+                        "acceptValue":["Disease-B"],
                         "rejectValue":["Disease-ABC"]
                     },
                     {
                         "fieldSchema":"birthyear",
-                        "type":"Range",
+                        "type":"RANGE",
                         "acceptValue":["1954-1999","2000-2012", "2014-MAX"]
                     }
                 ],
@@ -36,9 +36,9 @@
         }
     },
 
-    "cohortSelection":{
+    "cohortSelector":{
         "fieldSchema":"birthyear",
-        "type":"Range",
+        "type":"RANGE",
         "acceptValue":[],
         "rejectValue":[],
         "interval":10,
@@ -46,14 +46,14 @@
         "min":1900
     },
 
-    "ageSelection":{
+    "ageSelector":{
         "unit":"DAY",
         "min":2,
         "max":10,
         "interval":1
     },
 
-    "valueSelection":{
+    "valueSelector":{
         "filters":[
             {
                 "fieldSchema":"labtest",
