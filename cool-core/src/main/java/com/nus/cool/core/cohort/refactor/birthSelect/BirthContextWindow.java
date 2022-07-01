@@ -33,6 +33,12 @@ public class BirthContextWindow {
     public void put(Integer eventId, Calendar date) {
         Preconditions.checkState(eventId < this.eventNum,
                 "Input eventId is out of range");
+        
+        if(this.maxTimeWindow == null){
+            // no need to maintain window, all action tuple should be considered
+            this.eventState[eventId] += 1;
+            return;
+        }
         EventTime newEventTime = new EventTime(eventId, date);
         window.add(newEventTime);
         this.eventState[eventId] += 1;
