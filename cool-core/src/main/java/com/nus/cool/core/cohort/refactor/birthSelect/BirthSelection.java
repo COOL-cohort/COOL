@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
@@ -17,7 +18,8 @@ public class BirthSelection {
     // @Getter
     // @Setter
     private List<EventSelection> birthEvents;
- 
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private TimeWindow timeWindow;
 
     @JsonIgnore
@@ -39,7 +41,7 @@ public class BirthSelection {
             eventMinFrequency[i] = birthEvents.get(i).getFrequency();
             this.relatedSchemas.addAll(birthEvents.get(i).getSchemaList());
         }
-        this.context = new BirthSelectionContext(timeWindow, eventMinFrequency);
+        this.context = new BirthSelectionContext(this.timeWindow, eventMinFrequency);
     }
 
     /**
