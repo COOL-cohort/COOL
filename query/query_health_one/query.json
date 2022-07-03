@@ -1,10 +1,10 @@
 {
-    "brithSelector":{
+    "birthSelector":{
         "birthEvents":[
             {
                 "filters":[
                     {
-                        "fieldschema":"prescribe",
+                        "fieldSchema":"prescribe",
                         "type":"SET",
                         "acceptValue":["Disease-A"]
 
