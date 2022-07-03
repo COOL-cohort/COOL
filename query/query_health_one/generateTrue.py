@@ -6,6 +6,7 @@ from tqdm import tqdm
 import json
 
 '''
+Cohort Query Target
 BirthEvent: select two "Disease-A" in field "prescribe"
 AgeSelector: from 0->7
 Cohort:1950-1960, 1960-1970, 1970-1980, 1980-1990, 1990-2000

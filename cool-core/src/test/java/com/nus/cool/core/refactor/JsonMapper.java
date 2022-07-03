@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,15 +18,16 @@ import com.nus.cool.core.cohort.refactor.cohortSelect.CohortSelector;
 import com.nus.cool.core.cohort.refactor.valueSelect.ValueSelection;
 
 public class JsonMapper {
+
     /**
      * Use the Jackson JSON Tree Model to check the ObjectMapper from Json to
      * CohortQuery
      * 
      * @throws IOException
      */
-
+    @SuppressWarnings("unused")
     @Test
-    public void JsonLoadTest() throws IOException {
+    public void JsonLoadDebugTest() throws IOException {
         Path resourceRoot = Paths.get(System.getProperty("user.dir"),
                 "src", "test", "java", "com", "nus", "cool", "core", "resources");
         Path queryPath = Paths.get(resourceRoot.toString(),
@@ -49,9 +51,9 @@ public class JsonMapper {
         JsonNode cohortSelectorJsonNode = cohortQueryJsonNode.get("cohortSelector");
         System.out.println(cohortSelectorJsonNode.toString());
         // cohortSelector create
-        CohortSelectionLayout cohortSelectLayout = objectMapper.treeToValue(cohortSelectorJsonNode, CohortSelectionLayout.class);
+        CohortSelectionLayout cohortSelectLayout = objectMapper.treeToValue(cohortSelectorJsonNode,
+                CohortSelectionLayout.class);
         CohortSelector cohortSelector = cohortSelectLayout.generateCohortSelector();
-        
 
         JsonNode ageSelectorJsonNode = cohortQueryJsonNode.get("ageSelector");
         System.out.println(ageSelectorJsonNode.toString());
@@ -62,8 +64,24 @@ public class JsonMapper {
         System.out.println(valueSelectorJsonNode.toString());
         ValueSelection valueSelector = objectMapper.treeToValue(valueSelectorJsonNode, ValueSelection.class);
         valueSelector.init();
-    
+
         CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryFile);
+    }
+
+    @SuppressWarnings("unused")
+    @Test(dataProvider = "QueryJsonMapperDP")
+    public void QueryJsonMapperTest(String DirPath) throws IOException {
+        String queryPath = Paths.get(DirPath, "query.json").toString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
+    }
+
+    @DataProvider(name = "QueryJsonMapperDP")
+    public Object[][] QueryJsonMapperDP() {
+        String queryDir = Paths.get(System.getProperty("user.dir"), "..", "query").toString();
+        return new Object[][] {
+                { Paths.get(queryDir, "query_health_one").toString() },
+        };
     }
 
 }
