@@ -26,7 +26,6 @@ public class ValueSelection {
 
     private String observedSchema;
 
-
     @JsonIgnore
     private List<String> schemaList;
     // private

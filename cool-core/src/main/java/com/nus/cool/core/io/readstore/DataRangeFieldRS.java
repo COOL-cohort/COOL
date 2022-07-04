@@ -68,7 +68,6 @@ public class DataRangeFieldRS implements FieldRS {
         FieldType fieldType = FieldType.fromInteger(buffer.get());
         this.readFromWithFieldType(buffer, fieldType);
     }
-
     
 
     //no used, only to keep compatiable with old version code
