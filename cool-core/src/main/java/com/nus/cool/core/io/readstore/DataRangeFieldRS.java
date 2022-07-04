@@ -69,16 +69,6 @@ public class DataRangeFieldRS implements FieldRS {
         this.readFromWithFieldType(buffer, fieldType);
     }
 
-    private void validateInitialization(){
-        Preconditions.checkState(this.initialized, "DataRangeFiledRS is not initialized");
-    }   
-
-
-    @Override
-    public void readFrom(ByteBuffer buffer) {
-        FieldType fieldType = FieldType.fromInteger(buffer.get());
-        this.readFromWithFieldType(buffer, fieldType);
-    }
     
 
     //no used, only to keep compatiable with old version code

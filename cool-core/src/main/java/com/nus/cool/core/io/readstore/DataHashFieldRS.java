@@ -40,14 +40,6 @@ public class DataHashFieldRS implements FieldRS {
         return this.keyVector.get(this.valueVector.get(idx));
     }
 
-    /**
-     * 
-     */
-    @Override
-    public int getValueByIndex(int idx){
-        return this.keyVector.get(this.valueVector.get(idx));
-    }
-
     @Override
     public void readFromWithFieldType(ByteBuffer buf, FieldType ft) {
         this.initialized = true;
