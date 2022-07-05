@@ -2,6 +2,7 @@ package com.nus.cool.core.cohort.refactor;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -26,7 +27,9 @@ import com.nus.cool.core.io.readstore.CubletRS;
 import com.nus.cool.core.io.readstore.HashMetaFieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
+import com.nus.cool.core.schema.TableSchema;
 
 import lombok.Getter;
 
@@ -46,16 +49,16 @@ public class CohortProcessor {
     private CohortSelector cohortSelector;
 
     @JsonIgnore
-    private List<String> projectedSchemaList;
+    private HashSet<String> projectedSchemaSet;
 
     @JsonIgnore
     private boolean inilialize = false;
 
     @JsonIgnore
-    private final String UserIdSchema = "UserID";
+    private String UserIdSchema;
 
     @JsonIgnore
-    private final String ActionTimeSchema = "ActionTime";
+    private String ActionTimeSchema;
 
     @JsonIgnore
     private ProjectedTuple tuple;
@@ -74,16 +77,13 @@ public class CohortProcessor {
         this.valueSelector.init();
         this.birthSelector.init();
         // Merge Schema
-        HashSet<String> schemaMap = new HashSet<>();
+        this.projectedSchemaSet = new HashSet<>();
         // Default Add UserIdSchema and ActionTimeSchema
-        schemaMap.add(this.UserIdSchema);
-        schemaMap.add(this.ActionTimeSchema);
-        schemaMap.add(this.cohortSelector.getSchema());
-        schemaMap.addAll(this.valueSelector.getSchemaList());
-        schemaMap.addAll(this.birthSelector.getRelatedSchemas());
+        this.projectedSchemaSet.add(this.cohortSelector.getSchema());
+        this.projectedSchemaSet.addAll(this.valueSelector.getSchemaList());
+        this.projectedSchemaSet.addAll(this.birthSelector.getRelatedSchemas());
+
         
-        this.projectedSchemaList = new ArrayList<>(schemaMap);
-        this.tuple = new ProjectedTuple(this.projectedSchemaList);
         // generate CohortResult to store intermediate result
         this.result = new CohortRet(this.ageSelector);
     }
@@ -96,6 +96,19 @@ public class CohortProcessor {
      * @return CohortRet
      */
     public CohortRet process(CubeRS cube) {
+        // initialize the UserId and KeyId
+        TableSchema tableschema = cube.getSchema();
+        for(FieldSchema fieldSchema : tableschema.getFields()){
+            if(fieldSchema.getFieldType() == FieldType.UserKey){
+                this.UserIdSchema = fieldSchema.getName();
+            } else if (fieldSchema.getFieldType() == FieldType.ActionTime){
+                this.ActionTimeSchema = fieldSchema.getName();
+            }
+        }
+        // add this two schema into List
+        this.projectedSchemaSet.add(this.UserIdSchema);
+        this.projectedSchemaSet.add(this.ActionTimeSchema);
+        this.tuple = new ProjectedTuple(this.projectedSchemaSet);
         for (CubletRS cublet : cube.getCublets()) {
             processCublet(cublet);
         }
@@ -121,7 +134,7 @@ public class CohortProcessor {
         HashMap<String, String[]> gidMapBySchema = new HashMap<>();
 
         // we only get used schema;
-        for (String schema : this.projectedSchemaList) {
+        for (String schema : this.projectedSchemaSet) {
             MetaFieldRS metaField = metaChunk.getMetaField(schema);
             if (FieldType.IsHashType(metaField.getFieldType())) {
                 gidMapBySchema.put(schema, ((HashMetaFieldRS) metaField).getGidMap());
@@ -144,8 +157,15 @@ public class CohortProcessor {
     private void processDataChunk(ChunkRS chunk, HashMap<String, String[]> hashMapperBySchema) {
         for (int i = 0; i < chunk.getRecords(); i++) {
             // load data into tuple
-            for (String schema : this.projectedSchemaList) {
-                tuple.loadAttr(chunk.getField(schema).getValueByIndex(i), schema);
+            for (String schema : this.projectedSchemaSet) {
+                // if the value is segment type, we should convert it to String from globalId
+                if(hashMapperBySchema.containsKey(schema)){
+                    int globalId = chunk.getField(schema).getValueByIndex(i);
+                    String v = hashMapperBySchema.get(schema)[globalId];
+                    tuple.loadAttr(v, schema);
+                } else {
+                    tuple.loadAttr(chunk.getField(schema).getValueByIndex(i), schema);
+                }
             }
             // now this tuple is loaded
             this.processTuple();
@@ -158,7 +178,7 @@ public class CohortProcessor {
     private void processTuple() {
         // For One Tuple, we firstly get the userId, and ActionTime
         int userId = (int) tuple.getValueBySchema(this.UserIdSchema);
-        Calendar actionTime = DateUtils.createCalender((long) tuple.getValueBySchema(this.ActionTimeSchema));
+        Calendar actionTime = DateUtils.createCalender(Integer.valueOf((int)tuple.getValueBySchema(this.ActionTimeSchema)));
         // check whether its birthEvent is selected
         if (!this.birthSelector.isUserSelected(userId)) {
             // if birthEvent is not selected
