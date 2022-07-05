@@ -1,8 +1,11 @@
 package com.nus.cool.core.cohort.refactor.storage;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
+import com.fasterxml.jackson.annotation.JsonFormat.Value;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelection;
 
@@ -33,6 +36,7 @@ public class CohortRet {
     /**
      * Initialize the missing intance
      * Get the certain RetUnit, user can modify RetUnit in place
+     * 
      * @param cohort
      * @param age
      * @return
@@ -64,16 +68,33 @@ public class CohortRet {
      */
     private class Xaxis {
         private RetUnit[] retUnits;
+
         Xaxis(int size) {
             this.retUnits = new RetUnit[size];
         }
 
         // Directly change the RetUnit in place
         public RetUnit get(int i) {
-            if(this.retUnits[i] == null) this.retUnits[i] = new RetUnit(0,0); 
+            if (this.retUnits[i] == null)
+                this.retUnits[i] = new RetUnit(0, 0);
             return this.retUnits[i];
         }
 
+        @Override
+        public String toString() {
+            return "Xaxis [retUnits=" + Arrays.toString(retUnits) + "]";
+        }
+
+    }
+
+    @Override
+    public String toString() {
+        String ret = "CohortRet [interval=" + interval + ", max=" + max
+                + ", min=" + min + ", size=" + size + "]\n";
+        for (Entry<String,Xaxis> entry:this.cohortToValueList.entrySet()){
+            ret = entry.getKey() + ":" + entry.getValue().toString() + "\n";
+        }
+        return ret;
     }
 
 }
