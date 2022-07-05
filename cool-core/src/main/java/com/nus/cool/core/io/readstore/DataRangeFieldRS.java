@@ -52,6 +52,8 @@ public class DataRangeFieldRS implements FieldRS {
     public void readFromWithFieldType(ByteBuffer buf, FieldType ft) {
         this.initialized = true;
         this.fieldType = ft;
+        this.minKey = buf.getInt();
+        this.maxKey = buf.getInt();
         this.valueVector = InputVectorFactory.readFrom(buf);
         // TODO(Lingze) There is still room for optimization
         // We can directly read from buffer to ArrayList<Integar>
@@ -79,8 +81,7 @@ public class DataRangeFieldRS implements FieldRS {
 
     @Override
     public InputVector getValueVector() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.valueVector;
     }
 
 }

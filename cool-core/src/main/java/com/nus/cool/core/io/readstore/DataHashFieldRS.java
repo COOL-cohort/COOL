@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
+import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.FieldType;
 
 public class DataHashFieldRS implements FieldRS {
@@ -41,11 +42,16 @@ public class DataHashFieldRS implements FieldRS {
     }
 
     @Override
-    public void readFromWithFieldType(ByteBuffer buf, FieldType ft) {
+    public void readFromWithFieldType(ByteBuffer buffer, FieldType ft) {
         this.initialized = true;
         this.fieldType = ft;
-        this.keyVector = InputVectorFactory.readFrom(buf);
-        this.valueVector = InputVectorFactory.readFrom(buf);
+        // this.keyVector = InputVectorFactory.readFrom(buf);
+
+        // this.valueVector = InputVectorFactory.readFrom(buf);
+
+      
+        this.keyVector = InputVectorFactory.readFrom(buffer);
+        this.valueVector = InputVectorFactory.readFrom(buffer);
     }
 
     private void validateInitialization() {
@@ -80,8 +86,8 @@ public class DataHashFieldRS implements FieldRS {
 
     @Override
     public int maxKey() {
-        // TODO Auto-generated method stub
-        return 0;
+        
+        return this.valueVector.size();
     }
 
 }

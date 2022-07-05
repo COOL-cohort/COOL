@@ -76,8 +76,8 @@ public interface FieldRS extends Input {
   int getValueByIndex(int idx);
   void readFromWithFieldType(ByteBuffer buf, FieldType fieldType);
 
-  public static FieldRS ReadFieldRS(ByteBuffer buf){
-    FieldType fieldtype = FieldType.fromInteger(buf.get());
+  public static FieldRS ReadFieldRS(ByteBuffer buf, FieldType fieldtype){
+
     Codec codec = Codec.fromInteger(buf.get());
     if(codec == Codec.Range) {
         // Generate DataRangeFieldRS
@@ -86,6 +86,7 @@ public interface FieldRS extends Input {
         return rs;
     } else {
         // Generate DataHashFieldRS
+        buf.position(buf.position() - 1);
         DataHashFieldRS rs = new DataHashFieldRS();
         rs.readFromWithFieldType(buf,fieldtype);
         return rs;

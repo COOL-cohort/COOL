@@ -107,7 +107,7 @@ public class ChunkRS implements Input {
     for (int i = 0; i < fields; i++) {
       // System.out.println("Reading data chunk's field ="+i+".....");
       buffer.position(fieldOffsets[i]);
-      this.fields[i] = FieldRS.ReadFieldRS(buffer);
+      this.fields[i] = FieldRS.ReadFieldRS(buffer,this.schema.getField(i).getFieldType());
     }
   }
 

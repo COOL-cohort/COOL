@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.CoolFieldRS;
+import com.nus.cool.core.io.readstore.DataHashFieldRS;
+import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.HashMetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.writestore.DataHashFieldWS;
@@ -98,20 +100,15 @@ public class HashFieldTest {
         HashMetaFieldRS hmrs = new HashMetaFieldRS(charset);
         hmrs.readFromWithFieldType(bf, fType);
         bf.position(wsPos);
-        CoolFieldRS rs = new CoolFieldRS();
-        rs.readFromWithFieldType(bf, fType);
+        FieldRS rs = FieldRS.ReadFieldRS(bf,fType);
 
         // Check the Key Point of HashMetaField and HashField
         Assert.assertEquals(hmws.count(), hmrs.count());
 
-        // localId 2 GlobalId
-        InputVector lid2Gid = rs.getKeyVector();
-        // Tuple global Id
-        InputVector vec = rs.getValueVector();
-        for (int i = 0; i < vec.size(); i++) {
+
+        for (int i = 0; i < data.size(); i++) {
             String expected = data.get(i);
-            int localId = vec.get(i);
-            int globalId = lid2Gid.get(localId);
+            int globalId = rs.getValueByIndex(i);
             String actual = hmrs.getString(globalId);
 
             Assert.assertEquals(actual, expected);
