@@ -1,7 +1,7 @@
 package com.nus.cool.core.cohort.refactor.storage;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map.Entry;
 
 /**
@@ -20,12 +20,13 @@ public class ProjectedTuple {
         return tuple[schema2Index.get(schema)];
     }
 
-    public ProjectedTuple(List<String> schemaList){
+    public ProjectedTuple(HashSet<String> schemaList){
         this.schema2Index = new HashMap<>();
         int idx = 0;
         for(String schema : schemaList){
             this.schema2Index.put(schema, idx++);
         }
+        this.tuple = new Object[this.schema2Index.size()];
     }
 
     // public ProjectedTuple
