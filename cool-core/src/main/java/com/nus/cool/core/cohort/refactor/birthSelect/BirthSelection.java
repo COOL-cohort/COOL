@@ -50,7 +50,7 @@ public class BirthSelection {
      * @param userId
      * @return
      */
-    public boolean isUserSelected(int userId) {
+    public boolean isUserSelected(String userId) {
         return context.IsUserSelected(userId);
     }
 
@@ -61,7 +61,7 @@ public class BirthSelection {
      * @param userId
      * @return
      */
-    public Calendar getUserBirthEventDate(int userId) {
+    public Calendar getUserBirthEventDate(String userId) {
         return context.getUserBirthEventDate(userId);
     }
 
@@ -73,7 +73,7 @@ public class BirthSelection {
      * @param tuple  Partial Action Tuple,
      * @return
      */
-    public boolean selectEvent(int userId, Calendar date, ProjectedTuple tuple) {
+    public boolean selectEvent(String userId, Calendar date, ProjectedTuple tuple) {
         int eventIdx = 0;
         for (EventSelection event : birthEvents) {
             if (event.Accept(tuple)) {

@@ -11,8 +11,8 @@ import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
  */
 public class BirthSelectionContext {
 
-  private HashMap<Integer, Calendar> userSelected; // If user is selected and BirthEvent Calender
-  private HashMap<Integer, BirthContextWindow> userBirthTime; // UserId -> BirthContextWindow
+  private HashMap<String, Calendar> userSelected; // If user is selected and BirthEvent Calender
+  private HashMap<String, BirthContextWindow> userBirthTime; // UserId -> BirthContextWindow
   private final TimeWindow maxTimeWindow;
   private final int[] eventMinFrequency; // EventId (index) -> Frequency (value)
 
@@ -30,7 +30,7 @@ public class BirthSelectionContext {
    * @param EventId
    * @param date
    */
-  public void Add(Integer userId, Integer eventId, Calendar date) {
+  public void Add(String userId, Integer eventId, Calendar date) {
     Preconditions.checkArgument(userSelected.containsKey(userId) == false,
         "Before Invoke Add, the userId should be unselected state");
     if (!userBirthTime.containsKey(userId))
@@ -57,7 +57,7 @@ public class BirthSelectionContext {
    * @param userId
    * @return
    */
-  public boolean IsUserSelected(Integer userId) {
+  public boolean IsUserSelected(String userId) {
     return userSelected.containsKey(userId);
   }
 
@@ -67,7 +67,7 @@ public class BirthSelectionContext {
    * @param userId
    * @return null if user is not selected
    */
-  public Calendar getUserBirthEventDate(Integer userId) {
+  public Calendar getUserBirthEventDate(String userId) {
     return userSelected.get(userId);
   }
 
