@@ -32,6 +32,7 @@ import lombok.Getter;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Range MetaField write store
@@ -109,6 +110,11 @@ public class MetaRangeFieldWS implements MetaFieldWS {
 
   @Override
   public void putUser(String[] tupleValue) {
+
+  }
+
+  @Override
+  public void putUser(String[] tupleValue, List<FieldType> invariantType) {
 
   }
 
