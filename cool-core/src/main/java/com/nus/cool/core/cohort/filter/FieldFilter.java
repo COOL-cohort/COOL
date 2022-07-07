@@ -21,6 +21,8 @@ package com.nus.cool.core.cohort.filter;
 import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.storevector.InputVector;
+
 import java.util.List;
 
 /**
@@ -57,6 +59,8 @@ public interface FieldFilter {
    * @return false indicates the field is not eligible and true indicates the field is eligible
    */
   boolean accept(FieldRS field);
+
+  boolean accept(InputVector inputVector);
 
   /**
    * Indicate whether the interger v is eligible

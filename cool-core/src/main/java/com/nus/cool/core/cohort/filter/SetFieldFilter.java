@@ -146,6 +146,17 @@ public class SetFieldFilter implements FieldFilter {
     return bHit || (this.values.isEmpty());
   }
 
+  @Override
+  public boolean accept(InputVector inputVector) {
+    if(this.isAll) return true;
+    for(int i =0;i<inputVector.size();i++){
+      if(inputVector.find(this.contentIDs[i])>=0){
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Indicate whether the integer is eligible
    * 
