@@ -23,6 +23,7 @@ import com.nus.cool.core.schema.FieldType;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.List;
 
 public interface MetaFieldWS extends Output {
 
@@ -40,6 +41,7 @@ public interface MetaFieldWS extends Output {
   void update(String v);
 
   void putUser(String[] tupleValue);
+  void putUser(String[] tupleValue, List<FieldType> invariantType);
 
   /**
    * Find the index of value in this meta field, return -1 if no such value exists

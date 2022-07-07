@@ -105,7 +105,6 @@ public class MetaChunkWS implements Output {
 
             switch (fieldType) {
                 case UserKey:
-                    metaFields[i] = new MetaHashFieldWS(fieldType, charset, compressor,schema);
                 case AppKey:
                 case Action:
                 case Segment:
@@ -127,14 +126,14 @@ public class MetaChunkWS implements Output {
      *
      * @param tuple Plain data line
      */
-    public void put(String[] tuple) {
+    public void put(String[] tuple,List<FieldType>invariantType) {
         checkNotNull(tuple);
         for (int i = 0; i < tuple.length; i++) {
             if (userKeyIndex == i) {
                 List<String> userData = new ArrayList<>();
                 userData.add(tuple[userKeyIndex]);
                 for (int j = 0; j < invariantFieldIndex.size(); j++) userData.add(tuple[invariantFieldIndex.get(i)]);
-                this.metaFields[i].putUser((String[])userData.toArray(new String[0]));
+                this.metaFields[i].putUser((String[])userData.toArray(new String[0]),invariantType);
             } else {
                 this.metaFields[i].put(tuple[i]);
             }
