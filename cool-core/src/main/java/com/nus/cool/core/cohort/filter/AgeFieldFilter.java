@@ -22,6 +22,7 @@ package com.nus.cool.core.cohort.filter;
 import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.storevector.InputVector;
 
 import java.util.List;
 
@@ -57,6 +58,11 @@ public class AgeFieldFilter implements FieldFilter {
 
 	@Override
 	public boolean accept(FieldRS chunkField) {
+		return true;
+	}
+
+	@Override
+	public boolean accept(InputVector inputVector) {
 		return true;
 	}
 

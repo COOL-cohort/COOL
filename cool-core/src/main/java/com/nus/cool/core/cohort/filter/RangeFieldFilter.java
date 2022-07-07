@@ -137,6 +137,17 @@ public class RangeFieldFilter implements FieldFilter {
     return !(field.minKey() > this.max || field.maxKey() < this.min);
   }
 
+  @Override
+  public boolean accept(InputVector inputVector) {
+    inputVector.skipTo(0);
+    for(int i =0;i<inputVector.size();i++){
+      if(inputVector.get(i)<this.max && inputVector.get(i)>this.min){
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   /**
    * Indicate whether the integer v is eligible

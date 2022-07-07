@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -56,6 +57,12 @@ public class TableSchema {
    */
   @Getter
   private int userKeyField = -1;
+
+  @Getter
+  private List<Integer> invariantFields = new ArrayList<>();
+
+  @Getter
+  private Map<String, Integer> invariantName2Id = Maps.newHashMap();
 
   /**
    * AppKeyField index, assign -1 if this field type not exist.
@@ -103,6 +110,11 @@ public class TableSchema {
     for (int i = 0; i < fields.size(); i++) {
       FieldSchema field = fields.get(i);
       FieldType fieldType = field.getFieldType();
+      boolean invariantField=field.isInvariantField();
+      if(invariantField) {
+        this.invariantFields.add(i);
+        invariantName2Id.put(field.getName(),this.invariantFields.size()-1);
+      }
       this.name2Id.put(field.getName(), i);
       switch (fieldType) {
         case AppKey:

@@ -25,8 +25,12 @@ import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
+import lombok.Getter;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +59,7 @@ public class MetaChunkRS implements Input {
   /**
    * TableSchema for this meta chunk
    */
+  @Getter
   private TableSchema schema;
 
   /**
@@ -108,9 +113,13 @@ public class MetaChunkRS implements Input {
     int fieldOffset = this.fieldOffsets[i];
     this.buffer.position(fieldOffset);
     MetaFieldRS metaField = null;
+    List<Integer> invariantFields = this.schema.getInvariantFields();
+    Map<String, Integer> invariantName2Id = this.schema.getInvariantName2Id();
     switch (type) {
-      case AppKey:
       case UserKey:
+        metaField=new UserMetaFieldRS(this.charset,invariantFields,invariantName2Id);
+        break;
+      case AppKey:
       case Action:
       case Segment:
         metaField = new HashMetaFieldRS(this.charset);
