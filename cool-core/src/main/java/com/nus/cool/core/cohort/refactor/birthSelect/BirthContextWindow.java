@@ -1,5 +1,6 @@
 package com.nus.cool.core.cohort.refactor.birthSelect;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.LinkedList;
 
@@ -30,7 +31,7 @@ public class BirthContextWindow {
      * 
      * @param newEventTime
      */
-    public void put(Integer eventId, Calendar date) {
+    public void put(Integer eventId, LocalDateTime date) {
         Preconditions.checkState(eventId < this.eventNum,
                 "Input eventId is out of range");
         
@@ -71,8 +72,8 @@ public class BirthContextWindow {
     /**
      * Typedef a Pair<EventId, DateTime>
      */
-    private class EventTime extends Pair<Integer, Calendar> {
-        public EventTime(Integer EventId, Calendar Date) {
+    private class EventTime extends Pair<Integer, LocalDateTime> {
+        public EventTime(Integer EventId, LocalDateTime Date) {
             super(EventId, Date);
         }
 
@@ -80,7 +81,7 @@ public class BirthContextWindow {
             return super.getKey();
         }
 
-        public Calendar getTimeCalendar() {
+        public LocalDateTime getTimeCalendar() {
             return super.getValue();
         }
     }

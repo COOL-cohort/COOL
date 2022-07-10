@@ -1,92 +1,81 @@
 package com.nus.cool.core.cohort.refactor.utils;
 
-import java.util.Calendar;
-import java.util.Date;
-
-import com.nus.cool.core.cohort.refactor.utils.TimeUtils.TimeUnit;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 
 public class DateUtils {
     /**
-     * Create a Calendar Instance from a unix timestamp
+     * Create a LocalDateTime Instance from a unix timestamp
+     * 
      * @param unixTime
      * @return
      */
-    public static Calendar createCalender(long unixTime){
-        Calendar is = Calendar.getInstance();
-        is.setTime(new Date(unixTime));
-        return is;
+    // public static Local
+    public static LocalDateTime createCalender(long unixTime) {
+        // LocalDateTime.ofInstant(, zone)
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(unixTime),
+                TimeZone.getDefault().toZoneId());
     }
 
+    public static int getPart(LocalDateTime time, TimeUtils.TimeUnit unit) {
+        switch (unit) {
+            case DAY:
+                return time.getDayOfMonth();
+            case HOUR:
+                return time.getHour();
+            case MINUTE:
+                return time.getMinute();
+            case MONTH:
+                return time.getMonthValue();
+            case SECOND:
+                return time.getSecond();
+            case WEEK:
+                return (int) (time.getDayOfYear() / 7) + 1;
+            case YEAR:
+                return time.getYear();
+            default:
+                throw new IllegalStateException("Illegal TimeUnit");
+        }
+    }
 
     /**
-     * Get Specific part of the date
-     * @param calendar
+     * 
+     * @param ts1
+     *            the start localDateTime
+     * @param ts2
+     *            the compared lis duration.
      * @param unit
-     * @return Day, Month, Year, HOUR of Date
+     *            duration's unit
+     * @return a TimeWindow to descripte duration
      */
-    public static int getPart(Calendar calendar, TimeUtils.TimeUnit unit){
-        switch(unit){
+    public static TimeWindow getDifference(LocalDateTime ts1, LocalDateTime ts2, TimeUtils.TimeUnit unit) {
+        Duration d = Duration.between(ts1, ts2);
+        switch (unit) {
             case DAY:
-                return calendar.get(Calendar.DAY_OF_MONTH);
+                return new TimeWindow(d.toDays(), TimeUtils.TimeUnit.DAY);
             case HOUR:
-                return calendar.get(Calendar.HOUR_OF_DAY);
-            case MONTH:
-                return calendar.get(Calendar.MONTH);
-            case WEEK:
-                return calendar.get(Calendar.WEEK_OF_YEAR);
+                return new TimeWindow(d.toHours(), TimeUtils.TimeUnit.HOUR);
             case MINUTE:
-                return calendar.get(Calendar.MINUTE);
+                return new TimeWindow(d.toMinutes(), TimeUtils.TimeUnit.MINUTE);
+            case MONTH:
+                return new TimeWindow(d.toDays() / 30, TimeUtils.TimeUnit.MONTH);
             case SECOND:
-                return calendar.get(Calendar.SECOND);
+                return new TimeWindow(d.toSeconds(), TimeUtils.TimeUnit.SECOND);
+            case WEEK:
+                return new TimeWindow(d.toDays() / 7, TimeUtils.TimeUnit.WEEK);
             case YEAR:
-                return calendar.get(Calendar.YEAR);
+                return new TimeWindow(d.toDays() / 365, TimeUtils.TimeUnit.YEAR);
             default:
                 throw new IllegalStateException("Illegal TimeUnit");
+
         }
     }
 
-    public static TimeWindow getDifference(Calendar calendar1, Calendar calendar2, TimeUtils.TimeUnit unit){
-        
-        long diff;
-        // Change to Unix Timestamp, MillSeconds
-        if (calendar1.before(calendar2)) {
-            diff = calendar2.getTimeInMillis() - calendar1.getTimeInMillis();
-        } else {
-            diff = calendar1.getTimeInMillis() - calendar2.getTimeInMillis();
-        }
-
-        switch(unit){
-            case DAY:
-                return new TimeWindow(
-                    java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diff),
-                    TimeUnit.DAY);
-            case HOUR:
-                return new TimeWindow(
-                    java.util.concurrent.TimeUnit.MILLISECONDS.toHours(diff),
-                    TimeUnit.HOUR);
-            case MINUTE:
-                return new TimeWindow(
-                    java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(diff),
-                    TimeUnit.MINUTE);
-            case MONTH:
-                return new TimeWindow(
-                    java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diff)/30, 
-                    TimeUnit.MONTH);
-            case SECOND:
-                return new TimeWindow(
-                    java.util.concurrent.TimeUnit.MILLISECONDS.toSeconds(diff), 
-                    TimeUnit.SECOND);
-            case WEEK:
-                return new TimeWindow(
-                    java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diff)/7, 
-                    TimeUnit.WEEK);
-            case YEAR:
-                return new TimeWindow(
-                    java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diff)/365, 
-                    TimeUnit.YEAR);
-            default:
-                throw new IllegalStateException("Illegal TimeUnit");
-        }
+    public static String convertString(LocalDateTime date) {
+        return date.toString();
     }
+
 }

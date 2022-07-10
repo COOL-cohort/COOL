@@ -1,6 +1,6 @@
 package com.nus.cool.core.cohort.refactor.ageSelect;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Preconditions;
@@ -49,7 +49,7 @@ public class AgeSelection {
      *         TODO(lingze): Long to int will raise loss of precision,
      *         future implementation should focus on long type data.
      */
-    public int generateAge(Calendar birthDate, Calendar actionTime) {
+    public int generateAge(LocalDateTime birthDate, LocalDateTime actionTime) {
         TimeWindow tw = DateUtils.getDifference(birthDate, actionTime, this.unit);
         int age = (int) tw.getLength();
         age = age > max || age < min ? -1 : age;

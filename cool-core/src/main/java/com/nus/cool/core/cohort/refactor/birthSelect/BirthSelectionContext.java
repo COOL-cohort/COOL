@@ -1,9 +1,12 @@
 package com.nus.cool.core.cohort.refactor.birthSelect;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 
 import com.google.common.base.Preconditions;
+import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 /**
@@ -11,7 +14,7 @@ import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
  */
 public class BirthSelectionContext {
 
-  private HashMap<String, Calendar> userSelected; // If user is selected and BirthEvent Calender
+  private HashMap<String, LocalDateTime> userSelected; // If user is selected and BirthEvent Calender
   private HashMap<String, BirthContextWindow> userBirthTime; // UserId -> BirthContextWindow
   private final TimeWindow maxTimeWindow;
   private final int[] eventMinFrequency; // EventId (index) -> Frequency (value)
@@ -30,7 +33,7 @@ public class BirthSelectionContext {
    * @param EventId
    * @param date
    */
-  public void Add(String userId, Integer eventId, Calendar date) {
+  public void Add(String userId, Integer eventId, LocalDateTime date) {
     Preconditions.checkArgument(userSelected.containsKey(userId) == false,
         "Before Invoke Add, the userId should be unselected state");
     if (!userBirthTime.containsKey(userId))
@@ -45,6 +48,7 @@ public class BirthSelectionContext {
       // If Satisfied, we update the birthEventTime
       // the new added event make the ContextWindow satisfy the requirement
       // means the new added event's date is the "birth Time"
+      System.out.println("UserId " + userId +"\tdate:" + DateUtils.convertString(date));
       userSelected.put(userId, date);
       userBirthTime.remove(userId);
       // free the context content for selected user.
@@ -67,7 +71,7 @@ public class BirthSelectionContext {
    * @param userId
    * @return null if user is not selected
    */
-  public Calendar getUserBirthEventDate(String userId) {
+  public LocalDateTime getUserBirthEventDate(String userId) {
     return userSelected.get(userId);
   }
 

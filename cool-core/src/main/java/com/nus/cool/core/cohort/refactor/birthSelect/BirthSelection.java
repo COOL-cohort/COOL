@@ -1,5 +1,6 @@
 package com.nus.cool.core.cohort.refactor.birthSelect;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -15,8 +16,7 @@ import lombok.Setter;
 
 @Getter
 public class BirthSelection {
-    // @Getter
-    // @Setter
+
     private List<EventSelection> birthEvents;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -61,7 +61,7 @@ public class BirthSelection {
      * @param userId
      * @return
      */
-    public Calendar getUserBirthEventDate(String userId) {
+    public LocalDateTime getUserBirthEventDate(String userId) {
         return context.getUserBirthEventDate(userId);
     }
 
@@ -73,7 +73,7 @@ public class BirthSelection {
      * @param tuple  Partial Action Tuple,
      * @return
      */
-    public boolean selectEvent(String userId, Calendar date, ProjectedTuple tuple) {
+    public boolean selectEvent(String userId, LocalDateTime date, ProjectedTuple tuple) {
         int eventIdx = 0;
         for (EventSelection event : birthEvents) {
             if (event.Accept(tuple)) {
@@ -84,4 +84,5 @@ public class BirthSelection {
         }
         return false;
     }
+
 }
