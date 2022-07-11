@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 
+import lombok.val;
+
 import java.lang.UnsupportedOperationException;
 
 public class SetFilter implements Filter {
@@ -43,7 +45,12 @@ public class SetFilter implements Filter {
 
     @Override
     public Boolean accept(String value) throws RuntimeException {
-        return !IsReject(value) && IsAccept(value);
+        if(this.acceptSet!= null){
+            return this.acceptSet.contains(value);
+        } else if(this.rejectSet != null){
+            return !this.rejectSet.contains(value);
+        }
+        throw new RuntimeException("acList and rejList can not be null at the same time");
     }
 
     @Override
@@ -73,14 +80,6 @@ public class SetFilter implements Filter {
     }
 
     /* ---------------------- Helper function ---------------*/
-
-    private boolean IsReject(String value){
-        return this.rejectSet == null || !this.rejectSet.contains(value);
-    }
-
-    private boolean IsAccept(String value){
-        return this.acceptSet != null && this.acceptSet.contains(value);
-    }
 
     @Override
     public String getFilterSchema() {

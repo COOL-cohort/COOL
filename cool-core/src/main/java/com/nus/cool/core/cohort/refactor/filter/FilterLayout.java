@@ -1,5 +1,7 @@
 package com.nus.cool.core.cohort.refactor.filter;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Preconditions;
 
@@ -42,6 +44,16 @@ public class FilterLayout {
                 throw new IllegalArgumentException(
                         String.format("No filter of this type named %s", type));
         }
-
+    }
+    /**
+     * Default Constructor, JsonMapper use it
+     */
+    public FilterLayout(){}
+    // ----------------- For Test ----------------------- //
+    public FilterLayout (Boolean IsSet, String[] acList, String[] rejList){
+        if (IsSet) this.type = FilterType.Set;
+        else  this.type = FilterType.Range;
+        this.acceptValue = acList;
+        this.rejectValue = rejList;
     }
 }
