@@ -29,8 +29,8 @@ import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,6 +48,8 @@ public class IcebergSelection {
 
     private IcebergQuery.granularityType granularity;
 
+    private IcebergQuery.granularityType groupFields_granularity;
+
     private String timeRange;
 
     // max and min query Time specified by user
@@ -57,7 +59,7 @@ public class IcebergSelection {
     // time range split by system, used as key in map
     private List<String> timeRanges;
 
-    // store multiple time range, convert data into integer
+    // store multiple time range lower bounds and upper bounds, convert data into integer
     private List<Integer> maxTimeRanges;
     private List<Integer> minTimeRanges;
 
@@ -268,6 +270,12 @@ public class IcebergSelection {
         return (min <= this.maxQueryTime) && (max >= this.minQueryTime);
     }
 
+    /**
+     * Init the selection instance,
+     * @param tableSchema table.yaml
+     * @param query query.json
+     * @throws ParseException
+     */
     public void init(TableSchema tableSchema, IcebergQuery query) throws ParseException{
         this.tableSchema = checkNotNull(tableSchema);
         checkNotNull(query);
@@ -275,6 +283,7 @@ public class IcebergSelection {
         // parse selection from query.json
         SelectionQuery selection = query.getSelection();
         this.filter = init(selection);
+        this.groupFields_granularity = query.getGroupFields_granularity();
 
         // parse time range from query.json
         if (query.getTimeRange() != null) {
@@ -303,70 +312,77 @@ public class IcebergSelection {
 
     /**
      * process dataChunk filter with time range
-     * @param chunk: dataChunk
+     * @param dataChunk: dataChunk
      * @return map of < time_range : bitMap >,
      *  where each element in biteMap is one record,
      *              true = the record meet the requirement,
      *              false = the record don't meet the requirement.
      */
-    public Map<String, BitSet> process(ChunkRS chunk) {
-        FieldRS timeField = chunk.getField(this.tableSchema.getActionTimeField());
+    public ArrayList< TimeBitSet > process(ChunkRS dataChunk) {
+        FieldRS timeField = dataChunk.getField(this.tableSchema.getActionTimeField());
         // get the min max time of this dataChunk
         int minKey = timeField.minKey();
         int maxKey = timeField.maxKey();
-        if (!(accept(minKey, maxKey) && process(this.filter, chunk))) {
+        if (!(accept(minKey, maxKey) && process(this.filter, dataChunk))) {
             return null;
         }
 
-        Map<String, BitSet> map = new HashMap<>();
+        // store the records in map of ["t1|t2": bitSets [t,f...] ]
+        ArrayList< TimeBitSet > resultMap = new ArrayList<>();
+
         // if the query don't provide timeRange, all record is true
         if (this.timeRange == null) {
-            BitSet bv = new BitSet(chunk.records());
-            bv.set(0, chunk.records());
-            map.put("no time filter", bv);
+            BitSet bv = new BitSet(dataChunk.records());
+            bv.set(0, dataChunk.records());
+            resultMap.add( new TimeBitSet("no time filter", bv ) );
         }
-        // if the query don't provide the timeRange
+        // if the query provides the timeRange
         else {
             long beg = System.currentTimeMillis();
             // time min-max combination id
-            int tag = 0;
+            int timeRangeKey = 0;
             // find min-max combination where min is under this range
-            while (minKey > this.maxTimeRanges.get(tag)) tag += 1;
+            while (minKey > this.maxTimeRanges.get(timeRangeKey)) timeRangeKey += 1;
 
-            // if all data in this dataChunk satisfied the current range at key=tage
-            if (minKey >= this.minTimeRanges.get(tag) & maxKey <= this.maxTimeRanges.get(tag)) {
-                BitSet bv = new BitSet(chunk.records());
+            // if all data in this dataChunk satisfied the current range at key=timeRangeKeye
+            if (minKey >= this.minTimeRanges.get(timeRangeKey) & maxKey <= this.maxTimeRanges.get(timeRangeKey)) {
+                BitSet bv = new BitSet(dataChunk.records());
                 bv.set(0, bv.size());
-                map.put(this.timeRanges.get(tag), bv);
+                resultMap.add( new TimeBitSet(this.timeRanges.get(timeRangeKey), bv ) );
             }
             // traverse each record from beginning
             else {
+                // read the localIDs from position 0
                 InputVector timeInput = timeField.getValueVector();
                 timeInput.skipTo(0);
+                // init the bitSets
                 BitSet[] bitSets = new BitSet[this.timeRanges.size()];
                 for (int i = 0; i < this.timeRanges.size(); i++) {
-                    bitSets[i] = new BitSet(chunk.records());
+                    bitSets[i] = new BitSet(dataChunk.records());
                 }
-                int min = this.minTimeRanges.get(tag);
-                int max = this.maxTimeRanges.get(tag);
+                int min = this.minTimeRanges.get(timeRangeKey);
+                int max = this.maxTimeRanges.get(timeRangeKey);
+                // for each record,
+                ArrayList<String> dataStrList = new ArrayList<>();
                 for (int i = 0; i < timeInput.size(); i++) {
                     int time = timeInput.next();
                     if (time < this.minQueryTime) continue; // this record is not in the range
                     if (time > this.maxQueryTime) break; // the rest all greater than this.max. not in range, skip
                     if (time >= min && time <= max) {
-                        bitSets[tag].set(i);
+                        bitSets[timeRangeKey].set(i);
                     } else {
-                        while (!(time >= this.minTimeRanges.get(tag) && (time <= this.maxTimeRanges.get(tag)))) tag += 1;
-                        min = this.minTimeRanges.get(tag);
-                        max = this.maxTimeRanges.get(tag);
-                        bitSets[tag].set(i);
+                        while (!(time >= this.minTimeRanges.get(timeRangeKey) && (time <= this.maxTimeRanges.get(timeRangeKey)))) timeRangeKey += 1;
+                        min = this.minTimeRanges.get(timeRangeKey);
+                        max = this.maxTimeRanges.get(timeRangeKey);
+                        bitSets[timeRangeKey].set(i);
                     }
                 }
 
+                // store the records in map of ["t1|t2": bitSets [t,f...] ]
                 for (int i = 0; i < bitSets.length; i++) {
                     // if the number of true in bitMap > 0
                     if (bitSets[i].cardinality() != 0) {
-                        map.put(this.timeRanges.get(i), bitSets[i]); //  record the corresponding records.
+                        resultMap.add( new TimeBitSet(this.timeRanges.get(i), bitSets[i]) );
                     }
                 }
             }
@@ -374,15 +390,23 @@ public class IcebergSelection {
             //System.out.println("process time filter elapsed: " + (end - beg));
         }
 
-        for (Map.Entry<String, BitSet> entry : map.entrySet()) {
-            BitSet bs = select(this.filter, chunk, entry.getValue());
-            map.put(entry.getKey(), bs);
+        for (int i = 0; i < resultMap.size(); i++){
+            BitSet bs = select(this.filter, dataChunk, resultMap.get(i).matchedRecords);
+            resultMap.set(i, new TimeBitSet( this.timeRanges.get(i), bs ) );
         }
-        return map;
+
+        return resultMap;
     }
 
     public boolean isbActivateCublet() {
         return this.bActivateCublet;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class TimeBitSet{
+        private String timeRange;
+        private BitSet matchedRecords;
     }
 
 }
