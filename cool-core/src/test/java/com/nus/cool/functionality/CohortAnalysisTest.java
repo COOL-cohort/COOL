@@ -86,7 +86,7 @@ public class CohortAnalysisTest extends CohortSelectionTest {
                         out2
                 },{
                         Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
-                        Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce/queries", "query_cohort.json").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce/queries", "2.query_cohort.json").toString(),
                         new ArrayList<>()
                 }
         };
