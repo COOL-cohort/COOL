@@ -20,6 +20,11 @@ public class DateUtils {
                 TimeZone.getDefault().toZoneId());
     }
 
+    public static LocalDateTime createCalender(int days){
+        long unixTime = days * 24 * 3600;
+        return createCalender(unixTime);
+    }
+
     public static int getPart(LocalDateTime time, TimeUtils.TimeUnit unit) {
         switch (unit) {
             case DAY:
