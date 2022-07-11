@@ -8,6 +8,7 @@ import com.nus.cool.core.cohort.refactor.aggregate.AggregateFactory;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateFunc;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
+import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.filter.FilterLayout;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
@@ -54,13 +55,16 @@ public class ValueSelection {
      */
     public boolean IsSelected(ProjectedTuple tuple) {
         for (Filter filter : filterList) {
-            switch (filter.getType()) {
+            FilterType type = filter.getType();
+            switch (type) {
                 case Range:
                     if (!filter.accept((Integer) tuple.getValueBySchema(filter.getFilterSchema())))
                         return false;
+                    break;
                 case Set:
                     if (!filter.accept((String) tuple.getValueBySchema(filter.getFilterSchema())))
                         return false;
+                    break;
                 default:
                     throw new IllegalArgumentException(
                             String.format("No filter of this type named %s", filter.getType()));
