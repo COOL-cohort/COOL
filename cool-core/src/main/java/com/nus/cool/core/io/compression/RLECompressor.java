@@ -51,6 +51,12 @@ public class RLECompressor implements Compressor {
     this.maxCompressedLen = HEADACC + (Math.max(hist.getRawSize(), uncompressedSize));
   }
 
+  /**
+   * Write int value to a given buffer.
+   * @param buf buffer to be filled
+   * @param v value
+   * @param width length of the valuen
+   */
   private void writeInt(ByteBuffer buf, int v, int width) {
     switch (width) {
       case 1:
@@ -68,15 +74,21 @@ public class RLECompressor implements Compressor {
     }
   }
 
+  /**
+   * Add value to a given buffer.
+   * @param buf the buffet to filled
+   * @param val value
+   * @param off offset of the buffer
+   * @param len how many the value has been repeated
+   */
   private void write(ByteBuffer buf, int val, int off, int len) {
-    byte b = 0;
-    b |= ((IntegerUtil.minBytes(val) << 4) | IntegerUtil.minBytes(off) << 2 | IntegerUtil
-        .minBytes(len));
+    byte b = 0; // store value's width + offset's width + len's width
+    b |= ((IntegerUtil.minBytes(val) << 4) | IntegerUtil.minBytes(off) << 2 | IntegerUtil.minBytes(len));
     buf.put(b);
 
-    writeInt(buf, val, ((b >> 4) & 3));
-     writeInt(buf, off, ((b >> 2) & 3));
-    writeInt(buf, len, ((b) & 3));
+    writeInt(buf, val, ((b >> 4) & 3)); // get upper 2 bites
+    writeInt(buf, off, ((b >> 2) & 3)); // get middle 2 bites
+    writeInt(buf, len, ((b) & 3)); // get lower 2 bites
   }
 
   @Override
@@ -93,14 +105,16 @@ public class RLECompressor implements Compressor {
   @Override
   public int compress(int[] src, int srcOff, int srcLen, byte[] dest,
       int destOff, int maxDestLen) {
-    int n = 1;
+    int n = 1; // how many distinct value
     ByteBuffer buf = ByteBuffer.wrap(dest, destOff, maxDestLen).order(ByteOrder.nativeOrder());
     buf.position(HEADACC);
     int v = src[srcOff], voff = 0, vlen = 1;
+    // for each record,
     for (int i = srcOff + 1; i < srcOff + srcLen; i++) {
       if (src[i] != v) {
         write(buf, v, voff, vlen);
         v = src[i];
+        // re-init offset in output buffer, and length of distinct value
         voff = i - srcOff;
         vlen = 1;
         n++;

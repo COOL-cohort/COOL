@@ -170,9 +170,9 @@ public class NativeDataWriter implements DataWriter {
         // start a new chunk
         if (maybeSwitchChunk(curUser)) maybeSwitchCublet();
         lastUser = curUser;
-        // update metachunk / metafield
+        // put metaChunk / metaField
         metaChunk.put(insertTuple);
-        // update data chunk 
+        // put data chunk
         dataChunk.put(insertTuple);
         tupleCount++;
         return true;
