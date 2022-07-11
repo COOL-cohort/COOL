@@ -78,8 +78,12 @@ public class CsvLoaderTest {
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "scripts", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
+                }, {
+                    "ecommerce1",
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce", "table.yaml").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce", "update-sample.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 },
-
         };
     }
 
@@ -90,7 +94,7 @@ public class CsvLoaderTest {
                     "health",
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "raw2.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/datasetSource").toString()
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 },
         };
     }

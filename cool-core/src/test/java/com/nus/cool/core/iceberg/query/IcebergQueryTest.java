@@ -73,7 +73,7 @@ public class IcebergQueryTest {
     public void EcommerceDataTestSQL1() throws Exception {
 
         String dzFilePath = "../datasetSource";
-        String queryFilePath = "../datasets/ecommerce/test4Cool/query_product_retention.json";
+        String queryFilePath = "../datasets/ecommerce/queries/1.query_retention.json";
 
         // load query
         ObjectMapper mapper = new ObjectMapper();
