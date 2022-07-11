@@ -22,10 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
 import com.nus.cool.core.iceberg.query.*;
 import com.nus.cool.core.iceberg.result.BaseResult;
-import com.nus.cool.core.io.readstore.ChunkRS;
-import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.*;
 import com.nus.cool.core.schema.TableSchema;
 
 import java.io.IOException;
@@ -66,21 +63,24 @@ public class CoolOlapEngine {
                 List<ChunkRS> datachunks = cubletRS.getDataChunks();
                 for (ChunkRS dataChunk : datachunks) {
                     beg = System.currentTimeMillis();
+
                     // 1. find all records in dataChunk meet the timeRange and selection requirements.
-                    Map<String, BitSet> map = selection.process(dataChunk);
+                    ArrayList<IcebergSelection.TimeBitSet> map = selection.process(dataChunk);
+
                     end = System.currentTimeMillis();
                     //System.out.println("selection process data chunk elapsed: " + (end - beg));
                     if (map == null) {
                         continue;
                     }
                     // 2. for each time range, run aggregation
-                    for (Map.Entry<String, BitSet> entry : map.entrySet()) {
-                        String timeRange = entry.getKey();
-                        BitSet bs = entry.getValue();
+                    for (int i = 0; i < map.size(); i++){
+                        String timeRange = map.get(i).getTimeRange();
+                        BitSet bs = map.get(i).getMatchedRecords();
+
                         beg = System.currentTimeMillis();
                         // 2. run groupBy
                         IcebergAggregation icebergAggregation = new IcebergAggregation();
-                        icebergAggregation.init(bs, query.getGroupFields(), metaChunk, dataChunk, timeRange);
+                        icebergAggregation.groupBy(bs, query.getGroupFields(), metaChunk, dataChunk, timeRange, query.getGroupFields_granularity());
                         end = System.currentTimeMillis();
                         //System.out.println("init aggregation elapsed: " + (end - beg));
                         for (Aggregation aggregation : query.getAggregations()) {
