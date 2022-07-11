@@ -97,11 +97,9 @@ public class DataHashFieldWS implements DataFieldWS {
   @Override
   public void put(String tupleValue) throws IOException {
     int gId = this.metaField.find(tupleValue);
-      if (gId == -1)
-      // The data may be corrupted
-      {
-          throw new IllegalArgumentException("Value not exist in dimension: " + tupleValue);
-      }
+    if (gId == -1){
+      throw new IllegalArgumentException("Value not exist in dimension: " + tupleValue);
+    }
     // Write globalIDs as values for temporary
     this.buffer.writeInt(gId);
     // Set localID as 0 for temporary
@@ -146,7 +144,7 @@ public class DataHashFieldWS implements DataFieldWS {
         }
       }
     }
-
+//    System.out.println(value);
     // Write compressed key vector (unique global id)
     int min = ArrayUtil.min(key);
     int max = ArrayUtil.max(key);
