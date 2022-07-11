@@ -55,9 +55,11 @@ public class EventSelection {
             if (filterList.get(i).getType().equals(FilterType.Set)) {
                 if (!filterList.get(i).accept((String) projectTuple.getValueBySchema(schema)))
                     return false;
-            } else {
+            } else if(filterList.get(i).getType().equals(FilterType.Range)) {
                 if (!filterList.get(i).accept((Integer) projectTuple.getValueBySchema(schema)))
                     return false;
+            } else {
+                // throw execption
             }
         }
 
