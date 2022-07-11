@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 
 public class RLEInputVector implements InputVector {
 
+  // total number of blocks
   private int blks;
 
   private ByteBuffer buffer;
@@ -34,6 +35,7 @@ public class RLEInputVector implements InputVector {
   // end offset
   private int bend;
 
+  // current value
   private int bval;
 
   @Override
@@ -49,7 +51,7 @@ public class RLEInputVector implements InputVector {
   @Override
   public int get(int index) {
     int offset = this.boff;
-    this.skipTo(index);
+    this.skipTo(index); // skip to one block, and read the value
     int v = next();
     this.boff = offset;
     return v;
@@ -78,12 +80,12 @@ public class RLEInputVector implements InputVector {
       this.curBlk = 0;
       readNextBlock();
     }
-      while (pos >= this.bend && this.curBlk < this.blks) {
-          readNextBlock();
-      }
-      if (pos >= this.bend) {
-          throw new IllegalArgumentException("Too large pos param");
-      }
+    while (pos >= this.bend && this.curBlk < this.blks) {
+        readNextBlock();
+    }
+    if (pos >= this.bend) {
+        throw new IllegalArgumentException("Too large pos param");
+    }
     this.boff = pos;
   }
 
@@ -129,7 +131,7 @@ public class RLEInputVector implements InputVector {
     this.curBlk++;
   }
 
-  // todo why do we need & 0xff, already read same bytes.
+  // todo(naili) why do we need & 0xff, already read same bytes.
   private int read(int width) {
     switch (width) {
       case 1:
@@ -148,12 +150,8 @@ public class RLEInputVector implements InputVector {
   }
 
   public static class Block {
-
     public int value;
-
     public int off;
-
     public int len;
-
   }
 }

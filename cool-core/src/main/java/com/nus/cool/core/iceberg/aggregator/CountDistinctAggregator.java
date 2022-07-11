@@ -25,40 +25,46 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 
-import java.util.BitSet;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class CountDistinctAggregator implements Aggregator{
     @Override
     public void process(Map<String, BitSet> groups, FieldRS field,
                         Map<String, AggregatorResult> resultMap, MetaFieldRS metaFieldRS) {
+
+
         for (Map.Entry<String, BitSet> entry : groups.entrySet()) {
             if (resultMap.get(entry.getKey()) == null) {
-                String groupNmae = entry.getKey();
+                String groupName = entry.getKey();
                 AggregatorResult aggregatorResult = new AggregatorResult();
-                resultMap.put(groupNmae, aggregatorResult);
+                resultMap.put(groupName, aggregatorResult);
             }
+
             AggregatorResult result = resultMap.get(entry.getKey());
+
             if (result.getCountDistinct() == null) {
                 if (field.getFieldType() == FieldType.Metric) {
                     throw new UnsupportedOperationException();
                 }
+
                 BitSet bs = entry.getValue();
-                InputVector key = field.getKeyVector();
-                InputVector value = field.getValueVector();
-                Set<Integer> set = new HashSet<>();
+                InputVector key = field.getKeyVector(); // globalIDs,
+                InputVector value = field.getValueVector(); // localIDs
+
+                ArrayList<Integer> debugInt = new ArrayList<>();
+
+                Set<Integer> localIdSet = new HashSet<>();
                 for (int i = 0; i < bs.size(); i++) {
                     int nextPos = bs.nextSetBit(i);
                     if (nextPos < 0) {
                         break;
                     }
-                    set.add(value.get(nextPos));
+                    localIdSet.add(value.get(nextPos));
                     i = nextPos;
+                    debugInt.add(i);
                 }
-                for (Integer i : set) {
+                for (Integer i : localIdSet) {
                     result.getDistinctSet().add(metaFieldRS.getString(key.get(i)));
                 }
 
