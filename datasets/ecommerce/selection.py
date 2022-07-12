@@ -1,11 +1,12 @@
 
 
-files = open("/Users/kevin/project_java/COOL/datasets/ecommerce/update-sample.csv")
+files = open("/COOL/datasets/ecommerce/update-sample.csv")
 
 contest = files.readlines()
 
 time_range = {}
 
+# group by products ID with time, and then count distinct product ids
 i = -1
 for line in contest:
     if i < 0:
