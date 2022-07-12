@@ -6,7 +6,7 @@
                     {
                         "fieldSchema":"prescribe",
                         "type":"SET",
-                        "acceptValue":["Disease-A"]
+                        "acceptValue":["Medicine-A"]
 
                     }
                 ],
@@ -26,19 +26,19 @@
         "fieldSchema":"birthyear",
         "type":"RANGE",
         "min":1950,
-        "max":1990,
+        "max":2000,
         "interval":10
     },
 
     "valueSelector":{
         "filters":[
             {
-                "fieldSchema":"prescribe",
+                "fieldSchema":"labtest",
                 "type":"SET",
-                "acceptValue":["Medicine-C"]
+                "acceptValue":["Labtest-C"]
             },
             {
-                "fieldSchema":"labtest",
+                "fieldSchema":"value",
                 "type":"RANGE",
                 "acceptValue":["MIN-45", "131-MAX"]
             }
