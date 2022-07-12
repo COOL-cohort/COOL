@@ -30,14 +30,11 @@ public class ArrowRowViewTest {
 
     @Test(dataProvider = "ArrowRowReviewDP")
     public void testGetField(VectorSchemaRoot root) {
-        {
             ArrowRowView arv = new ArrowRowView(root,1);
             Assert.assertTrue(arv.getField("height").isPresent());
             Assert.assertEquals(arv.getField("height").get(), 20);
             Assert.assertTrue(arv.getField("name").isPresent());
             Assert.assertEquals(arv.getField("name").get().toString(), "Amie");
-
-        }
     }
 
 
