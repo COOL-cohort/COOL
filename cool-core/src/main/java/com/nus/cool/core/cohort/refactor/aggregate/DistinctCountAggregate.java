@@ -15,6 +15,7 @@ public class DistinctCountAggregate implements AggregateFunc {
 
     public DistinctCountAggregate(String schema){
         this.schema = schema;
+        this.set = new HashSet<>();
     }
 
     @Override
