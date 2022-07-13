@@ -1,7 +1,6 @@
 package com.nus.cool.core.cohort.refactor.birthSelect;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.LinkedList;
 
 import com.google.common.base.Preconditions;
