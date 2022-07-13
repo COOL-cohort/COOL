@@ -171,6 +171,11 @@ public class CoolModel implements Closeable {
       return out;
   }
 
+  public synchronized boolean isCubeExsit(String cube) throws IOException{
+    File cubeRoot = new File(this.localRepo, cube);
+    return cubeRoot.exists();
+    
+  }
   public static String[] listCubes(String Path) {
     File localRepoPara = new File(Path);
     return localRepoPara.list();
