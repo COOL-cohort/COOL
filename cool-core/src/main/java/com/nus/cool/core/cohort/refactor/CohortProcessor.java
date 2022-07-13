@@ -2,12 +2,10 @@ package com.nus.cool.core.cohort.refactor;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,17 +31,26 @@ import com.nus.cool.core.schema.TableSchema;
 
 import lombok.Getter;
 
-@Getter
 public class CohortProcessor {
 
+    @Getter
+    @JsonProperty("ageSelector")
     private AgeSelection ageSelector;
 
+    @Getter
     @JsonProperty("cohortSelector")
     private CohortSelectionLayout cohortSelectionLayout;
-
+    
+    @Getter
+    @JsonProperty("valueSelector")
     private ValueSelection valueSelector;
 
+    @Getter
+    @JsonProperty("birthSelector")
     private BirthSelection birthSelector;
+
+    @Getter
+    private String dataSource;
 
     @JsonIgnore
     private CohortSelector cohortSelector;
@@ -112,7 +119,7 @@ public class CohortProcessor {
         for (CubletRS cublet : cube.getCublets()) {
             processCublet(cublet);
         }
-        return null;
+        return this.result;
     }
 
     /**
@@ -177,8 +184,8 @@ public class CohortProcessor {
      */
     private void processTuple() {
         // For One Tuple, we firstly get the userId, and ActionTime
-        int userId = (int) tuple.getValueBySchema(this.UserIdSchema);
-        Calendar actionTime = DateUtils.createCalender(Integer.valueOf((int)tuple.getValueBySchema(this.ActionTimeSchema)));
+        String userId = (String) tuple.getValueBySchema(this.UserIdSchema);
+        LocalDateTime actionTime = DateUtils.createCalender((int)tuple.getValueBySchema(this.ActionTimeSchema));
         // check whether its birthEvent is selected
         if (!this.birthSelector.isUserSelected(userId)) {
             // if birthEvent is not selected
@@ -188,7 +195,7 @@ public class CohortProcessor {
 
             // do time_diff to generate age
             // get the BirthEvent Date
-            Calendar birthTime = this.birthSelector.getUserBirthEventDate(userId);
+            LocalDateTime birthTime = this.birthSelector.getUserBirthEventDate(userId);
             int age = this.ageSelector.generateAge(birthTime, actionTime);
             if (age == AgeSelection.DefaultNullAge) {
                 // age is outofrange
@@ -208,6 +215,7 @@ public class CohortProcessor {
             }
             // Pass all above filter, we can store value into CohortRet
             // get the temporay result for this CohortGroup and this age
+            System.out.println("[Update Cohort Result]: cohortName:" + cohortName + "\tage:"+ age);
             RetUnit ret = this.result.get(cohortName, age);
             // update
             this.valueSelector.updateRetUnit(ret, tuple);
@@ -240,6 +248,11 @@ public class CohortProcessor {
     public static CohortProcessor readFromJson(String path) throws IOException{
         return readFromJson(new File(path));
     }
+
+
+    /* ------------------- Test Only -------------------------- */
+    
+    // public Set<String> analyze
 
 
 }
