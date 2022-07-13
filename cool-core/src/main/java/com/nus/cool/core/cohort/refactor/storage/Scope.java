@@ -13,7 +13,7 @@ public class Scope {
     }
 
     public Boolean IsInScope(Integer i){
-        return i <= this.right && i >= this.left;
+        return i < this.right && i >= this.left;
     }  
 
 

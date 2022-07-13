@@ -79,7 +79,7 @@ public class FilterTest {
         return new Object[][]{
             {
                 new FilterLayout(false, new String[]{"MIN-15","16-2000", "2555-MAX"}, null),
-                new int[]{12,55,555555,1999,15,16,2000,2555}
+                new int[]{12,55,555555,1999,14,16,1999,2555}
             }
         };
     }
