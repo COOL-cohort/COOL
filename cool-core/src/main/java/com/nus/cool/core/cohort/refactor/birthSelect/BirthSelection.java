@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -85,4 +86,17 @@ public class BirthSelection {
         return false;
     }
 
+
+    // -------------- the method is for UnitTest and Debug -------------- //
+    // public static BirthSelection readFromJson(File in) throws IOException {
+    //     ObjectMapper objectMapp
+    // }
+
+    /**
+     * 
+     * @return usersId which is eligiable for conditions
+     */
+    public Set<String> getAcceptedUsers(){
+        return this.context.getSelectedUserId();
+    }
 }
