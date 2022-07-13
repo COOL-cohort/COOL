@@ -1,15 +1,15 @@
 package com.nus.cool.core.cohort.refactor.storage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.Map.Entry;
 
-import com.fasterxml.jackson.annotation.JsonFormat.Value;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelection;
-
-import javafx.scene.chart.Axis;
 
 /**
  * Class for Cohort Analysis Result
@@ -80,6 +80,15 @@ public class CohortRet {
             return this.retUnits[i];
         }
 
+        // TODO(lingze), only support int type value
+        public List<Integer> getValues(){
+            ArrayList<Integer> ret =  new ArrayList<>();
+            for(RetUnit i : retUnits){
+                ret.add((int)i.getValue());
+            }
+            return ret;
+        }
+
         @Override
         public String toString() {
             return "Xaxis [retUnits=" + Arrays.toString(retUnits) + "]";
@@ -87,12 +96,34 @@ public class CohortRet {
 
     }
 
+    /**
+     * 
+     * @return get the list of all cohortName 
+     */
+    public List<String> getCohortList(){
+        return new ArrayList<>(this.cohortToValueList.keySet());
+    }
+    
+    /**
+     * 
+     * @param cohort
+     * @return
+     */
+    public List<Integer> getValuesByCohort(String cohort){
+         if(!this.cohortToValueList.containsKey(cohort)){
+            return null;
+         }  
+         Xaxis x = this.cohortToValueList.get(cohort);
+         return x.getValues();
+    }
+
+
     @Override
     public String toString() {
         String ret = "CohortRet [interval=" + interval + ", max=" + max
                 + ", min=" + min + ", size=" + size + "]\n";
         for (Entry<String,Xaxis> entry:this.cohortToValueList.entrySet()){
-            ret = entry.getKey() + ":" + entry.getValue().toString() + "\n";
+            ret += entry.getKey() + ":" + entry.getValue().toString() + "\n";
         }
         return ret;
     }
