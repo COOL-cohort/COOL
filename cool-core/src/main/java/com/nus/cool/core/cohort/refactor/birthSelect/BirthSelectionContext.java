@@ -1,9 +1,8 @@
 package com.nus.cool.core.cohort.refactor.birthSelect;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Set;
 
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
@@ -48,7 +47,7 @@ public class BirthSelectionContext {
       // If Satisfied, we update the birthEventTime
       // the new added event make the ContextWindow satisfy the requirement
       // means the new added event's date is the "birth Time"
-      System.out.println("UserId " + userId +"\tdate:" + DateUtils.convertString(date));
+      System.out.println("UserId " + userId + "\tdate:" + DateUtils.convertString(date));
       userSelected.put(userId, date);
       userBirthTime.remove(userId);
       // free the context content for selected user.
@@ -88,6 +87,12 @@ public class BirthSelectionContext {
       }
     }
     return true;
+  }
+
+  // --------- only for unit test
+
+  public Set<String> getSelectedUserId() {
+    return this.userSelected.keySet();
   }
 
 }
