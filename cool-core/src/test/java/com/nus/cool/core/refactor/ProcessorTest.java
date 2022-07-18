@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
@@ -36,16 +35,15 @@ public class ProcessorTest {
         this.coolModel = new CoolModel(this.cubeRepo);
     }
 
-    // @Test
-    // public void ProcessorDebugTest() throws IOException {
-    //     String queryPath = "../query/query_health_one/query.json";
-    //     String cubeName = "health";
-    //     CubeRS cube = loadData(cubeName);
-    //     CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
-    //     // System.out.println(cohortProcessor.getProjectedSchemaSet().toString());
-    //     CohortRet ret = cohortProcessor.process(cube);
-    //     System.out.println(ret.toString());
-    // }
+    @Test(dataProvider = "ProcessQueryDP")
+    public void ProcessorDebugTest(String queryDir) throws IOException {
+        String queryPath = Paths.get(queryDir, this.queryName).toString();
+        CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
+        CubeRS cube = loadData(cohortProcessor.getDataSource());
+        CohortRet ret = cohortProcessor.process(cube);
+        System.out.printf("Cohort List : %s\n", ret.getCohortList().toString());
+        System.out.println(ret.toString());
+    }
 
 
     /**
@@ -61,18 +59,17 @@ public class ProcessorTest {
         String queryResultPath = Paths.get(queryDir, this.resultName).toString();
         ObjectMapper mapper = new ObjectMapper();
         HashMap<String, ArrayList<Integer>> cohortData = mapper.readValue(new File(queryResultPath), HashMap.class);
-       
         // check the result
-        System.out.println(cohortData.toString());
+        System.out.println(ret.toString());
         // validate the cohortName
         Assert.assertEquals(ret.getCohortList().size(), cohortData.size());
-
+        
         System.out.println(ret.getCohortList());
         for(String cohortName: ret.getCohortList()){
             System.out.printf("Get CohortName %s\n", cohortName);
-            List<Integer> ff = cohortData.get(cohortName);
-            System.out.println(ff);
             Assert.assertTrue(cohortData.containsKey(cohortName));
+            System.out.printf("True Result %s\n", cohortData.get(cohortName).toString());
+            System.out.printf("Get Result %s\n", ret.getValuesByCohort(cohortName));
             Assert.assertEquals(cohortData.get(cohortName),ret.getValuesByCohort(cohortName));
         }
     }
@@ -80,7 +77,8 @@ public class ProcessorTest {
     @DataProvider(name = "ProcessQueryDP")
     public Object[][] queryDirDataProvider(){
         return new Object[][]{
-            { new String("../query/query_health_one")}
+            { new String("../query/query_0")},
+            { new String("../query/query_1")},
         };
     }
 
