@@ -43,6 +43,7 @@ public class TimeUtils {
                 case "MINUTE": return TimeUnit.MINUTE;
                 case "SECOND": return TimeUnit.SECOND;
                 case "YEAR": return TimeUnit.YEAR;
+                case "MONTH": return TimeUnit.MONTH;
                 default:
                     throw new IllegalArgumentException();
             }
