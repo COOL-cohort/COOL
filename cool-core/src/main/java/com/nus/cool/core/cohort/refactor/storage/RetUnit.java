@@ -1,5 +1,7 @@
 package com.nus.cool.core.cohort.refactor.storage;
 
+import java.util.HashSet;
+
 import lombok.Data;
 
 /**
@@ -15,8 +17,18 @@ public class RetUnit{
     // (used to calculate AVERAGE and COUNT)
     private int count;
 
+    private HashSet<String> userIdSet;
+
     public RetUnit(float value, int count){
         this.value = value;
         this.count = count;
+        userIdSet = new HashSet<>();
     }
+
+    @Override
+    public String toString() {
+        Integer i = (int)this.value;
+        return i.toString();
+    }
+
 }
