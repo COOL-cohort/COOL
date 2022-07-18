@@ -11,17 +11,15 @@ public class DistinctCountAggregate implements AggregateFunc {
 
     private String schema;
 
-    private HashSet<String> set;
-
     public DistinctCountAggregate(String schema){
         this.schema = schema;
-        this.set = new HashSet<>();
     }
 
     @Override
     public void calulate(RetUnit retUnit, ProjectedTuple tuple) {
         String value = (String)tuple.getValueBySchema(this.schema);
-        if(!set.contains(value)){
+        if(!retUnit.getUserIdSet().contains(value)){
+            retUnit.getUserIdSet().add(value);
             retUnit.setValue(retUnit.getValue() + 1);
         }
         retUnit.setCount(retUnit.getCount() + 1);

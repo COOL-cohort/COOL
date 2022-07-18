@@ -83,8 +83,12 @@ public class CohortRet {
         // TODO(lingze), only support int type value
         public List<Integer> getValues(){
             ArrayList<Integer> ret =  new ArrayList<>();
-            for(RetUnit i : retUnits){
-                ret.add((int)i.getValue());
+            for(int i = 0 ; i < retUnits.length; i++){
+                if(retUnits[i] == null) {
+                    ret.add(0);
+                    continue;
+                }
+                ret.add((int)retUnits[i].getValue());
             }
             return ret;
         }
