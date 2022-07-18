@@ -4,7 +4,10 @@ import os
 import datetime
 from tqdm import tqdm
 import json
+# import argparse
 
+# parser = argparse.ArgumentParser(description= "Add the input Data Path")
+# parser.add_argument("data_path", type=str, )
 '''
 Cohort Query Target
 BirthEvent: select two "Disease-A" in field "prescribe"
@@ -18,12 +21,15 @@ data_path = os.path.join(data_dir, "table.csv")
 ret_path = os.path.join(cwd, "query", "query_health_one", "query_result.json")
 
 
+
 def generateCohort(year: int) -> str:
-    if year <= 1950 or year > 2000:
+    if year < 1950 or year > 2000:
         return None
-    n_interval = (year - 1950 - 1) // 10
+    n_interval = (year - 1950) // 10
     left_margin = 1950 + n_interval * 10
-    right_margin = left_margin + 10
+    
+    right_margin = left_margin + 10 if left_margin + 10 > 2000 else 2001
+    
     return str(left_margin) + "-" + str(right_margin)
 
 
@@ -45,7 +51,9 @@ if __name__ == '__main__':
         user_id = item["id"]
         if user_id in userId2time:
             continue
-        oldCount = userId2medicineACount.setdefault(user_id, 0)
+        if user_id not in userId2medicineACount:
+            userId2medicineACount[user_id] = 0
+        oldCount = userId2medicineACount[user_id]
         if oldCount + 1 == 2:
             userId2time[user_id] = item["time"]
             continue
@@ -54,7 +62,7 @@ if __name__ == '__main__':
     result = {}
     # key : cohort , value : dict
     # value -> k: age , v: Set {user_key}
-
+    # print("Selected Users :" + str(userId2time.keys()))
     for user_key, birth_time in tqdm(userId2time.items()):
         user_sub_data = data[(data["id"] == user_key) &
                              (data["labtest"] == "Labtest-C")]
@@ -69,7 +77,7 @@ if __name__ == '__main__':
 
             # check value
             v = int(item["value"])
-            if v < 131 and v > 45:
+            if v < 131 and v >= 45:
                 continue
 
             # update result
@@ -81,7 +89,7 @@ if __name__ == '__main__':
 
     # summary count, fill None Value
     cohortRet = {}
-    for y in range(1951, 2000, 10):
+    for y in range(1950, 2001, 10):
         cohort = generateCohort(y)
         if cohort not in cohortRet:
             cohortRet[cohort] = [0] * 8
