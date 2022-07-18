@@ -1,8 +1,6 @@
 package com.nus.cool.core.cohort.refactor.birthSelect;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,11 +11,13 @@ import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class BirthSelection {
 
+    // if the birthEvents is null
+    // we thought that any action condition can be regareded as birthAction
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<EventSelection> birthEvents;
     
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -35,13 +35,17 @@ public class BirthSelection {
      * transfer filter layout to filter instance.
      */
     public void init() {
-        int[] eventMinFrequency = new int[birthEvents.size()];
+        int[] eventMinFrequency = null;
         this.relatedSchemas = new HashSet<>();
-        for (int i = 0; i < birthEvents.size(); i++) {
-            birthEvents.get(i).init();
-            eventMinFrequency[i] = birthEvents.get(i).getFrequency();
-            this.relatedSchemas.addAll(birthEvents.get(i).getSchemaList());
+        if(birthEvents != null) {
+            eventMinFrequency = new int[birthEvents.size()];
+            for (int i = 0; i < birthEvents.size(); i++) {
+                birthEvents.get(i).init();
+                eventMinFrequency[i] = birthEvents.get(i).getFrequency();
+                this.relatedSchemas.addAll(birthEvents.get(i).getSchemaList());
+            }
         }
+        // if birthEvents == null, there is no Null
         this.context = new BirthSelectionContext(this.timeWindow, eventMinFrequency);
     }
 
@@ -52,7 +56,7 @@ public class BirthSelection {
      * @return
      */
     public boolean isUserSelected(String userId) {
-        return context.IsUserSelected(userId);
+        return context.isUserSelected(userId);
     }
 
     /**
@@ -76,6 +80,18 @@ public class BirthSelection {
      */
     public boolean selectEvent(String userId, LocalDateTime date, ProjectedTuple tuple) {
         int eventIdx = 0;
+        // if no birthEvents in query
+        // which means that all event is acceptable
+        // thus, we just to record the first actionItem's time.
+        if(birthEvents == null){
+            if(!context.isUserSelected(userId)){
+                context.setUserSelected(userId, date);
+                return true;
+            }
+            return false;
+        }
+
+        // if birthEvents is not null
         for (EventSelection event : birthEvents) {
             if (event.Accept(tuple)) {
                 context.Add(userId, eventIdx, date);
@@ -85,7 +101,6 @@ public class BirthSelection {
         }
         return false;
     }
-
 
     // -------------- the method is for UnitTest and Debug -------------- //
     // public static BirthSelection readFromJson(File in) throws IOException {

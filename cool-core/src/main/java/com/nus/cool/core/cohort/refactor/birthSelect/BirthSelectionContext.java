@@ -43,7 +43,7 @@ public class BirthSelectionContext {
 
     // check whether the contextWindow meet the MinFrequency
     // if so, update the event birth date.
-    if (IsSatisfied(contextWindow.getEventState())) {
+    if (isSatisfied(contextWindow.getEventState())) {
       // If Satisfied, we update the birthEventTime
       // the new added event make the ContextWindow satisfy the requirement
       // means the new added event's date is the "birth Time"
@@ -60,8 +60,21 @@ public class BirthSelectionContext {
    * @param userId
    * @return
    */
-  public boolean IsUserSelected(String userId) {
+  public boolean isUserSelected(String userId) {
     return userSelected.containsKey(userId);
+  }
+
+  /**
+   * Directly set user's Action time
+   * Skip to record the frequency of events
+   * (this method will invoked when the birthEvents is Null)
+   * @param userId
+   * @param date
+   */
+  public void setUserSelected(String userId, LocalDateTime date){
+    if(!userSelected.containsKey(userId)){
+      userSelected.put(userId, date);
+    }
   }
 
   /**
@@ -80,7 +93,7 @@ public class BirthSelectionContext {
    * @param eventState
    * @return
    */
-  private boolean IsSatisfied(int[] eventState) {
+  private boolean isSatisfied(int[] eventState) {
     for (int i = 0; i < eventMinFrequency.length; i++) {
       if (eventState[i] < eventMinFrequency[i]) {
         return false;

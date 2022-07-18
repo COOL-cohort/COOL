@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateFactory;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateFunc;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
@@ -18,6 +19,7 @@ import lombok.Getter;
 @Getter
 public class ValueSelection {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<FilterLayout> filters;
 
     @JsonIgnore
@@ -37,9 +39,11 @@ public class ValueSelection {
     public void init() {
         this.filterList = new ArrayList<>();
         this.schemaList = new ArrayList<>();
-        for (FilterLayout layout : this.filters) {
-            this.filterList.add(layout.generateFilter());
-            this.schemaList.add(layout.getFieldSchema());
+        if (this.filters != null) {
+            for (FilterLayout layout : this.filters) {
+                this.filterList.add(layout.generateFilter());
+                this.schemaList.add(layout.getFieldSchema());
+            }
         }
         this.filters = null;
         // reclaim the FilterLayout
