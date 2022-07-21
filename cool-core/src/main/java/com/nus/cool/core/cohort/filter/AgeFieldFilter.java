@@ -23,6 +23,7 @@ import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldType;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class AgeFieldFilter implements FieldFilter {
 	
 	private final int minAge;
+	private FieldType fieldType;
 	
 	private final int maxAge;
 	
@@ -91,6 +93,9 @@ public class AgeFieldFilter implements FieldFilter {
 		throw new UnsupportedOperationException();
 	}
 
-
+	@Override
+	public FieldType getFieldType() {
+		return fieldType;
+	}
 
 }
