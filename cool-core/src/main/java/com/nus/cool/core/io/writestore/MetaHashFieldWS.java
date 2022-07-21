@@ -114,7 +114,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
             int invariantSize = tupleValue.length - 1;
             for (int i = 0; i < invariantSize; i++) {
                 if (invariantType.get(i) == FieldType.ActionTime || invariantType.get(i) == FieldType.Metric) {
-                    this.userToInvariant.get(hashKey).add(tupleValue[i + 1]);
+                    this.userToInvariant.get(hashKey).add(Integer.parseInt(tupleValue[i + 1]));
                 } else {
                     int invariantHashKey = rhash.hash(tupleValue[i + 1]);
                     this.userToInvariant.get(hashKey).add(invariantHashKey);
