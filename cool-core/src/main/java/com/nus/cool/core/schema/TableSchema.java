@@ -64,6 +64,15 @@ public class TableSchema {
   @Getter
   private Map<String, Integer> invariantName2Id = Maps.newHashMap();
 
+  @Getter
+  private Map<Integer,String> invariantId2Name = Maps.newHashMap();
+
+  @Getter
+  private Map<String, Integer> dataChunkFieldName2Id = Maps.newHashMap();
+
+  @Getter
+  private List<FieldType>invariantType=new ArrayList<>();
+
   /**
    * AppKeyField index, assign -1 if this field type not exist.
    */
@@ -113,7 +122,12 @@ public class TableSchema {
       boolean invariantField=field.isInvariantField();
       if(invariantField) {
         this.invariantFields.add(i);
-        invariantName2Id.put(field.getName(),this.invariantFields.size()-1);
+        invariantName2Id.put(field.getName(),this.invariantFields.size());
+        invariantId2Name.put(this.invariantFields.size(),field.getName());
+        this.invariantType.add(fieldType);
+      }
+      else{
+        this.dataChunkFieldName2Id.put(field.getName(),this.dataChunkFieldName2Id.size());
       }
       this.name2Id.put(field.getName(), i);
       switch (fieldType) {
@@ -127,7 +141,7 @@ public class TableSchema {
           this.actionField = i;
           break;
         case ActionTime:
-          this.actionTimeField = i;
+          this.actionTimeField = this.dataChunkFieldName2Id.get(field.getName());
           break;
         default:
           break;
