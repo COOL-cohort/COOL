@@ -77,4 +77,9 @@ public class BirthMinAggregator implements EventAggregator {
         // TODO Auto-generated method stub
     }
 
+    @Override
+    public void ageAggregateMetirc(BitSet bv, InputVector valueVector, int birthDate, int ageOff, int end, int ageInterval, TimeUnit unit, FieldFilter ageFieldFilter, int totalUsers, InputVector fieldIn, Map<Integer, List<Double>> cohortCells) {
+
+    }
+
 }

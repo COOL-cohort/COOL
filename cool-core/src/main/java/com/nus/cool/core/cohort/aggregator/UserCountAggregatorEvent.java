@@ -177,6 +177,55 @@ public class UserCountAggregatorEvent implements EventAggregator{
 		}
 	}
 
+	public void ageAggregateMetirc(BitSet ageOffset, InputVector timeVec, int birthDay, int ageOff, int ageEnd, int ageInterval,
+								   TimeUnit unit, FieldFilter ageFilter, int userIndex, InputVector filedValue, Map<Integer, List<Double>> ageMetrics){
+		// initialize the first age, i.e., the birth day
+		int age = 0;
+		List<Double> cohortCell = ageMetrics.get(age);
+		if (cohortCell == null) {
+			cohortCell = initCohortCell();
+			ageMetrics.put(age, cohortCell);
+		}
+		cohortCell.set(0, cohortCell.get(0) + 1);
+
+		// start from the birthday
+		int ageDate = TimeUtils.getDateofNextTimeUnitN(birthDay, unit, age);
+		int toffset = TimeUtils.skipToDate(timeVec, ageOff, ageEnd, ageDate);
+		int offset, nextAgeDate, nextToffset;
+		while (toffset < ageEnd) {
+			// determine the age
+			nextAgeDate = TimeUtils.getDateofNextTimeUnitN(ageDate, unit, ageInterval);
+			nextToffset = TimeUtils.skipToDate(timeVec, toffset, ageEnd, nextAgeDate);
+			offset = ageOffset.nextSetBit(toffset);
+			if (offset < 0) return;
+
+			boolean hasActivity = false;
+			age = TimeUtils.getDateFromOffset(timeVec, offset)-birthDay;
+			if (!ageFilter.accept(age)) return;
+			cohortCell = ageMetrics.get(age);
+			// init the cohort cell
+			// if the cohort cell is for the metric, it consists of "measure", "max", "min", "sum", "num"
+			// else, it only consists of "measure"
+			if (cohortCell == null) {
+				cohortCell = initCohortCell();
+				ageMetrics.put(age, cohortCell);
+			}
+			// update the cohort cell
+			while(offset>0 && offset<nextToffset){
+				hasActivity = true;
+				filedValue.skipTo(userIndex-1);
+				int val = filedValue.next();
+				updateStats(val, cohortCell);
+				offset = ageOffset.nextSetBit(offset+1);
+			}
+			// add the measure by 1
+			if (hasActivity)  ageMetrics.get(age).set(0,  ageMetrics.get(age).get(0) + 1);
+
+			ageDate = nextAgeDate;
+			toffset = nextToffset;
+		}
+	}
+
 	private List<Double> initCohortCell(){
 		List<Double> cohortCell = new ArrayList<>(5);
 		cohortCell.add(0.0);
