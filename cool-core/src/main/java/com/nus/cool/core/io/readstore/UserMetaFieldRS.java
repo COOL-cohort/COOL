@@ -33,7 +33,7 @@ public class UserMetaFieldRS implements MetaFieldRS{
     private InputVector globalIDVec;
 
     @Getter
-    private List<InputVector> userToInvariant=new ArrayList<>();
+    private List<InputVector> userToInvariant;
 
     private InputVector valueVec;
 
@@ -100,6 +100,7 @@ public class UserMetaFieldRS implements MetaFieldRS{
         this.fieldType = fieldType;
         this.fingerVec = InputVectorFactory.readFrom(buffer);
         this.globalIDVec = InputVectorFactory.readFrom(buffer);
+        this.userToInvariant=new ArrayList<>(this.invariantName2Id.size());
         for(int i=0;i<this.invariantName2Id.size();i++)
         {
             this.userToInvariant.set(i,InputVectorFactory.readFrom(buffer));
