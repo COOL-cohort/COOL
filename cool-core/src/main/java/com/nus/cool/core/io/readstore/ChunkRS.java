@@ -105,10 +105,16 @@ public class ChunkRS implements Input {
      */
 
     this.fields = new FieldRS[fields];
-    for (int i = 0; i < fields; i++) {
+    int fieldIndex=0;
+    for (int i = 0; i < schema.getFields().size(); i++) {
       // System.out.println("Reading data chunk's field ="+i+".....");
-      buffer.position(fieldOffsets[i]);
-      this.fields[i] = FieldRS.ReadFieldRS(buffer,this.schema.getField(i).getFieldType());
+      if(schema.getInvariantFields().contains(i)){
+        continue;
+      }
+      buffer.position(fieldOffsets[fieldIndex]);
+      FieldRS field = new CoolFieldRS();
+      field.readFromWithFieldType(buffer, this.schema.getField(i).getFieldType());
+      this.fields[fieldIndex++] = field;
     }
   }
 
@@ -123,7 +129,7 @@ public class ChunkRS implements Input {
   }
 
   public FieldRS getField(String fieldName) {
-    return getField(schema.getFieldID(fieldName));
+    return getField(schema.getDataChunkFieldName2Id().get(fieldName));
   }
 
 }
