@@ -21,18 +21,18 @@ package com.nus.cool.core.cohort;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 
 import com.nus.cool.core.cohort.ExtendedCohortQuery.AgeField;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.UserMetaFieldRS;
 import com.nus.cool.core.cohort.aggregator.EventAggregator;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
+import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -213,6 +213,134 @@ public class ExtendedCohortAggregation implements CohortOperator {
                     aggr.ageAggregateMetirc(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
                             query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
                             sigma.getAgeFieldFilter(), fieldIn, cohortCells);
+                } else{
+                    aggr.ageAggregate(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
+                            query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
+                            sigma.getAgeFieldFilter(), cohortCells);
+                }
+
+                bv.clear(ageOff, end + 1);
+            }
+        }
+
+        if (totalCorruptedUsers > 0)
+            LOG.info("Total corrupted users: " + totalCorruptedUsers + " " + totalDataChunks);
+    }
+
+    public void process(ChunkRS chunk, MetaChunkRS metaChunk) {
+        totalDataChunks++;
+
+        sigma.process(chunk, metaChunk);
+        if (!sigma.isUserActiveChunk()) {
+            totalSkippedDataChunks++;
+            return;
+        }
+
+        // Load necessary fields, we need at least four fields
+        FieldRS userField = chunk.getField(tableSchema.getUserKeyField());
+        UserMetaFieldRS userMetaField = (UserMetaFieldRS) metaChunk.getMetaField(metaChunk.getSchema().getUserKeyField(), FieldType.UserKey);
+        FieldRS actionTimeField = chunk.getField(tableSchema.getActionTimeField());
+
+//        Measure measure = cubeSchema.getMeasure(query.getMeasure());
+//        checkArgument(measure != null);
+//        FieldRS metricField = chunk.getField(measure.getTableFieldName());
+//        FieldRS metricField = chunk.getField("id");
+        FieldRS metricField = userField;
+
+        // Intentionally allocate one additional bit for dimension-base ageby aggregation
+        BitSet bv = new BitSet(chunk.records() + 1);
+
+        AgeField ageField = query.getAgeField();
+        BitSet ageDelimiter = null;
+        if (tableSchema.getFieldID(ageField.getField()) != tableSchema.getActionTimeField())
+            ageDelimiter = new BitSet(chunk.records() + 1);
+
+        // Skipping non RLE compressed blocks
+        int totalCorruptedUsers = 0;
+
+        if (userField.getValueVector() instanceof RLEInputVector == false) {
+            totalCorruptedUsers++;
+            return;
+        }
+
+        RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
+        RLEInputVector.Block userBlock = new RLEInputVector.Block();
+        List<InputVector> fieldVector = userMetaField.getUserToInvariant();
+        InputVector userKey = userField.getKeyVector();
+
+        // TODO: later will dynamically determine the scan of cohort users:
+        // either do a sequential scan or use the index
+        while (userInput.hasNext()) {
+
+            userInput.nextBlock(userBlock); // Next user RLE block
+            int userGlobalID=userKey.get(userBlock.value);
+            int userInvariantHash=userMetaField.findInvariantHash(userGlobalID);
+            int userGlobalIDLocation= userMetaField.find(userInvariantHash);
+
+            List<Integer>userFieldVector=new ArrayList<>();
+            for (int i=0;i<fieldVector.size();i++)
+                userFieldVector.add(fieldVector.get(i).get(userGlobalIDLocation));
+
+            // Find a new user
+            totalUsers++;
+            int beg = userBlock.off;
+            int end = userBlock.off + userBlock.len;
+
+            if (this.cohortUsers != null) {
+                if (curUser != userKey.get(userBlock.value) && curUser >= 0)
+                    continue;
+                if (cohortUsers.hasNext())
+                    curUser = cohortUsers.next();
+                else return;
+            }
+
+            ExtendedCohort cohort = sigma.selectUser(beg, end, userFieldVector, (UserMetaFieldRS) metaChunk.getMetaField(tableSchema.getUserKeyField(),FieldType.UserKey));
+
+            if (cohort == null) {
+                totalSkippedUsers++;
+                continue;
+            }
+
+            Map<Integer, List<Double>> cohortCells = (Map<Integer, List<Double>>) cubletResults.get(cohort);
+
+            // init a new cohort cell
+            if (cohortCells == null) {
+                cohortCells = new HashMap<>();
+                cubletResults.put(new ExtendedCohort(cohort), cohortCells);
+            }
+
+            int ageOff = cohort.getBirthOffset();
+
+            if (ageOff < end && sigma.isAgeActiveChunk()) {
+                if (tableSchema.getFieldID(ageField.getField()) != tableSchema.getActionTimeField()) {
+                    ageDelimiter.set(ageOff, end);
+                    sigma.selectAgeByActivities(ageOff, end, ageDelimiter);
+                }
+                bv.set(ageOff, end);
+                // process activities by age
+                String MetricAgeFilterName = sigma.selectAgeActivities(ageOff, end, bv, ageDelimiter, totalUsers, (UserMetaFieldRS)metaChunk.getMetaField(tableSchema.getUserKeyField(),FieldType.UserKey));
+                // updateStats(sigma.selectAgeActivities(ageOff, end, bv, ageDelimiter), cohortCells.get(0));
+
+                EventAggregator aggr = BirthAggregatorFactory.getAggregator(query.getMeasure().toUpperCase());
+                aggr.init(metricField.getValueVector());
+                if (tableSchema.getFieldID(query.getAgeField().getField()) != tableSchema.getActionTimeField()) {
+                    aggr.ageAggregate(bv, ageDelimiter, ageOff, end, this.query.getAgeField().getAgeInterval(),
+                            sigma.getAgeFieldFilter(), cohortCells);
+                    ageDelimiter.clear(ageOff, end + 1);
+                }
+                else if (MetricAgeFilterName!=null){
+                    if(tableSchema.getInvariantName2Id().keySet().contains(MetricAgeFilterName)){
+                        InputVector fieldIn=((UserMetaFieldRS) metaChunk.getMetaField(tableSchema.getUserKeyField(), FieldType.UserKey)).getUserToInvariant().get(tableSchema.getInvariantName2Id().get(MetricAgeFilterName));
+                        aggr.ageAggregateMetirc(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
+                                query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
+                                sigma.getAgeFieldFilter(), totalUsers, fieldIn, cohortCells);
+                    }
+                    else {
+                        InputVector fieldIn = chunk.getField(MetricAgeFilterName).getValueVector();
+                        aggr.ageAggregateMetirc(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
+                                query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
+                                sigma.getAgeFieldFilter(), fieldIn, cohortCells);
+                    }
                 } else{
                     aggr.ageAggregate(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
                             query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
