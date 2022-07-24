@@ -67,7 +67,12 @@ public class ZIntBitInputVector implements ZIntStore, InputVector {
 
   @Override
   public int find(int key) {
-    throw new UnsupportedOperationException();
+    for(int i=0;i<this.capacity;i++){
+      if(get(i)==key){
+        return i;
+      }
+    }
+    return -1;
   }
 
   @Override
