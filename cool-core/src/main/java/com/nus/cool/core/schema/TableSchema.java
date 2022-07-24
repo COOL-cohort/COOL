@@ -71,6 +71,9 @@ public class TableSchema {
   private Map<String, Integer> dataChunkFieldName2Id = Maps.newHashMap();
 
   @Getter
+  private Map<Integer, Integer> fieldID2dataChunkFieldId = Maps.newHashMap();
+
+  @Getter
   private List<FieldType>invariantType=new ArrayList<>();
 
   /**
@@ -90,6 +93,9 @@ public class TableSchema {
    */
   @Getter
   private int actionTimeField = -1;
+
+  @Getter
+  private int actionTimeMetaField=-1;
 
   /**
    * Obtain the content of a table from input stream
@@ -128,20 +134,22 @@ public class TableSchema {
       }
       else{
         this.dataChunkFieldName2Id.put(field.getName(),this.dataChunkFieldName2Id.size());
+        this.fieldID2dataChunkFieldId.put(i,this.dataChunkFieldName2Id.size()-1);
       }
       this.name2Id.put(field.getName(), i);
       switch (fieldType) {
         case AppKey:
-          this.appKeyField = i;
+          this.appKeyField = this.dataChunkFieldName2Id.get(field.getName());
           break;
         case UserKey:
-          this.userKeyField = i;
+          this.userKeyField = this.dataChunkFieldName2Id.get(field.getName());
           break;
         case Action:
-          this.actionField = i;
+          this.actionField = this.dataChunkFieldName2Id.get(field.getName());
           break;
         case ActionTime:
           this.actionTimeField = this.dataChunkFieldName2Id.get(field.getName());
+          this.actionTimeMetaField=i;
           break;
         default:
           break;
