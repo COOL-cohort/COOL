@@ -32,9 +32,7 @@ import lombok.Getter;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -268,6 +266,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
         // Codec is written internal
         // Actually data is not compressed here
         bytesWritten += this.compressor.writeTo(out);
+
 
         // generate globalID bytes
         hist = Histogram.builder()
