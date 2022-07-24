@@ -174,11 +174,13 @@ public class MetaHashFieldWS implements MetaFieldWS {
         int[] fingers = new int[this.hashToTerm.size()];
         // globalIDs contain the global ids in the hash order
         int[] globalIDs = new int[this.hashToTerm.size()];
+
         int i = 0;
         for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
             globalIDs[i] = en.getValue().globalId;
             fingers[i++] = en.getKey();
         }
+
 
         // generate finger bytes
         Histogram hist = Histogram.builder()
@@ -243,8 +245,11 @@ public class MetaHashFieldWS implements MetaFieldWS {
         // Write fingers, i.e., the hash values of the original string, into the array
         // fingers contain data's hash value
         int[] fingers = new int[this.hashToTerm.size()];
+        int[] sortedFingers=new int[this.hashToTerm.size()];
         // globalIDs contain the global ids in the hash order
         int[] globalIDs = new int[this.hashToTerm.size()];
+        int[] sortedGlobalIDs=new int[this.hashToTerm.size()];
+
         int i = 0;
         for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
             globalIDs[i] = en.getValue().globalId;
@@ -252,6 +257,31 @@ public class MetaHashFieldWS implements MetaFieldWS {
             i++;
         }
 
+        Comparator<Map.Entry<Integer, Term>> valueComparator
+                = new Comparator<Map.Entry<Integer, Term>>() {
+            @Override
+            public int compare(Map.Entry<Integer, Term> e1, Map.Entry<Integer, Term> e2) {
+                Integer v1 = e1.getValue().globalId;
+                Integer v2 = e2.getValue().globalId;
+                return v1.compareTo(v2);
+            }
+        };
+
+        List<Map.Entry<Integer, Term>> listOfEntries
+                = new ArrayList<Map.Entry<Integer, Term>>(this.hashToTerm.entrySet());
+        Collections.sort(listOfEntries, valueComparator);
+
+        LinkedHashMap<Integer, Term> sortedByValue
+                = new LinkedHashMap<Integer, Term>(listOfEntries.size());
+        for(Map.Entry<Integer, Term> entry :listOfEntries)
+        {
+            sortedByValue.put(entry.getKey(), entry.getValue());
+        }
+        i=0;
+        for (Map.Entry<Integer, Term> en : sortedByValue.entrySet()) {
+            sortedGlobalIDs[i] = en.getValue().globalId;
+            sortedFingers[i++] = en.getKey();
+        }
 
         // generate finger bytes
         Histogram hist = Histogram.builder()
@@ -267,6 +297,18 @@ public class MetaHashFieldWS implements MetaFieldWS {
         // Actually data is not compressed here
         bytesWritten += this.compressor.writeTo(out);
 
+        hist = Histogram.builder()
+                .min(fingers[0])
+                .max(fingers[fingers.length - 1])
+                .numOfValues(fingers.length)
+                .rawSize(Ints.BYTES * fingers.length)
+                .type(CompressType.KeyFinger)
+                .build();
+        this.compressor.reset(hist, sortedFingers, 0, fingers.length);
+        // Compress and write the fingers
+        // Codec is written internal
+        // Actually data is not compressed here
+        bytesWritten += this.compressor.writeTo(out);
 
         // generate globalID bytes
         hist = Histogram.builder()
@@ -277,6 +319,16 @@ public class MetaHashFieldWS implements MetaFieldWS {
                 .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
                 .build();
         this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
+        bytesWritten += this.compressor.writeTo(out);
+
+        hist = Histogram.builder()
+                .min(0)
+                .max(this.hashToTerm.size())
+                .numOfValues(globalIDs.length)
+                .rawSize(Ints.BYTES * globalIDs.length)
+                .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
+                .build();
+        this.compressor.reset(hist, sortedGlobalIDs, 0, globalIDs.length);
         bytesWritten += this.compressor.writeTo(out);
 
         for (int j = 0; j < invariantName2Id.size(); j++) {

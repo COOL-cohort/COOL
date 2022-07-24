@@ -29,8 +29,9 @@ public class UserMetaFieldRS implements MetaFieldRS{
     private FieldType fieldType;
 
     private InputVector fingerVec;
-
+    private InputVector sortedFingerVec;
     private InputVector globalIDVec;
+    private InputVector sortedGlobalIDVec;
 
     @Getter
     private List<InputVector> userToInvariant;
@@ -63,8 +64,8 @@ public class UserMetaFieldRS implements MetaFieldRS{
     }
 
     public int findInvariantHash(int globalID) {
-        int fingerIdx = this.globalIDVec.find(globalID);
-        return fingerIdx;
+        int fingerIdx = this.sortedGlobalIDVec.find(globalID);
+        return this.sortedFingerVec.get(fingerIdx);
     }
 
     @Override
@@ -99,7 +100,9 @@ public class UserMetaFieldRS implements MetaFieldRS{
     public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
         this.fieldType = fieldType;
         this.fingerVec = InputVectorFactory.readFrom(buffer);
+        this.sortedFingerVec=InputVectorFactory.readFrom(buffer);
         this.globalIDVec = InputVectorFactory.readFrom(buffer);
+        this.sortedGlobalIDVec=InputVectorFactory.readFrom(buffer);
         this.userToInvariant=new ArrayList<>(this.invariantName2Id.size());
         for(int i=0;i<this.invariantName2Id.size();i++)
         {
