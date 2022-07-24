@@ -276,9 +276,9 @@ public class ExtendedCohortAggregation implements CohortOperator {
 
             userInput.nextBlock(userBlock); // Next user RLE block
             int userGlobalID=userKey.get(userBlock.value);
-//            int userInvariantHash=userMetaField.findInvariantHash(userGlobalID);
-//            int userGlobalIDLocation= userMetaField.find(userInvariantHash);
-            int userGlobalIDLocation=userMetaField.findInvariantHash(userGlobalID);
+            int userInvariantHash=userMetaField.findInvariantHash(userGlobalID);
+            int userGlobalIDLocation= userMetaField.find(userInvariantHash);
+//            int userGlobalIDLocation=userMetaField.findInvariantHash(userGlobalID);
 //            int userGlobalID;
 //            int userInvariantHash;
 //            int userGlobalIDLocation;
