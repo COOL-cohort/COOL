@@ -47,6 +47,8 @@ public class ExtendedCohortAggregation implements CohortOperator {
 
     private InputVector cohortUsers;
 
+    private List<Integer> userIndex=new ArrayList<>();
+
     private int curUser = -1;
 
     private ExtendedCohortQuery query;
@@ -274,8 +276,13 @@ public class ExtendedCohortAggregation implements CohortOperator {
 
             userInput.nextBlock(userBlock); // Next user RLE block
             int userGlobalID=userKey.get(userBlock.value);
-            int userInvariantHash=userMetaField.findInvariantHash(userGlobalID);
-            int userGlobalIDLocation= userMetaField.find(userInvariantHash);
+//            int userInvariantHash=userMetaField.findInvariantHash(userGlobalID);
+//            int userGlobalIDLocation= userMetaField.find(userInvariantHash);
+            int userGlobalIDLocation=userMetaField.findInvariantHash(userGlobalID);
+//            int userGlobalID;
+//            int userInvariantHash;
+//            int userGlobalIDLocation;
+//            List<Integer>userFieldVector=new ArrayList<>();
 
             List<Integer>userFieldVector=new ArrayList<>();
             for (int i=0;i<fieldVector.size();i++)
@@ -294,7 +301,8 @@ public class ExtendedCohortAggregation implements CohortOperator {
                 else return;
             }
 
-            ExtendedCohort cohort = sigma.selectUser(beg, end, userFieldVector, (UserMetaFieldRS) metaChunk.getMetaField(tableSchema.getUserKeyField(),FieldType.UserKey));
+            userIndex.add(end);
+            ExtendedCohort cohort = sigma.selectUser(beg, end, userGlobalIDLocation, userFieldVector, (UserMetaFieldRS) metaChunk.getMetaField(tableSchema.getUserKeyField(),FieldType.UserKey));
 
             if (cohort == null) {
                 totalSkippedUsers++;
@@ -312,7 +320,7 @@ public class ExtendedCohortAggregation implements CohortOperator {
             int ageOff = cohort.getBirthOffset();
 
             if (ageOff < end && sigma.isAgeActiveChunk()) {
-                if (tableSchema.getFieldID(ageField.getField()) != tableSchema.getActionTimeField()) {
+                if (tableSchema.getFieldID(ageField.getField()) != tableSchema.getActionTimeMetaField()) {
                     ageDelimiter.set(ageOff, end);
                     sigma.selectAgeByActivities(ageOff, end, ageDelimiter);
                 }
@@ -323,7 +331,7 @@ public class ExtendedCohortAggregation implements CohortOperator {
 
                 EventAggregator aggr = BirthAggregatorFactory.getAggregator(query.getMeasure().toUpperCase());
                 aggr.init(metricField.getValueVector());
-                if (tableSchema.getFieldID(query.getAgeField().getField()) != tableSchema.getActionTimeField()) {
+                if (tableSchema.getFieldID(query.getAgeField().getField()) != tableSchema.getActionTimeMetaField()) {
                     aggr.ageAggregate(bv, ageDelimiter, ageOff, end, this.query.getAgeField().getAgeInterval(),
                             sigma.getAgeFieldFilter(), cohortCells);
                     ageDelimiter.clear(ageOff, end + 1);
