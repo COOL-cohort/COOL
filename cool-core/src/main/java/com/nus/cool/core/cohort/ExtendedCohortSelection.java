@@ -200,7 +200,7 @@ public class ExtendedCohortSelection implements Operator {
         }
 
         this.maxDate = TimeUtils.getDate(
-                metaChunk.getMetaField(tableSchema.getActionTimeField(), FieldType.ActionTime).getMaxValue());
+                metaChunk.getMetaField(tableSchema.getActionTimeMetaField(), FieldType.ActionTime).getMaxValue());
     }
 
     @Override
@@ -771,7 +771,7 @@ public class ExtendedCohortSelection implements Operator {
         return null;
     }
 
-    public ExtendedCohort selectUser(int start, int end, List<Integer> userFieldVector, UserMetaFieldRS userMetaField) {
+    public ExtendedCohort selectUser(int start, int end, int userIndex, List<Integer> userFieldVector, UserMetaFieldRS userMetaField) {
         checkArgument(start < end);
 
         // clean event offset
@@ -799,7 +799,7 @@ public class ExtendedCohortSelection implements Operator {
                         continue;
                     }
 
-                    Double value = getBirthAttribute(idx, fieldID, userMetaField);
+                    Double value = getBirthAttribute(idx, fieldID, userIndex, userMetaField);
                     if (value == null)
                         return null;
 
@@ -909,7 +909,7 @@ public class ExtendedCohortSelection implements Operator {
         int fieldID = tableSchema.getFieldID(q.getAgeField().getField());
         if (fieldID != tableSchema.getActionField() &&
                 fieldID != tableSchema.getActionTimeField()) {
-            InputVector inputVector = this.chunk.getField(fieldID).getValueVector();
+            InputVector inputVector = this.chunk.getField(tableSchema.getFieldID2dataChunkFieldId().get(fieldID)).getValueVector();
             int pos = ageOff;
             inputVector.skipTo(pos);
             int lastVal = inputVector.next();
@@ -992,11 +992,11 @@ public class ExtendedCohortSelection implements Operator {
         // as event-based ageby operator
         int fieldID = tableSchema.getFieldID(q.getAgeField().getField());
         if (fieldID != tableSchema.getActionField() &&
-                fieldID != tableSchema.getActionTimeField()) {
+                fieldID != tableSchema.getActionTimeMetaField()) {
             bs.and(ageDelimiters);
             int pos = ageDelimiters.nextSetBit(ageOff);
             int lastSetbit = pos;
-            InputVector inputVector = this.chunk.getField(fieldID).getValueVector();
+            InputVector inputVector = this.chunk.getField(tableSchema.getFieldID2dataChunkFieldId().get(fieldID)).getValueVector();
             while (pos >= 0 && pos < ageEnd) {
                 lastSetbit = pos;
                 inputVector.skipTo(pos);
@@ -1052,7 +1052,7 @@ public class ExtendedCohortSelection implements Operator {
         return aggregator.birthAggregate(eventOffset.get(baseEvent));
     }
 
-    private Double getBirthAttribute(int baseEvent, int fieldID, UserMetaFieldRS userMetaField) {
+    private Double getBirthAttribute(int baseEvent, int fieldID, int userIndex, UserMetaFieldRS userMetaField) {
         FieldSchema schema = tableSchema.getField(fieldID);
         EventAggregator aggregator;
 
@@ -1063,11 +1063,16 @@ public class ExtendedCohortSelection implements Operator {
 //			fieldID = tableSchema.getFieldID(schema.getBaseField());
         }
         if (tableSchema.getInvariantFields().contains(fieldID)) {
-            aggregator.init(userMetaField.getUserToInvariant().get(tableSchema.getInvariantName2Id().get(tableSchema.getInvariantId2Name().get(fieldID))));
+            aggregator.init(userMetaField.getUserToInvariant().get(tableSchema.getInvariantName2Id().get(tableSchema.getInvariantId2Name().get(fieldID))-1));
         } else {
             aggregator.init(chunk.getField(fieldID).getValueVector());
         }
-        return aggregator.birthAggregate(eventOffset.get(baseEvent));
+        if(tableSchema.getInvariantId2Name().containsKey(fieldID)){
+            return aggregator.birthAggregate(eventOffset.get(baseEvent), userIndex);
+        }
+        else{
+            return aggregator.birthAggregate(eventOffset.get(baseEvent));
+        }
     }
 
     public boolean isUserActiveCublet() {
