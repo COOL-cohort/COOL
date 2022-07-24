@@ -240,7 +240,9 @@ public class CoolCohortEngine {
             if (sigma.isUserActiveCublet()) {
                 List<ChunkRS> dataChunks = cubletRS.getDataChunks();
                 for (ChunkRS dataChunk : dataChunks) {
-                    gamma.process(dataChunk);
+                    //加入metachunk
+                    //datachunk对某个用户处理，metachunk也需要进行用户处理对同步
+                    gamma.process(dataChunk,metaChunk);
                 }
             }
 
