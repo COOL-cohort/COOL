@@ -24,10 +24,7 @@ import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserCountAggregatorEvent implements EventAggregator{
 
@@ -224,6 +221,11 @@ public class UserCountAggregatorEvent implements EventAggregator{
 			ageDate = nextAgeDate;
 			toffset = nextToffset;
 		}
+	}
+
+	@Override
+	public Double birthAggregate(List<Integer> offset, int userIndex) {
+		return null;
 	}
 
 	private List<Double> initCohortCell(){
