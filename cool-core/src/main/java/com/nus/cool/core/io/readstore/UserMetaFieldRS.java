@@ -64,7 +64,7 @@ public class UserMetaFieldRS implements MetaFieldRS{
 
     public int findInvariantHash(int globalID) {
         int fingerIdx = this.globalIDVec.find(globalID);
-        return this.fingerVec.get(fingerIdx);
+        return fingerIdx;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class UserMetaFieldRS implements MetaFieldRS{
         this.userToInvariant=new ArrayList<>(this.invariantName2Id.size());
         for(int i=0;i<this.invariantName2Id.size();i++)
         {
-            this.userToInvariant.set(i,InputVectorFactory.readFrom(buffer));
+            this.userToInvariant.add(i,InputVectorFactory.readFrom(buffer));
         }
         this.valueVec = InputVectorFactory.readFrom(buffer);
     }
