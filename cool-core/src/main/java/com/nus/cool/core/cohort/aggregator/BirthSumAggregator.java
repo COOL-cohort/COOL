@@ -23,10 +23,7 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * BirthSumAggregator is used to aggregate the cohort results
@@ -140,5 +137,10 @@ public class BirthSumAggregator implements EventAggregator {
 	@Override
 	public void ageAggregateMetirc(BitSet bv, InputVector valueVector, int birthDate, int ageOff, int end, int ageInterval, TimeUnit unit, FieldFilter ageFieldFilter, int totalUsers, InputVector fieldIn, Map<Integer, List<Double>> cohortCells) {
 
+	}
+
+	@Override
+	public Double birthAggregate(List<Integer> offset, int userIndex) {
+		return null;
 	}
 }

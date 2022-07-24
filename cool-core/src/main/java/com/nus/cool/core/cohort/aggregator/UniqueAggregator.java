@@ -46,6 +46,14 @@ public class UniqueAggregator implements EventAggregator {
         return same ? (double) ret : null;
     }
 
+    @Override
+    public Double birthAggregate(List<Integer> offset, int userIndex) {
+        if (offset.isEmpty()) return null;
+        int ret = values.get(userIndex);
+
+        return (double) ret;
+    }
+
 	@Override
 	public void ageAggregate(BitSet ageOffset, BitSet ageDelimiter, int start, int end, int ageInterval,
                              FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics) {

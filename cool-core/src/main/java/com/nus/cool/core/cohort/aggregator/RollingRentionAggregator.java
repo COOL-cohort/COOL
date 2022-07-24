@@ -23,10 +23,7 @@ import com.nus.cool.core.cohort.TimeUtils;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RollingRentionAggregator implements EventAggregator{
 
@@ -141,5 +138,10 @@ public class RollingRentionAggregator implements EventAggregator{
 	@Override
 	public void ageAggregateMetirc(BitSet bv, InputVector valueVector, int birthDate, int ageOff, int end, int ageInterval, TimeUnit unit, FieldFilter ageFieldFilter, int totalUsers, InputVector fieldIn, Map<Integer, List<Double>> cohortCells) {
 
+	}
+
+	@Override
+	public Double birthAggregate(List<Integer> offset, int userIndex) {
+		return null;
 	}
 }
