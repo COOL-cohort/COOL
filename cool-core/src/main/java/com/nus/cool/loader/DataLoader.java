@@ -20,6 +20,7 @@ package com.nus.cool.loader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
@@ -59,6 +60,9 @@ public class DataLoader {
 
     @NonNull
     private final DataWriter writer;
+
+    @NonNull
+    private final List<Integer> metaInvariantField;
     
 
     public static Builder builder(String dataSourceName,
@@ -118,7 +122,8 @@ public class DataLoader {
                     config.createTupleReader(dataFile),
                     config.createTupleParser(tableSchema),
                     new NativeDataWriter(
-                            tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()));
+                            tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()),
+                    tableSchema.getInvariantFields());
         }
     }
 }
