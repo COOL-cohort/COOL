@@ -3,6 +3,7 @@ package com.nus.cool.core.cohort.funnel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.BirthSequence;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,11 @@ public class FunnelQuery {
 	}
 
 	@JsonIgnore
-	public boolean isValid() {
-		return (stages != null) && (dataSource != null);
+	public boolean isValid() throws IOException {
+		if ((stages != null) && (dataSource != null)){
+			return true;
+		} else{
+			throw new IOException("[x] Invalid funnel query.");
+		}
 	}
 }

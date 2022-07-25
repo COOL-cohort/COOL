@@ -23,12 +23,18 @@ import com.google.common.io.Files;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.loader.DataLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
 public class CoolLoader {
+
+    static final Logger logger = LoggerFactory.getLogger(CoolLoader.class);
+
     private final DataLoaderConfig loaderConfig;
     /**
      *
@@ -51,9 +57,9 @@ public class CoolLoader {
         File root = new File(cubeRepo);
         if (!root.exists()){
             if (root.mkdir()){
-                System.out.println("[*] Data repository " + root.getCanonicalPath() + " is created!");
+                logger.info("[*] Data repository " + root.getCanonicalPath() + " is created!");
             } else {
-                System.out.println("[x] Data repository " + root.getCanonicalPath() + " already exist!");
+                logger.info("[x] Data repository " + root.getCanonicalPath() + " already exist!");
             }
         }
         File schemaFile = new File(schemaFileName);
@@ -64,9 +70,9 @@ public class CoolLoader {
         File cubeRoot = new File(root, dataSourceName);
         if (!cubeRoot.exists()){
             if (cubeRoot.mkdir()){
-                System.out.println("[*] New Repo " + cubeRoot.getCanonicalPath() + " is created!");
+                logger.info("[*] New Repo " + cubeRoot.getCanonicalPath() + " is created!");
             } else {
-                System.out.println("[x] New Repo " + cubeRoot.getCanonicalPath() + "cannot be created!");
+                logger.info("[x] New Repo " + cubeRoot.getCanonicalPath() + "cannot be created!");
             }
         }
 
@@ -82,7 +88,7 @@ public class CoolLoader {
         // create a new folder to this new version
         File outputCubeVersionDir = new File(cubeRoot, String.format("v%0"+8+"d",(currentVersion+1)));
         if (outputCubeVersionDir.mkdir()){
-            System.out.println("[*] New version " + outputCubeVersionDir.getName() + " is created!");
+            logger.info("[*] New version " + outputCubeVersionDir.getName() + " is created!");
         }
         DataLoader loader = DataLoader.builder(dataSourceName, schema, dataFile, outputCubeVersionDir, this.loaderConfig).build();
         loader.load();

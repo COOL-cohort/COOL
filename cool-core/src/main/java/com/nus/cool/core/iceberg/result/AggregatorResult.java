@@ -20,82 +20,32 @@
 package com.nus.cool.core.iceberg.result;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AggregatorResult {
 
-    private Float count;
+    private Integer count;
 
     private Long sum;
 
     private Float average;
 
-    private Float max;
+    private Integer max;
 
-    private Float min;
+    private Integer min;
 
     private Float countDistinct;
 
     @JsonIgnore
     private Set<String> distinctSet = new HashSet<>();
-
-    public Float getCount() {
-        return count;
-    }
-
-    public void setCount(float count) {
-        this.count = count;
-    }
-
-    public Long getSum() {
-        return sum;
-    }
-
-    public void setSum(Long sum) {
-        this.sum = sum;
-    }
-
-    public Float getAverage() {
-        return average;
-    }
-
-    public void setAverage(float average) {
-        this.average = average;
-    }
-
-    public Float getMax() {
-        return max;
-    }
-
-    public void setMax(float max) {
-        this.max = max;
-    }
-
-    public Float getMin() {
-        return min;
-    }
-
-    public void setMin(float min) {
-        this.min = min;
-    }
-
-    public Float getCountDistinct() {
-        return countDistinct;
-    }
-
-    public void setCountDistinct(Float countDistinct) {
-        this.countDistinct = countDistinct;
-    }
-
-    public Set<String> getDistinctSet() {
-        return distinctSet;
-    }
-
-    public void setDistinctSet(Set<String> distinctSet) {
-        this.distinctSet = distinctSet;
-    }
 
     public void merge(AggregatorResult res) {
         if (this.countDistinct != null) {
@@ -106,6 +56,6 @@ public class AggregatorResult {
         if (this.min != null) this.min = this.min <= res.getMin() ? this.min : res.getMin();
         if (this.count != null) this.count += res.getCount();
         if (this.sum != null) this.sum += res.getSum();
-        if (this.average != null) this.average = this.sum / this.count;
+        if (this.average != null) this.average = this.sum / (float)this.count;
      }
 }

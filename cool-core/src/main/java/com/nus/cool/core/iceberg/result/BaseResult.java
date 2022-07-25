@@ -19,8 +19,15 @@
 
 package com.nus.cool.core.iceberg.result;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.*;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BaseResult {
 
     private String timeRange;
@@ -30,38 +37,6 @@ public class BaseResult {
     private String fieldName;
 
     private AggregatorResult aggregatorResult;
-
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
-
-    public String getTimeRange() {
-        return timeRange;
-    }
-
-    public void setTimeRange(String timeRange) {
-        this.timeRange = timeRange;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public AggregatorResult getAggregatorResult() {
-        return aggregatorResult;
-    }
-
-    public void setAggregatorResult(AggregatorResult aggregatorResult) {
-        this.aggregatorResult = aggregatorResult;
-    }
 
     private boolean equalsKey(BaseResult another) {
         Set<String> set1 = new HashSet<>(Arrays.asList(this.getKey().split("|")));

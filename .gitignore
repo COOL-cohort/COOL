@@ -1,5 +1,7 @@
 # idea
 .idea/
+tree.txt
+*/tree.txt
 
 # product
 target/
@@ -16,6 +18,10 @@ dependency-reduced-pom.xml
 
 # dataset source files
 datasetSource/
+
+# log file
+cool.log
+*/cool.log
 
 .DS_Store
 NOTICE
