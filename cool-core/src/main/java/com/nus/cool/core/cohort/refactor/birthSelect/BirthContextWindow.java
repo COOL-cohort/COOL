@@ -7,7 +7,6 @@ import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
-import javafx.util.Pair;
 import lombok.Getter;
 
 public class BirthContextWindow {
@@ -71,17 +70,21 @@ public class BirthContextWindow {
     /**
      * Typedef a Pair<EventId, DateTime>
      */
-    private class EventTime extends Pair<Integer, LocalDateTime> {
+    private class EventTime {
+        private Integer eventId;
+        private LocalDateTime datetime;
+
         public EventTime(Integer EventId, LocalDateTime Date) {
-            super(EventId, Date);
+            this.eventId = EventId;
+            this.datetime = Date;
         }
 
         public Integer getEventId() {
-            return super.getKey();
+            return this.eventId;
         }
 
         public LocalDateTime getTimeCalendar() {
-            return super.getValue();
+            return this.datetime;
         }
     }
 }
