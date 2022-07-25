@@ -28,8 +28,11 @@ public class FilterLayout {
 
     @Override
     public String toString() {
+        String acStr = "", rejStr = "";
+        if(this.acceptValue != null) acStr = acceptValue.toString();
+        if(this.rejectValue != null) rejStr = rejectValue.toString();
         return String.format("FilterLayout fieldSchema %s filter type %s, acceptValue %s, rejectValue %s",
-                fieldSchema, type, acceptValue.toString(), rejectValue.toString());
+                fieldSchema, type, acStr, rejStr);
     }
 
     public Filter generateFilter() {
