@@ -33,15 +33,41 @@ public class LZ4InputVector implements InputVector {
 
   private ByteBuffer buffer;
 
+  private boolean decoded;
+
   private int[] offsets;
 
   private byte[] data;
 
   private LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 
+  private void decode() {
+    byte[] compressed = new byte[this.zLen];
+    byte[] raw = new byte[this.rawLen];
+    this.buffer.get(compressed);
+    this.decompressor.decompress(compressed, raw, this.rawLen);
+    ByteBuffer buffer = ByteBuffer.wrap(raw);
+    // get # values
+    int values = buffer.getInt();
+    // get offsets
+    this.offsets = new int[values];
+      for (int i = 0; i < values; i++) {
+          this.offsets[i] = buffer.getInt();
+      }
+    // place the remaining bytes (values) in data
+    this.data = new byte[rawLen - 4 - values * 4];
+    buffer.get(this.data);
+    this.decoded = true;
+  }
+
+
+  /**
+   * number of items
+   */
   @Override
   public int size() {
-    throw new UnsupportedOperationException();
+    if (!decoded) decode();
+    return this.offsets.length;
   }
 
   @Override
@@ -71,6 +97,7 @@ public class LZ4InputVector implements InputVector {
 
   @Override
   public void readFrom(ByteBuffer buffer) {
+    this.decoded = false;
     this.zLen = buffer.getInt();
     this.rawLen = buffer.getInt();
     int oldLimit = buffer.limit();
@@ -82,23 +109,7 @@ public class LZ4InputVector implements InputVector {
   }
 
   public String getString(int index, Charset charset) {
-    if (this.buffer.hasRemaining()) {
-      byte[] compressed = new byte[this.zLen];
-      byte[] raw = new byte[this.rawLen];
-      this.buffer.get(compressed);
-      this.decompressor.decompress(compressed, raw, this.rawLen);
-      ByteBuffer buffer = ByteBuffer.wrap(raw);
-      // get # values
-      int values = buffer.getInt();
-      // get offsets
-      this.offsets = new int[values];
-        for (int i = 0; i < values; i++) {
-            this.offsets[i] = buffer.getInt();
-        }
-      // place the remaining bytes (values) in data
-      this.data = new byte[rawLen - 4 - values * 4];
-      buffer.get(this.data);
-    }
+    if (!decoded) decode();
     checkArgument(index < this.offsets.length && index >= 0);
     int last = this.offsets.length - 1;
     int off = this.offsets[index];
