@@ -47,34 +47,19 @@ public class CsvLoaderTest {
 
     @DataProvider(name = "CsvLoaderTestDP")
     public Object[][] CsvLoaderTestDPArgObjects() {
-        String sourcePath = Paths.get(System.getProperty("user.dir"),
-                "src",
-                "test",
-                "java",
-                "com",
-                "nus",
-                "cool",
-                "core",
-                "resources").toString();
         return new Object[][] {
                 {
                     "health",
-                    // Paths.get(sourcePath, "health", "table.yaml").toString(),
-                    // Paths.get(sourcePath, "health", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "health", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "health", "raw.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                     "sogamo",
-                    // Paths.get(sourcePath, "sogamo", "table.yaml").toString(),
-                    // Paths.get(sourcePath, "sogamo", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "sogamo", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "sogamo", "test.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
                 }, {
                     "tpc-h-10g",
-                    // Paths.get(sourcePath, "olap-tpch", "table.yaml").toString(),
-                    // Paths.get(sourcePath, "olap-tpch", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "olap-tpch", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "olap-tpch", "scripts", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
