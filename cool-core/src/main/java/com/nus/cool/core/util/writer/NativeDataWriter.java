@@ -188,12 +188,25 @@ public class NativeDataWriter implements DataWriter {
         return true;
     }
 
+    private void GenerateCubeMeta() throws IOException {
+      if (!finished) return;
+      String fileName = "cubemeta";
+      File cubemeta = new File(outputDir, fileName);
+      DataOutputStream out = new DataOutputStream(
+        new FileOutputStream(cubemeta));
+      offset = 0;
+      metaChunk.writeCubeMeta(out);
+      out.flush();
+      out.close();
+    }
+
     @Override
     public void Finish() throws IOException {
         if (finished) return;
         finishChunk();
         finishCublet();
         finished = true;
+        GenerateCubeMeta();
     }
 
     @Override
