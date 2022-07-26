@@ -18,6 +18,9 @@
  */
 package com.nus.cool.core.io.writestore;
 
+import java.io.DataOutput;
+import java.io.IOException;
+
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.FieldType;
 
@@ -30,11 +33,6 @@ public interface MetaFieldWS extends Output {
    */
   void put(String v);
 
-  /**
-   * Update the meta with value
-   * @param v value
-   */
-  void update(String v);
 
   /**
    * Find the index of value in this meta field, return -1 if no such value exists
@@ -63,4 +61,19 @@ public interface MetaFieldWS extends Output {
    * method returns, this meta field is frozen for writing.
    */
   void complete();
+
+  /**
+   * clean internal data for processing next cublet
+   */
+  void cleanForNextCublet();
+
+
+  /**
+   * write the summary of this field to cube meta file
+   * @param out: the cube meta file
+   * @return bytes written
+   * @throws IOException
+   */
+  public int writeCubeMeta(DataOutput out) throws IOException;
+  
 }

@@ -162,53 +162,47 @@ public class MetaChunkWS implements Output {
     public int writeTo(DataOutput out) throws IOException {
         int bytesWritten = 0;
 
-        // Store field offsets and write MetaFields as MetaChunkData layout
-        int[] offsets = new int[this.metaFields.length];
-        for (int i = 0; i < this.metaFields.length; i++) {
-            offsets[i] = this.offset + bytesWritten;
-            if(i==userKeyIndex){
-                bytesWritten += this.metaFields[i].writeTo(out);
-            }
-            else{
-                bytesWritten += this.metaFields[i].writeTo(out);
-            }
-        }
-
-        // Store header offset for MetaChunk layout
-        int headOffset = this.offset + bytesWritten;
-
-        // 1. Write ChunkType for header layout
-        out.writeByte(ChunkType.META.ordinal());
-        bytesWritten++;
-
-        // 2.1 Write fields for header layout
-        out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
-        bytesWritten += Ints.BYTES;
-
-        // 2.2 Write field offsets for header layout
-        for (int offset : offsets) {
-            out.writeInt(IntegerUtil.toNativeByteOrder(offset));
-            bytesWritten += Ints.BYTES;
-        }
-
-        // 3. Write header offset for MetaChunk layout
-        out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
-        bytesWritten += Ints.BYTES;
-        return bytesWritten;
+    // Store field offsets and write MetaFields as MetaChunkData layout
+    int[] offsets = new int[this.metaFields.length];
+    for (int i = 0; i < this.metaFields.length; i++) {
+      offsets[i] = this.offset + bytesWritten;
+      bytesWritten += this.metaFields[i].writeTo(out);
     }
 
-    @Override
-    public String toString() {
-        return "MetaChunk: " + Arrays.asList(metaFields).stream()
-                .map(Object::toString).reduce((x, y) -> x + ", " + y);
+    // Store header offset for MetaChunk layout
+    int headOffset = this.offset + bytesWritten;
+
+    // 1. Write ChunkType for header layout
+    out.writeByte(ChunkType.META.ordinal());
+    bytesWritten++;
+
+    // 2.1 Write fields for header layout
+    out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
+    bytesWritten += Ints.BYTES;
+
+    // 2.2 Write field offsets for header layout
+    for (int offset : offsets) {
+      out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+      bytesWritten += Ints.BYTES;
     }
 
-    /**
-     * Update beginning offset to write the
-     *
-     * @param newOffset: new offset to write metaChunk
-     */
-    public void updateBeginOffset(int newOffset) {
-        this.offset = newOffset;
-    }
+    // 3. Write header offset for MetaChunk layout
+    out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
+    bytesWritten += Ints.BYTES;
+    return bytesWritten;
+  }
+
+  @Override
+  public String toString() {
+    return "MetaChunk: " + Arrays.asList(metaFields).stream()
+      .map(Object::toString).reduce((x, y) -> x + ", " + y);
+  }
+
+  /**
+   * Update beginning offset to write the
+   * @param newOffset: new offset to write metaChunk
+   */
+  public void updateBeginOffset(int newOffset){
+    this.offset = newOffset;
+  }
 }

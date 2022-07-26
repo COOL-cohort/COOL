@@ -19,6 +19,7 @@
 package com.nus.cool.core.io.writestore;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.Histogram;
@@ -33,6 +34,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -52,167 +54,193 @@ import java.util.stream.Collectors;
  */
 public class MetaHashFieldWS implements MetaFieldWS {
 
-    protected final Charset charset;
-    protected final FieldType fieldType;
-    protected final OutputCompressor compressor;
-    protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
+  protected final Charset charset;
+  protected final FieldType fieldType;
+  protected final OutputCompressor compressor;
+  protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
-    /**
-     * Global hashToTerm, keys are hashed by the indexed string
-     */
+  /**
+   * Global hashToTerm, keys are hashed by the indexed string
+   */
 
-    // hash of one tuple field : Term {origin value of tuple filed, global ID. }
-    protected final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
+  // hash of one tuple field : Term {origin value of tuple filed, global ID. }
+  protected final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
 
-    // store keys of hashToTerm
-    protected final List<Integer> gidToHash = new ArrayList<>();
+  // all possible values of the field.
+  protected final Set<String> fieldValues = Sets.newTreeSet();
 
-    // global id
-    protected int nextGid = 0;
+  // global id
+  protected int nextGid = 0;
 
-    public MetaHashFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
-        this.fieldType = type;
-        this.charset = charset;
-        this.compressor = compressor;
+  public MetaHashFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
+    this.fieldType = type;
+    this.charset = charset;
+    this.compressor = compressor;
+  }
+
+  @Override
+  public void put(String tupleValue) {
+    int hashKey = rhash.hash(tupleValue);
+    if (!this.hashToTerm.containsKey(hashKey)) {
+      this.hashToTerm.put(hashKey, new Term(tupleValue, nextGid++));
+    }
+  }
+
+  @Override
+  public int find(String v) {
+    // TODO: Need to handle the case where v is null
+    int fp = this.rhash.hash(v);
+    return this.hashToTerm.containsKey(fp) ? this.hashToTerm.get(fp).globalId : -1;
+  }
+
+  @Override
+  public int count() {
+    return this.hashToTerm.size();
+  }
+
+  @Override
+  public FieldType getFieldType() {
+    return this.fieldType;
+  }
+
+  @Override
+  public void complete() {
+    for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
+      fieldValues.add(en.getValue().term);
+    }
+  }
+
+  @Override
+  public void cleanForNextCublet() {
+    this.hashToTerm.clear();
+    this.nextGid = 0; // a field can have different id across cublet.
+  }
+
+  @Override
+  public int writeTo(DataOutput out) throws IOException {
+    int bytesWritten = 0;
+
+    // Write fingers, i.e., the hash values of the original string, into the array
+    // fingers contain data's hash value
+    int[] fingers = new int[this.hashToTerm.size()];
+    // globalIDs contain the global ids in the hash order
+    int[] globalIDs = new int[this.hashToTerm.size()];
+    int i = 0;
+    for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
+      globalIDs[i] = en.getValue().globalId;
+      fingers[i++] = en.getKey();
     }
 
-    @Override
-    public void put(String tupleValue) {
-        int hashKey = rhash.hash(tupleValue);
-        if (!this.hashToTerm.containsKey(hashKey)) {
-            this.hashToTerm.put(hashKey, new Term(tupleValue, nextGid++));
-            this.gidToHash.add(hashKey);
-        }
-    }
+    // generate finger bytes
+    Histogram hist = Histogram.builder()
+        .min(fingers[0])
+        .max(fingers[fingers.length - 1])
+        .numOfValues(fingers.length)
+        .rawSize(Ints.BYTES * fingers.length)
+        .type(CompressType.KeyFinger)
+        .build();
+    this.compressor.reset(hist, fingers, 0, fingers.length);
+    // Compress and write the fingers
+    // Codec is written internal
+    // Actually data is not compressed here
+    bytesWritten += this.compressor.writeTo(out);
 
-    @Override
-    public int find(String v) {
-        // TODO: Need to handle the case where v is null
-        int fp = this.rhash.hash(v);
-        return this.hashToTerm.containsKey(fp) ? this.hashToTerm.get(fp).globalId : -1;
-    }
+    // generate globalID bytes
+    hist = Histogram.builder()
+        .min(0)
+        .max(this.hashToTerm.size())
+        .numOfValues(globalIDs.length)
+        .rawSize(Ints.BYTES * globalIDs.length)
+        .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
+        .build();
+    this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
+    bytesWritten += this.compressor.writeTo(out);
 
-    @Override
-    public int count() {
-        return this.hashToTerm.size();
-    }
-
-    @Override
-    public FieldType getFieldType() {
-        return this.fieldType;
-    }
-
-    @Override
-    public void complete() {
-        int gID = 0;
-        // Set globalIDs
+    // Write values
+    if (this.fieldType == FieldType.Segment || this.fieldType == FieldType.Action
+        || this.fieldType == FieldType.UserKey) {
+      try (DataOutputBuffer buffer = new DataOutputBuffer()) {
+        // Store offsets into the buffer first
+        buffer.writeInt(this.hashToTerm.size());
+        // Value offsets begin with 0
+        int off = 0;
         for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-            // temp fix to not delete complete logic, while preserving correctness of using update.
-            if (en.getValue().globalId == 0) en.getValue().globalId = gID++;
+          buffer.writeInt(off);
+          off += en.getValue().term.getBytes(this.charset).length;
         }
-    }
 
-    @Override
-    public int writeTo(DataOutput out) throws IOException {
-        int bytesWritten = 0;
-
-        // Write fingers, i.e., the hash values of the original string, into the array
-        // fingers contain data's hash value
-        int[] fingers = new int[this.hashToTerm.size()];
-        // globalIDs contain the global ids in the hash order
-        int[] globalIDs = new int[this.hashToTerm.size()];
-
-        int i = 0;
+        // Store String values into the buffer
         for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-            globalIDs[i] = en.getValue().globalId;
-            fingers[i++] = en.getKey();
+          buffer.write(en.getValue().term.getBytes(this.charset));
         }
 
-        // generate finger bytes
-        Histogram hist = Histogram.builder()
-                .min(fingers[0])
-                .max(fingers[fingers.length - 1])
-                .numOfValues(fingers.length)
-                .rawSize(Ints.BYTES * fingers.length)
-                .type(CompressType.KeyFinger)
-                .build();
-        this.compressor.reset(hist, fingers, 0, fingers.length);
-        // Compress and write the fingers
-        // Codec is written internal
-        // Actually data is not compressed here
-        bytesWritten += this.compressor.writeTo(out);
-
-        // generate globalID bytes
+        // Compress and write the buffer
+        // The codec is written internal
         hist = Histogram.builder()
-                .min(0)
-                .max(this.hashToTerm.size())
-                .numOfValues(globalIDs.length)
-                .rawSize(Ints.BYTES * globalIDs.length)
-                .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
-                .build();
-        this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
+            .type(CompressType.KeyString)
+            .rawSize(buffer.size())
+            .build();
+        this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
         bytesWritten += this.compressor.writeTo(out);
-
-        // Write values
-        if (this.fieldType == FieldType.Segment || this.fieldType == FieldType.Action
-                || this.fieldType == FieldType.UserKey) {
-            try (DataOutputBuffer buffer = new DataOutputBuffer()) {
-                // Store offsets into the buffer first
-                buffer.writeInt(this.hashToTerm.size());
-                // Value offsets begin with 0
-                int off = 0;
-                for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-                    buffer.writeInt(off);
-                    off += en.getValue().term.getBytes(this.charset).length;
-                }
-
-                // Store String values into the buffer
-                for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-                    buffer.write(en.getValue().term.getBytes(this.charset));
-                }
-
-                // Compress and write the buffer
-                // The codec is written internal
-                hist = Histogram.builder()
-                        .type(CompressType.KeyString)
-                        .rawSize(buffer.size())
-                        .build();
-                this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
-                bytesWritten += this.compressor.writeTo(out);
-            }
-        }
-        return bytesWritten;
+      }
     }
+    return bytesWritten;
+  }
 
+  @Override
+  public int writeCubeMeta(DataOutput out) throws IOException {
+    int bytesWritten = 0;
+    if (this.fieldType == FieldType.Segment
+      || this.fieldType == FieldType.Action
+      || this.fieldType == FieldType.UserKey) {
+        try (DataOutputBuffer buffer = new DataOutputBuffer()) {
+          buffer.writeInt(this.fieldValues.size());
+          int off = 0;
+  
+          for (String s : this.fieldValues) {
+            buffer.writeInt(off);
+            off += s.getBytes(this.charset).length;
+          }
+
+          for (String s : this.fieldValues) {
+            buffer.write(s.getBytes(this.charset));
+          }
+
+          Histogram hist = Histogram.builder()
+          .type(CompressType.KeyString)
+          .rawSize(buffer.size())
+          .build();
+          this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
+          bytesWritten = this.compressor.writeTo(out);
+        }
+      }
+    return bytesWritten;
+  }
+
+  @Override
+  public String toString() {
+    return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
+  }
+
+
+  /**
+   * Convert string to globalIDs
+   */
+  public static class Term {
+
+    // the real value in each row of the csv file
+    String term;
+    // assigned global ID.
+    int globalId;
+
+    public Term(String term, int globalId) {
+      this.term = term;
+      this.globalId = globalId;
+    }
 
     @Override
     public String toString() {
-        return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
+      return "{term: " + term + ", globalId: " + globalId + "}";
     }
-
-    @Override
-    public void update(String tuple) {
-        throw new UnsupportedOperationException("Doesn't support update now");
-    }
-
-    /**
-     * Convert string to globalIDs
-     */
-    public static class Term {
-
-        // the real value in each row of the csv file
-        String term;
-        // assigned global ID.
-        int globalId;
-
-        public Term(String term, int globalId) {
-            this.term = term;
-            this.globalId = globalId;
-        }
-
-        @Override
-        public String toString() {
-            return "{term: " + term + ", globalId: " + globalId + "}";
-        }
-    }
+  }
 }
