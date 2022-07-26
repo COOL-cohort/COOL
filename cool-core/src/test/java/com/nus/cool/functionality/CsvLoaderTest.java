@@ -47,34 +47,19 @@ public class CsvLoaderTest {
 
     @DataProvider(name = "CsvLoaderTestDP")
     public Object[][] CsvLoaderTestDPArgObjects() {
-        String sourcePath = Paths.get(System.getProperty("user.dir"),
-                "src",
-                "test",
-                "java",
-                "com",
-                "nus",
-                "cool",
-                "core",
-                "resources").toString();
         return new Object[][] {
                 {
                     "health",
-                    // Paths.get(sourcePath, "health", "table.yaml").toString(),
-                    // Paths.get(sourcePath, "health", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 }, {
                     "sogamo",
-                    // Paths.get(sourcePath, "sogamo", "table.yaml").toString(),
-                    // Paths.get(sourcePath, "sogamo", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 }, {
                     "tpc-h-10g",
-                    // Paths.get(sourcePath, "olap-tpch", "table.yaml").toString(),
-                    // Paths.get(sourcePath, "olap-tpch", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "scripts", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
