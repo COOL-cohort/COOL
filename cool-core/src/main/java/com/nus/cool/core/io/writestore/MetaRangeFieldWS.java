@@ -25,8 +25,6 @@ import com.google.common.primitives.Ints;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.converter.DayIntConverter;
-import com.nus.cool.core.util.parser.TupleParser;
-import com.nus.cool.core.util.parser.VerticalTupleParser;
 
 import lombok.Getter;
 
@@ -51,10 +49,16 @@ public class MetaRangeFieldWS implements MetaFieldWS {
   @Getter
   private int max;
 
+  private int cubeMax;
+
+  private int cubeMin;
+
   public MetaRangeFieldWS(FieldType type) {
     this.fieldType = type;
     this.min = Integer.MAX_VALUE;
     this.max = Integer.MIN_VALUE;
+    this.cubeMax = this.max;
+    this.cubeMin = this.min;
   }
 
 
@@ -94,19 +98,37 @@ public class MetaRangeFieldWS implements MetaFieldWS {
 
   @Override
   public void complete() {
-
+    if (min > max) return; // empty
+    this.cubeMax = Math.max(this.max, this.cubeMax);
+    this.cubeMin = Math.min(this.min, this.cubeMin);
   }
 
   @Override
-  public void update(String v) {
-    throw new UnsupportedOperationException("Doesn't support update now");
+  public void cleanForNextCublet() {
+    this.max = Integer.MIN_VALUE;
+    this.min = Integer.MAX_VALUE;
   }
+
+  // guoyu0724 outdated
+  // @Override
+  // public void update(String v) {
+  //   throw new UnsupportedOperationException("Doesn't support update now");
+  // }
 
   @Override
   public int writeTo(DataOutput out) throws IOException {
     int bytesWritten = 0;
     out.writeInt(IntegerUtil.toNativeByteOrder(this.min));
     out.writeInt(IntegerUtil.toNativeByteOrder(this.max));
+    bytesWritten += 2 * Ints.BYTES;
+    return bytesWritten;
+  }
+  
+  @Override
+  public int writeCubeMeta(DataOutput out) throws IOException {
+    int bytesWritten = 0;
+    out.writeInt(IntegerUtil.toNativeByteOrder(this.cubeMin));
+    out.writeInt(IntegerUtil.toNativeByteOrder(this.cubeMax));
     bytesWritten += 2 * Ints.BYTES;
     return bytesWritten;
   }
