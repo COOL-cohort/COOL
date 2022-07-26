@@ -19,6 +19,7 @@
 package com.nus.cool.core.io.writestore;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.Histogram;
@@ -30,9 +31,8 @@ import com.rabinhash.RabinHashFunction32;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -64,8 +64,8 @@ public class MetaHashFieldWS implements MetaFieldWS {
   // hash of one tuple field : Term {origin value of tuple filed, global ID. }
   private final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
 
-  // store keys of hashToTerm
-  private final List<Integer> gidToHash = new ArrayList<>();
+  // all possible values of the field.
+  private final Set<String> fieldValues = Sets.newTreeSet();
 
   // global id
   private int nextGid = 0;
@@ -81,7 +81,6 @@ public class MetaHashFieldWS implements MetaFieldWS {
     int hashKey = rhash.hash(tupleValue);
     if (!this.hashToTerm.containsKey(hashKey)) {
       this.hashToTerm.put(hashKey, new Term(tupleValue, nextGid++));
-      this.gidToHash.add(hashKey);
     }
   }
 
@@ -104,12 +103,15 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
   @Override
   public void complete() {
-    int gID = 0;
-    // Set globalIDs
     for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-      // temp fix to not delete complete logic, while preserving correctness of using update.
-      if (en.getValue().globalId == 0) en.getValue().globalId = gID++;
+      fieldValues.add(en.getValue().term);
     }
+  }
+
+  @Override
+  public void cleanForNextCublet() {
+    this.hashToTerm.clear();
+    this.nextGid = 0; // a field can have different id across cublet.
   }
 
   @Override
@@ -184,14 +186,40 @@ public class MetaHashFieldWS implements MetaFieldWS {
   }
 
   @Override
+  public int writeCubeMeta(DataOutput out) throws IOException {
+    int bytesWritten = 0;
+    if (this.fieldType == FieldType.Segment
+      || this.fieldType == FieldType.Action
+      || this.fieldType == FieldType.UserKey) {
+        try (DataOutputBuffer buffer = new DataOutputBuffer()) {
+          buffer.writeInt(this.fieldValues.size());
+          int off = 0;
+  
+          for (String s : this.fieldValues) {
+            buffer.writeInt(off);
+            off += s.getBytes(this.charset).length;
+          }
+
+          for (String s : this.fieldValues) {
+            buffer.write(s.getBytes(this.charset));
+          }
+
+          Histogram hist = Histogram.builder()
+          .type(CompressType.KeyString)
+          .rawSize(buffer.size())
+          .build();
+          this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
+          bytesWritten = this.compressor.writeTo(out);
+        }
+      }
+    return bytesWritten;
+  }
+
+  @Override
   public String toString() {
     return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
   }
 
-  @Override
-  public void update(String tuple) {
-    throw new UnsupportedOperationException("Doesn't support update now");
-  }
 
   /**
    * Convert string to globalIDs
