@@ -90,7 +90,7 @@ public class ProcessorTest {
      * @throws IOException
      */
     private CubeRS loadData(String dataSetName) throws IOException{
-        if(!coolModel.isCubeExsit(dataSetName)){
+        if(!coolModel.isCubeExist(dataSetName)){
             DataLoaderConfig config = new CsvDataLoaderConfig();
             CoolLoader loader = new CoolLoader(config);
             String dataSetPath = Paths.get(this.rootPath, dataSetName).toString();
@@ -103,10 +103,4 @@ public class ProcessorTest {
     }
 
 }
-    // @Getter
-    // public class cohortResult{
-    //     public HashMap<String, List<Integer>> 
-    //     public cohortResult readFromJson(String path){
 
-    //     }
-    // }
