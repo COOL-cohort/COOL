@@ -140,6 +140,7 @@ public class MetaChunkWS implements Output {
    */
   @Override
   public int writeTo(DataOutput out) throws IOException {
+    this.offset = 0;
     int bytesWritten = 0;
 
     // Store field offsets and write MetaFields as MetaChunkData layout
@@ -170,6 +171,12 @@ public class MetaChunkWS implements Output {
     out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
     bytesWritten += Ints.BYTES;
     return bytesWritten;
+  }
+
+  public void cleanForNextCublet() {
+    for (MetaFieldWS metaField : this.metaFields) {
+      metaField.cleanForNextCublet();
+    }
   }
 
   public int writeCubeMeta(DataOutput out) throws IOException {
