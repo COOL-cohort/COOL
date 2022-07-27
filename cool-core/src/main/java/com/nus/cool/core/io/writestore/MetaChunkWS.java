@@ -151,16 +151,56 @@ public class MetaChunkWS implements Output {
         }
     }
 
-    /**
-     * Write MetaChunkWS to out stream and return bytes written
-     *
-     * @param out stream can write data to output stream
-     * @return How many bytes has been written
-     * @throws IOException If an I/O error occurs
-     */
-    @Override
-    public int writeTo(DataOutput out) throws IOException {
-        int bytesWritten = 0;
+  /**
+   * Write MetaChunkWS to out stream and return bytes written
+   *
+   * @param out stream can write data to output stream
+   * @return How many bytes has been written
+   * @throws IOException If an I/O error occurs
+   */
+  @Override
+  public int writeTo(DataOutput out) throws IOException {
+    this.offset = 0;
+    int bytesWritten = 0;
+
+    // Store field offsets and write MetaFields as MetaChunkData layout
+    int[] offsets = new int[this.metaFields.length];
+    for (int i = 0; i < this.metaFields.length; i++) {
+      offsets[i] = this.offset + bytesWritten;
+      bytesWritten += this.metaFields[i].writeTo(out);
+    }
+
+    // Store header offset for MetaChunk layout
+    int headOffset = this.offset + bytesWritten;
+
+    // 1. Write ChunkType for header layout
+    out.writeByte(ChunkType.META.ordinal());
+    bytesWritten++;
+
+    // 2.1 Write fields for header layout
+    out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
+    bytesWritten += Ints.BYTES;
+
+    // 2.2 Write field offsets for header layout
+    for (int offset : offsets) {
+      out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+      bytesWritten += Ints.BYTES;
+    }
+
+    // 3. Write header offset for MetaChunk layout
+    out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
+    bytesWritten += Ints.BYTES;
+    return bytesWritten;
+  }
+
+  public void cleanForNextCublet() {
+    for (MetaFieldWS metaField : this.metaFields) {
+      metaField.cleanForNextCublet();
+    }
+  }
+
+  public int writeCubeMeta(DataOutput out) throws IOException {
+    int bytesWritten = 0;
 
     // Store field offsets and write MetaFields as MetaChunkData layout
     int[] offsets = new int[this.metaFields.length];
