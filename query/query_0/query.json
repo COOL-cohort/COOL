@@ -45,5 +45,5 @@
         "function":"DISTINCT",
         "observedSchema":"id"
     },
-    "dataSource": "health"
+    "dataSource": "health_raw"
 }

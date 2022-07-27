@@ -17,5 +17,5 @@
         "function":"DISTINCT",
         "observedSchema":"Product_ID"
     },
-    "dataSource":"ecommerce"
+    "dataSource":"ecommerce_query"
 }

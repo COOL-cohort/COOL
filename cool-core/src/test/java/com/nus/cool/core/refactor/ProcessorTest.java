@@ -22,7 +22,7 @@ import com.nus.cool.model.CoolModel;
 
 public class ProcessorTest {
     private final String cubeRepo = "../datasetSource";
-    private final String rootPath = "..";
+    private final String rootPath = "../datasets";
     private final String tableName = "table.csv";
     private final String configName = "table.yaml";
     private CoolModel coolModel;
@@ -35,16 +35,16 @@ public class ProcessorTest {
         this.coolModel = new CoolModel(this.cubeRepo);
     }
 
-    @Test(dataProvider = "ProcessQueryDP")
-    public void ProcessorDebugTest(String queryDir) throws IOException {
-        String queryPath = Paths.get(queryDir, this.queryName).toString();
-        CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
-        CubeRS cube = loadData(cohortProcessor.getDataSource());
-        CohortRet ret = cohortProcessor.process(cube);
-        System.out.printf("Cohort List : %s\n", ret.getCohortList().toString());
-        System.out.println(ret.toString());
-    }
-
+    // Display the cohort result
+    // @Test(dataProvider = "ProcessQueryDP")
+    // public void ProcessorDebugTest(String queryDir) throws IOException {
+    //     String queryPath = Paths.get(queryDir, this.queryName).toString();
+    //     CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
+    //     CubeRS cube = loadData(cohortProcessor.getDataSource());
+    //     CohortRet ret = cohortProcessor.process(cube);
+    //     System.out.printf("Cohort List : %s\n", ret.getCohortList().toString());
+    //     System.out.println(ret.toString());
+    // }
 
     /**
      * 
@@ -90,7 +90,8 @@ public class ProcessorTest {
      * @throws IOException
      */
     private CubeRS loadData(String dataSetName) throws IOException{
-        if(!coolModel.isCubeExist(dataSetName)){
+        // if(!coolModel.isCubeExist(dataSetName)){
+        if(true){ 
             DataLoaderConfig config = new CsvDataLoaderConfig();
             CoolLoader loader = new CoolLoader(config);
             String dataSetPath = Paths.get(this.rootPath, dataSetName).toString();
