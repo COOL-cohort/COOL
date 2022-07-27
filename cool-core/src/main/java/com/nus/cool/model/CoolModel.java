@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CohortRS;
+import com.nus.cool.core.io.readstore.CubeMetaRS;
 import com.nus.cool.core.io.readstore.CubletRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.ChunkRS;
@@ -47,7 +48,10 @@ public class CoolModel implements Closeable {
     static final Logger logger = LoggerFactory.getLogger(CoolModel.class);
 
     // Container of loaded cubes
-    private final Map<String, CubeRS> metaStore = Maps.newHashMap();
+    private final Map<String, CubeRS> cubeStore = Maps.newHashMap();
+
+    // separate store for cube meta (not needed for processing)
+    private final Map<String, CubeMetaRS> cubeMetaStore = Maps.newHashMap();
 
     // Container of loaded cohorts
     private final Map<String, CohortRS> cohortStore = Maps.newHashMap();
@@ -81,6 +85,28 @@ public class CoolModel implements Closeable {
             // throw new FileNotFoundException("[x] Cube Repository " + localRepo.getAbsolutePath() + " was not found");
         }
     }
+    
+    /**
+     * load the latest version directory of a cube
+     * caller: reload(String) and getCubeMeta(String)
+     */
+    private File loadLatestVersion(String cube) throws IOException {
+        // Check the existence of cube under this repository
+        File cubeRoot = new File(this.localRepo, cube);
+        if (!cubeRoot.exists()) {
+            throw new FileNotFoundException("[x] Cube " + cube + " was not found in the repository.");
+        }
+
+        File[] versions = cubeRoot.listFiles(File::isDirectory);
+        checkNotNull(versions);
+        if (versions.length == 0) {
+          throw new IOException("[x] No version found for the cube" + cube +".");
+        }
+        Arrays.sort(versions);
+
+        // Only load the latest version
+        return versions[versions.length - 1];
+    }
 
     /**
      * Load a cube (a set of cube files) from the repository folder into memory
@@ -100,25 +126,12 @@ public class CoolModel implements Closeable {
         }
 
         // Remove the old version of the cube
-        this.metaStore.remove(cube);
+        this.cubeStore.remove(cube);
         this.cohortStore.clear();
         this.currentCube = cube;
 
-        // Check the existence of cube under this repository
-        File cubeRoot = new File(this.localRepo, cube);
-        if (!cubeRoot.exists()) {
-            throw new FileNotFoundException("[x] Cube " + cube + " was not found in the repository.");
-        }
-
-        File[] versions = cubeRoot.listFiles(File::isDirectory);
-        checkNotNull(versions);
-        if (versions.length == 0) {
-            return;
-        }
-        Arrays.sort(versions);
-
         // Only load the latest version
-        File currentVersion = versions[versions.length - 1];
+        File currentVersion = loadLatestVersion(cube);
 
         // Read schema information
         TableSchema schema = TableSchema.read(new FileInputStream(new File(currentVersion, "table.yaml")));
@@ -134,7 +147,7 @@ public class CoolModel implements Closeable {
             cubeRS.addCublet(cubletFile);
         }
 
-        this.metaStore.put(cube, cubeRS);
+        this.cubeStore.put(cube, cubeRS);
     }
 
     /**
@@ -148,7 +161,7 @@ public class CoolModel implements Closeable {
     public synchronized void reload(String cube, ByteBuffer buffer, TableSchema tableSchema) throws IOException {
 
         // Remove the old version of the cube
-        this.metaStore.remove(cube);
+        this.cubeStore.remove(cube);
         this.cohortStore.clear();
         this.currentCube = cube;
 
@@ -156,8 +169,8 @@ public class CoolModel implements Closeable {
         CubeRS cubeRS = new CubeRS(tableSchema);
         // 2. Load cube from buffer
         cubeRS.addCublet(buffer);
-        this.metaStore.put(cube, cubeRS);
-        System.out.println("Cube " + cube + ", metaStore: " + this.metaStore.keySet());
+        this.cubeStore.put(cube, cubeRS);
+        System.out.println("Cube " + cube + ", cubeStore: " + this.cubeStore.keySet());
     }
 
     @Override
@@ -171,7 +184,7 @@ public class CoolModel implements Closeable {
      * @throws IOException
      */
     public synchronized CubeRS getCube(String cube) throws IOException {
-        CubeRS out = this.metaStore.get(cube);
+        CubeRS out = this.cubeStore.get(cube);
         if (out == null) {
             throw new IOException("[*] Cube " + cube + " is not loaded in the COOL system. Please reload it.");
         } else
@@ -179,13 +192,33 @@ public class CoolModel implements Closeable {
         return out;
     }
 
+    public synchronized CubeMetaRS getCubeMeta(String cube) throws IOException {
+        CubeMetaRS cubeMeta = this.cubeMetaStore.get(cube);
+        if (cubeMeta != null) {
+          return cubeMeta;
+        }
+        
+        // load from the latest version
+        File currentVersion = loadLatestVersion(cube);
+        
+        // Read schema information
+        TableSchema schema = TableSchema.read(new FileInputStream(new File(currentVersion, "table.yaml")));
+
+        // load the cube meta.
+        cubeMeta = new CubeMetaRS(schema);
+        File cubeMetaFile = new File(currentVersion, "cubemeta");
+        cubeMeta.readFrom(Files.map(cubeMetaFile).order(ByteOrder.nativeOrder()));
+        this.cubeMetaStore.put(cube, cubeMeta);
+        return cubeMeta;
+    }   
+
     public static String[] listCubes(String Path) {
         File localRepoPara = new File(Path);
         return localRepoPara.list();
     }
 
     public synchronized boolean isCubeLoaded(String Cube) {
-        return this.metaStore.containsKey(Cube);
+        return this.cubeStore.containsKey(Cube);
     }
 
     public synchronized String[] listCohorts(String cube) throws IOException {
@@ -224,7 +257,7 @@ public class CoolModel implements Closeable {
  
 
     public void resetCube(String cube_name) throws IOException {
-        CubeRS cube = this.metaStore.get(cube_name);
+        CubeRS cube = this.cubeStore.get(cube_name);
         int userKeyId = cube.getTableSchema().getUserKeyField();
         for (CubletRS cubletRS : cube.getCublets()) {
             for (ChunkRS dataChunk : cubletRS.getDataChunks()) {
