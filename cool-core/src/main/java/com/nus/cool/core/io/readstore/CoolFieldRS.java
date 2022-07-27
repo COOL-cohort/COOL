@@ -25,6 +25,7 @@ import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
+import java.util.List;
 
 /**
  * Cool field read store, both hash field and range field
@@ -141,4 +142,14 @@ public class CoolFieldRS implements FieldRS {
       this.valueVec = InputVectorFactory.readFrom(buffer);
     }
   }
+
+
+
+  // ------ no used, keep compatiable with new version code
+  @Override
+  public int getValueByIndex(int idx) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
 }

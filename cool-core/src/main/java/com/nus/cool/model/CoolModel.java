@@ -215,6 +215,8 @@ public class CoolModel implements Closeable {
 
     }
 
+ 
+
     public void resetCube(String cube_name) throws IOException {
         CubeRS cube = this.metaStore.get(cube_name);
         int userKeyId = cube.getTableSchema().getUserKeyField();
@@ -230,5 +232,17 @@ public class CoolModel implements Closeable {
 
     public void clearCohorts() throws IOException {
         this.cohortStore.clear();
+    }
+
+    /**
+     * Check whether cube is loaded before
+     * @param cube
+     * @return
+     * @throws IOException
+     */
+    public synchronized boolean isCubeExist(String cube) throws IOException{
+      File cubeRoot = new File(this.localRepo, cube);
+      return cubeRoot.exists();
+  
     }
 }
