@@ -122,7 +122,9 @@ public class NativeDataWriter implements DataWriter {
     private void finishCublet() throws IOException {
         // write metaChunk begin from current offset.
         this.metaChunk.updateBeginOffset(this.offset);
+        this.metaChunk.complete();
         offset += this.metaChunk.writeTo(out);
+        this.metaChunk.cleanForNextCublet();
         // record header offset
         chunkHeaderOffsets.add(offset - Ints.BYTES);
         // 1. write number of chunks
