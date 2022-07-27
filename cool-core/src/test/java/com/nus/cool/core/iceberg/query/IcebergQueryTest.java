@@ -1,13 +1,18 @@
 package com.nus.cool.core.iceberg.query;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.FileInputStream;
 
+import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.schema.FieldType;
+import com.nus.cool.model.CoolModel;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -60,7 +65,28 @@ public class IcebergQueryTest {
     @DataProvider(name = "IcebergQueryTestDP")
     public Object[][] dpArgs() {
         return new Object[][] {
-                {"../olap-tpch/query.json"}
+                {"../datasets/olap-tpch/query.json"}
         };
     }
+
+    @Test
+    public void EcommerceDataTestSQL1() throws Exception {
+
+        String dzFilePath = "../datasetSource";
+        String queryFilePath = "../datasets/ecommerce/queries/1.query_retention.json";
+
+        // load query
+        ObjectMapper mapper = new ObjectMapper();
+        IcebergQuery query = mapper.readValue(new File(queryFilePath), IcebergQuery.class);
+
+        // load .dz file
+        String dataSourceName = query.getDataSource();
+        CoolModel coolModel = new CoolModel(dzFilePath);
+        coolModel.reload(dataSourceName);
+
+        List<BaseResult> results = coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
+        QueryResult result = QueryResult.ok(results);
+        System.out.println("Result for the query is  " + result);
+    }
+
 }

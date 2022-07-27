@@ -75,6 +75,7 @@ public class ChunkRS implements Input {
   }
 
   @Override
+  // read the dataChunk
   public void readFrom(ByteBuffer buffer) {
     // Get chunkType
     ChunkType chunkType = ChunkType.fromInteger(buffer.get());
@@ -111,6 +112,11 @@ public class ChunkRS implements Input {
     }
   }
 
+  /**
+   * Get the filed information according to index
+   * @param i index of filed
+   * @return
+   */
   public FieldRS getField(int i) {
 
     return this.fields[i];

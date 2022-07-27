@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Scheme of a cube.
  */
 public class CubeSchema {
 	

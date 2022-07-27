@@ -22,10 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
 import com.nus.cool.core.iceberg.query.*;
 import com.nus.cool.core.iceberg.result.BaseResult;
-import com.nus.cool.core.io.readstore.ChunkRS;
-import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.*;
 import com.nus.cool.core.schema.TableSchema;
 
 import java.io.IOException;
@@ -35,6 +32,7 @@ public class CoolOlapEngine {
 
     /**
      * execute iceberg query
+     * timeRange, selection => groupBY => aggregate on each group
      *
      * @param cube the cube that stores the data we need
      * @param query the cohort query needed to process
@@ -48,32 +46,41 @@ public class CoolOlapEngine {
         List<BaseResult> results = new ArrayList<>();
 
         beg = System.currentTimeMillis();
+        // get selection in query with fields etc
         IcebergSelection selection = new IcebergSelection();
         selection.init(tableSchema, query);
         end = System.currentTimeMillis();
         //System.out.println("selection init elapsed: " + (end - beg));
+        // for each cubelet,
         for (CubletRS cubletRS : cublets) {
             MetaChunkRS metaChunk = cubletRS.getMetaChunk();
             beg = System.currentTimeMillis();
             selection.process(metaChunk);
             end = System.currentTimeMillis();
             //System.out.println("selection process meta chunk elapsed: " + (end - beg));
+            // if this metaChunk need to be checked, read all data-chunks
             if (selection.isbActivateCublet()) {
                 List<ChunkRS> datachunks = cubletRS.getDataChunks();
                 for (ChunkRS dataChunk : datachunks) {
                     beg = System.currentTimeMillis();
-                    Map<String, BitSet> map = selection.process(dataChunk);
+
+                    // 1. find all records in dataChunk meet the timeRange and selection requirements.
+                    ArrayList<IcebergSelection.TimeBitSet> map = selection.process(dataChunk);
+
                     end = System.currentTimeMillis();
                     //System.out.println("selection process data chunk elapsed: " + (end - beg));
                     if (map == null) {
                         continue;
                     }
-                    for (Map.Entry<String, BitSet> entry : map.entrySet()) {
-                        String timeRange = entry.getKey();
-                        BitSet bs = entry.getValue();
+                    // 2. for each time range, run aggregation
+                    for (int i = 0; i < map.size(); i++){
+                        String timeRange = map.get(i).getTimeRange();
+                        BitSet bs = map.get(i).getMatchedRecords();
+
                         beg = System.currentTimeMillis();
+                        // 2. run groupBy
                         IcebergAggregation icebergAggregation = new IcebergAggregation();
-                        icebergAggregation.init(bs, query.getGroupFields(), metaChunk, dataChunk, timeRange);
+                        icebergAggregation.groupBy(bs, query.getGroupFields(), metaChunk, dataChunk, timeRange, query.getGroupFields_granularity());
                         end = System.currentTimeMillis();
                         //System.out.println("init aggregation elapsed: " + (end - beg));
                         for (Aggregation aggregation : query.getAggregations()) {
@@ -86,6 +93,7 @@ public class CoolOlapEngine {
                     }
                 }
             }
+
         }
         results = BaseResult.merge(results);
         return results;
@@ -100,7 +108,7 @@ public class CoolOlapEngine {
         Float totalSum = (float) 0;
         for (BaseResult res: results){
             String k = res.getKey();
-            profilingCount.put(k, res.getAggregatorResult().getCount());
+            profilingCount.put(k, (float)res.getAggregatorResult().getCount());
             profilingSum.put(k, res.getAggregatorResult().getSum());
             totalCount += res.getAggregatorResult().getCount();;
             totalSum += res.getAggregatorResult().getSum();

@@ -213,6 +213,7 @@ public class CoolModel implements Closeable {
         } else
             return out;
 
+<<<<<<< HEAD
     }
 
  
@@ -244,5 +245,24 @@ public class CoolModel implements Closeable {
       File cubeRoot = new File(this.localRepo, cube);
       return cubeRoot.exists();
   
+=======
+    }
+
+    public void resetCube(String cube_name) throws IOException {
+        CubeRS cube = this.metaStore.get(cube_name);
+        int userKeyId = cube.getTableSchema().getUserKeyField();
+        for (CubletRS cubletRS : cube.getCublets()) {
+            for (ChunkRS dataChunk : cubletRS.getDataChunks()) {
+                FieldRS userField = dataChunk.getField(userKeyId);
+                RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
+                userInput.skipTo(0);
+            }
+        }
+        System.out.println("Cube " + cube + " has been reset.");
+    }
+
+    public void clearCohorts() throws IOException {
+        this.cohortStore.clear();
+>>>>>>> dev
     }
 }

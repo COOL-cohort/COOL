@@ -22,16 +22,20 @@ import java.nio.ByteBuffer;
 
 public class RLEInputVector implements InputVector {
 
+  // total number of blocks
   private int blks;
 
   private ByteBuffer buffer;
 
   private int curBlk;
 
+  // begin offset
   private int boff;
 
+  // end offset
   private int bend;
 
+  // current value
   private int bval;
 
   @Override
@@ -47,7 +51,7 @@ public class RLEInputVector implements InputVector {
   @Override
   public int get(int index) {
     int offset = this.boff;
-    this.skipTo(index);
+    this.skipTo(index); // skip to one block, and read the value
     int v = next();
     this.boff = offset;
     return v;
@@ -76,12 +80,12 @@ public class RLEInputVector implements InputVector {
       this.curBlk = 0;
       readNextBlock();
     }
-      while (pos >= this.bend && this.curBlk < this.blks) {
-          readNextBlock();
-      }
-      if (pos >= this.bend) {
-          throw new IllegalArgumentException("Too large pos param");
-      }
+    while (pos >= this.bend && this.curBlk < this.blks) {
+        readNextBlock();
+    }
+    if (pos >= this.bend) {
+        throw new IllegalArgumentException("Too large pos param");
+    }
     this.boff = pos;
   }
 
@@ -112,6 +116,13 @@ public class RLEInputVector implements InputVector {
     this.boff = this.bend;
   }
 
+  /**
+   * read block, and update current value.
+   * read 8 bites first,
+   * first two bites => size of value
+   * medium two bites => size of boff
+   * last two bites => size of bend
+  */
   private void readNextBlock() {
     int b = this.buffer.get();
     this.bval = read((b >> 4) & 3);
@@ -120,14 +131,18 @@ public class RLEInputVector implements InputVector {
     this.curBlk++;
   }
 
+  // todo(naili) why do we need & 0xff, already read same bytes.
   private int read(int width) {
     switch (width) {
       case 1:
+        // Reads the byte and get the lower 8 bites
         return this.buffer.get() & 0xff;
       case 2:
+        // read the next two bytes and get the lower 16 bites
         return this.buffer.getShort() & 0xffff;
       case 3:
       case 0:
+        // get the lower 32 bites
         return this.buffer.getInt();
       default:
         throw new IllegalArgumentException("Incorrect number of bytes");
@@ -135,12 +150,8 @@ public class RLEInputVector implements InputVector {
   }
 
   public static class Block {
-
     public int value;
-
     public int off;
-
     public int len;
-
   }
 }

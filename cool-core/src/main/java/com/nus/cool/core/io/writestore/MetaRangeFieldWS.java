@@ -58,7 +58,6 @@ public class MetaRangeFieldWS implements MetaFieldWS {
   }
 
 
-  // TODO (lingze) : Does this method make any sense ?
   @Override
   public void put(String v) {
     v = checkNotNull(v);

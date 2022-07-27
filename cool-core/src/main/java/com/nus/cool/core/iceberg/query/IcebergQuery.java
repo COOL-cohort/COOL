@@ -21,6 +21,7 @@ package com.nus.cool.core.iceberg.query;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,80 +29,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-
+@Data
 public class IcebergQuery {
 
     public enum granularityType{
         DAY,
-
         MONTH,
-
         YEAR,
-
         NULL
     }
 
     private static final Log LOG = LogFactory.getLog(IcebergQuery.class);
-
+    // dataSource path
     private String dataSource;
-
+    // select condition
     private SelectionQuery selection;
-
+    // a list a groupFields
     private List<String> groupFields;
-
+    // a list of aggregation functions, sum, count etc
     private List<Aggregation> aggregations;
-
+    // selected time range
     private String timeRange;
 
+    // granularity for time range
     private granularityType granularity;
-
-    public String getTimeRange() {
-        return timeRange;
-    }
-
-    public void setTimeRange(String timeRange) {
-        this.timeRange = timeRange;
-    }
-
-    public List<Aggregation> getAggregations() {
-        return aggregations;
-    }
-
-    public void setAggregations(List<Aggregation> aggregations) {
-        this.aggregations = aggregations;
-    }
-
-    public List<String> getGroupFields() {
-        return groupFields;
-    }
-
-    public void setGroupFields(List<String> groupFields) {
-        this.groupFields = groupFields;
-    }
-
-    public String getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(String dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public SelectionQuery getSelection() {
-        return selection;
-    }
-
-    public void setSelection(SelectionQuery selection) {
-        this.selection = selection;
-    }
-
-    public granularityType getGranularity() {
-        return granularity;
-    }
-
-    public void setGranularity(granularityType granularity) {
-        this.granularity = granularity;
-    }
+    // granularity for groupBy, if the groupBy field is dataType,
+    private granularityType groupFields_granularity;
 
     @Override
     public String toString() {

@@ -72,6 +72,7 @@ public class DataHashFieldWS implements DataFieldWS {
    */
   private final Map<Integer, Integer> idMap = Maps.newTreeMap();
 
+  // buffer used to store global ID
   private final DataOutputBuffer buffer = new DataOutputBuffer();
 
   private final List<BitSet> bitSetList = Lists.newArrayList();
@@ -96,11 +97,9 @@ public class DataHashFieldWS implements DataFieldWS {
   @Override
   public void put(String tupleValue) throws IOException {
     int gId = this.metaField.find(tupleValue);
-      if (gId == -1)
-      // The data may be corrupted
-      {
-          throw new IllegalArgumentException("Value not exist in dimension: " + tupleValue);
-      }
+    if (gId == -1){
+      throw new IllegalArgumentException("Value not exist in dimension: " + tupleValue);
+    }
     // Write globalIDs as values for temporary
     this.buffer.writeInt(gId);
     // Set localID as 0 for temporary
@@ -116,7 +115,7 @@ public class DataHashFieldWS implements DataFieldWS {
 
     // Store globalID in order, key: unique global id
     int[] key = new int[this.idMap.size()];
-    // i: local id
+    // i: local id, indicate order or globalID
     int i = 0;
     for (Map.Entry<Integer, Integer> en : this.idMap.entrySet()) {
       key[i] = en.getKey();
@@ -130,14 +129,14 @@ public class DataHashFieldWS implements DataFieldWS {
       i++;
     }
 
-    // Store value vector
+    // Store value vector, local IDs
     int[] value = new int[size];
     // outputBuffer to InputBuffer, for read
     try (DataInputBuffer input = new DataInputBuffer()) {
       input.reset(this.buffer);
       for (i = 0; i < size; i++) {
-        int id = input.readInt();
-        // Store value as localID
+        int id = input.readInt(); // read globalID
+        // Store localID to value i-th position
         value[i] = this.idMap.get(id);
         if (this.preCal) {
           // Store value bitSet
@@ -145,7 +144,7 @@ public class DataHashFieldWS implements DataFieldWS {
         }
       }
     }
-
+//    System.out.println(value);
     // Write compressed key vector (unique global id)
     int min = ArrayUtil.min(key);
     int max = ArrayUtil.max(key);

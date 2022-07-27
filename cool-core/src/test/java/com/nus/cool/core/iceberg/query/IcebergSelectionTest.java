@@ -10,6 +10,7 @@ import com.nus.cool.core.schema.TableSchema;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class IcebergSelectionTest {
         TableSchema tableSchema = cube.getSchema();
         IcebergSelection  icebergSec= new IcebergSelection();
         icebergSec.init(tableSchema,query);
-        Map<String, BitSet> result= icebergSec.process(dataChunks.get(0));
+        ArrayList<IcebergSelection.TimeBitSet> result= icebergSec.process(dataChunks.get(0));
         System.out.println("Iceberg Selection result=" + result);
 
     }
@@ -51,7 +52,7 @@ public class IcebergSelectionTest {
     @DataProvider(name = "IcebergQuerySelectionTestDP")
     public Object[][] dpArgs() {
         return new Object[][] {
-                {"../datasetSource","../olap-tpch/query.json"}
+                {"../datasetSource","../datasets/olap-tpch/query.json"}
         };
     }
 

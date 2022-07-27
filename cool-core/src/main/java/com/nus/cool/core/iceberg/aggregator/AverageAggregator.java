@@ -55,7 +55,7 @@ public class AverageAggregator implements Aggregator {
                 } else {
                     sum = resultMap.get(entry.getKey()).getSum();
                 }
-                float count = (float) bs.cardinality();
+                int count = bs.cardinality();
                 if(resultMap.get(entry.getKey()).getCount() == null) {
                     resultMap.get(entry.getKey()).setCount(count);
                 }

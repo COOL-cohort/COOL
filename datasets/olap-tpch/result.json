@@ -1,0 +1,53 @@
+{
+  "status" : "OK",
+  "elapsed" : 0,
+  "result" : [ {
+    "timeRange" : "1993-01-01|1994-01-01",
+    "key" : "RUSSIA|EUROPE",
+    "fieldName" : "O_TOTALPRICE",
+    "aggregatorResult" : {
+      "count" : 2.0,
+      "sum" : 312855,
+      "average" : null,
+      "max" : null,
+      "min" : null,
+      "countDistinct" : null
+    }
+  }, {
+    "timeRange" : "1993-01-01|1994-01-01",
+    "key" : "GERMANY|EUROPE",
+    "fieldName" : "O_TOTALPRICE",
+    "aggregatorResult" : {
+      "count" : 1.0,
+      "sum" : 4820,
+      "average" : null,
+      "max" : null,
+      "min" : null,
+      "countDistinct" : null
+    }
+  }, {
+    "timeRange" : "1993-01-01|1994-01-01",
+    "key" : "ROMANIA|EUROPE",
+    "fieldName" : "O_TOTALPRICE",
+    "aggregatorResult" : {
+      "count" : 2.0,
+      "sum" : 190137,
+      "average" : null,
+      "max" : null,
+      "min" : null,
+      "countDistinct" : null
+    }
+  }, {
+    "timeRange" : "1993-01-01|1994-01-01",
+    "key" : "UNITED KINGDOM|EUROPE",
+    "fieldName" : "O_TOTALPRICE",
+    "aggregatorResult" : {
+      "count" : 1.0,
+      "sum" : 33248,
+      "average" : null,
+      "max" : null,
+      "min" : null,
+      "countDistinct" : null
+    }
+  } ]
+}

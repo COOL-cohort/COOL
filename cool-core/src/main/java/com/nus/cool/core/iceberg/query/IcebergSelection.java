@@ -29,8 +29,8 @@ import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,10 +40,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class IcebergSelection {
 
-    private static Log LOG = LogFactory.getLog(IcebergSelection.class);
-
-    private final FieldFilterFactory filterFactory = new FieldFilterFactory();
-
     private boolean bActivateCublet;
 
     private TableSchema tableSchema;
@@ -52,32 +48,38 @@ public class IcebergSelection {
 
     private IcebergQuery.granularityType granularity;
 
-    private MetaChunkRS metaChunk;
+    private IcebergQuery.granularityType groupFields_granularity;
 
     private String timeRange;
 
-    private int max;
+    // max and min query Time specified by user
+    private int maxQueryTime;
+    private int minQueryTime;
 
-    private int min;
-
+    // time range split by system, used as key in map
     private List<String> timeRanges;
 
-    private List<Integer> maxs;
+    // store multiple time range lower bounds and upper bounds, convert data into integer
+    private List<Integer> maxTimeRanges;
+    private List<Integer> minTimeRanges;
 
-    private List<Integer> mins;
-
+    /**
+     * Split time range according to user specified granularity
+     * @throws ParseException ParseException
+     */
     private void splitTimeRange() throws ParseException {
         // TODO: format time range
         this.timeRanges = new ArrayList<>();
-        this.maxs = new ArrayList<>();
-        this.mins = new ArrayList<>();
+        this.maxTimeRanges = new ArrayList<>();
+        this.minTimeRanges = new ArrayList<>();
         DayIntConverter converter = new DayIntConverter();
+
         switch(granularity) {
             case DAY:
-                for (int i = 0; i < this.max - this.min; i++) {
-                    int time = this.min + i;
-                    this.maxs.add(time);
-                    this.mins.add(time);
+                for (int i = 0; i < this.maxQueryTime - this.minQueryTime; i++) {
+                    int time = this.minQueryTime + i;
+                    this.maxTimeRanges.add(time);
+                    this.minTimeRanges.add(time);
                     this.timeRanges.add(converter.getString(time));
                 }
                 break;
@@ -92,17 +94,18 @@ public class IcebergSelection {
                 calendar.setTime(d1);
                 List<String> points = new ArrayList<>();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                // add all data before end of range
                 while (calendar.getTime().before(d2)) {
                     points.add(sdf.format(calendar.getTime()));
                     calendar.add(Calendar.MONTH, 1);
                 }
                 for (int i = 0; i < points.size() - 1; i++) {
                     this.timeRanges.add(points.get(i) + "|" + points.get(i + 1));
-                    this.mins.add(converter.toInt(points.get(i)));
-                    this.maxs.add(converter.toInt(points.get(i + 1)) - 1);
+                    this.minTimeRanges.add(converter.toInt(points.get(i)));
+                    this.maxTimeRanges.add(converter.toInt(points.get(i + 1)) - 1);
                 }
-                this.mins.set(0, this.min);
-                this.maxs.set(this.maxs.size() - 1, this.max);
+                this.minTimeRanges.set(0, this.minQueryTime);
+                this.maxTimeRanges.set(this.maxTimeRanges.size() - 1, this.maxQueryTime);
 
                 break;
             }
@@ -123,14 +126,14 @@ public class IcebergSelection {
                 }
                 for (int i = 0; i < points.size() - 1; i++) {
                     this.timeRanges.add(points.get(i) + "|" + points.get(i + 1));
-                    this.mins.add(converter.toInt(points.get(i)));
-                    this.maxs.add(converter.toInt(points.get(i + 1)));
+                    this.minTimeRanges.add(converter.toInt(points.get(i)));
+                    this.maxTimeRanges.add(converter.toInt(points.get(i + 1)));
                 }
                 break;
             }
             case NULL:
-                this.maxs.add(this.max);
-                this.mins.add(this.min);
+                this.maxTimeRanges.add(this.maxQueryTime);
+                this.minTimeRanges.add(this.minQueryTime);
                 this.timeRanges.add(this.timeRange);
                 break;
             default:
@@ -151,16 +154,24 @@ public class IcebergSelection {
         }
     }
 
+    /**
+     * Init Filter from origin selection
+     * @param selection selection of query file.
+     * @return filter instance, parsed after checking selection type. (only supports and, or, filter)
+     */
     private SelectionFilter init(SelectionQuery selection) {
         if (selection == null) return null;
         SelectionFilter filter = new SelectionFilter();
         filter.setType(selection.getType());
+        // filter requires 'dimension', 'values'
         if (filter.getType().equals(SelectionQuery.SelectionType.filter)) {
             FieldFilter fieldFilter = FieldFilterFactory.create(
                     this.tableSchema.getFieldSchema(selection.getDimension()), null, selection.getValues());
             filter.setFilter(fieldFilter);
             filter.setDimension(selection.getDimension());
-        } else {
+        }
+        // and , or requires 'fields' .
+        else {
             for (SelectionQuery childSelection : selection.getFields()) {
                 SelectionFilter childFilter = init(childSelection);
                 filter.getFields().add(childFilter);
@@ -169,12 +180,20 @@ public class IcebergSelection {
         return filter;
     }
 
+    /**
+     * Check if current cublet requires seleciton,
+     * @param selectionFilter parsed from query.json
+     * @param metaChunk the checked metaChunk
+     * @return true: this cublet meet the requirements of seleciton, false: skip processing this.
+     */
     private boolean process(SelectionFilter selectionFilter, MetaChunkRS metaChunk) {
         if (selectionFilter == null) return true;
+        // if this is filter, then
         if (selectionFilter.getType().equals(SelectionQuery.SelectionType.filter)) {
             MetaFieldRS metaField = metaChunk.getMetaField(selectionFilter.getDimension());
             return selectionFilter.getFilter().accept(metaField);
         } else {
+            // recursively check if this cublet requires checking
             boolean flag = selectionFilter.getType().equals(SelectionQuery.SelectionType.and);
             for (SelectionFilter childFilter : selectionFilter.getFields()) {
                 if (selectionFilter.getType().equals(SelectionQuery.SelectionType.and)) {
@@ -248,102 +267,146 @@ public class IcebergSelection {
 
     private boolean accept(int min, int max) {
         if (this.timeRange == null) return true;
-        return (min <= this.max) && (max >= this.min);
+        return (min <= this.maxQueryTime) && (max >= this.minQueryTime);
     }
 
+    /**
+     * Init the selection instance,
+     * @param tableSchema table.yaml
+     * @param query query.json
+     * @throws ParseException
+     */
     public void init(TableSchema tableSchema, IcebergQuery query) throws ParseException{
         this.tableSchema = checkNotNull(tableSchema);
-        query = checkNotNull(query);
+        checkNotNull(query);
 
+        // parse selection from query.json
         SelectionQuery selection = query.getSelection();
         this.filter = init(selection);
+        this.groupFields_granularity = query.getGroupFields_granularity();
 
+        // parse time range from query.json
         if (query.getTimeRange() != null) {
             this.timeRange = query.getTimeRange();
             this.granularity = query.getGranularity();
             String[] timePoints = this.timeRange.split("\\|");
             DayIntConverter converter = new DayIntConverter();
-            this.min = converter.toInt(timePoints[0]);
-            this.max = converter.toInt(timePoints[1]);
+            this.minQueryTime = converter.toInt(timePoints[0]);
+            this.maxQueryTime = converter.toInt(timePoints[1]);
             splitTimeRange();
         }
     }
 
     // process metaChunk
     public void process(MetaChunkRS metaChunk) {
-        this.metaChunk = metaChunk;
-        int actionField = this.tableSchema.getActionTimeField();
-        MetaFieldRS timeField = metaChunk.getMetaField(actionField, FieldType.ActionTime);
+        int actionFieldIndex = this.tableSchema.getActionTimeField();
+        MetaFieldRS timeField = metaChunk.getMetaField(actionFieldIndex, FieldType.ActionTime);
         // min and max must be in valid range
         boolean isAccepted = accept(timeField.getMinValue(), timeField.getMaxValue());
-        // must have and
+        // must have
         boolean isProcess = process(this.filter, metaChunk);
 
         // if both accepted, then it's activate
         this.bActivateCublet = isAccepted  && isProcess;
     }
 
-    // process dataChunk
-    public Map<String, BitSet> process(ChunkRS chunk) {
-        FieldRS timeField = chunk.getField(this.tableSchema.getActionTimeField());
+    /**
+     * process dataChunk filter with time range
+     * @param dataChunk: dataChunk
+     * @return map of < time_range : bitMap >,
+     *  where each element in biteMap is one record,
+     *              true = the record meet the requirement,
+     *              false = the record don't meet the requirement.
+     */
+    public ArrayList< TimeBitSet > process(ChunkRS dataChunk) {
+        FieldRS timeField = dataChunk.getField(this.tableSchema.getActionTimeField());
+        // get the min max time of this dataChunk
         int minKey = timeField.minKey();
         int maxKey = timeField.maxKey();
-        if (!(accept(minKey, maxKey) && process(this.filter, chunk))) {
+        if (!(accept(minKey, maxKey) && process(this.filter, dataChunk))) {
             return null;
         }
-        Map<String, BitSet> map = new HashMap<>();
+
+        // store the records in map of ["t1|t2": bitSets [t,f...] ]
+        ArrayList< TimeBitSet > resultMap = new ArrayList<>();
+
+        // if the query don't provide timeRange, all record is true
         if (this.timeRange == null) {
-            BitSet bv = new BitSet(chunk.records());
-            bv.set(0, chunk.records());
-            map.put("no time filter", bv);
-        } else {
+            BitSet bv = new BitSet(dataChunk.records());
+            bv.set(0, dataChunk.records());
+            resultMap.add( new TimeBitSet("no time filter", bv ) );
+        }
+        // if the query provides the timeRange
+        else {
             long beg = System.currentTimeMillis();
-            int tag = 0;
-            while (minKey > this.maxs.get(tag)) tag += 1;
-            if (minKey >= this.mins.get(tag) & maxKey <= this.maxs.get(tag)) {
-                BitSet bv = new BitSet(chunk.records());
+            // time min-max combination id
+            int timeRangeKey = 0;
+            // find min-max combination where min is under this range
+            while (minKey > this.maxTimeRanges.get(timeRangeKey)) timeRangeKey += 1;
+
+            // if all data in this dataChunk satisfied the current range at key=timeRangeKeye
+            if (minKey >= this.minTimeRanges.get(timeRangeKey) & maxKey <= this.maxTimeRanges.get(timeRangeKey)) {
+                BitSet bv = new BitSet(dataChunk.records());
                 bv.set(0, bv.size());
-                map.put(this.timeRanges.get(tag), bv);
-            } else {
+                resultMap.add( new TimeBitSet(this.timeRanges.get(timeRangeKey), bv ) );
+            }
+            // traverse each record from beginning
+            else {
+                // read the localIDs from position 0
                 InputVector timeInput = timeField.getValueVector();
                 timeInput.skipTo(0);
+                // init the bitSets
                 BitSet[] bitSets = new BitSet[this.timeRanges.size()];
                 for (int i = 0; i < this.timeRanges.size(); i++) {
-                    bitSets[i] = new BitSet(chunk.records());
+                    bitSets[i] = new BitSet(dataChunk.records());
                 }
-                int min = this.mins.get(tag);
-                int max = this.maxs.get(tag);
+                int min = this.minTimeRanges.get(timeRangeKey);
+                int max = this.maxTimeRanges.get(timeRangeKey);
+                // for each record,
+                ArrayList<String> dataStrList = new ArrayList<>();
                 for (int i = 0; i < timeInput.size(); i++) {
                     int time = timeInput.next();
-                    if (time < this.min) continue;
-                    if (time > this.max) break;
+                    if (time < this.minQueryTime) continue; // this record is not in the range
+                    if (time > this.maxQueryTime) break; // the rest all greater than this.max. not in range, skip
                     if (time >= min && time <= max) {
-                        bitSets[tag].set(i);
+                        bitSets[timeRangeKey].set(i);
                     } else {
-                        while (!(time >= this.mins.get(tag) && (time <= this.maxs.get(tag)))) tag += 1;
-                        min = this.mins.get(tag);
-                        max = this.maxs.get(tag);
-                        bitSets[tag].set(i);
+                        while (!(time >= this.minTimeRanges.get(timeRangeKey) && (time <= this.maxTimeRanges.get(timeRangeKey)))) timeRangeKey += 1;
+                        min = this.minTimeRanges.get(timeRangeKey);
+                        max = this.maxTimeRanges.get(timeRangeKey);
+                        bitSets[timeRangeKey].set(i);
                     }
                 }
+
+                // store the records in map of ["t1|t2": bitSets [t,f...] ]
                 for (int i = 0; i < bitSets.length; i++) {
+                    // if the number of true in bitMap > 0
                     if (bitSets[i].cardinality() != 0) {
-                        map.put(this.timeRanges.get(i), bitSets[i]);
+                        resultMap.add( new TimeBitSet(this.timeRanges.get(i), bitSets[i]) );
                     }
                 }
             }
             long end = System.currentTimeMillis();
             //System.out.println("process time filter elapsed: " + (end - beg));
         }
-        for (Map.Entry<String, BitSet> entry : map.entrySet()) {
-            BitSet bs = select(this.filter, chunk, entry.getValue());
-            map.put(entry.getKey(), bs);
+
+        for (int i = 0; i < resultMap.size(); i++){
+            BitSet bs = select(this.filter, dataChunk, resultMap.get(i).matchedRecords);
+            resultMap.set(i, new TimeBitSet( this.timeRanges.get(i), bs ) );
         }
-        return map;
+
+        return resultMap;
     }
 
     public boolean isbActivateCublet() {
         return this.bActivateCublet;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class TimeBitSet{
+        private String timeRange;
+        private BitSet matchedRecords;
     }
 
 }
