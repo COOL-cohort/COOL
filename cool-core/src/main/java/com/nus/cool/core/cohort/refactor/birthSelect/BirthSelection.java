@@ -12,23 +12,29 @@ import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 import lombok.Getter;
 
+/**
+ * This class shows how to choose the birthAction according to cohort query
+ */ 
 @Getter
 public class BirthSelection {
 
-    // if the birthEvents is null
-    // we thought that any action condition can be regareded as birthAction
+    // a list of events filter, if any item pass the filter, it can be considered as selected event. 
+    // if the birthEvents is null, we thought that any action condition can be regareded as birthAction
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<EventSelection> birthEvents;
     
+    // the size of time sliding window
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private TimeWindow timeWindow;
 
     @JsonIgnore
     private BirthSelectionContext context;
 
+    // a set of schema used in BirthSelction part
     @JsonIgnore
     @Getter
     private HashSet<String> relatedSchemas;
+
 
     /**
      * initialize a instance of BirthSelection load from json
@@ -49,19 +55,20 @@ public class BirthSelection {
         this.context = new BirthSelectionContext(this.timeWindow, eventMinFrequency);
     }
 
+
     /**
      * If user's birthEvent is selected return true else return false
-     * 
-     * @param userId
-     * @return
+     * @param userId 
+     * @return whether the user's birthEvent is selected
      */
     public boolean isUserSelected(String userId) {
         return context.isUserSelected(userId);
     }
 
     /**
-     * If user's birthEvent is selected
-     * Get the BirthEvent Date to generate "Age" in Cohort
+     * If user's birthEvent is selected, Get the birthEvent's Date.
+     * If cohort query requires a collection of event
+     * we take the first event in whole collection as user's birthEvent
      * 
      * @param userId
      * @return
@@ -71,8 +78,8 @@ public class BirthSelection {
     }
 
     /**
-     * Select input Action Tuple, if it can be selected as event return true else
-     * return false
+     * Select input Action Tuple, if it can not be selected as event return false
+     * Else return true and add this event into BirthSelectionContext for further check.
      * @param userId
      * @param date
      * @param tuple  Partial Action Tuple,
@@ -102,14 +109,8 @@ public class BirthSelection {
         return false;
     }
 
-    // -------------- the method is for UnitTest and Debug -------------- //
-    // public static BirthSelection readFromJson(File in) throws IOException {
-    //     ObjectMapper objectMapp
-    // }
-
-    /**
-     * 
-     * @return usersId which is eligiable for conditions
+    /** 
+     * @return a list of userId, in which any user have eligiable birthEvent
      */
     public Set<String> getAcceptedUsers(){
         return this.context.getSelectedUserId();

@@ -8,14 +8,26 @@ import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 import lombok.Getter;
-
+/**
+ * BirthContextWindow is a sliding window based on adaptive queue.
+ * It keep a maxTimeWindow and a time-based queue (LinkedList)
+ * When new <eventId, datetime> input, this queue will automatically pop elements 
+ * to keep the time duration between the first and the last element is less than the maxTimeWindow
+ */
 public class BirthContextWindow {
-    private LinkedList<EventTime> window; // store EventTime in a queue, in time order
+    
+    // store EventTime in a queue, in time order
+    private LinkedList<EventTime> window;
 
+    // store the frequency of chosen Event in this Window
     @Getter
-    private int[] eventState; // store the frequency of chosen Event in this Window
+    private int[] eventState;
+
     private final int eventNum;
+    
+    // the max timeWindow
     private final TimeWindow maxTimeWindow;
+
 
     public BirthContextWindow(TimeWindow tWindow, int eventNum) {
         this.maxTimeWindow = tWindow;
@@ -25,14 +37,12 @@ public class BirthContextWindow {
     }
 
     /**
-     * Put new Chosen Event and TimeInto Queue
-     * 
+     * Put new Chosen EventId and corresponding time into queue.
      * @param newEventTime
      */
     public void put(Integer eventId, LocalDateTime date) {
         Preconditions.checkState(eventId < this.eventNum,
                 "Input eventId is out of range");
-        
         if(this.maxTimeWindow == null){
             // no need to maintain window, all action tuple should be considered
             this.eventState[eventId] += 1;
@@ -41,7 +51,6 @@ public class BirthContextWindow {
         EventTime newEventTime = new EventTime(eventId, date);
         window.add(newEventTime);
         this.eventState[eventId] += 1;
-
         while (true) {
             EventTime peak = window.peek();
             TimeWindow duration = DateUtils.getDifference(peak.getTimeCalendar(), newEventTime.getTimeCalendar(),
@@ -52,7 +61,6 @@ public class BirthContextWindow {
             } else
                 break;
         }
-
     }
 
     /**

@@ -5,18 +5,29 @@ import java.util.HashMap;
 import java.util.Set;
 
 import com.google.common.base.Preconditions;
-import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 /**
- * for every user, we maintain a queue to record timewindow chosen event
+ * Class BirthSelectionContext is a control and manage layer for birthSelector
+ * 
+ * for every user, we maintain a queue (BirthContextWindow) to record chosen event's frequency in a time sliding window.
+ * If the events frequency of one user's BirthContextWindow satisfied the requirement (eventMinFrequency), this user is selected.
+ * and no longer needed to maintain BirthContextWindow for this user.
  */
 public class BirthSelectionContext {
 
-  private HashMap<String, LocalDateTime> userSelected; // If user is selected and BirthEvent Calender
-  private HashMap<String, BirthContextWindow> userBirthTime; // UserId -> BirthContextWindow
+  // If user is selected, we store the birth date for this user
+  private HashMap<String, LocalDateTime> userSelected;  
+
+  // UserId -> BirthContextWindow, for every unselected user, we maintain a queue. It's action tuple is ordered in time series
+  private HashMap<String, BirthContextWindow> userBirthTime; 
+  
+  // the max size of timeWindow
   private final TimeWindow maxTimeWindow;
-  private final int[] eventMinFrequency; // EventId (index) -> Frequency (value)
+
+  // Required from query, min frequency for every events in timeWindow.
+  // EventId (index) -> Frequency (value)
+  private final int[] eventMinFrequency; 
 
   public BirthSelectionContext(TimeWindow tWindow, int[] freq) {
     this.maxTimeWindow = tWindow;
@@ -26,8 +37,12 @@ public class BirthSelectionContext {
   }
 
   /**
-   * Add a event which is pass the eventSelection
+   * Add a event into event queue
    * 
+   * get the corresponding BirthContextWindow, and push new eventId into it.
+   * the BirthContextWindow will automatically adjust the inner event queue when new event is pushed
+   * check whether the state of birthContextWindow satisfied the requirement.
+   * if satisfied, mark the corresponding user's birthAction
    * @param userId
    * @param EventId
    * @param date
@@ -47,7 +62,7 @@ public class BirthSelectionContext {
       // If Satisfied, we update the birthEventTime
       // the new added event make the ContextWindow satisfy the requirement
       // means the new added event's date is the "birth Time"
-      System.out.println("UserId " + userId + "\tdate:" + DateUtils.convertString(date));
+      // System.out.println("UserId " + userId + "\tdate:" + DateUtils.convertString(date));
       userSelected.put(userId, date);
       userBirthTime.remove(userId);
       // free the context content for selected user.
@@ -55,8 +70,7 @@ public class BirthSelectionContext {
   }
 
   /**
-   * Judge whether the user's birthEvent is selected
-   * 
+   * whether the user's birthEvent is selected
    * @param userId
    * @return
    */
@@ -78,8 +92,7 @@ public class BirthSelectionContext {
   }
 
   /**
-   * get the Calender of birthEvent date of certain user
-   * 
+   * get the birthEvent's datetime of certain user
    * @param userId
    * @return null if user is not selected
    */
@@ -89,7 +102,6 @@ public class BirthSelectionContext {
 
   /**
    * check whether in ContextWindow the birthEvent requirement is satisfied.
-   * 
    * @param eventState
    * @return
    */
@@ -102,8 +114,10 @@ public class BirthSelectionContext {
     return true;
   }
 
-  // --------- only for unit test
-
+  /**
+   * Get the set of selecetd User Id
+   * @return
+   */
   public Set<String> getSelectedUserId() {
     return this.userSelected.keySet();
   }
