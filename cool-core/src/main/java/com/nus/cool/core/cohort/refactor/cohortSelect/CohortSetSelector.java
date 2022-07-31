@@ -2,6 +2,10 @@ package com.nus.cool.core.cohort.refactor.cohortSelect;
 import com.nus.cool.core.cohort.refactor.filter.SetFilter;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 
+/**
+ * Class CohortSetSelector extends SetFilter
+ * It helps to judge whether the value in cohortSchema is acceptable
+ */
 public class CohortSetSelector extends SetFilter implements CohortSelector {
 
     

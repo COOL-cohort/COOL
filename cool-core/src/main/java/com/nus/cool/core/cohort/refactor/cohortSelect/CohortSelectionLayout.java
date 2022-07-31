@@ -4,6 +4,10 @@ import com.nus.cool.core.cohort.refactor.filter.FilterType;
 
 import lombok.Getter;
 
+/**
+ * Mappered from json file into CohortSelectionLayout
+ * Parse it to generate different CohortSelection instance.
+ */
 @Getter
 public class CohortSelectionLayout {
 

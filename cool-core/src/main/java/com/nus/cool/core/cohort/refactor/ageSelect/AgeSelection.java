@@ -32,10 +32,6 @@ public class AgeSelection {
      * if min and max is null, we should initialize it with the extremum
      */
     public void init() {
-        // if (this.min == null)
-        //     this.min = Integer.MIN_VALUE;
-        // if (this.max == null)
-        //     this.max = Integer.MAX_VALUE;
         Preconditions.checkArgument(this.min!=null, "AgeSelection's min is not allowed to be missing");
         Preconditions.checkArgument(this.max!= null, "AgeSelection's max is not allowed to be missing");   
     }

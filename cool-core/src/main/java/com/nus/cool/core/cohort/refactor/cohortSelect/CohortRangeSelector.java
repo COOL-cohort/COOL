@@ -5,7 +5,10 @@ import com.nus.cool.core.cohort.refactor.filter.RangeFilter;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
 
-
+/**
+ * Class CohortRangeSelector extends RangeFilter
+ * It helps to judge whether the value in cohortSchema is acceptable
+ */
 public class CohortRangeSelector extends RangeFilter implements CohortSelector  {
 
     private CohortRangeSelector(String fieldSchema){
