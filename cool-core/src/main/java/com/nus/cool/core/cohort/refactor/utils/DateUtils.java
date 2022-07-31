@@ -68,7 +68,7 @@ public class DateUtils {
             case MONTH:
                 return new TimeWindow(d.toDays() / 30, TimeUtils.TimeUnit.MONTH);
             case SECOND:
-                return new TimeWindow(d.toSeconds(), TimeUtils.TimeUnit.SECOND);
+                return new TimeWindow(d.toMinutes() * 60, TimeUtils.TimeUnit.SECOND);
             case WEEK:
                 return new TimeWindow(d.toDays() / 7, TimeUtils.TimeUnit.WEEK);
             case YEAR:

@@ -3,11 +3,7 @@ package com.nus.cool.core.cohort.refactor.filter;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
-
 import com.google.common.base.Preconditions;
-
-import lombok.val;
-
 import java.lang.UnsupportedOperationException;
 
 public class SetFilter implements Filter {

@@ -1,6 +1,5 @@
 package com.nus.cool.core.cohort.refactor.aggregate;
 
-import java.util.HashSet;
 
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
