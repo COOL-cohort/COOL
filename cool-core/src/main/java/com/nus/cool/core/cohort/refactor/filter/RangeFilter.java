@@ -9,6 +9,9 @@ import com.nus.cool.core.cohort.refactor.storage.Scope;
 
 import lombok.Getter;
 
+/**
+ * Range filter class
+ */
 public class RangeFilter implements Filter {
 
     // Some static defined parameter
@@ -21,6 +24,7 @@ public class RangeFilter implements Filter {
     // accepted range
     protected ArrayList<Scope> acceptRangeList = new ArrayList<>();
 
+    // filter schema
     private String fieldSchema;
 
     protected RangeFilter(String fieldSchema, String[] acceptValues) {

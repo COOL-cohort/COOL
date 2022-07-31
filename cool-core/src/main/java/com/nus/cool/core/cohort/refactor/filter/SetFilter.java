@@ -6,15 +6,18 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 import java.lang.UnsupportedOperationException;
 
+/**
+ * Set filter 
+ */
 public class SetFilter implements Filter {
 
     private static final FilterType type = FilterType.Set;
 
-    // O(1) to check whether the value is acceptable
+    // O(1) to check whether the value is acceptable or rejectable
     private HashSet<String> acceptSet;
-
     private HashSet<String> rejectSet;
 
+    // filter schema
     private String fieldSchema;
 
 

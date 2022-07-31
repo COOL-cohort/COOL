@@ -3,6 +3,9 @@ package com.nus.cool.core.cohort.refactor.filter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * enum class for filtertype
+ */
 public enum FilterType {
     Range("RANGE"), Set("SET");
 

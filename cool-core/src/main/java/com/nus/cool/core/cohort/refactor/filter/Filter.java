@@ -3,7 +3,9 @@ package com.nus.cool.core.cohort.refactor.filter;
 import java.util.BitSet;
 import java.util.List;
 
-
+/**
+ * All filters should implement filter's interface
+ */
 public interface Filter {
 
     /**
@@ -39,7 +41,9 @@ public interface Filter {
      */
     public FilterType getType();
 
-
+    /**
+     * @return the related Schema
+     */
     public String getFilterSchema();
 
 }

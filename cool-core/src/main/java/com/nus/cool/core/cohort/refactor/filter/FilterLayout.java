@@ -1,6 +1,5 @@
 package com.nus.cool.core.cohort.refactor.filter;
 
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Preconditions;
@@ -9,7 +8,7 @@ import lombok.Getter;
 
 /**
  * Read from json file into FilterLayout
- * Parse to construct certain filter class
+ * Parse to construct different filter instance
  **/
 public class FilterLayout {
     @Getter
@@ -35,6 +34,9 @@ public class FilterLayout {
                 fieldSchema, type, acStr, rejStr);
     }
 
+    /**
+     * Generate different filter instances
+     */
     public Filter generateFilter() {
         switch (type) {
             case Range:
