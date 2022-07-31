@@ -2,7 +2,7 @@ package com.nus.cool.core.cohort.refactor.storage;
 
 /**
  * represent a range from left to right
- * [left, right]
+ * [left, right)
  */
 public class Scope {
     private Integer left, right;
