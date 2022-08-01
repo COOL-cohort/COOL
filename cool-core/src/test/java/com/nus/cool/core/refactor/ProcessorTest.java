@@ -83,8 +83,8 @@ public class ProcessorTest {
     @DataProvider(name = "ProcessQueryDP")
     public Object[][] queryDirDataProvider(){
         return new Object[][]{
-            { new String("../query/query_0")},
-            { new String("../query/query_1")},
+            { new String("../datasets/health_raw/sample_query")},
+            { new String("../datasets/ecommerce_query/sample_query")},
         };
     }
 
