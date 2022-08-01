@@ -74,8 +74,8 @@ public class CohortProcessor {
     private CohortRet result;
 
     /**
-     * Create some filter instance, it's private func
-     * It will be invoked automatically, when create a new CohortProcessor from cohortQuery file
+     * Create some filter instances, it's private func
+     * It will be invoked automatically when creating a new CohortProcessor from cohortQuery file
      */
     private void init() {
         this.inilialize = true;

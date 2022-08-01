@@ -80,9 +80,15 @@ public class CsvLoaderTest {
                     Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 }, {
                     "ecommerce1",
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce", "data.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce_query", "table.yaml").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce_query", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
+                },
+                {
+                        "ecommerce1",
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasets/health_raw", "table.yaml").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "datasets/health_raw", "data.csv").toString(),
+                        Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 },
         };
     }

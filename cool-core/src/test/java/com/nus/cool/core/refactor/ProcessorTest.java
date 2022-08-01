@@ -6,6 +6,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
@@ -15,24 +17,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.CohortProcessor;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.util.config.CsvDataLoaderConfig;
-import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.model.CoolLoader;
 import com.nus.cool.model.CoolModel;
 
 public class ProcessorTest {
+    static final Logger logger = LoggerFactory.getLogger(ProcessorTest.class);
     private final String cubeRepo = "../CubeRepo";
-    private final String rootPath = "../datasets";
-    private final String tableName = "data.csv";
-    private final String configName = "table.yaml";
     private CoolModel coolModel;
 
     private final String queryName = "query.json";
     private final String resultName = "query_result.json";
 
     @BeforeTest
-    public void startUp() throws IOException{
-        this.coolModel = new CoolModel(this.cubeRepo);
+    public void setUp(){
+        logger.info("Start UnitTest " + ProcessorTest.class.getSimpleName());
+    }
+
+    public void tearDown() {
+        logger.info(String.format("Tear down UnitTest %s\n", ProcessorTest.class.getSimpleName()));
     }
 
     // Display the cohort result
@@ -53,7 +54,12 @@ public class ProcessorTest {
     public void ProcessQueryAndValidResult(String queryDir) throws IOException{
         String queryPath = Paths.get(queryDir, this.queryName).toString();
         CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
-        CubeRS cube = loadData(cohortProcessor.getDataSource());
+
+        // start a new cool model and reload the cube
+        this.coolModel = new CoolModel(this.cubeRepo);
+        coolModel.reload(cohortProcessor.getDataSource());
+        CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
+
         CohortRet ret = cohortProcessor.process(cube);
         
         String queryResultPath = Paths.get(queryDir, this.resultName).toString();
@@ -80,27 +86,6 @@ public class ProcessorTest {
             { new String("../query/query_0")},
             { new String("../query/query_1")},
         };
-    }
-
-    /**
-     * Get the Cube from CoolModel, if the Cube is not existed
-     * Load the data into CoolModel
-     * @param dataSetName, source data 
-     * @return
-     * @throws IOException
-     */
-    private CubeRS loadData(String dataSetName) throws IOException{
-        // if(!coolModel.isCubeExist(dataSetName)){
-        if(true){ 
-            DataLoaderConfig config = new CsvDataLoaderConfig();
-            CoolLoader loader = new CoolLoader(config);
-            String dataSetPath = Paths.get(this.rootPath, dataSetName).toString();
-            String tablePath = Paths.get(dataSetPath, tableName).toString();
-            String configPath = Paths.get(dataSetPath, configName).toString();
-            loader.load(dataSetName, configPath, tablePath, this.cubeRepo);
-        }
-        coolModel.reload(dataSetName);
-        return coolModel.getCube(dataSetName);
     }
 
 }
