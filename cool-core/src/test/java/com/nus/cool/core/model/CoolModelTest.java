@@ -29,7 +29,7 @@ public class CoolModelTest extends CsvLoaderTest  {
 
     @DataProvider(name = "CubeReloadTestDP")
     public Object[][] CubeReloadTestDPArgObjects() {
-        String sourcePath = Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString();
+        String sourcePath = Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString();
         return new Object[][] {
                 {sourcePath, "health"},
                 {sourcePath, "sogamo"},
@@ -39,7 +39,7 @@ public class CoolModelTest extends CsvLoaderTest  {
 
     @DataProvider(name = "CubeListTestDP")
     public Object[][] CubeListArgObjects() {
-        String sourcePath = Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString();
+        String sourcePath = Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString();
         return new Object[][] {
                 {sourcePath, new String[]{"sogamo", "tpc-h-10g", "health"}},
         };

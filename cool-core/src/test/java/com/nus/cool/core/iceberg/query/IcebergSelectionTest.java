@@ -52,7 +52,7 @@ public class IcebergSelectionTest {
     @DataProvider(name = "IcebergQuerySelectionTestDP")
     public Object[][] dpArgs() {
         return new Object[][] {
-                {"../datasetSource","../datasets/olap-tpch/query.json"}
+                {"../CubeRepo","../datasets/olap-tpch/query.json"}
         };
     }
 

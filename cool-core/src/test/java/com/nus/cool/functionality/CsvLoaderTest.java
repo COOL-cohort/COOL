@@ -62,27 +62,27 @@ public class CsvLoaderTest {
                     // Paths.get(sourcePath, "health", "table.yaml").toString(),
                     // Paths.get(sourcePath, "health", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "raw.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "data.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 }, {
                     "sogamo",
                     // Paths.get(sourcePath, "sogamo", "table.yaml").toString(),
                     // Paths.get(sourcePath, "sogamo", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "test.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "data.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 }, {
                     "tpc-h-10g",
                     // Paths.get(sourcePath, "olap-tpch", "table.yaml").toString(),
                     // Paths.get(sourcePath, "olap-tpch", "table.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "scripts", "data.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
+                    Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 }, {
                     "ecommerce1",
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce", "update-sample.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce", "data.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 },
         };
     }
@@ -93,8 +93,8 @@ public class CsvLoaderTest {
                 {
                     "health",
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "table.yaml").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "raw2.csv").toString(),
-                    Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString()
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/health", "raw.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 },
         };
     }

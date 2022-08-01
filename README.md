@@ -99,27 +99,27 @@ We have provided examples in `sogamo` directory and `health` directory. Now we t
 The COOL system supports CSV data format by default, and you can load `sogamo` dataset with the following command.
 
 ```bash
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader sogamo sogamo/table.yaml sogamo/test.csv datasetSource
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader sogamo sogamo/table.yaml sogamo/data.csv CubeRepo
 ```
 
 In addition, you can run the following command to load dataset in other formats under the `sogamo` directory.
 
 - parquet format data
 ```bash
-$ java -jar cool-extensions/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/test.parquet datasetSource
+$ java -jar cool-extensions/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/data.parquet CubeRepo
 ```
 
 - Arrow format data
 ```bash
-$ java -jar cool-extensions/arrow-extensions/target/arrow-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/test.arrow datasetSource
+$ java -jar cool-extensions/arrow-extensions/target/arrow-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/data.arrow CubeRepo
 ```
 
 - Avro format data
 ```bash
-$ java -jar cool-extensions/avro-extensions/target/avro-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/avro/test.avro datasetSource sogamo/avro/schema.avsc
+$ java -jar cool-extensions/avro-extensions/target/avro-extensions-0.1-SNAPSHOT.jar sogamo sogamo/table.yaml sogamo/avro/test.avro CubeRepo sogamo/avro/schema.avsc
 ```
 
-Finally, there will be a cube generated under the `datasetSource` directory, which is named `sogamo`.
+Finally, there will be a cube generated under the `CubeRepo` directory, which is named `sogamo`.
 
 #### Execute queries
 
@@ -128,29 +128,29 @@ We use the `health` dataset for example to demonstrate the cohort ananlysis.
 - Select the specific users.
 
 ```bash
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortSelection datasetSource health/query1-0.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortSelection CubeRepo health/query1-0.json
 ```
 
 where the three arguments are as follows:
-1. `datasetSource`: the output directory for the compacted dataset
+1. `CubeRepo`: the output directory for the compacted dataset
 2. `health`: the cube name of the compacted dataset
 3. `health/query1-0.json`: the json file for the cohort query
 
 - Display the selected all records of the cohort in terminal for exploration
 ```
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortExploration datasetSource health loyal
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortExploration CubeRepo health loyal
 ```
 
 - Execute cohort query on the selected users.
 
 ```bash
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis datasetSource health/query1-1.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis CubeRepo health/query1-1.json
 ```
 
 - Execute cohort query on all the users.
 
 ```bash
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis datasetSource health/query2.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CohortAnalysis CubeRepo health/query2.json
 ```
 
 Partial results for the query `health/query2.json` on the `health` dataset are as at [result2.json](health/result2.json)
@@ -158,7 +158,7 @@ Partial results for the query `health/query2.json` on the `health` dataset are a
 We use the `sogamo` dataset for example to demonstrate the funnel analysis.
 
 ```bash
-$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.FunnelAnalysis datasetSource sogamo/query1.json
+$ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.FunnelAnalysis CubeRepo sogamo/query1.json
 ```
 
 ### Example-OLAP Analysis
@@ -170,10 +170,10 @@ We have provided examples in `olap-tpch` directory.
 The COOL system supports CSV data format by default, and you can load `tpc-h` dataset with the following command.
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader tpc-h-10g olap-tpch/table.yaml olap-tpch/scripts/data.csv datasetSource
+java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.CsvLoader tpc-h-10g olap-tpch/table.yaml olap-tpch/scripts/data.csv CubeRepo
 ```
 
-Finally, there will be a cube generated under the `datasetSource` directory, which is named `tpc-h-10g`.
+Finally, there will be a cube generated under the `CubeRepo` directory, which is named `tpc-h-10g`.
 
 #### Execute queries
 
@@ -190,7 +190,7 @@ HAVING O_ORDERDATE >= '1993-01-01' AND O_ORDERDATE <= '1994-01-01'
 - Then execute following cmd
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.IcebergLoader datasetSource olap-tpch/query.json
+java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.IcebergLoader CubeRepo olap-tpch/query.json
 ```
 
  Results for the query  [query.json](olap-tpch/query.json) on the `tpc-h-10g` dataset are as at [result.json](olap-tpch/result2.json)
@@ -198,7 +198,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionalit
 Run Server
 
 ```
-java -jar cool-queryserver/target/cool-queryserver-0.0.1-SNAPSHOT.jar datasetSource/ 9009 STANDALONE
+java -jar cool-queryserver/target/cool-queryserver-0.0.1-SNAPSHOT.jar CubeRepo/ 9009 STANDALONE
 ```
 
 ## CONNECT TO EXTERNAL STORAGE SERVICES

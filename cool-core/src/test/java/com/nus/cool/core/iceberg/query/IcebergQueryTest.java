@@ -72,7 +72,7 @@ public class IcebergQueryTest {
     @Test
     public void EcommerceDataTestSQL1() throws Exception {
 
-        String dzFilePath = "../datasetSource";
+        String dzFilePath = "../CubeRepo";
         String queryFilePath = "../datasets/ecommerce/queries/1.query_retention.json";
 
         // load query

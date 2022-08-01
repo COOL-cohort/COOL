@@ -21,9 +21,9 @@ import com.nus.cool.model.CoolLoader;
 import com.nus.cool.model.CoolModel;
 
 public class ProcessorTest {
-    private final String cubeRepo = "../datasetSource";
+    private final String cubeRepo = "../CubeRepo";
     private final String rootPath = "../datasets";
-    private final String tableName = "table.csv";
+    private final String tableName = "data.csv";
     private final String configName = "table.yaml";
     private CoolModel coolModel;
 
