@@ -38,7 +38,8 @@ public class BirthContextWindow {
 
     /**
      * Put new Chosen EventId and corresponding time into queue.
-     * @param newEventTime
+     * @param eventId
+     * @param date
      */
     public void put(Integer eventId, LocalDateTime date) {
         Preconditions.checkState(eventId < this.eventNum,

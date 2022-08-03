@@ -59,7 +59,7 @@ public class CohortProcessor {
     private HashSet<String> projectedSchemaSet;
 
     @JsonIgnore
-    private boolean inilialize = false;
+    private boolean initialized = false;
 
     @JsonIgnore
     private String UserIdSchema;
@@ -78,7 +78,7 @@ public class CohortProcessor {
      * It will be invoked automatically when creating a new CohortProcessor from cohortQuery file
      */
     private void init() {
-        this.inilialize = true;
+        this.initialized = true;
         this.ageSelector.init();
         this.cohortSelector = this.cohortSelectionLayout.generateCohortSelector();
         this.valueSelector.init();
@@ -233,7 +233,7 @@ public class CohortProcessor {
      /**
      * Read from json file and create a instance of CohortProcessor
      * 
-     * @param in
+     * @param in File
      * @return
      * @throws IOException
      */
