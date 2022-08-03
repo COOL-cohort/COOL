@@ -18,7 +18,7 @@ public class SetFilter implements Filter {
     private HashSet<String> rejectSet;
 
     // filter schema
-    private String fieldSchema;
+    private final String fieldSchema;
 
 
     protected SetFilter(String fieldSchema,String[] acceptValues, String[] rejectedValues) {

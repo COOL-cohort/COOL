@@ -44,7 +44,7 @@ public class BirthSelectionContext {
    * check whether the state of birthContextWindow satisfied the requirement.
    * if satisfied, mark the corresponding user's birthAction
    * @param userId
-   * @param EventId
+   * @param eventId
    * @param date
    */
   public void Add(String userId, Integer eventId, LocalDateTime date) {

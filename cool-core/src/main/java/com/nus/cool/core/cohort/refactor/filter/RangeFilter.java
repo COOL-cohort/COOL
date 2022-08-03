@@ -29,8 +29,8 @@ public class RangeFilter implements Filter {
 
     protected RangeFilter(String fieldSchema, String[] acceptValues) {
         this.fieldSchema = fieldSchema;
-        for (int i = 0; i < acceptValues.length; i++) {
-            acceptRangeList.add(parse(acceptValues[i]));
+        for (String acceptValue : acceptValues) {
+            acceptRangeList.add(parse(acceptValue));
         }
     }
 

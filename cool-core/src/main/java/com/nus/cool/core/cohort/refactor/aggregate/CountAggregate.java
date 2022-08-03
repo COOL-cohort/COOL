@@ -13,7 +13,7 @@ public class CountAggregate implements AggregateFunc {
     }
 
     @Override
-    public void calulate(RetUnit retUnit, ProjectedTuple tuple) {
+    public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
         retUnit.setCount(retUnit.getCount() + 1);
     }
 

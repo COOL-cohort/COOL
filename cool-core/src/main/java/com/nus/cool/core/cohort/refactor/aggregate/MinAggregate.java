@@ -14,7 +14,7 @@ public class MinAggregate implements AggregateFunc {
     }
 
     @Override
-    public void calulate(RetUnit retUnit, ProjectedTuple tuple) {
+    public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
         float value = (float) tuple.getValueBySchema(this.schema);
         if (retUnit.getValue() > value) {
             retUnit.setValue(value);

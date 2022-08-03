@@ -15,7 +15,7 @@ public class DistinctCountAggregate implements AggregateFunc {
     }
 
     @Override
-    public void calulate(RetUnit retUnit, ProjectedTuple tuple) {
+    public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
         String value = (String)tuple.getValueBySchema(this.schema);
         if(!retUnit.getUserIdSet().contains(value)){
             retUnit.getUserIdSet().add(value);

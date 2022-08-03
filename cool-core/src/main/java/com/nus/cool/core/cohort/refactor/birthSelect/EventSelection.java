@@ -54,7 +54,7 @@ public class EventSelection {
 
     /**
      * 
-     * @param ProjectTuple, partial row of one data tuple
+     * @param projectTuple, partial row of one data tuple
      * @return whether this item can be chosen as a birthEvents
      */
     public boolean Accept(ProjectedTuple projectTuple) {

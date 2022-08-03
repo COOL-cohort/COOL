@@ -84,7 +84,7 @@ public class ValueSelection {
      * @param tuple
      */
     public void updateRetUnit(RetUnit retUnit, ProjectedTuple tuple) {
-        this.aggregateFunc.calulate(retUnit, tuple);
+        this.aggregateFunc.calculate(retUnit, tuple);
     }
 
 }
