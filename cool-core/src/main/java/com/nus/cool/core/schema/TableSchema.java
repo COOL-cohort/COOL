@@ -50,6 +50,7 @@ public class TableSchema {
   /**
    * name2Id is the mapping of field name and the corresponding id
    */
+  @Getter
   private Map<String, Integer> name2Id = Maps.newHashMap();
 
   /**
