@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.CohortProcessor;
+import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
@@ -36,16 +37,6 @@ public class ProcessorTest {
         logger.info(String.format("Tear down UnitTest %s\n", ProcessorTest.class.getSimpleName()));
     }
 
-    // Display the cohort result
-    // @Test(dataProvider = "ProcessQueryDP")
-    // public void ProcessorDebugTest(String queryDir) throws IOException {
-    //     String queryPath = Paths.get(queryDir, this.queryName).toString();
-    //     CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
-    //     CubeRS cube = loadData(cohortProcessor.getDataSource());
-    //     CohortRet ret = cohortProcessor.process(cube);
-    //     System.out.printf("Cohort List : %s\n", ret.getCohortList().toString());
-    //     System.out.println(ret.toString());
-    // }
 
     /**
      * 
@@ -53,6 +44,7 @@ public class ProcessorTest {
     @Test(dataProvider = "ProcessQueryDP")
     public void ProcessQueryAndValidResult(String queryDir) throws IOException{
         String queryPath = Paths.get(queryDir, this.queryName).toString();
+<<<<<<< HEAD
         CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
 
         // start a new cool model and reload the cube
@@ -60,6 +52,11 @@ public class ProcessorTest {
         coolModel.reload(cohortProcessor.getDataSource());
         CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
 
+=======
+        CohortQueryLayout layout  = CohortQueryLayout.readFromJson(queryPath);
+        CohortProcessor cohortProcessor = new CohortProcessor(layout);
+        CubeRS cube = loadData(cohortProcessor.getDataSource());
+>>>>>>> pass cohort processor test
         CohortRet ret = cohortProcessor.process(cube);
         
         String queryResultPath = Paths.get(queryDir, this.resultName).toString();
@@ -72,10 +69,10 @@ public class ProcessorTest {
         
         System.out.println(ret.getCohortList());
         for(String cohortName: ret.getCohortList()){
-            System.out.printf("Get CohortName %s\n", cohortName);
+            // System.out.printf("Get CohortName %s\n", cohortName);
             Assert.assertTrue(cohortData.containsKey(cohortName));
-            System.out.printf("True Result %s\n", cohortData.get(cohortName).toString());
-            System.out.printf("Get Result %s\n", ret.getValuesByCohort(cohortName));
+            // System.out.printf("True Result %s\n", cohortData.get(cohortName).toString());
+            // System.out.printf("Get Result %s\n", ret.getValuesByCohort(cohortName));
             Assert.assertEquals(cohortData.get(cohortName),ret.getValuesByCohort(cohortName));
         }
     }
