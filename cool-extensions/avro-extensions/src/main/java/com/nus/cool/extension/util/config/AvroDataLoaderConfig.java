@@ -16,8 +16,7 @@ public class AvroDataLoaderConfig extends DataLoaderConfig {
 
   private Schema schema;
 
-  public AvroDataLoaderConfig() {
-  }
+  AvroDataLoaderConfig() {}
 
   public AvroDataLoaderConfig(File avroSchema) throws IOException {
     this.schema = new Schema.Parser().parse(avroSchema);
