@@ -44,19 +44,13 @@ public class ProcessorTest {
     @Test(dataProvider = "ProcessQueryDP")
     public void ProcessQueryAndValidResult(String queryDir) throws IOException{
         String queryPath = Paths.get(queryDir, this.queryName).toString();
-<<<<<<< HEAD
-        CohortProcessor cohortProcessor = CohortProcessor.readFromJson(queryPath);
-
+        CohortQueryLayout layout  = CohortQueryLayout.readFromJson(queryPath);
+        CohortProcessor cohortProcessor = new CohortProcessor(layout);
+    
         // start a new cool model and reload the cube
         this.coolModel = new CoolModel(this.cubeRepo);
         coolModel.reload(cohortProcessor.getDataSource());
         CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
-
-=======
-        CohortQueryLayout layout  = CohortQueryLayout.readFromJson(queryPath);
-        CohortProcessor cohortProcessor = new CohortProcessor(layout);
-        CubeRS cube = loadData(cohortProcessor.getDataSource());
->>>>>>> pass cohort processor test
         CohortRet ret = cohortProcessor.process(cube);
         
         String queryResultPath = Paths.get(queryDir, this.resultName).toString();

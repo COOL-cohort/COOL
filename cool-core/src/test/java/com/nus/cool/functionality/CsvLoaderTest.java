@@ -79,7 +79,7 @@ public class CsvLoaderTest {
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "scripts", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 }, {
-                    "ecommerce_query",
+                    "ecommerce1",
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce_query", "table.yaml").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/ecommerce_query", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()

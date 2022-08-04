@@ -30,14 +30,9 @@ public class RangeFilter implements Filter {
 
     public RangeFilter(String fieldSchema, String[] acceptValues) {
         this.fieldSchema = fieldSchema;
-<<<<<<< HEAD
-        for (String acceptValue : acceptValues) {
-            acceptRangeList.add(parse(acceptValue));
-=======
         this.acceptRangeList = new ArrayList<Scope>();
         for (int i = 0; i < acceptValues.length; i++) {
             acceptRangeList.add(parse(acceptValues[i]));
->>>>>>> Fix According to PR#72
         }
     }
 

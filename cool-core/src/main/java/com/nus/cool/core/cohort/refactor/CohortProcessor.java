@@ -43,13 +43,8 @@ public class CohortProcessor {
 
     private ProjectedTuple tuple;
 
-<<<<<<< HEAD
-    @JsonIgnore
-    private boolean initialized = false;
-=======
     @Getter
     private CohortRet result;
->>>>>>> Fix According to PR#72
 
     private String UserIdSchema;
 
@@ -57,34 +52,6 @@ public class CohortProcessor {
     
     private HashSet<String> projectedSchemaSet;
 
-<<<<<<< HEAD
-    @JsonIgnore
-    private ProjectedTuple tuple;
-
-    @JsonIgnore
-    private CohortRet result;
-
-    /**
-     * Create some filter instances, it's private func
-     * It will be invoked automatically when creating a new CohortProcessor from cohortQuery file
-     */
-    private void init() {
-        this.initialized = true;
-        this.ageSelector.init();
-        this.cohortSelector = this.cohortSelectionLayout.generateCohortSelector();
-        this.valueSelector.init();
-        this.birthSelector.init();
-        // Merge Schema
-        this.projectedSchemaSet = new HashSet<>();
-        // Default Add UserIdSchema and ActionTimeSchema
-        this.projectedSchemaSet.add(this.cohortSelector.getSchema());
-        this.projectedSchemaSet.addAll(this.valueSelector.getSchemaList());
-        this.projectedSchemaSet.addAll(this.birthSelector.getRelatedSchemas());
-
-        
-        // generate CohortResult to store intermediate result
-        this.result = new CohortRet(this.ageSelector);
-=======
     public CohortProcessor(CohortQueryLayout layout){
         this.ageSelector = layout.getAgetSelectionLayout().generate();
         this.birthSelector = layout.getBirthSelectionLayout().generate();
@@ -93,7 +60,6 @@ public class CohortProcessor {
         this.projectedSchemaSet = layout.getSchemaSet();
         this.dataSource = layout.getDataSource();
         this.result =  new CohortRet(layout.getAgetSelectionLayout());
->>>>>>> Fix According to PR#72
     }
 
    
