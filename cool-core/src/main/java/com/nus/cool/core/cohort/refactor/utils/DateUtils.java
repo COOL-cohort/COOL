@@ -20,7 +20,7 @@ public class DateUtils {
                 TimeZone.getDefault().toZoneId());
     }
 
-    public static LocalDateTime createCalender(int days){
+    public static LocalDateTime daysSinceEpoch(int days){
         long unixTime = days * 24 * 3600;
         return createCalender(unixTime);
     }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.google.common.base.Preconditions;
-import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelection;
+import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelectionLayout;
 
 /**
  * Class for Cohort Analysis Result
@@ -24,11 +24,19 @@ public class CohortRet {
 
     private int size;
 
-    public CohortRet(AgeSelection ageSelection) {
+    public CohortRet(AgeSelectionLayout ageSelection) {
         this.cohortToValueList = new HashMap<>();
         this.interval = ageSelection.getInterval();
         this.min = ageSelection.getMin();
         this.max = ageSelection.getMax();
+        this.size = (this.max - this.min) / this.interval + 1;
+    }
+
+    public CohortRet(int min, int max, int interval){
+        this.cohortToValueList = new HashMap<>();
+        this.min = min;
+        this.max = max;
+        this.interval = interval;
         this.size = (this.max - this.min) / this.interval + 1;
     }
 
@@ -40,11 +48,11 @@ public class CohortRet {
      * @param age
      * @return
      */
-    public RetUnit get(String cohort, int age) {
+    public RetUnit getByAge(String cohort, int age) {
         if (!this.cohortToValueList.containsKey(cohort)) {
             this.cohortToValueList.put(cohort, new Xaxis(this.size));
         }
-        int offset = calIndex(age);
+        int offset = getCohortAge(age);
         return this.cohortToValueList.get(cohort).get(offset);
     }
 
@@ -56,7 +64,7 @@ public class CohortRet {
      * @return
      * @throws IOException
      */
-    private int calIndex(int index) {
+    private int getCohortAge(int index) {
         Preconditions.checkArgument(index <= max && index >= min, "input tuple didn't pass the ageSelection");
         int offset = (index - this.min) / this.interval;
         return offset;

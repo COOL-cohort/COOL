@@ -3,37 +3,26 @@ package com.nus.cool.core.cohort.refactor.ageSelect;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Preconditions;
+import com.nus.cool.core.cohort.refactor.storage.Scope;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
-import lombok.Getter;
 
 /**
  * Store Age condition and filter valid age for cohort Analysis.
  */
-@Getter
 public class AgeSelection {
     private TimeUtils.TimeUnit unit;
 
-
-    private Integer min, max;
-
-    // For current implementation, we ignore different interval for age
-    // @JsonIgnore
-    private int interval = 1;
+    private Scope scope;
 
     @JsonIgnore
     public final static int DefaultNullAge = -1;
-    
-    /**
-     * After read from json directly
-     * if min and max is null, we should initialize it with the extremum
-     */
-    public void init() {
-        Preconditions.checkArgument(this.min!=null, "AgeSelection's min is not allowed to be missing");
-        Preconditions.checkArgument(this.max!= null, "AgeSelection's max is not allowed to be missing");   
+
+    public AgeSelection(Scope scope, TimeUtils.TimeUnit unit) {
+        this.scope = scope;
+        this.unit = unit;
     }
 
     /**
@@ -48,7 +37,9 @@ public class AgeSelection {
     public int generateAge(LocalDateTime birthDate, LocalDateTime actionTime) {
         TimeWindow tw = DateUtils.getDifference(birthDate, actionTime, this.unit);
         int age = (int) tw.getLength();
-        age = age > max || age < min ? -1 : age;
-        return age;
+        if (this.scope.IsInScope(age)) {
+            return age;
+        }
+        return -1;
     }
 }

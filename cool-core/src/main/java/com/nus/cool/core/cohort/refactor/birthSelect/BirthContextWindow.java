@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 /**
  * BirthContextWindow is a sliding window based on adaptive queue.
@@ -46,6 +47,7 @@ public class BirthContextWindow {
                 "Input eventId is out of range");
         if(this.maxTimeWindow == null){
             // no need to maintain window, all action tuple should be considered
+            // consider the window is infinete max
             this.eventState[eventId] += 1;
             return;
         }
@@ -54,7 +56,7 @@ public class BirthContextWindow {
         this.eventState[eventId] += 1;
         while (true) {
             EventTime peak = window.peek();
-            TimeWindow duration = DateUtils.getDifference(peak.getTimeCalendar(), newEventTime.getTimeCalendar(),
+            TimeWindow duration = DateUtils.getDifference(peak.getDatetime(), newEventTime.getDatetime(),
                     maxTimeWindow.getUnit());
             if (duration.compareTo(maxTimeWindow) > 0) {
                 // pop out this Event
@@ -67,7 +69,7 @@ public class BirthContextWindow {
     /**
      * Pop out the first element in queue and update the EventState
      */
-    public void pop() {
+    private void pop() {
         if (window.isEmpty())
             return;
         EventTime peak = window.peek();
@@ -79,21 +81,10 @@ public class BirthContextWindow {
     /**
      * Typedef a Pair<EventId, DateTime>
      */
-    private class EventTime {
+    @Getter
+    @AllArgsConstructor
+    public class EventTime {
         private Integer eventId;
         private LocalDateTime datetime;
-
-        public EventTime(Integer EventId, LocalDateTime Date) {
-            this.eventId = EventId;
-            this.datetime = Date;
-        }
-
-        public Integer getEventId() {
-            return this.eventId;
-        }
-
-        public LocalDateTime getTimeCalendar() {
-            return this.datetime;
-        }
     }
 }

@@ -1,6 +1,8 @@
 package com.nus.cool.core.cohort.refactor.cohortSelect;
 
 
+import java.util.List;
+
 import com.nus.cool.core.cohort.refactor.filter.RangeFilter;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
@@ -9,32 +11,24 @@ import com.nus.cool.core.cohort.refactor.storage.Scope;
  * Class CohortRangeSelector extends RangeFilter
  * It helps to judge whether the value in cohortSchema is acceptable
  */
-public class CohortRangeSelector extends RangeFilter implements CohortSelector  {
+public class CohortRangeSelector implements CohortSelector  {
 
-    private CohortRangeSelector(String fieldSchema){
-        super(fieldSchema);
-    }
+    private RangeFilter filter;
 
-    public static CohortRangeSelector generateCohortRangeSelector(String fieldSchema, int max, int min, int interval) {
-        CohortRangeSelector selector = new CohortRangeSelector(fieldSchema);
-        for(int i = min; i<= max; i+= interval){
-            int uplevel = i+interval > max ? max + 1 : i + interval;
-            Scope u = new Scope(i, uplevel);
-            selector.addScope(u);
-        }
-        return selector;
+    public CohortRangeSelector(String fieldSchema, List<Scope> scopeList){
+        this.filter = new RangeFilter(fieldSchema, scopeList);
     }
 
     public String selectCohort(Object input) {
         Integer i = (Integer)input;
-        for(Scope u : this.acceptRangeList){
+        for(Scope u : this.filter.getAcceptRangeList()){
             if(u.IsInScope(i)) return u.toString();
         }
         return null;
     }
 
     public String getSchema(){
-        return this.getFilterSchema();
+        return this.filter.getFilterSchema();
     }
 
     @Override

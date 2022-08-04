@@ -21,7 +21,7 @@ public class SetFilter implements Filter {
     private final String fieldSchema;
 
 
-    protected SetFilter(String fieldSchema,String[] acceptValues, String[] rejectedValues) {
+    public SetFilter(String fieldSchema,String[] acceptValues, String[] rejectedValues) {
         Preconditions.checkArgument(acceptValues!=null || rejectedValues !=null, 
             "acceptValues and rejectValue can not be null at the same time");
         

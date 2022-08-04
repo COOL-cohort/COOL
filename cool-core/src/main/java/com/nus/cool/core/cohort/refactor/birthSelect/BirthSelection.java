@@ -1,14 +1,10 @@
 package com.nus.cool.core.cohort.refactor.birthSelect;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
-import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 import lombok.Getter;
 
@@ -20,41 +16,20 @@ public class BirthSelection {
 
     // a list of events filter, if any item pass the filter, it can be considered as selected event. 
     // if the birthEvents is null, we thought that any action condition can be regareded as birthAction
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<EventSelection> birthEvents;
     
-    // the size of time sliding window
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private TimeWindow timeWindow;
-
-    @JsonIgnore
     private BirthSelectionContext context;
-
-    // a set of schema used in BirthSelction part
-    @JsonIgnore
-    @Getter
-    private HashSet<String> relatedSchemas;
 
 
     /**
-     * initialize a instance of BirthSelection load from json
-     * transfer filter layout to filter instance.
+     * Create BirthSelection from BirthSelectionLayout
+     * @param events
+     * @param Context
      */
-    public void init() {
-        int[] eventMinFrequency = null;
-        this.relatedSchemas = new HashSet<>();
-        if(birthEvents != null) {
-            eventMinFrequency = new int[birthEvents.size()];
-            for (int i = 0; i < birthEvents.size(); i++) {
-                birthEvents.get(i).init();
-                eventMinFrequency[i] = birthEvents.get(i).getFrequency();
-                this.relatedSchemas.addAll(birthEvents.get(i).getSchemaList());
-            }
-        }
-        // if birthEvents == null, there is no Null
-        this.context = new BirthSelectionContext(this.timeWindow, eventMinFrequency);
+    public BirthSelection(List<EventSelection> events, BirthSelectionContext Context){
+        this.birthEvents =  events;
+        this.context = Context;
     }
-
 
     /**
      * If user's birthEvent is selected return true else return false

@@ -22,15 +22,22 @@ public class RangeFilter implements Filter {
     private static final String splitChar = "-";
 
     // accepted range
-    protected ArrayList<Scope> acceptRangeList = new ArrayList<>();
+    @Getter
+    private List<Scope> acceptRangeList;
 
     // filter schema
     private String fieldSchema;
 
-    protected RangeFilter(String fieldSchema, String[] acceptValues) {
+    public RangeFilter(String fieldSchema, String[] acceptValues) {
         this.fieldSchema = fieldSchema;
+<<<<<<< HEAD
         for (String acceptValue : acceptValues) {
             acceptRangeList.add(parse(acceptValue));
+=======
+        this.acceptRangeList = new ArrayList<Scope>();
+        for (int i = 0; i < acceptValues.length; i++) {
+            acceptRangeList.add(parse(acceptValues[i]));
+>>>>>>> Fix According to PR#72
         }
     }
 
@@ -38,16 +45,9 @@ public class RangeFilter implements Filter {
      * Need add Scope in the next steps
      * @param fieldSchema
      */
-    protected RangeFilter(String fieldSchema){
+    public RangeFilter(String fieldSchema, List<Scope> scopeList){
         this.fieldSchema = fieldSchema;
-    }
-
-    /**
-     * Add new scope conditions
-     * @param u
-     */
-    protected void addScope(Scope u){
-        this.acceptRangeList.add(u);
+        this.acceptRangeList = scopeList; 
     }
 
 

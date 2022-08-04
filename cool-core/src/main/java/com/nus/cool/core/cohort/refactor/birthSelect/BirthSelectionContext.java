@@ -55,7 +55,6 @@ public class BirthSelectionContext {
     // Initialize a BirthContextWindow
     BirthContextWindow contextWindow = this.userBirthTime.get(userId);
     contextWindow.put(eventId, date);
-
     // check whether the contextWindow meet the MinFrequency
     // if so, update the event birth date.
     if (isSatisfied(contextWindow.getEventState())) {

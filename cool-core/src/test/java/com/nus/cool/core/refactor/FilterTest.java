@@ -1,9 +1,5 @@
 package com.nus.cool.core.refactor;
 
-import java.util.BitSet;
-
-import javax.validation.constraints.Pattern.Flag;
-
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
