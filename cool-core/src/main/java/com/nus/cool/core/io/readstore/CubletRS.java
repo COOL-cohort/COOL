@@ -109,9 +109,9 @@ public class CubletRS implements Input {
     buffer.position(headOffset);
     int chunks = buffer.getInt();
     int[] chunkOffsets = new int[chunks];
-      for (int i = 0; i < chunks; i++) {
-          chunkOffsets[i] = buffer.getInt();
-      }
+    for (int i = 0; i < chunks; i++) {
+      chunkOffsets[i] = buffer.getInt();
+    }
 
     // read the metaChunk, which is the last one in #chunks
     this.metaChunk = new MetaChunkRS(this.schema);
