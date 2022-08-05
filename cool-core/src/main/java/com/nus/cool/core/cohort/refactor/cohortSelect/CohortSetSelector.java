@@ -5,7 +5,7 @@ import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import lombok.Getter;
 
 /**
- * Class CohortSetSelector extends SetFilter
+ * Class CohortSetSelector for set type column schema
  * It helps to judge whether the value in cohortSchema is acceptable
  */
 public class CohortSetSelector implements CohortSelector {
