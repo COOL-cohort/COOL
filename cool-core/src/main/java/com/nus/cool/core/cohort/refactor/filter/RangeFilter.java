@@ -32,7 +32,7 @@ public class RangeFilter implements Filter {
         this.fieldSchema = fieldSchema;
         this.acceptRangeList = new ArrayList<Scope>();
         for (int i = 0; i < acceptValues.length; i++) {
-            acceptRangeList.add(parse(acceptValues[i]));
+            acceptRangeList.add(RangeFilter.parse(acceptValues[i]));
         }
     }
 
@@ -89,7 +89,7 @@ public class RangeFilter implements Filter {
      * @param str
      * @return RangeUnit
      */
-    private  Scope parse(String str) {
+    private static Scope parse(String str) {
         String[] part = str.split(splitChar);
         Preconditions.checkArgument(part.length == 2,
                 "Split RangeUnit failed");

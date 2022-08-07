@@ -8,7 +8,7 @@ import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
 
 /**
- * Class CohortRangeSelector extends RangeFilter
+ * Class CohortRangeSelector for Range type column schema
  * It helps to judge whether the value in cohortSchema is acceptable
  */
 public class CohortRangeSelector implements CohortSelector  {
