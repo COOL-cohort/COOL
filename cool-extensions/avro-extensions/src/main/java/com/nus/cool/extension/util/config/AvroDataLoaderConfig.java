@@ -15,7 +15,9 @@ import org.apache.avro.generic.GenericRecord;
 public class AvroDataLoaderConfig extends DataLoaderConfig {
 
   private Schema schema;
-  
+
+  AvroDataLoaderConfig() {}
+
   public AvroDataLoaderConfig(File avroSchema) throws IOException {
     this.schema = new Schema.Parser().parse(avroSchema);
   }
