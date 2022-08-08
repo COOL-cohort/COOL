@@ -65,14 +65,20 @@ public class CoolModel implements Closeable {
     public CoolOlapEngine olapEngine = new CoolOlapEngine();
 
     /**
-     * Create a CoolModel to manage a cube repository
+     * Create a CoolModel to manage a cube repository.
+     * It supports to create a new cube repository if it does not exist.
      *
      * @param path the repository directory
      */
     public CoolModel(String path) throws IOException {
         localRepo = new File(path);
         if (!localRepo.exists()) {
-            throw new FileNotFoundException("[x] Repository " + localRepo.getAbsolutePath() + " was not found");
+            if (localRepo.mkdir()){
+                logger.info("[*] Cube repository " + localRepo.getCanonicalPath() + " is created!");
+            } else {
+                logger.info("[x] Cube repository " + localRepo.getCanonicalPath() + " already exist!");
+            }
+            // throw new FileNotFoundException("[x] Cube Repository " + localRepo.getAbsolutePath() + " was not found");
         }
     }
 
@@ -215,6 +221,8 @@ public class CoolModel implements Closeable {
 
     }
 
+ 
+
     public void resetCube(String cube_name) throws IOException {
         CubeRS cube = this.metaStore.get(cube_name);
         int userKeyId = cube.getTableSchema().getUserKeyField();
@@ -230,5 +238,17 @@ public class CoolModel implements Closeable {
 
     public void clearCohorts() throws IOException {
         this.cohortStore.clear();
+    }
+
+    /**
+     * Check whether cube is loaded before
+     * @param cube
+     * @return
+     * @throws IOException
+     */
+    public synchronized boolean isCubeExist(String cube) throws IOException{
+      File cubeRoot = new File(this.localRepo, cube);
+      return cubeRoot.exists();
+  
     }
 }

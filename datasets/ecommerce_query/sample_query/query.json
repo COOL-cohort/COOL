@@ -1,0 +1,21 @@
+{
+    "birthSelector":{
+    },
+
+    "ageSelector":{
+        "unit":"MONTH",
+        "min":0,
+        "max":12,
+        "interval":1
+    },
+    "cohortSelector":{
+        "fieldSchema":"First_Reported_Date",
+        "type":"SET",
+        "rejectValue":[]
+    },
+    "valueSelector":{
+        "function":"DISTINCT",
+        "observedSchema":"Product_ID"
+    },
+    "dataSource":"ecommerce_query"
+}

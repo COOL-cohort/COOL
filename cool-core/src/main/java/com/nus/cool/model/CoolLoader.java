@@ -57,9 +57,9 @@ public class CoolLoader {
         File root = new File(cubeRepo);
         if (!root.exists()){
             if (root.mkdir()){
-                logger.info("[*] Data repository " + root.getCanonicalPath() + " is created!");
+                logger.info("[*] Cube repository " + root.getCanonicalPath() + " is created!");
             } else {
-                logger.info("[x] Data repository " + root.getCanonicalPath() + " already exist!");
+                logger.info("[x] Cube repository " + root.getCanonicalPath() + " already exist!");
             }
         }
         File schemaFile = new File(schemaFileName);
@@ -70,9 +70,9 @@ public class CoolLoader {
         File cubeRoot = new File(root, dataSourceName);
         if (!cubeRoot.exists()){
             if (cubeRoot.mkdir()){
-                logger.info("[*] New Repo " + cubeRoot.getCanonicalPath() + " is created!");
+                logger.info("[*] New cube " + cubeRoot.getCanonicalPath() + " is created!");
             } else {
-                logger.info("[x] New Repo " + cubeRoot.getCanonicalPath() + "cannot be created!");
+                logger.info("[x] New cube " + cubeRoot.getCanonicalPath() + "cannot be created!");
             }
         }
 

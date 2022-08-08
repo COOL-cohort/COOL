@@ -57,7 +57,7 @@ public class FunnulAnalysisTest extends CsvLoaderTest{
     public Object[][] FunnelAnalysisTestDPArgObjects() {
         int[] out = {5, 5, 4, 4};
         return new Object[][] {{
-                Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
+                Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString(),
                 Paths.get(System.getProperty("user.dir"),  "..", "datasets/sogamo", "query1.json").toString(),
                 out
         }};

@@ -17,6 +17,7 @@ dependency-reduced-pom.xml
 */*/*.iml
 
 # dataset source files
+CubeRepo/
 datasetSource/
 
 # log file

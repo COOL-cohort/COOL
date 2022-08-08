@@ -20,8 +20,10 @@ package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public interface FieldRS extends Input {
 
@@ -66,8 +68,28 @@ public interface FieldRS extends Input {
    */
   boolean isSetField();
 
+  /**
+   * Get the idx tuple's value in this field
+   * @param idx
+   * @return
+   */
+  int getValueByIndex(int idx);
   void readFromWithFieldType(ByteBuffer buf, FieldType fieldType);
 
-  // todo check if need isPreCal() and getBitSets()
+  public static FieldRS ReadFieldRS(ByteBuffer buf, FieldType fieldtype){
 
+    Codec codec = Codec.fromInteger(buf.get());
+    if(codec == Codec.Range) {
+        // Generate DataRangeFieldRS
+        DataRangeFieldRS rs = new DataRangeFieldRS();
+        rs.readFromWithFieldType(buf,fieldtype);
+        return rs;
+    } else {
+        // Generate DataHashFieldRS
+        buf.position(buf.position() - 1);
+        DataHashFieldRS rs = new DataHashFieldRS();
+        rs.readFromWithFieldType(buf,fieldtype);
+        return rs;
+    }
+}
 }

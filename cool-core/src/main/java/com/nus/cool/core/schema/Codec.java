@@ -66,6 +66,11 @@ public enum Codec {
    */ 
   Range,
 
+  /**
+   * 
+   */
+  Set,
+
   /** 
    * Code for numeric data, use delta encoding
    */ 
@@ -92,6 +97,8 @@ public enum Codec {
       case 8:
         return Range;
       case 9:
+        return Set;
+      case 10:
         return Delta;
       default:
         throw new IllegalArgumentException("Invalid codec ordinal: " + c);

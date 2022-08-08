@@ -61,7 +61,7 @@ public class IcebergLoaderTest extends CsvLoaderTest {
                 new AggregatorResult(1, (long)33248, null, null, null, null, null)));
 
         return new Object[][] {{
-                Paths.get(System.getProperty("user.dir"),  "..", "datasetSource").toString(),
+                Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString(),
                 Paths.get(System.getProperty("user.dir"),  "..", "datasets/olap-tpch", "query.json").toString(),
                 out
         }};

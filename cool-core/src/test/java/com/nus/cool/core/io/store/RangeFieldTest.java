@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.CoolFieldRS;
+import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.RangeMetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.writestore.DataRangeFieldWS;
@@ -76,10 +77,10 @@ public class RangeFieldTest {
         bf.order(ByteOrder.nativeOrder());
         // Read from Buffer
         RangeMetaFieldRS rmrs = new RangeMetaFieldRS();
-        CoolFieldRS rs = new CoolFieldRS();
+      
         rmrs.readFromWithFieldType(bf, fType);
         bf.position(wsPos);
-        rs.readFromWithFieldType(bf, fType);
+        FieldRS rs = FieldRS.ReadFieldRS(bf, fType);
 
         // check Range Meta Field
         Assert.assertEquals(rmrs.getMinValue(), rmws.getMin());
@@ -96,7 +97,7 @@ public class RangeFieldTest {
             if (fType == FieldType.ActionTime) {
                 expect = Integer.toString(convertor.toInt(data.get(i)));
             }
-            String actual = Integer.toString(vec.get(i));
+            String actual = Integer.toString(rs.getValueByIndex(i));
             Assert.assertEquals(expect, actual);
         }
 

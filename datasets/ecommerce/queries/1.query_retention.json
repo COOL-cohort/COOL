@@ -1,5 +1,5 @@
 {
-  "dataSource": "ecommerce1",
+  "dataSource": "ecommerce_query",
   "groupFields":["Reported_Date"],
   "aggregations":[
     {"fieldName":"Product_ID","operators":["DISTINCTCOUNT"]}
