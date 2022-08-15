@@ -76,6 +76,7 @@ public class ProcessorTest {
         return new Object[][]{
             { new String("../datasets/health_raw/sample_query")},
             { new String("../datasets/ecommerce_query/sample_query")},
+            { new String("../datasets/health_raw/sample_query_count")},
         };
     }
 
