@@ -15,6 +15,7 @@ public class CountAggregate implements AggregateFunc {
     @Override
     public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
         retUnit.setCount(retUnit.getCount() + 1);
+        retUnit.setValue(retUnit.getCount());
     }
 
     @Override
