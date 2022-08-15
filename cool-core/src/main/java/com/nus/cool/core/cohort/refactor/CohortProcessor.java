@@ -177,7 +177,7 @@ public class CohortProcessor {
             }
             // Pass all above filter, we can store value into CohortRet
             // get the temporay result for this CohortGroup and this age
-            System.out.println("[Update Cohort Result]: cohortName:" + cohortName + "\tage:"+ age);
+//            System.out.println("[Update Cohort Result]: cohortName:" + cohortName + "\tage:"+ age);
             RetUnit ret = this.result.getByAge(cohortName, age);
             // update
             this.valueSelector.updateRetUnit(ret, tuple);
