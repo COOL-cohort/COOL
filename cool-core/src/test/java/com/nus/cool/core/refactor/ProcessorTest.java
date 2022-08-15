@@ -77,6 +77,10 @@ public class ProcessorTest {
             { new String("../datasets/health_raw/sample_query")},
             { new String("../datasets/ecommerce_query/sample_query")},
             { new String("../datasets/health_raw/sample_query_count")},
+            { new String("../datasets/health_raw/sample_query_average")},
+            { new String("../datasets/health_raw/sample_query_max")},
+            { new String("../datasets/health_raw/sample_query_min")},
+            { new String("../datasets/health_raw/sample_query_sum")},
         };
     }
 
