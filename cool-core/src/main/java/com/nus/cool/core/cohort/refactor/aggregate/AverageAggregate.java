@@ -15,7 +15,8 @@ public class AverageAggregate implements AggregateFunc {
 
     @Override
     public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-        float value = (float) tuple.getValueBySchema(this.schema);
+        int parse_value = (Integer) tuple.getValueBySchema(this.schema);
+        float value =  (float) parse_value;
         float sum = retUnit.getValue() * retUnit.getCount() + value;
         retUnit.setCount(retUnit.getCount() + 1);
         retUnit.setValue(sum / retUnit.getCount());
