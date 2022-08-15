@@ -16,9 +16,9 @@ Cohort:1950-1960, 1960-1970, 1970-1980, 1980-1990, 1990-2000
 '''
 
 cwd = os.getcwd()
-data_dir = os.path.join(cwd, "health")
-data_path = os.path.join(data_dir, "table.csv")
-ret_path = os.path.join(cwd, "query", "query_health_one", "query_result.json")
+data_dir = os.path.join(cwd, "datasets", "health_raw")
+data_path = os.path.join(data_dir, "data.csv")
+ret_path = os.path.join(data_dir,"sample_query","query_result.json")
 
 
 
@@ -28,7 +28,7 @@ def generateCohort(year: int) -> str:
     n_interval = (year - 1950) // 10
     left_margin = 1950 + n_interval * 10
     
-    right_margin = left_margin + 10 if left_margin + 10 > 2000 else 2001
+    right_margin = left_margin + 10 if left_margin + 10 <= 2000 else 2001
     
     return str(left_margin) + "-" + str(right_margin)
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
             # check value
             v = int(item["value"])
-            if v < 131 and v >= 45:
+            if v < 131 and v >= 45: 
                 continue
 
             # update result

@@ -12,9 +12,10 @@ AgeSelector: Month from 0 -> 12
 Cohort:1950
 '''
 cwd = os.getcwd()
-ecommerce_data_path = os.path.join(cwd, "ecommerce", "table.csv")
+ecommerce_data_path = os.path.join(
+    cwd, "datasets", "ecommerce_query", "data.csv")
 ecommerce_data_output_path = os.path.join(
-    cwd, "query", "query_ecommerce_one", "query_result.json")
+    cwd, "datasets", "ecommerce_query", "sample_query", "query_result.json")
 
 if __name__ == '__main__':
     data = pd.read_csv(ecommerce_data_path, parse_dates=[
