@@ -23,22 +23,22 @@ public class RangeFilter implements Filter {
 
     // accepted range
     @Getter
-    private List<Scope> acceptRangeList;
+    private final List<Scope> acceptRangeList;
 
     // filter schema
-    private String fieldSchema;
+    private final String fieldSchema;
 
     public RangeFilter(String fieldSchema, String[] acceptValues) {
         this.fieldSchema = fieldSchema;
         this.acceptRangeList = new ArrayList<Scope>();
-        for (int i = 0; i < acceptValues.length; i++) {
-            acceptRangeList.add(RangeFilter.parse(acceptValues[i]));
+        for (String acceptValue : acceptValues) {
+            acceptRangeList.add(RangeFilter.parse(acceptValue));
         }
     }
 
     /**
      * Need add Scope in the next steps
-     * @param fieldSchema
+     * @param fieldSchema String
      */
     public RangeFilter(String fieldSchema, List<Scope> scopeList){
         this.fieldSchema = fieldSchema;
@@ -62,7 +62,7 @@ public class RangeFilter implements Filter {
     }
 
     @Override
-    public BitSet accpet(List<String> values) throws RuntimeException {
+    public BitSet accept(String[] values) throws RuntimeException {
         throw new UnsupportedOperationException("RangeFilter dosent't implement the Integer accept method");
     }
 
@@ -78,6 +78,17 @@ public class RangeFilter implements Filter {
     }
 
     @Override
+    public BitSet accept(Scope scope) throws RuntimeException {
+        BitSet res = new BitSet(1);
+        for (Scope u : acceptRangeList) {
+            if (u.IsIntersection(scope)) {
+                res.set(1);
+            }
+        }
+        return res;
+    }
+
+    @Override
     public FilterType getType() {
         return type;
     }
@@ -86,7 +97,7 @@ public class RangeFilter implements Filter {
      * Parse string to RangeUnit
      * Exmaple [145 - 199] = RangeUnit{left:145 , right:199}
      * 
-     * @param str
+     * @param str string
      * @return RangeUnit
      */
     private static Scope parse(String str) {

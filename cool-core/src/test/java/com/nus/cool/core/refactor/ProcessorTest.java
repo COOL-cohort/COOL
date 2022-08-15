@@ -42,7 +42,8 @@ public class ProcessorTest {
      * 
      */
     @Test(dataProvider = "ProcessQueryDP")
-    public void ProcessQueryAndValidResult(String queryDir) throws IOException {
+    public void ProcessQueryAndValidResult(String queryDir) throws Exception {
+
         String queryPath = Paths.get(queryDir, this.queryName).toString();
         CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
         CohortProcessor cohortProcessor = new CohortProcessor(layout);

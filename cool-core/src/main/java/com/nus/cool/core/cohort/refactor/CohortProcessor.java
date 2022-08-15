@@ -3,60 +3,60 @@ package com.nus.cool.core.cohort.refactor;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelection;
 import com.nus.cool.core.cohort.refactor.birthSelect.BirthSelection;
+import com.nus.cool.core.cohort.refactor.birthSelect.EventSelection;
 import com.nus.cool.core.cohort.refactor.cohortSelect.CohortSelector;
+import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
+import com.nus.cool.core.cohort.refactor.storage.Scope;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.valueSelect.ValueSelection;
-import com.nus.cool.core.io.readstore.ChunkRS;
-import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.HashMetaFieldRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
-import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.readstore.*;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 
 import lombok.Getter;
+import com.nus.cool.core.cohort.refactor.filter.Filter;
 
 public class CohortProcessor {
 
-    private AgeSelection ageSelector;
+    private final AgeSelection ageSelector;
 
-    private ValueSelection valueSelector;
+    private final ValueSelection valueSelector;
 
-    private CohortSelector cohortSelector;
+    private final CohortSelector cohortSelector;
 
-    private BirthSelection birthSelector;
+    private final BirthSelection birthSelector;
 
     @Getter
-    private String dataSource;
+    private final String dataSource;
 
     private ProjectedTuple tuple;
 
     @Getter
-    private CohortRet result;
+    private final CohortRet result;
 
     private String UserIdSchema;
 
     private String ActionTimeSchema;
     
-    private HashSet<String> projectedSchemaSet;
+    private final HashSet<String> projectedSchemaSet;
 
     public CohortProcessor(CohortQueryLayout layout){
+
         this.ageSelector = layout.getAgetSelectionLayout().generate();
         this.birthSelector = layout.getBirthSelectionLayout().generate();
         this.cohortSelector = layout.getCohortSelectionLayout().generate();
         this.valueSelector = layout.getValueSelectionLayout().generate();
+
         this.projectedSchemaSet = layout.getSchemaSet();
         this.dataSource = layout.getDataSource();
         this.result =  new CohortRet(layout.getAgetSelectionLayout());
@@ -69,7 +69,7 @@ public class CohortProcessor {
      * @param cube
      * @return CohortRet
      */
-    public CohortRet process(CubeRS cube) {
+    public CohortRet process(CubeRS cube) throws Exception {
         // initialize the UserId and KeyId
         TableSchema tableschema = cube.getSchema();
         for(FieldSchema fieldSchema : tableschema.getFields()){
@@ -96,9 +96,6 @@ public class CohortProcessor {
      */
     private void processCublet(CubletRS cublet) {
         MetaChunkRS metaChunk = cublet.getMetaChunk();
-        if (!this.checkMetaChunk(metaChunk)) {
-            return;
-        }
         // if it is necessary, add logic in method checkMetaChunk
         // Personally, this step is not universal
         // all right, can check whether this cublet pass rangeFilter
@@ -114,9 +111,15 @@ public class CohortProcessor {
             }
         }
 
+        if (!this.checkMetaChunk(metaChunk)) {
+            return;
+        }
+
         // Now start to pass the DataChunk
         for (ChunkRS chunk : cublet.getDataChunks()) {
-            this.processDataChunk(chunk, gidMapBySchema);
+            if (this.checkDataChunk(chunk)){
+                this.processDataChunk(chunk, gidMapBySchema);
+            }
         }
     }
 
@@ -124,8 +127,8 @@ public class CohortProcessor {
      * In this section, we load the tuple which is a inner property.
      * We left the process logic in procesTuple function.
      * 
-     * @param chunk
-     * @param hashMapperBySchema
+     * @param chunk dataChunk
+     * @param hashMapperBySchema map of filedName: []value
      */
     private void processDataChunk(ChunkRS chunk, HashMap<String, String[]> hashMapperBySchema) {
         for (int i = 0; i < chunk.getRecords(); i++) {
@@ -184,19 +187,78 @@ public class CohortProcessor {
         }
     }
 
-    private boolean checkMetaChunk(MetaChunkRS meta) {
+
+    /**
+     * Check if this cublet contains the required field.
+     * @param metaChunk hashMetaFields result
+     * @return true: this metaChunk is valid, false: this metaChunk is invalid.
+     */
+    private Boolean checkMetaChunk(MetaChunkRS metaChunk){
+
+        // 1. check birth selection
+        // if the metaChunk contains all birth filter's accept value, then the metaChunk is valid.
+        if ( this.birthSelector.getBirthEvents() == null ){
+            return true;
+        }
+
+        for (EventSelection es: this.birthSelector.getBirthEvents()){
+            for (Filter ft: es.getFilterList()){
+                // get schema and type
+                String checkedSchema = ft.getFilterSchema();
+                MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
+                if (this.checkMetaField(metaField, ft)){return false;}
+            }
+        }
+
+        // 2. check birth selection
+        Filter cohortFilter = this.cohortSelector.getFilter();
+        String checkedSchema = cohortFilter.getFilterSchema();
+        MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
+        if (this.checkMetaField(metaField, cohortFilter)){return false;}
+
+        // 3. check value Selector,
+        for (Filter ft: this.valueSelector.getFilterList()){
+            String ValueSchema = ft.getFilterSchema();
+            MetaFieldRS ValueMetaField = metaChunk.getMetaField(ValueSchema);
+            if (this.checkMetaField(ValueMetaField, ft)){return false;}
+        }
+        return true;
+    }
+
+    public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
+        FilterType checkedType = ft.getType();
+        if (checkedType.equals(FilterType.Set)) {
+            BitSet res = ft.accept(( (HashMetaFieldRS) metaField).getGidMap());
+            // if there is no true in res, then no record meet the requirement
+            return res.nextSetBit(0) == -1;
+        } else if (checkedType.equals(FilterType.Range)) {
+            Scope scope = new Scope(metaField.getMinValue(), metaField.getMaxValue());
+            BitSet res = ft.accept(scope);
+            // if there is no true in res, then no record meet the requirement
+            return res.nextSetBit(0) == -1;
+        } else {
+            throw new IllegalArgumentException("Only support set or range");
+        }
+    }
+
+    /***
+     *
+     * @param chunk data chunk
+     * @return if this data chunk need to check
+     */
+    public Boolean checkDataChunk(ChunkRS chunk){
+
+
+
         return true;
     }
 
 
-
-    /**-------------------  IO Factory    ----------------------*/
      /**
      * Read from json file and create a instance of CohortProcessor
-     * 
      * @param in File
-     * @return
-     * @throws IOException
+     * @return instance of file
+     * @throws IOException IOException
      */
     public static CohortProcessor readFromJson(File in) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
