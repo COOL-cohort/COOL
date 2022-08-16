@@ -8,12 +8,9 @@ import com.nus.cool.core.util.parser.CsvTupleParser;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.LineTupleReader;
 import com.nus.cool.core.util.reader.TupleReader;
-import lombok.Getter;
 
 public class CsvDataLoaderConfig extends DataLoaderConfig {
 
-  @Getter
-  String[] fieldLine;
   public CsvDataLoaderConfig() {
     super();
   }
@@ -26,7 +23,7 @@ public class CsvDataLoaderConfig extends DataLoaderConfig {
   public TupleReader createTupleReader(File dataFile) throws IOException {
     TupleReader reader = new LineTupleReader(dataFile);
     // read the csv column
-    if(reader.hasNext()) fieldLine= ((String) reader.next()).split(",");
+    if(reader.hasNext()) reader.next();
     return reader;
   }
 

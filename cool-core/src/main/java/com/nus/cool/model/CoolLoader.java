@@ -22,7 +22,6 @@ package com.nus.cool.model;
 import com.google.common.io.Files;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.loader.DataLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Map;
 
 public class CoolLoader {
 
@@ -93,24 +91,10 @@ public class CoolLoader {
             logger.info("[*] New version " + outputCubeVersionDir.getName() + " is created!");
         }
         DataLoader loader = DataLoader.builder(dataSourceName, schema, dataFile, outputCubeVersionDir, this.loaderConfig).build();
-        if (!checkConsistency((CsvDataLoaderConfig) this.loaderConfig,schema))
-        {
-            logger.error("The order of fields in .yaml and .csv is different! Please check it!");
-            System.exit(0);
-        }
         loader.load();
         // copy the table.yaml to new version folder
         Files.copy(schemaFile, new File(outputCubeVersionDir, "table.yaml"));
     }
-    public boolean checkConsistency(CsvDataLoaderConfig conf, TableSchema schema){
-        boolean flag=true;
-        Map<String, Integer> name2Id = schema.getName2Id();
-        for(int i=0;i<name2Id.size();i++){
-            if (name2Id.get(conf.getFieldLine()[i])!=i)
-                flag=false;
-            return flag;
-        }
-        return flag;
-    }
+
 
 }
