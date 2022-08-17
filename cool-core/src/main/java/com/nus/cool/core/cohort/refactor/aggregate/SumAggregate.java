@@ -15,7 +15,8 @@ public class SumAggregate implements AggregateFunc {
 
     @Override
     public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-        float value = (float) tuple.getValueBySchema(this.schema);
+        int parse_value = (Integer) tuple.getValueBySchema(this.schema);
+        float value =  (float) parse_value;
         retUnit.setValue(retUnit.getValue() + value);
         retUnit.setCount(retUnit.getCount() + 1);
     }
