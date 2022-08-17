@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.DataOutputBuffer;
@@ -66,15 +67,16 @@ public class ChunkTest {
             String[] vec = parser.parse(line);
             data.add(vec);
         }
-
+        int userKeyIndex = schemas.getUserKeyField();
+        List<Integer> invariantFieldIndex = schemas.getInvariantFields();
         // Generate MetaChunkWS
-        MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0);
+        MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0,userKeyIndex, invariantFieldIndex);
         DataChunkWS chunkWS = DataChunkWS.newDataChunk(schemas, metaChunkWS.getMetaFields(), 0);
 
         for (int i = 0; i < data.size(); i++) {
             // You have to update meta first,
             // you have to update globalId first
-            metaChunkWS.put(data.get(i));
+            metaChunkWS.put(data.get(i), schemas.getInvariantType());
             chunkWS.put(data.get(i));
         }
         // We create two Buffer, one for chunkWS, another for metaChunkWS
