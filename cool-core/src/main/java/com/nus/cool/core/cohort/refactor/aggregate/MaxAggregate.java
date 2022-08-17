@@ -9,17 +9,22 @@ public class MaxAggregate implements AggregateFunc {
 
     private String schema;
 
-    public MaxAggregate(String schema){
+    public MaxAggregate(String schema) {
         this.schema = schema;
     }
 
     @Override
     public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-        float value = (float)tuple.getValueBySchema(this.schema);
-        if (retUnit.getValue() < value) {
+        int parse_value = (Integer) tuple.getValueBySchema(this.schema);
+        float value = (float) parse_value;
+        retUnit.setCount(retUnit.getCount() + 1);
+
+        if (!retUnit.isUsed()) {
+            retUnit.setValue(value);
+            retUnit.setUsed(true);
+        } else if (retUnit.getValue() < value) {
             retUnit.setValue(value);
         }
-        retUnit.setCount(retUnit.getCount() + 1);
     }
 
     @Override

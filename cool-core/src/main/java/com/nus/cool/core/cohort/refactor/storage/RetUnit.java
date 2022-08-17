@@ -17,11 +17,14 @@ public class RetUnit{
     // (used to calculate AVERAGE and COUNT)
     private int count;
 
+    private boolean used;
+
     private HashSet<String> userIdSet;
 
     public RetUnit(float value, int count){
         this.value = value;
         this.count = count;
+        this.used = false;
         userIdSet = new HashSet<>();
     }
 
