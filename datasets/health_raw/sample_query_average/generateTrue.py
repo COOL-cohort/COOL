@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
     for cohort, age_dict in result.items():
         for age, user_set in age_dict.items():
-            cohortRet[cohort][age] = sum(user_set)/len(user_set)
+            cohortRet[cohort][age] = int(sum(user_set)/len(user_set))
 
     # Save cohortRet into json file
     '''CohortRet
