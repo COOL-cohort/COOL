@@ -77,8 +77,22 @@ public enum FieldType {
       case Action:
       case AppKey:
       case Segment:
+        return true;
+      case UserKey:
+      case ActionTime:
+      case Metric:
+        return false;
+      default:
+        throw new IllegalArgumentException("Invalid field" + fieldType.toString());
+    }
+  }
+  public static boolean IsInvariantType(FieldType fieldType) {
+    switch (fieldType) {
       case UserKey:
         return true;
+      case Action:
+      case AppKey:
+      case Segment:
       case ActionTime:
       case Metric:
         return false;

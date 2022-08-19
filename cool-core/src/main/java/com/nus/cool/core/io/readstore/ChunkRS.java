@@ -63,7 +63,7 @@ public class ChunkRS implements Input {
 
   private int[] fieldOffsets;
  
-  
+  @Getter
   private TableSchema schema;
 
   public ChunkRS(TableSchema schema) {
@@ -112,9 +112,8 @@ public class ChunkRS implements Input {
         continue;
       }
       buffer.position(fieldOffsets[fieldIndex]);
-      FieldRS field = new CoolFieldRS();
-      field.readFromWithFieldType(buffer, this.schema.getField(i).getFieldType());
-      this.fields[fieldIndex++] = field;
+
+      this.fields[fieldIndex++] = FieldRS.ReadFieldRS(buffer, this.schema.getField(i).getFieldType());
     }
   }
 
