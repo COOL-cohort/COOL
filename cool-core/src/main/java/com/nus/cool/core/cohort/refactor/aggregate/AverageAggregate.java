@@ -7,16 +7,21 @@ public class AverageAggregate implements AggregateFunc {
 
     private final AggregateType type = AggregateType.AVERAGE;
 
-    private String schema;
+    private static class AverageAggregateSingularHolder {
+        private static final AverageAggregate instance = new AverageAggregate();
+    }
 
-    public AverageAggregate(String schema) {
-        this.schema = schema;
+    private AverageAggregate() {
+    }
+
+    public static final AverageAggregate getInstance() {
+        return AverageAggregateSingularHolder.instance;
     }
 
     @Override
-    public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-        int parse_value = (Integer) tuple.getValueBySchema(this.schema);
-        float value =  (float) parse_value;
+    public void calculate(RetUnit retUnit, ProjectedTuple tuple, String schema) {
+        int parse_value = (Integer) tuple.getValueBySchema(schema);
+        float value = (float) parse_value;
         float sum = retUnit.getValue() * retUnit.getCount() + value;
         retUnit.setCount(retUnit.getCount() + 1);
         retUnit.setValue(sum / retUnit.getCount());
@@ -25,11 +30,6 @@ public class AverageAggregate implements AggregateFunc {
     @Override
     public AggregateType getType() {
         return this.type;
-    }
-
-    @Override
-    public String getSchema() {
-        return this.schema;
     }
 
 }

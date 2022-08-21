@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelection;
 import com.nus.cool.core.cohort.refactor.birthSelect.BirthSelection;
@@ -49,20 +48,19 @@ public class CohortProcessor {
     private String UserIdSchema;
 
     private String ActionTimeSchema;
-    
+
     private HashSet<String> projectedSchemaSet;
 
-    public CohortProcessor(CohortQueryLayout layout){
+    public CohortProcessor(CohortQueryLayout layout) {
         this.ageSelector = layout.getAgetSelectionLayout().generate();
         this.birthSelector = layout.getBirthSelectionLayout().generate();
         this.cohortSelector = layout.getCohortSelectionLayout().generate();
         this.valueSelector = layout.getValueSelectionLayout().generate();
         this.projectedSchemaSet = layout.getSchemaSet();
         this.dataSource = layout.getDataSource();
-        this.result =  new CohortRet(layout.getAgetSelectionLayout());
+        this.result = new CohortRet(layout.getAgetSelectionLayout());
     }
 
-   
     /**
      * Public interface, Scan whole table and return CohortResult
      * 
@@ -72,13 +70,16 @@ public class CohortProcessor {
     public CohortRet process(CubeRS cube) {
         // initialize the UserId and KeyId
         TableSchema tableschema = cube.getSchema();
-        for(FieldSchema fieldSchema : tableschema.getFields()){
-            if(fieldSchema.getFieldType() == FieldType.UserKey){
+        HashSet<String> schemaSet = new HashSet<>();
+        for (FieldSchema fieldSchema : tableschema.getFields()) {
+            if (fieldSchema.getFieldType() == FieldType.UserKey) {
                 this.UserIdSchema = fieldSchema.getName();
-            } else if (fieldSchema.getFieldType() == FieldType.ActionTime){
+            } else if (fieldSchema.getFieldType() == FieldType.ActionTime) {
                 this.ActionTimeSchema = fieldSchema.getName();
             }
+            schemaSet.add(fieldSchema.getName());
         }
+        this.validateSchema(schemaSet);
         // add this two schema into List
         this.projectedSchemaSet.add(this.UserIdSchema);
         this.projectedSchemaSet.add(this.ActionTimeSchema);
@@ -132,7 +133,7 @@ public class CohortProcessor {
             // load data into tuple
             for (String schema : this.projectedSchemaSet) {
                 // if the value is segment type, we should convert it to String from globalId
-                if(hashMapperBySchema.containsKey(schema)){
+                if (hashMapperBySchema.containsKey(schema)) {
                     int globalId = chunk.getField(schema).getValueByIndex(i);
                     String v = hashMapperBySchema.get(schema)[globalId];
                     tuple.loadAttr(v, schema);
@@ -151,7 +152,7 @@ public class CohortProcessor {
     private void processTuple() {
         // For One Tuple, we firstly get the userId, and ActionTime
         String userId = (String) tuple.getValueBySchema(this.UserIdSchema);
-        LocalDateTime actionTime = DateUtils.daysSinceEpoch((int)tuple.getValueBySchema(this.ActionTimeSchema));
+        LocalDateTime actionTime = DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.ActionTimeSchema));
         // check whether its birthEvent is selected
         if (!this.birthSelector.isUserSelected(userId)) {
             // if birthEvent is not selected
@@ -177,7 +178,8 @@ public class CohortProcessor {
             }
             // Pass all above filter, we can store value into CohortRet
             // get the temporay result for this CohortGroup and this age
-//            System.out.println("[Update Cohort Result]: cohortName:" + cohortName + "\tage:"+ age);
+            // System.out.println("[Update Cohort Result]: cohortName:" + cohortName +
+            // "\tage:"+ age);
             RetUnit ret = this.result.getByAge(cohortName, age);
             // update
             this.valueSelector.updateRetUnit(ret, tuple);
@@ -188,10 +190,17 @@ public class CohortProcessor {
         return true;
     }
 
+    private void validateSchema(HashSet<String> tableSchemas) {
+        for (String key : this.projectedSchemaSet) {
+            if (!tableSchemas.contains(key)) {
+                throw new IllegalArgumentException(
+                        String.format("The query is invalid, no schema %s in table %s", key, this.dataSource));
+            }
+        }
+    }
 
-
-    /**-------------------  IO Factory    ----------------------*/
-     /**
+    /** ------------------- IO Factory ---------------------- */
+    /**
      * Read from json file and create a instance of CohortProcessor
      * 
      * @param in File
@@ -204,8 +213,7 @@ public class CohortProcessor {
         return instance;
     }
 
-
-    public static CohortProcessor readFromJson(String path) throws IOException{
+    public static CohortProcessor readFromJson(String path) throws IOException {
         return readFromJson(new File(path));
     }
 

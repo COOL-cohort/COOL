@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.ageSelect.AgeSelectionLayout;
+import com.nus.cool.core.cohort.refactor.aggregate.AggregateFunc;
+
 
 /**
  * Class for Cohort Analysis Result
@@ -23,6 +25,8 @@ public class CohortRet {
     private int min, max, interval;
 
     private int size;
+
+    private AggregateFunc func;
 
     public CohortRet(AgeSelectionLayout ageSelection) {
         this.cohortToValueList = new HashMap<>();

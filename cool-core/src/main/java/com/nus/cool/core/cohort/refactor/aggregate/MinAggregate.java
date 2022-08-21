@@ -7,17 +7,22 @@ public class MinAggregate implements AggregateFunc {
 
     private final AggregateType type = AggregateType.MIN;
 
-    private String schema;
+    private static class MinAggregateSingularHolder {
+        private static final MinAggregate instance = new MinAggregate();
+    }
 
-    public MinAggregate(String schema) {
-        this.schema = schema;
+    private MinAggregate() {
+    }
+
+    public static final MinAggregate getInstance() {
+        return MinAggregateSingularHolder.instance;
     }
 
     @Override
-    public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-        int parse_value = (Integer) tuple.getValueBySchema(this.schema);
-        float value =  (float) parse_value;
-        if(!retUnit.isUsed()){
+    public void calculate(RetUnit retUnit, ProjectedTuple tuple, String schema) {
+        int parse_value = (Integer) tuple.getValueBySchema(schema);
+        float value = (float) parse_value;
+        if (!retUnit.isUsed()) {
             retUnit.setValue(value);
             retUnit.setUsed(true);
         } else if (retUnit.getValue() > value) {
@@ -29,11 +34,6 @@ public class MinAggregate implements AggregateFunc {
     @Override
     public AggregateType getType() {
         return this.type;
-    }
-
-    @Override
-    public String getSchema() {
-        return null;
     }
 
 }

@@ -7,15 +7,19 @@ public class SumAggregate implements AggregateFunc {
 
     private final AggregateType type = AggregateType.SUM;
 
-    private String schema;
-
-    public SumAggregate(String schema) {
-        this.schema = schema;
+    private static class SumAggregateSingularHolder{
+        private static final SumAggregate instance = new SumAggregate();
     }
 
+    private SumAggregate(){}
+
+    public static final SumAggregate getInstance(){
+        return SumAggregateSingularHolder.instance;
+    }
+    
     @Override
-    public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-        int parse_value = (Integer) tuple.getValueBySchema(this.schema);
+    public void calculate(RetUnit retUnit, ProjectedTuple tuple, String schema) {
+        int parse_value = (Integer) tuple.getValueBySchema(schema);
         float value =  (float) parse_value;
         retUnit.setValue(retUnit.getValue() + value);
         retUnit.setCount(retUnit.getCount() + 1);
@@ -25,10 +29,4 @@ public class SumAggregate implements AggregateFunc {
     public AggregateType getType() {
         return this.type;
     }
-
-    @Override
-    public String getSchema() {
-        return null;
-    }
-
 }

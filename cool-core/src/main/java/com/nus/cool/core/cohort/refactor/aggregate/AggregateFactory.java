@@ -20,17 +20,17 @@ public class AggregateFactory {
     public static AggregateFunc generateAggregate(AggregateType type, String schema) {
         switch (type) {
             case AVERAGE:
-                return new AverageAggregate(schema);
+                return AverageAggregate.getInstance();
             case COUNT:
-                return new CountAggregate();
+                return CountAggregate.getInstance();
             case MAX:
-                return new MaxAggregate(schema);
+                return MaxAggregate.getInstance();
             case MIN:
-                return new MinAggregate(schema);
+                return MinAggregate.getInstance();
             case SUM:
-                return new SumAggregate(schema);
+                return SumAggregate.getInstance();
             case DISTINCT:
-                return new DistinctCountAggregate(schema);
+                return DistinctCountAggregate.getInstance();
             default:
                 throw new IllegalArgumentException(
                         String.format("%s this type is not existed ", type.toString()));

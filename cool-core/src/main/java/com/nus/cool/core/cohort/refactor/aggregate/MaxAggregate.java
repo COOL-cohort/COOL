@@ -7,15 +7,20 @@ public class MaxAggregate implements AggregateFunc {
 
     private final AggregateType type = AggregateType.MAX;
 
-    private String schema;
+    private static class MaxAggregateSingularHolder {
+        private static final MaxAggregate instance = new MaxAggregate();
+    }
 
-    public MaxAggregate(String schema) {
-        this.schema = schema;
+    private MaxAggregate() {
+    }
+
+    public static final MaxAggregate getInstance() {
+        return MaxAggregateSingularHolder.instance;
     }
 
     @Override
-    public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-        int parse_value = (Integer) tuple.getValueBySchema(this.schema);
+    public void calculate(RetUnit retUnit, ProjectedTuple tuple, String schema) {
+        int parse_value = (Integer) tuple.getValueBySchema(schema);
         float value = (float) parse_value;
         retUnit.setCount(retUnit.getCount() + 1);
 
@@ -30,12 +35,6 @@ public class MaxAggregate implements AggregateFunc {
     @Override
     public AggregateType getType() {
         return this.type;
-    }
-
-    @Override
-    public String getSchema() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

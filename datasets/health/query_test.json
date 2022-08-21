@@ -64,5 +64,10 @@
         ],
         "function":"AVERAGE",
         "observedSchema":"value"
+    },
+    
+    "queryList":{
+        "value":["SUM", "MAX", "MIN"],
+        "id":["DISTINCT"]
     }
 }

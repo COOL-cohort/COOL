@@ -13,9 +13,8 @@ public interface AggregateFunc {
      * @param retUnit
      * @param value
      */
-    public void calculate(RetUnit retUnit, ProjectedTuple tuple);
+    public void calculate(RetUnit retUnit, ProjectedTuple tuple, String schema);
     
     public AggregateType getType();
 
-    public String getSchema();
 }
