@@ -3,7 +3,6 @@ package com.nus.cool.core.refactor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,13 +77,13 @@ public class ProcessorTest {
     @DataProvider(name = "ProcessQueryDP")
     public Object[][] queryDirDataProvider() {
         return new Object[][] {
-                // { "../datasets/health_raw/sample_query_distinctcount" },
-                // { "../datasets/ecommerce_query/sample_query" },
-                // { "../datasets/health_raw/sample_query_count" },
-                // { "../datasets/health_raw/sample_query_average" },
-                // { "../datasets/health_raw/sample_query_max" },
+                { "../datasets/health_raw/sample_query_distinctcount" },
+                { "../datasets/ecommerce_query/sample_query" },
+                { "../datasets/health_raw/sample_query_count" },
+                { "../datasets/health_raw/sample_query_average" },
+                { "../datasets/health_raw/sample_query_max" },
                 { "../datasets/health_raw/sample_query_min" },
-                // { "../datasets/health_raw/sample_query_sum" },
+                { "../datasets/health_raw/sample_query_sum" },
         };
     }
 
