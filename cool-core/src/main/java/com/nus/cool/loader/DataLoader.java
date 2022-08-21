@@ -22,7 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.TupleReader;
@@ -82,6 +84,15 @@ public class DataLoader {
             writer.Add(parser.parse(reader.next()));
         }
         writer.Finish();
+    }
+
+    public static boolean checkConsistency(List<FieldSchema> schemasName, String[] fieldName){
+        boolean flag=true;
+        for(int i=0;i<schemasName.size();i++){
+         if(!schemasName.get(i).getName().equals(fieldName[i]))
+             flag=false;
+        }
+        return flag;
     }
 
     @AllArgsConstructor
