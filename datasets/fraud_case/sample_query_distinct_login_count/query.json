@@ -1,0 +1,42 @@
+{
+    "birthSelector":{
+        "birthEvents":[
+            {
+                "filters":[
+                    {
+                        "fieldSchema":"actions",
+                        "type":"SET",
+                        "acceptValue":["bW9kaWZ5X3Bhc3N3b3Jk", "dXBkYXRlX3Bob25l"]
+                    }
+                ],
+                "frequency":1
+            }
+        ]
+    },
+
+    "ageSelector":{
+        "unit":"DAY",
+        "min":0,
+        "max":7,
+        "interval":1
+    },
+
+    "cohortSelector":{
+        "fieldSchema":"date",
+        "type":"set",
+        "acceptValue":
+    },
+
+    "valueSelector":{
+        "filters":[
+            {
+                "fieldSchema":"actions",
+                "type":"SET",
+                "acceptValue":["bG9naW4="]
+            }
+        ],
+        "function":"DISTINCT",
+        "observedSchema":
+    },
+    "dataSource": "fraud_sample"
+}
