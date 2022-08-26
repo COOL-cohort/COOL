@@ -1,0 +1,23 @@
+charset: utf-8
+fields:
+- preCal: false
+  fieldType: UserKey
+  name: userid
+- preCal: false
+  fieldType: Action
+  name: actions
+- preCal: false
+  fieldType: Metric
+  name: timestamp
+- preCal: false
+  fieldType: Segment
+  name: clientIP
+- preCal: false
+  fieldType: ActionTime
+  name: date
+- preCal: false
+  fieldType: Segment
+  name: cohort
+- preCal: false
+  fieldType: Segment
+  name: isBirth
