@@ -90,6 +90,12 @@ public class CsvLoaderTest {
                     Paths.get(System.getProperty("user.dir"),  "..", "datasets/health_raw", "data.csv").toString(),
                     Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
                 },
+                {
+                    "fraud_case",
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/fraud_case", "table.yaml").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "datasets/fraud_case", "data.csv").toString(),
+                    Paths.get(System.getProperty("user.dir"),  "..", "CubeRepo").toString()
+                }
         };
     }
 

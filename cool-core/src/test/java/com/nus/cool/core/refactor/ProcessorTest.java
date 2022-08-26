@@ -41,7 +41,6 @@ public class ProcessorTest {
     /**
      * 
      */
-    // @SuppressWarnings("unchecked")
     @Test(dataProvider = "ProcessQueryDP")
     public void ProcessQueryAndValidResult(String queryDir) throws IOException {
         String queryPath = Paths.get(queryDir, this.queryName).toString();
@@ -62,7 +61,7 @@ public class ProcessorTest {
                 new TypeReference<HashMap<String, List<Integer>>>() {
                 });
         // check the result
-        System.out.println(ret.toString());
+        // System.out.println(ret.toString());
         // validate the cohortName
         Assert.assertEquals(ret.getCohortList().size(), cohortData.size());
 
@@ -87,6 +86,7 @@ public class ProcessorTest {
                 { "../datasets/health_raw/sample_query_max" },
                 { "../datasets/health_raw/sample_query_min" },
                 { "../datasets/health_raw/sample_query_sum" },
+                {"../datasets/fraud_case/sample_query_login_count"}
         };
     }
 

@@ -23,8 +23,7 @@
 
     "cohortSelector":{
         "fieldSchema":"cohort",
-        "type":"SET",
-        "rejectValue":[]
+        "type":"SET"
     },
 
     "valueSelector":{
