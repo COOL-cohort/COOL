@@ -4,9 +4,9 @@
             {
                 "filters":[
                     {
-                        "fieldSchema":"actions",
+                        "fieldSchema":"isBirth",
                         "type":"SET",
-                        "acceptValue":["bW9kaWZ5X3Bhc3N3b3Jk", "dXBkYXRlX3Bob25l"]
+                        "acceptValue":["1"]
                     }
                 ],
                 "frequency":1
@@ -17,14 +17,14 @@
     "ageSelector":{
         "unit":"DAY",
         "min":0,
-        "max":7,
+        "max":14,
         "interval":1
     },
 
     "cohortSelector":{
-        "fieldSchema":"date",
-        "type":"set",
-        "acceptValue":
+        "fieldSchema":"cohort",
+        "type":"SET",
+        "rejectValue":[]
     },
 
     "valueSelector":{
@@ -35,8 +35,8 @@
                 "acceptValue":["bG9naW4="]
             }
         ],
-        "function":"DISTINCT",
-        "observedSchema":
+        "function":"COUNT",
+        "observedSchema":"userid"
     },
-    "dataSource": "fraud_sample"
+    "dataSource": "fraud_case"
 }
