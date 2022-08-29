@@ -164,7 +164,7 @@ public class MetaChunkWS implements Output {
         int[] offsets = new int[this.metaFields.length];
         for (int i = 0; i < this.metaFields.length; i++) {
             offsets[i] = this.offset + bytesWritten;
-            if(i==userKeyIndex && this.invariantFieldIndex.size()!=0){
+            if(i==userKeyIndex){
                 bytesWritten += this.metaFields[i].writeUserTo(out);
             }
             else{
