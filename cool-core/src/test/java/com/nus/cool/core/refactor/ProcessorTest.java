@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.nus.cool.functionality.CsvLoaderTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -20,7 +21,7 @@ import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 
-public class ProcessorTest {
+public class ProcessorTest extends CsvLoaderTest {
     static final Logger logger = LoggerFactory.getLogger(ProcessorTest.class);
     private final String cubeRepo = "../CubeRepo";
     private CoolModel coolModel;
@@ -41,7 +42,7 @@ public class ProcessorTest {
     /**
      * 
      */
-    @Test(dataProvider = "ProcessQueryDP")
+    @Test(dataProvider = "ProcessQueryDP", dependsOnMethods="CsvLoaderUnitTest")
     public void ProcessQueryAndValidResult(String queryDir) throws IOException{
         String queryPath = Paths.get(queryDir, this.queryName).toString();
         CohortQueryLayout layout  = CohortQueryLayout.readFromJson(queryPath);
