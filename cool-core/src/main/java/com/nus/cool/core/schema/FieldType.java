@@ -86,7 +86,7 @@ public enum FieldType {
         throw new IllegalArgumentException("Invalid field" + fieldType.toString());
     }
   }
-  public static boolean IsInvariantType(FieldType fieldType) {
+  public static boolean IsUserKeyField(FieldType fieldType) {
     switch (fieldType) {
       case UserKey:
         return true;

@@ -107,7 +107,7 @@ public class CohortProcessor {
         // we only get used schema;
         for (String schema : this.projectedSchemaSet) {
             MetaFieldRS metaField = metaChunk.getMetaField(schema);
-            if(FieldType.IsInvariantType(metaField.getFieldType())){
+            if(FieldType.IsUserKeyField(metaField.getFieldType())){
                 gidMapBySchema.put(schema,((UserMetaFieldRS)metaField).getGidMap());
             }
             else if (FieldType.IsHashType(metaField.getFieldType())) {

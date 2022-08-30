@@ -143,7 +143,6 @@ public class RangeFieldFilter implements FieldFilter {
 
   @Override
   public boolean accept(InputVector inputVector) {
-    inputVector.skipTo(0);
     for(int i =0;i<inputVector.size();i++){
       if(inputVector.get(i)<this.max && inputVector.get(i)>this.min){
         return true;
