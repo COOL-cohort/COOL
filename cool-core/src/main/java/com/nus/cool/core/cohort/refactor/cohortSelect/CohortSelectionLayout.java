@@ -54,7 +54,14 @@ public class CohortSelectionLayout {
     }
 
     private CohortSetSelector generateSetSelector() {
-        return new CohortSetSelector(this.fieldSchema, acceptValue, rejectValue);
+        /**
+         *  If set cohort selector, and no rejectValue and acceptValue input.
+         *  We consider the situation that all value in this schema can be chosen as a 
+         */
+        if(this.acceptValue == null && this.rejectValue == null) {
+            this.rejectValue = new String[0];
+        }
+        return new CohortSetSelector(this.fieldSchema, this.acceptValue, this.rejectValue);
     }
 
 }
