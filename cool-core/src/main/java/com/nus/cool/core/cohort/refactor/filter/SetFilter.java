@@ -1,9 +1,12 @@
 package com.nus.cool.core.cohort.refactor.filter;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 import com.google.common.base.Preconditions;
+import com.nus.cool.core.cohort.refactor.storage.Scope;
+
 import java.lang.UnsupportedOperationException;
 
 /**
@@ -58,10 +61,11 @@ public class SetFilter implements Filter {
     }
 
     @Override
-    public BitSet accpet(List<String> values) throws RuntimeException {
-        BitSet res = new BitSet(values.size());
-        for(int i = 0 ; i < values.size(); i++){
-            if (this.accept(values.get(i))) {
+    public BitSet accept(String[] values) throws RuntimeException{
+
+        BitSet res = new BitSet(values.length);
+        for(int i = 0 ; i < values.length; i++){
+            if (this.accept(values[i])) {
                 res.set(i);
             }
         }
@@ -70,7 +74,12 @@ public class SetFilter implements Filter {
 
     @Override
     public BitSet accept(List<Integer> values) throws RuntimeException {
-        throw new UnsupportedOperationException("SetFilter dosent't implement the Integer accept method");
+        throw new UnsupportedOperationException("SetFilter doesn't implement the Integer accept method");
+    }
+
+    @Override
+    public BitSet accept(Scope values) throws RuntimeException {
+        throw new UnsupportedOperationException("SetFilter doesn't implement the Scope accept method");
     }
 
     @Override
