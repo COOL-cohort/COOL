@@ -1,6 +1,7 @@
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.io.storevector.InputVectorFactory;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
 
@@ -17,6 +18,9 @@ public class DataInvariantRangeFieldRS implements FieldRS {
 
   private final int invariantIdx;
 
+  private final int minKey;
+  private final int maxKey;
+
   /**
    * Constructor of DataInvariantRangeFieldRS.
    *
@@ -25,8 +29,14 @@ public class DataInvariantRangeFieldRS implements FieldRS {
    * @param userMetaField userMetaField
    * @param userDataField userDataField
    */
-  public DataInvariantRangeFieldRS(FieldType fieldType, int invariantIdx,
+  public DataInvariantRangeFieldRS(ByteBuffer buf, FieldType fieldType, int invariantIdx,
       MetaUserFieldRS userMetaField, DataHashFieldRS userDataField) {
+
+    // get codec (no used)
+    buf.get();
+    this.minKey = buf.getInt();
+    this.maxKey = buf.getInt();
+
     this.userMetaField = userMetaField;
     this.userDataField = userDataField;
     this.fieldType = fieldType;
@@ -59,14 +69,12 @@ public class DataInvariantRangeFieldRS implements FieldRS {
 
   @Override
   public int minKey() {
-    // TODO Auto-generated method stub
-    return 0;
+    return this.minKey;
   }
 
   @Override
   public int maxKey() {
-    // TODO Auto-generated method stub
-    return 0;
+    return this.maxKey;
   }
 
   @Override

@@ -87,7 +87,7 @@ public class RangeFilter implements Filter {
   @Override
   public boolean accept(Scope scope) throws RuntimeException {
     for (Scope u : acceptRangeList) {
-      if (u.isSubset(scope)) {
+      if (u.isSubset(scope) || u.isIntersection(scope)) {
         return true;
       }
     }

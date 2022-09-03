@@ -3,16 +3,20 @@ package com.nus.cool.core.cohort.refactor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.ageselect.AgeSelection;
 import com.nus.cool.core.cohort.refactor.birthselect.BirthSelection;
+import com.nus.cool.core.cohort.refactor.birthselect.EventSelection;
 import com.nus.cool.core.cohort.refactor.cohortselect.CohortSelector;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
+import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
+import com.nus.cool.core.cohort.refactor.storage.Scope;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.valueselect.ValueSelection;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
+import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.schema.FieldSchema;
@@ -121,10 +125,8 @@ public class CohortProcessor {
    * In this section, we load the tuple which is an inner property.
    * We left the process logic in processTuple function.
    *
-   * @param chunk              dataChunk
-   * @param metaChunk          metaChunk
-   * @param hashMapperBySchema map of filedName: []value
-   * @param invariantGidMap    map of invariant filedName: []value
+   * @param chunk     dataChunk
+   * @param metaChunk metaChunk
    */
   private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk) {
     for (int i = 0; i < chunk.getRecords(); i++) {
@@ -217,23 +219,55 @@ public class CohortProcessor {
       String valueSchema = ft.getFilterSchema();
       MetaFieldRS valueMetaField = metaChunk.getMetaField(valueSchema);
       if (this.checkMetaField(valueMetaField, ft)) {
-        return true;
+        return false;
       }
     }
     return false;
   }
 
   /**
-   * Now is not implemented.
+   * Check if this dataChunk is required.
+   *
+   * @param chunk data chunk
+   * @return if this data chunk need to check
    */
-  public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
+  public Boolean checkDataChunk(ChunkRS chunk) {
+
+    // 1. check birth selection
+    // if the metaChunk contains all birth filter's accept value, then the metaChunk
+    // is valid.
+    if (this.birthSelector.getBirthEvents() == null) {
+      return true;
+    }
+
+    // 1. check birth selection
+    for (EventSelection es : this.birthSelector.getBirthEvents()) {
+      for (Filter ft : es.getFilterList()) {
+        String checkedSchema = ft.getFilterSchema();
+        FieldRS dataField = chunk.getField(checkedSchema);
+        if (ft.getType().equals(FilterType.Range)) {
+          if (this.checkDataRangeFiled(dataField, ft)) {
+            return false;
+          }
+        }
+      }
+    }
+
+    // 2. check cohort selection
+    Filter cohortFilter = this.cohortSelector.getFilter();
+    String checkedSchema = cohortFilter.getFilterSchema();
+    FieldRS dataField = chunk.getField(checkedSchema);
+    if (cohortFilter.getType().equals(FilterType.Range)) {
+      return this.checkDataRangeFiled(dataField, cohortFilter);
+    }
+
     return true;
   }
 
-  /***
+  /**
    * Now is not implemented.
    */
-  public Boolean checkDataChunk(ChunkRS chunk) {
+  public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
     return true;
   }
 
@@ -255,6 +289,18 @@ public class CohortProcessor {
     for (Filter filter : this.valueSelector.getFilterList()) {
       filter.loadMetaInfo(metaChunkRS);
     }
+  }
+
+  /**
+   * Check if the range Filter meet the requirement.
+   *
+   * @param dataChunk dataChunk to be filtred
+   * @param ft        filter
+   * @return True or false
+   */
+  public Boolean checkDataRangeFiled(FieldRS dataChunk, Filter ft) {
+    Scope scope = new Scope(dataChunk.minKey(), dataChunk.maxKey());
+    return ft.accept(scope);
   }
 
   /**

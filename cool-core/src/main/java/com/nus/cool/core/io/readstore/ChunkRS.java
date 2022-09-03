@@ -126,7 +126,7 @@ public class ChunkRS implements Input {
       } else {
         if (tableSchema.isInvariantField(i)) {
           int invariantIdx = tableSchema.getInvariantFieldFlagMap()[i];
-          this.fields[i] = new DataInvariantRangeFieldRS(
+          this.fields[i] = new DataInvariantRangeFieldRS(buffer,
               fieldType, invariantIdx, userMetaField, userDataField);
         } else {
           this.fields[i] = DataRangeFieldRS.readFrom(buffer, fieldType);
