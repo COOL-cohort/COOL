@@ -19,21 +19,29 @@
 
 package com.nus.cool.core.cohort.refactor.olapSelect;
 
-import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class Aggregation {
+public class olapSelectionLayout {
 
-    // filed name used to do the aggregation
-    private String fieldName;
-
-    // get aggregator
-    private List<AggregateType> operators;
-
-    public Aggregation(String fieldName, List<AggregateType> operators) {
-        this.fieldName = fieldName;
-        this.operators = operators;
+    // inner data type for selection
+    public enum SelectionType {
+        and,
+        or,
+        filter
     }
+
+    // what type of selection
+    private SelectionType type;
+
+    // which dimension to use
+    private String dimension;
+
+    // values accepted in this field
+    private List<String> values;
+
+    // sub-operation
+    private List<olapSelectionLayout> fields = new ArrayList<>();
 }
