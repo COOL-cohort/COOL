@@ -10,9 +10,10 @@ import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.*;
-
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 public class UserMetaFieldRS implements MetaFieldRS{
     private static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;

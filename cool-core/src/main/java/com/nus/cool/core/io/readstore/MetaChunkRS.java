@@ -25,7 +25,6 @@ import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-import lombok.Getter;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -58,7 +57,6 @@ public class MetaChunkRS implements Input {
   /**
    * TableSchema for this meta chunk
    */
-  @Getter
   private TableSchema schema;
 
   /**

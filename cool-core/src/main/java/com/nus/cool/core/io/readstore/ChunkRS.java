@@ -20,6 +20,7 @@ package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
+import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import java.nio.ByteBuffer;
 
@@ -62,8 +63,7 @@ public class ChunkRS implements Input {
 
 
   private int[] fieldOffsets;
- 
-  @Getter
+
   private TableSchema schema;
 
   public ChunkRS(TableSchema schema) {
@@ -131,4 +131,15 @@ public class ChunkRS implements Input {
     return getField(schema.getDataChunkFieldID(fieldName));
   }
 
+  public boolean isInvariantFieldByName(String name){
+    return this.schema.isInvariantField(name);
+  }
+
+  public String getUserFieldName(){
+    return this.schema.getField(this.schema.getUserKeyField()).getName();
+  }
+
+  public FieldType getFieldTypeByName(String name){
+    return this.schema.getFieldType(name);
+  }
 }

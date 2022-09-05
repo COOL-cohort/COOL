@@ -6,7 +6,6 @@ import com.nus.cool.core.io.writestore.DataChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.IntegerUtil;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotNull;

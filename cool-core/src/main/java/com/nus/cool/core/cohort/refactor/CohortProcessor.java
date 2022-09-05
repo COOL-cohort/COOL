@@ -3,7 +3,9 @@ package com.nus.cool.core.cohort.refactor;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +17,13 @@ import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.valueSelect.ValueSelection;
-import com.nus.cool.core.io.readstore.*;
+import com.nus.cool.core.io.readstore.ChunkRS;
+import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.core.io.readstore.CubletRS;
+import com.nus.cool.core.io.readstore.HashMetaFieldRS;
+import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.readstore.UserMetaFieldRS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
@@ -144,13 +152,13 @@ public class CohortProcessor {
             // load data into tuple
             for (String schema : this.projectedSchemaSet) {
                 // if the value is segment type, we should convert it to String from globalId
-                if(chunk.getSchema().isInvariantField(schema)){
+                if(chunk.isInvariantFieldByName(schema)){
                     // get the invariant schema from UserMetaField
-                    String idName=chunk.getSchema().getField(chunk.getSchema().getUserKeyField()).getName();
+                    String idName=chunk.getUserFieldName();
                     UserMetaFieldRS userMetaField = (UserMetaFieldRS) metaChunk.getMetaField(idName);
                     int userGlobalId = chunk.getField(idName).getValueByIndex(i);
 
-                    if (FieldType.IsHashType(chunk.getSchema().getFieldType(schema))){
+                    if (FieldType.IsHashType(chunk.getFieldTypeByName(schema))){
                         int hash=invariantGidMap.get(schema)[userGlobalId];
                         int valueGlobalIDLocation= userMetaField.find(hash);
                         String v =metaChunk.getMetaField(schema).getString(valueGlobalIDLocation);
