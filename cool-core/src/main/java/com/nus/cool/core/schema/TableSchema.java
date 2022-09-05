@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -58,12 +60,11 @@ public class TableSchema {
   @Getter
   private int userKeyField = -1;
 
+  @Getter
   private List<Integer> invariantFields = new ArrayList<>();
 
-  @Getter
   private Map<String, Integer> invariantName2Id = Maps.newHashMap();
 
-  @Getter
   private Map<String, Integer> dataChunkFieldName2Id = Maps.newHashMap();
 
   @Getter
@@ -212,7 +213,25 @@ public class TableSchema {
     return getFieldSchema(getFieldID(name));
   }
 
-  public List<Integer> getInvariantFields(){
-    return this.invariantFields;
+  public int getInvariantSize(){return this.invariantName2Id.size();}
+
+  public boolean isInvariantField(String fieldName){
+    return this.invariantName2Id.containsKey(fieldName);
+  }
+
+  public boolean isInvariantField(int fieldIndex){
+    return this.invariantFields.contains(fieldIndex);
+  }
+
+  public int getDataChunkFieldID(String name){
+    return this.dataChunkFieldName2Id.get(name);
+  }
+
+  public Set<String> getInvariantNames(){
+    return this.invariantName2Id.keySet();
+  }
+
+  public int getInvariantIDFromName(String name){
+    return this.invariantName2Id.get(name);
   }
 }

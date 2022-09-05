@@ -24,10 +24,7 @@ public class UserMetaFieldRS implements MetaFieldRS{
 
     private InputVector fingerVec;
     private InputVector globalIDVec;
-
-    @Getter
     private List<InputVector> userToInvariant;
-
     private InputVector valueVec;
 
     // inverse map from global id to the offset in values.

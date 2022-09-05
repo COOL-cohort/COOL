@@ -144,7 +144,7 @@ public class CohortProcessor {
             // load data into tuple
             for (String schema : this.projectedSchemaSet) {
                 // if the value is segment type, we should convert it to String from globalId
-                if(chunk.getSchema().getInvariantName2Id().containsKey(schema)){
+                if(chunk.getSchema().isInvariantField(schema)){
                     // get the invariant schema from UserMetaField
                     String idName=chunk.getSchema().getField(chunk.getSchema().getUserKeyField()).getName();
                     UserMetaFieldRS userMetaField = (UserMetaFieldRS) metaChunk.getMetaField(idName);

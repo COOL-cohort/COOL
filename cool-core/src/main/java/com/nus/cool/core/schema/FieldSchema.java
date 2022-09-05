@@ -48,7 +48,6 @@ public class FieldSchema {
 
   private boolean preCal;
 
-  @Getter
   private boolean invariantField;
 
   // /**

@@ -22,6 +22,7 @@ import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.TimeUtils;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldType;
 
 import java.util.ArrayList;
 import java.util.BitSet;

@@ -73,14 +73,14 @@ public class MetaUserFieldWS implements MetaFieldWS {
     // global id
     private int nextGid = 0;
 
-    @Getter
-    private Map<String, Integer> invariantName2Id;
+    private int invatiantSize;
 
-    public MetaUserFieldWS(FieldType type, Charset charset, OutputCompressor compressor, TableSchema schema) {
+
+    public MetaUserFieldWS(FieldType type, Charset charset, OutputCompressor compressor, int invatiantSize) {
         this.fieldType = type;
         this.charset = charset;
         this.compressor = compressor;
-        this.invariantName2Id = schema.getInvariantName2Id();
+        this.invatiantSize=invatiantSize;
     }
 
     public void put(String[] tupleValue, List<FieldType> invariantType) {
@@ -173,7 +173,7 @@ public class MetaUserFieldWS implements MetaFieldWS {
         this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
         bytesWritten += this.compressor.writeTo(out);
 
-        for (int j = 0; j < invariantName2Id.size(); j++) {
+        for (int j = 0; j < this.invatiantSize; j++) {
             int[] userCorrespondingInvariant = new int[this.hashToTerm.size()];
             int index = 0;
             for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {

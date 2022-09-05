@@ -29,6 +29,7 @@ import lombok.Getter;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -111,9 +112,13 @@ public class MetaChunkRS implements Input {
     int fieldOffset = this.fieldOffsets[i];
     this.buffer.position(fieldOffset);
     MetaFieldRS metaField = null;
+    Map<String, Integer> invariantName2Id=new HashMap<>();
+    for(String invariantName : this.schema.getInvariantNames()){
+      invariantName2Id.put(invariantName, this.schema.getInvariantIDFromName(invariantName));
+    }
     switch (type) {
       case UserKey:
-        metaField=new UserMetaFieldRS(this.charset,this.schema.getInvariantName2Id());
+        metaField=new UserMetaFieldRS(this.charset,invariantName2Id);
         break;
       case AppKey:
       case Action:

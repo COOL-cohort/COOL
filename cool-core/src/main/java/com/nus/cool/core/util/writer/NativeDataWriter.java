@@ -48,7 +48,6 @@ public class NativeDataWriter implements DataWriter {
      */
     private int userKeyIndex;
 
-    @Getter
     private List<Integer> invariantFieldIndex = new ArrayList<>();
 
     private MetaChunkWS metaChunk;

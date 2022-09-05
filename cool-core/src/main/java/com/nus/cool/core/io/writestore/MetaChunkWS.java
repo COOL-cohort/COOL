@@ -105,7 +105,7 @@ public class MetaChunkWS implements Output {
 
             switch (fieldType) {
                 case UserKey:
-                    metaFields[i] = new MetaUserFieldWS(fieldType, charset, compressor, schema);
+                    metaFields[i] = new MetaUserFieldWS(fieldType, charset, compressor, schema.getInvariantSize());
                     break;
                 case AppKey:
                 case Action:
