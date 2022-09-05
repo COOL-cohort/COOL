@@ -19,6 +19,10 @@
 
 package com.nus.cool.core.cohort.refactor.olapSelect;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.nus.cool.core.cohort.refactor.filter.Filter;
+import com.nus.cool.core.cohort.refactor.filter.FilterLayout;
+import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -34,14 +38,41 @@ public class olapSelectionLayout {
     }
 
     // what type of selection
+    @JsonProperty("type")
     private SelectionType type;
 
     // which dimension to use
+    @JsonProperty("dimension")
     private String dimension;
 
+    // dimension type
+    @JsonProperty("dimension_type")
+    private FilterType dimension_type;
+
     // values accepted in this field
+    @JsonProperty("values")
     private List<String> values;
 
     // sub-operation
+    @JsonProperty("fields")
     private List<olapSelectionLayout> fields = new ArrayList<>();
+
+    // each selection layout has one filter,
+    private Filter filter;
+
+    // recursively generate filter instance for this sub selection
+    public void initSelectionFilter(){
+        if (this.type.equals(SelectionType.filter)){
+            FilterLayout selectionFilter = new FilterLayout(
+                this.dimension_type, this.values.toArray(new String[0]), new String[0]);
+
+            this.filter = selectionFilter.generateFilter();
+        }
+        else{
+            for (olapSelectionLayout childSelection: this.fields){
+                childSelection.initSelectionFilter();
+            }
+        }
+    }
+
 }
