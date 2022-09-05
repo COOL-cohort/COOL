@@ -23,6 +23,7 @@ import com.nus.cool.core.cohort.aggregator.Aggregator;
 import com.nus.cool.core.cohort.refactor.OlapQueryLayout.granularityType;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateFactory;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
+import com.nus.cool.core.cohort.refactor.storage.OlapRet;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory.AggregatorType;
 import com.nus.cool.core.iceberg.result.AggregatorResult;
 import com.nus.cool.core.iceberg.result.BaseResult;
@@ -217,7 +218,7 @@ public class olapAggregation {
      * @param timeRange time Range
      */
     public void groupBy(BitSet bs, List<String> groupbyFields, MetaChunkRS metaChunk,
-                     ChunkRS dataChunk, String timeRange, granularityType GroupFields_granularity) {
+                     ChunkRS dataChunk, granularityType GroupFields_granularity) {
 
         System.out.println("Init OLAP query timeRanges, key = "+ timeRange +", matched records = "+ bs.cardinality() + ", total size of BS = "+ bs.size());
 
@@ -251,7 +252,7 @@ public class olapAggregation {
         mergeGroups();
     }
 
-    public List<BaseResult> process(Aggregation aggregation) {
+    public List<OlapRet> process(Aggregation aggregation) {
 
         String fieldName = aggregation.getFieldName();
         FieldType fieldType = this.metaChunk.getMetaField(fieldName).getFieldType();;

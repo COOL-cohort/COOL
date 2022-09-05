@@ -1,13 +1,11 @@
 package com.nus.cool.core.cohort.refactor.olapSelect;
 
 import com.nus.cool.core.cohort.refactor.OlapQueryLayout;
-import com.nus.cool.core.cohort.refactor.OlapQueryLayout.granularityType;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.olapSelect.olapSelectionLayout.SelectionType;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.schema.TableSchema;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -25,7 +23,6 @@ public class olapSelector {
     private BitSet matchedRecords;
   }
 
-  private TableSchema tableSchema;
 
   private olapSelectionLayout selection;
 
@@ -46,11 +43,9 @@ public class olapSelector {
   private List<Integer> minTimeRanges;
 
 
-  public void init(TableSchema tableSchema, OlapQueryLayout query) throws ParseException {
-    this.tableSchema = tableSchema;
+  public void init(OlapQueryLayout query) throws ParseException {
     this.selection = query.getSelection();
     this.selection.initSelectionFilter();
-    granularityType groupFields_granularity = query.getGroupFields_granularity();
 
   }
 
@@ -62,22 +57,13 @@ public class olapSelector {
    *              true = the record meet the requirement,
    *              false = the record don't meet the requirement.
    */
-  public ArrayList<TimeBitSet> processDataChunk(ChunkRS dataChunk) {
-
-    // store the records in map of ["t1|t2": bitSets [t,f...] ]
-    ArrayList< TimeBitSet > resultMap = new ArrayList<>();
+  public BitSet selectRecordsOnDataChunk(ChunkRS dataChunk) {
 
     // if the query don't provide timeRange, all record is true
     BitSet bv = new BitSet(dataChunk.records());
     bv.set(0, dataChunk.records());
-    resultMap.add( new TimeBitSet("no time filter", bv ) );
 
-    for (int i = 0; i < resultMap.size(); i++){
-      BitSet bs = select(this.selection, dataChunk, resultMap.get(i).getMatchedRecords());
-      resultMap.set(i, new TimeBitSet( this.timeRanges.get(i), bs ) );
-    }
-
-    return resultMap;
+    return select(this.selection, dataChunk, bv );
   }
 
   /**
@@ -90,20 +76,25 @@ public class olapSelector {
   private BitSet select(olapSelectionLayout selectionFilter, ChunkRS chunk, BitSet bv) {
     BitSet bs = (BitSet) bv.clone();
     if (selectionFilter == null) return bs;
+    // if this is the final filter.
     if (selectionFilter.getType().equals(SelectionType.filter)) {
-      FieldRS field = chunk.getField(this.tableSchema.getFieldID(selectionFilter.getDimension()));
-      InputVector keyVector = field.getKeyVector();
+      FieldRS field = chunk.getField(selectionFilter.getDimension());
       selectFields(bs, field, selectionFilter.getFilter());
 
-    } else if (selectionFilter.getType().equals(SelectionType.and)) {
+    }
+    // for and operator
+    else if (selectionFilter.getType().equals(SelectionType.and)) {
       for (olapSelectionLayout childFilter : selectionFilter.getFields()) {
         bs = select(childFilter, chunk, bs);
       }
-    } else if (selectionFilter.getType().equals(SelectionType.or)) {
+    }
+    // for or operator
+    else if (selectionFilter.getType().equals(SelectionType.or)) {
       List<BitSet> bitSets = new ArrayList<>();
       for (olapSelectionLayout childFilter : selectionFilter.getFields()) {
         bitSets.add(select(childFilter, chunk, bs));
       }
+
       bs = this.orBitSets(bitSets);
     }
     return bs;
@@ -118,8 +109,8 @@ public class olapSelector {
   }
 
   private void selectFields(BitSet bs, FieldRS field, Filter filter) {
+    // get local ids
     InputVector fieldIn = field.getValueVector();
-    //fieldIn.skipTo(beg);
     int off = 0;
     while (off < fieldIn.size() && off >= 0) {
       fieldIn.skipTo(off);

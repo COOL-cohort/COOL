@@ -137,6 +137,11 @@ public class ChunkRS implements Input {
     return this.fields[i];
   }
 
+  /**
+   * Get the filed information according to fild name
+   * @param fieldName fileName
+   * @return fields
+   */
   public FieldRS getField(String fieldName) {
     return getField(tableSchema.getFieldID(fieldName));
   }

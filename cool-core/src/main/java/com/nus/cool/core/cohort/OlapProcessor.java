@@ -7,10 +7,8 @@ import com.nus.cool.core.cohort.refactor.olapSelect.olapAggregation;
 import com.nus.cool.core.cohort.refactor.olapSelect.olapSelectionLayout;
 import com.nus.cool.core.cohort.refactor.olapSelect.olapSelectionLayout.SelectionType;
 import com.nus.cool.core.cohort.refactor.olapSelect.olapSelector;
-import com.nus.cool.core.cohort.refactor.olapSelect.olapSelector.TimeBitSet;
 import com.nus.cool.core.cohort.refactor.storage.OlapRet;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
-import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
@@ -18,7 +16,6 @@ import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.HashMetaFieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
-import com.nus.cool.core.schema.TableSchema;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -28,14 +25,12 @@ import lombok.Getter;
 @Data
 public class OlapProcessor {
 
-  private TableSchema tableSchema;
-
   private OlapQueryLayout query;
   private final String dataSource;
   private olapSelector selection = new olapSelector();
 
   @Getter
-  private final OlapRet result = new OlapRet();
+  private final List<OlapRet> result = new ArrayList<>();
 
   public OlapProcessor(OlapQueryLayout layout){
     this.query = layout;
@@ -48,11 +43,9 @@ public class OlapProcessor {
    * @param cube the cube that stores the data we need
    * @return the result of the query
    */
-  public OlapRet process(CubeRS cube) throws  Exception{
+  public List<OlapRet> process(CubeRS cube) throws  Exception{
 
-    this.tableSchema = cube.getTableSchema();
-    this.selection.init(this.tableSchema, this.query);
-
+    this.selection.init(this.query);
     for (CubletRS cublet : cube.getCublets()) {
       processCublet(cublet);
     }
@@ -77,7 +70,6 @@ public class OlapProcessor {
       }
     }
   }
-
 
   /**
    * Check if this cublet contains the required field.
@@ -113,6 +105,12 @@ public class OlapProcessor {
     }
   }
 
+  /**
+   * Check if dataChunk meet the requirements
+   * @param dataChunk dataChunk
+   * @param selectionFilter selecton Filter
+   * @return t /f
+   */
   private boolean checkDataChunk(ChunkRS dataChunk, olapSelectionLayout selectionFilter) {
     if (selectionFilter == null) return true;
     if (selectionFilter.getType().equals(SelectionType.filter)) {
@@ -141,6 +139,12 @@ public class OlapProcessor {
     }
   }
 
+  /**
+   * check if this metaFiled meet the requirement
+   * @param metaField metaField
+   * @param ft filter
+   * @return yes, no
+   */
   public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
     FilterType checkedType = ft.getType();
     if (checkedType.equals(FilterType.Set)) {
@@ -157,7 +161,6 @@ public class OlapProcessor {
     }
   }
 
-
   /**
    * Process data chunk
    * @param metaChunk meta chunk
@@ -165,23 +168,19 @@ public class OlapProcessor {
    */
   private void processDataChunk(MetaChunkRS metaChunk, ChunkRS dataChunk){
     // 1. find all records in dataChunk meet the timeRange and selection requirements.
-    ArrayList<TimeBitSet> map = this.selection.processDataChunk(dataChunk);
-    if (map == null) {
-      return;
+    BitSet bs = this.selection.selectRecordsOnDataChunk(dataChunk);
+    if (bs.nextSetBit(0) == -1){
+      return ;
     }
-    // 2. for each time range, run aggregation
-    for (TimeBitSet timeBitSet : map) {
-      String timeRange = timeBitSet.getTimeRange();
-      BitSet bs = timeBitSet.getMatchedRecords();
 
-      // 2. run groupBy
-      olapAggregation olapAggregator = new olapAggregation();
-      olapAggregator.groupBy(bs, this.query.getGroupFields(), metaChunk, dataChunk,
-          timeRange, query.getGroupFields_granularity());
-      for (Aggregation aggregation : this.query.getAggregations()) {
-        List<BaseResult> res = olapAggregator.process(aggregation);
-        result.addAll(res);
-      }
+    // 2. run groupBy
+    olapAggregation olapAggregator = new olapAggregation();
+    olapAggregator.groupBy(
+        bs, this.query.getGroupFields(), metaChunk, dataChunk, query.getGroupFields_granularity());
+
+    for (Aggregation aggregation : this.query.getAggregations()) {
+      List<OlapRet> res = olapAggregator.process(aggregation);
+      this.result.addAll(res);
     }
   }
 
