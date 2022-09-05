@@ -46,14 +46,6 @@ public class UniqueAggregator implements EventAggregator {
         return same ? (double) ret : null;
     }
 
-    @Override
-    public Double birthAggregate(List<Integer> offset, int userIndex) {
-        if (offset.isEmpty()) return null;
-        int ret = values.get(userIndex);
-
-        return (double) ret;
-    }
-
 	@Override
 	public void ageAggregate(BitSet ageOffset, BitSet ageDelimiter, int start, int end, int ageInterval,
                              FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics) {
@@ -72,10 +64,5 @@ public class UniqueAggregator implements EventAggregator {
     public void ageAggregateMetirc(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
                                    TimeUnit unit, FieldFilter ageFilter, InputVector filedValue, Map<Integer, List<Double>> ageMetrics){
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void ageAggregateMetirc(BitSet bv, InputVector valueVector, int birthDate, int ageOff, int end, int ageInterval, TimeUnit unit, FieldFilter ageFieldFilter, int totalUsers, InputVector fieldIn, Map<Integer, List<Double>> cohortCells) {
-
     }
 }

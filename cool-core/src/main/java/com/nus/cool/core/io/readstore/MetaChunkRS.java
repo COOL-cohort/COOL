@@ -112,11 +112,9 @@ public class MetaChunkRS implements Input {
     int fieldOffset = this.fieldOffsets[i];
     this.buffer.position(fieldOffset);
     MetaFieldRS metaField = null;
-    List<Integer> invariantFields = this.schema.getInvariantFields();
-    Map<String, Integer> invariantName2Id = this.schema.getInvariantName2Id();
     switch (type) {
       case UserKey:
-        metaField=new UserMetaFieldRS(this.charset,invariantFields,invariantName2Id);
+        metaField=new UserMetaFieldRS(this.charset,this.schema.getInvariantName2Id());
         break;
       case AppKey:
       case Action:

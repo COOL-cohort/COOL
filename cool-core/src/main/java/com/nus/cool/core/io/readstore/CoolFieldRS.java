@@ -149,7 +149,6 @@ public class CoolFieldRS implements FieldRS {
   @Override
   public int getValueByIndex(int idx) {
     // TODO Auto-generated method stub
-    return this.valueVec.get(idx);
+    return 0;
   }
-
 }

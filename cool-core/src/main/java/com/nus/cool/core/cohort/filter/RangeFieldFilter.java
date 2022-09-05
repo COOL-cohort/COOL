@@ -141,6 +141,12 @@ public class RangeFieldFilter implements FieldFilter {
     return !(field.minKey() > this.max || field.maxKey() < this.min);
   }
 
+
+  /**
+   * Indicate whether the invariant field is eligible i.e. whether we can find eligible values in the invariant field
+   * @param inputVector the vector of invariant data to be checked
+   * @return false indicates the invariant field is not eligible and true indicates the invariant field is eligible
+   */
   @Override
   public boolean accept(InputVector inputVector) {
     for(int i =0;i<inputVector.size();i++){

@@ -23,7 +23,6 @@ import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
 
 import java.util.BitSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,8 +63,4 @@ public interface EventAggregator {
      */
     void ageAggregateMetirc(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
                       TimeUnit unit, FieldFilter ageFilter, InputVector filedValue, Map<Integer, List<Double>> ageMetrics);
-
-    void ageAggregateMetirc(BitSet bv, InputVector valueVector, int birthDate, int ageOff, int end, int ageInterval, TimeUnit unit, FieldFilter ageFieldFilter, int totalUsers, InputVector fieldIn, Map<Integer, List<Double>> cohortCells);
-
-    Double birthAggregate(List<Integer> offset, int userIndex);
 }

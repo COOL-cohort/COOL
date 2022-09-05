@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * | #values | value codec | value offsets | values |
  * --------------------------------------------------
  */
-public class MetaHashFieldWS implements MetaFieldWS {
+public class MetaUserFieldWS implements MetaFieldWS {
 
     private final Charset charset;
     private final FieldType fieldType;
@@ -67,21 +67,38 @@ public class MetaHashFieldWS implements MetaFieldWS {
     // store keys of hashToTerm
     private final List<Integer> gidToHash = new ArrayList<>();
 
+    private Map<Integer, List<Object>> userToInvariant = Maps.newTreeMap();
     // global id
     private int nextGid = 0;
 
-    public MetaHashFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
+    @Getter
+    private Map<String, Integer> invariantName2Id;
+
+    public MetaUserFieldWS(FieldType type, Charset charset, OutputCompressor compressor, TableSchema schema) {
         this.fieldType = type;
         this.charset = charset;
         this.compressor = compressor;
+        this.invariantName2Id = schema.getInvariantName2Id();
     }
 
-    @Override
-    public void put(String tupleValue) {
-        int hashKey = rhash.hash(tupleValue);
+    public void put(String[] tupleValue, List<FieldType> invariantType) {
+        int hashKey = rhash.hash(tupleValue[0]);
         if (!this.hashToTerm.containsKey(hashKey)) {
-            this.hashToTerm.put(hashKey, new Term(tupleValue, nextGid++));
+            this.hashToTerm.put(hashKey, new Term(tupleValue[0], nextGid++));
             this.gidToHash.add(hashKey);
+        }
+        if (tupleValue.length == 1) return;
+        else {
+            this.userToInvariant.put(hashKey, new ArrayList<>());
+            int invariantSize = tupleValue.length - 1;
+            for (int i = 0; i < invariantSize; i++) {
+                if (invariantType.get(i) == FieldType.ActionTime || invariantType.get(i) == FieldType.Metric) {
+                    this.userToInvariant.get(hashKey).add(Integer.parseInt(tupleValue[i + 1]));
+                } else {
+                    int invariantHashKey = rhash.hash(tupleValue[i + 1]);
+                    this.userToInvariant.get(hashKey).add(invariantHashKey);
+                }
+            }
         }
     }
 
@@ -112,7 +129,6 @@ public class MetaHashFieldWS implements MetaFieldWS {
         }
     }
 
-    @Override
     public int writeTo(DataOutput out) throws IOException {
         int bytesWritten = 0;
 
@@ -125,7 +141,8 @@ public class MetaHashFieldWS implements MetaFieldWS {
         int i = 0;
         for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
             globalIDs[i] = en.getValue().globalId;
-            fingers[i++] = en.getKey();
+            fingers[i] = en.getKey();
+            i++;
         }
 
         // generate finger bytes
@@ -142,6 +159,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
         // Actually data is not compressed here
         bytesWritten += this.compressor.writeTo(out);
 
+
         // generate globalID bytes
         hist = Histogram.builder()
                 .min(0)
@@ -153,12 +171,30 @@ public class MetaHashFieldWS implements MetaFieldWS {
         this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
         bytesWritten += this.compressor.writeTo(out);
 
+        for (int j = 0; j < invariantName2Id.size(); j++) {
+            int[] userCorrespondingInvariant = new int[this.hashToTerm.size()];
+            int index = 0;
+            for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
+                userCorrespondingInvariant[index++] = (int) this.userToInvariant.get(en.getKey()).get(j);
+            }
+            hist = Histogram.builder()
+                    .min(0)
+                    .max(this.hashToTerm.size())
+                    .numOfValues(userCorrespondingInvariant.length)
+                    .rawSize(Ints.BYTES * userCorrespondingInvariant.length)
+                    .type(CompressType.KeyFinger)
+                    .build();
+            this.compressor.reset(hist, userCorrespondingInvariant, 0, userCorrespondingInvariant.length);
+            bytesWritten += this.compressor.writeTo(out);
+        }
+
+
         // Write values
         if (this.fieldType == FieldType.Segment || this.fieldType == FieldType.Action
                 || this.fieldType == FieldType.UserKey) {
             try (DataOutputBuffer buffer = new DataOutputBuffer()) {
-                // Store offsets into the buffer first
                 buffer.writeInt(this.hashToTerm.size());
+                // Store offsets into the buffer first
                 // Value offsets begin with 0
                 int off = 0;
                 for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
@@ -184,10 +220,14 @@ public class MetaHashFieldWS implements MetaFieldWS {
         return bytesWritten;
     }
 
-
     @Override
     public String toString() {
         return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
+    }
+
+    @Override
+    public void put(String v) {
+
     }
 
     @Override

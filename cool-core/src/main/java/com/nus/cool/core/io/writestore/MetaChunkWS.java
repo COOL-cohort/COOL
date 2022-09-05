@@ -105,10 +105,12 @@ public class MetaChunkWS implements Output {
 
             switch (fieldType) {
                 case UserKey:
+                    metaFields[i] = new MetaUserFieldWS(fieldType, charset, compressor, schema);
+                    break;
                 case AppKey:
                 case Action:
                 case Segment:
-                    metaFields[i] = new MetaHashFieldWS(fieldType, charset, compressor, schema);
+                    metaFields[i] = new MetaHashFieldWS(fieldType, charset, compressor);
                     break;
                 case ActionTime:
                 case Metric:
@@ -133,7 +135,7 @@ public class MetaChunkWS implements Output {
                 List<String> userData = new ArrayList<>();
                 userData.add(tuple[userKeyIndex]);
                 for (int j = 0; j < invariantFieldIndex.size(); j++) userData.add(tuple[invariantFieldIndex.get(i)]);
-                this.metaFields[i].putUser((String[])userData.toArray(new String[0]),invariantType);
+                ((MetaUserFieldWS) this.metaFields[i]).put((String[])userData.toArray(new String[0]),invariantType);
             } else {
                 this.metaFields[i].put(tuple[i]);
             }
@@ -165,7 +167,7 @@ public class MetaChunkWS implements Output {
         for (int i = 0; i < this.metaFields.length; i++) {
             offsets[i] = this.offset + bytesWritten;
             if(i==userKeyIndex){
-                bytesWritten += this.metaFields[i].writeUserTo(out);
+                bytesWritten += this.metaFields[i].writeTo(out);
             }
             else{
                 bytesWritten += this.metaFields[i].writeTo(out);

@@ -40,9 +40,6 @@ public interface MetaFieldWS extends Output {
    */
   void update(String v);
 
-  void putUser(String[] tupleValue);
-  void putUser(String[] tupleValue, List<FieldType> invariantType);
-
   /**
    * Find the index of value in this meta field, return -1 if no such value exists
    *
@@ -70,7 +67,4 @@ public interface MetaFieldWS extends Output {
    * method returns, this meta field is frozen for writing.
    */
   void complete();
-
-
-  int writeUserTo(DataOutput out) throws IOException;
 }

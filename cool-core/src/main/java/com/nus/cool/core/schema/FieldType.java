@@ -86,18 +86,4 @@ public enum FieldType {
         throw new IllegalArgumentException("Invalid field" + fieldType.toString());
     }
   }
-  public static boolean IsUserKeyField(FieldType fieldType) {
-    switch (fieldType) {
-      case UserKey:
-        return true;
-      case Action:
-      case AppKey:
-      case Segment:
-      case ActionTime:
-      case Metric:
-        return false;
-      default:
-        throw new IllegalArgumentException("Invalid field" + fieldType.toString());
-    }
-  }
 }

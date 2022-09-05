@@ -20,7 +20,6 @@ package com.nus.cool.loader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;

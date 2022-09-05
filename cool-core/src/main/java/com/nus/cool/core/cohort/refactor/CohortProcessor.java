@@ -3,10 +3,7 @@ package com.nus.cool.core.cohort.refactor;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -103,12 +100,16 @@ public class CohortProcessor {
         // for Hash Value, Maintain HashMap<Schema, String[]>, the String[] is gid ->
         // True Value
         HashMap<String, String[]> gidMapBySchema = new HashMap<>();
+        HashMap<String, int[]> invariantGidMap = new HashMap<>();
 
         // we only get used schema;
+        UserMetaFieldRS userMetaField;
         for (String schema : this.projectedSchemaSet) {
             MetaFieldRS metaField = metaChunk.getMetaField(schema);
-            if(FieldType.IsUserKeyField(metaField.getFieldType())){
-                gidMapBySchema.put(schema,((UserMetaFieldRS)metaField).getGidMap());
+            if(metaField.getFieldType()==FieldType.UserKey){
+                userMetaField=(UserMetaFieldRS) metaField;
+                gidMapBySchema.put(schema,userMetaField.getGidMap());
+                invariantGidMap=loadInvariantGidMaps(userMetaField);
             }
             else if (FieldType.IsHashType(metaField.getFieldType())) {
                 gidMapBySchema.put(schema, ((HashMetaFieldRS) metaField).getGidMap());
@@ -117,9 +118,20 @@ public class CohortProcessor {
 
         // Now start to pass the DataChunk
         for (ChunkRS chunk : cublet.getDataChunks()) {
-            this.processDataChunk(chunk, gidMapBySchema, ((UserMetaFieldRS)(metaChunk.getMetaField(0,FieldType.UserKey))));
+            this.processDataChunk(chunk, metaChunk, gidMapBySchema, invariantGidMap);
         }
     }
+
+    public HashMap<String, int[]> loadInvariantGidMaps(UserMetaFieldRS userMetaField ){
+        HashMap<String, int[]> invariantRangeGidMap=new HashMap<>();
+        Set<String> invariantName=userMetaField.getInvariantName();
+        for( String invariantFieldName : invariantName){
+            invariantRangeGidMap.put(invariantFieldName,userMetaField.getInvariantGidMap(invariantFieldName));
+        }
+        return invariantRangeGidMap;
+    }
+
+
 
     /**
      * In this section, we load the tuple which is a inner property.
@@ -128,23 +140,27 @@ public class CohortProcessor {
      * @param chunk
      * @param hashMapperBySchema
      */
-    private void processDataChunk(ChunkRS chunk, HashMap<String, String[]> hashMapperBySchema, UserMetaFieldRS userMetaField) {
-        List<InputVector> userToInvariant=userMetaField.getUserToInvariant();
+    private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk, HashMap<String, String[]> hashMapperBySchema, HashMap<String, int[]>invariantGidMap) {
         for (int i = 0; i < chunk.getRecords(); i++) {
             // load data into tuple
             for (String schema : this.projectedSchemaSet) {
                 // if the value is segment type, we should convert it to String from globalId
                 if(chunk.getSchema().getInvariantName2Id().containsKey(schema)){
+                    // get the invariant schema from UserMetaField
                     String idName=chunk.getSchema().getField(chunk.getSchema().getUserKeyField()).getName();
+                    UserMetaFieldRS userMetaField = (UserMetaFieldRS) metaChunk.getMetaField(idName);
                     int userGlobalId = chunk.getField(idName).getValueByIndex(i);
-                    int userInvariantHash=userMetaField.findInvariantHash(userGlobalId);
-                    int userGlobalIDLocation= userMetaField.find(userInvariantHash);
 
-                    int InputVectorIndex=chunk.getSchema().getInvariantName2Id().get(schema)-1;
-                    InputVector invariantVector=userToInvariant.get(InputVectorIndex);
-
-                    //                    int userId=chunk.getField("id").getValueByIndex(i);
-                    tuple.loadAttr(invariantVector.get(userGlobalIDLocation),schema);
+                    if (FieldType.IsHashType(chunk.getSchema().getFieldType(schema))){
+                        int hash=invariantGidMap.get(schema)[userGlobalId];
+                        int valueGlobalIDLocation= userMetaField.find(hash);
+                        String v =metaChunk.getMetaField(schema).getString(valueGlobalIDLocation);
+                        tuple.loadAttr(v,schema);
+                    }
+                    else{
+                        int v = invariantGidMap.get(schema)[userGlobalId];
+                        tuple.loadAttr(v, schema);
+                    }
                 }
                 else if(hashMapperBySchema.containsKey(schema)){
                     int globalId = chunk.getField(schema).getValueByIndex(i);

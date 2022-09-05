@@ -10,9 +10,7 @@ import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -21,17 +19,12 @@ public class UserMetaFieldRS implements MetaFieldRS{
     private static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
     private Charset charset;
-    List<Integer> invariantFields = new ArrayList<>();
-    Map<String, Integer> invariantName2Id = Maps.newHashMap();
-    Map<String, Integer> invariantId2Name = Maps.newHashMap();
+    private Map<String, Integer> invariantName2Id = Maps.newHashMap();
 
-    private List<Integer> userFieldHashSize;
     private FieldType fieldType;
 
     private InputVector fingerVec;
-    private InputVector sortedFingerVec;
     private InputVector globalIDVec;
-    private InputVector sortedGlobalIDVec;
 
     @Getter
     private List<InputVector> userToInvariant;
@@ -42,9 +35,8 @@ public class UserMetaFieldRS implements MetaFieldRS{
     //  only populated once when getString is called to retrieve from valueVec
     private Map<Integer, Integer> id2offset;
 
-    public UserMetaFieldRS(Charset charset, List<Integer> invariantFields, Map<String, Integer> invariantName2Id) {
+    public UserMetaFieldRS(Charset charset, Map<String, Integer> invariantName2Id) {
         this.charset = checkNotNull(charset);
-        this.invariantFields=invariantFields;
         this.invariantName2Id=invariantName2Id;
     }
 
@@ -61,11 +53,6 @@ public class UserMetaFieldRS implements MetaFieldRS{
 
     public int find(int hash) {
         return this.fingerVec.find(hash);
-    }
-
-    public int findInvariantHash(int globalID) {
-        int fingerIdx = this.sortedGlobalIDVec.find(globalID);
-        return this.sortedFingerVec.get(fingerIdx);
     }
 
     @Override
@@ -100,9 +87,7 @@ public class UserMetaFieldRS implements MetaFieldRS{
     public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
         this.fieldType = fieldType;
         this.fingerVec = InputVectorFactory.readFrom(buffer);
-        this.sortedFingerVec=InputVectorFactory.readFrom(buffer);
         this.globalIDVec = InputVectorFactory.readFrom(buffer);
-        this.sortedGlobalIDVec=InputVectorFactory.readFrom(buffer);
         this.userToInvariant=new ArrayList<>(this.invariantName2Id.size());
         for(int i=0;i<this.invariantName2Id.size();i++)
         {
@@ -124,5 +109,19 @@ public class UserMetaFieldRS implements MetaFieldRS{
             ret[this.globalIDVec.get(i)] = strlist.getString(i, this.charset);
         }
         return ret;
+    }
+    public int[] getInvariantGidMap(String invariantFieldName){
+        int[] ret = new int[this.count()];
+        int invariantFiledIndex=this.invariantName2Id.get(invariantFieldName)-1;
+        InputVector invariantVector = this.userToInvariant.get(invariantFiledIndex);
+        for(int i = 0; i < ret.length; i++){
+            ret[this.globalIDVec.get(i)] = invariantVector.get(i);
+        }
+        return ret;
+
+    }
+
+    public Set<String> getInvariantName(){
+        return this.invariantName2Id.keySet();
     }
 }

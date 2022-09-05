@@ -108,7 +108,7 @@ public class ChunkRS implements Input {
     int fieldIndex=0;
     for (int i = 0; i < schema.getFields().size(); i++) {
       // System.out.println("Reading data chunk's field ="+i+".....");
-      if(schema.getInvariantFields().contains(i)){
+      if(schema.getInvariantName2Id().containsValue(i)){
         continue;
       }
       buffer.position(fieldOffsets[fieldIndex]);

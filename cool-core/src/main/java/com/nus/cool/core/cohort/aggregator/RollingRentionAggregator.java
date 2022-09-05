@@ -134,14 +134,4 @@ public class RollingRentionAggregator implements EventAggregator{
 								   TimeUnit unit, FieldFilter ageFilter, InputVector filedValue, Map<Integer, List<Double>> ageMetrics){
 		// TODO Auto-generated method stub
 	}
-
-	@Override
-	public void ageAggregateMetirc(BitSet bv, InputVector valueVector, int birthDate, int ageOff, int end, int ageInterval, TimeUnit unit, FieldFilter ageFieldFilter, int totalUsers, InputVector fieldIn, Map<Integer, List<Double>> cohortCells) {
-
-	}
-
-	@Override
-	public Double birthAggregate(List<Integer> offset, int userIndex) {
-		return null;
-	}
 }

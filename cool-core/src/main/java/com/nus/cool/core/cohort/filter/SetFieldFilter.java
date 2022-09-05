@@ -26,6 +26,7 @@ import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.ArrayUtil;
+import com.rabinhash.RabinHashFunction32;
 import java.util.BitSet;
 import java.util.List;
 
@@ -68,6 +69,8 @@ public class SetFieldFilter implements FieldFilter {
   private ExtendedFieldSet fieldSet;
 
   private FieldType fieldType;
+
+  private static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
   public SetFieldFilter(ExtendedFieldSet set, List<String> values, FieldType fieldType) {
     this.fieldSet = set;
@@ -150,11 +153,17 @@ public class SetFieldFilter implements FieldFilter {
     return bHit || (this.values.isEmpty());
   }
 
+  /**
+   * Indicate whether the invariant field is eligible i.e. whether we can find eligible values in the invariant field
+   * @param inputVector the vector of invariant data to be checked
+   * @return false indicates the invariant field is not eligible and true indicates the invariant field is eligible
+   */
   @Override
   public boolean accept(InputVector inputVector) {
     if(this.isAll) return true;
-    for(int i =0;i<inputVector.size();i++){
-      if(inputVector.find(this.contentIDs[i])>=0){
+    boolean flag=false;
+    for(int i =0;i<this.values.size();i++){
+      if(inputVector.find(rhash.hash(this.values.get(i)))>=0){
         return true;
       }
     }

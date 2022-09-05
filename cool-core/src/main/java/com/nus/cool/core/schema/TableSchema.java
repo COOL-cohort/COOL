@@ -58,20 +58,13 @@ public class TableSchema {
   @Getter
   private int userKeyField = -1;
 
-  @Getter
   private List<Integer> invariantFields = new ArrayList<>();
 
   @Getter
   private Map<String, Integer> invariantName2Id = Maps.newHashMap();
 
   @Getter
-  private Map<Integer,String> invariantId2Name = Maps.newHashMap();
-
-  @Getter
   private Map<String, Integer> dataChunkFieldName2Id = Maps.newHashMap();
-
-  @Getter
-  private Map<Integer, Integer> fieldID2dataChunkFieldId = Maps.newHashMap();
 
   @Getter
   private List<FieldType>invariantType=new ArrayList<>();
@@ -122,19 +115,19 @@ public class TableSchema {
   public void setFields(List<FieldSchema> fields) {
     this.fields = fields;
     this.name2Id.clear();
+    int invariantFieldSize=0;
     for (int i = 0; i < fields.size(); i++) {
       FieldSchema field = fields.get(i);
       FieldType fieldType = field.getFieldType();
       boolean invariantField=field.isInvariantField();
       if(invariantField) {
+        invariantFieldSize++;
         this.invariantFields.add(i);
-        invariantName2Id.put(field.getName(),this.invariantFields.size());
-        invariantId2Name.put(this.invariantFields.size(),field.getName());
+        invariantName2Id.put(field.getName(),invariantFieldSize);
         this.invariantType.add(fieldType);
       }
       else{
         this.dataChunkFieldName2Id.put(field.getName(),this.dataChunkFieldName2Id.size());
-        this.fieldID2dataChunkFieldId.put(i,this.dataChunkFieldName2Id.size()-1);
       }
       this.name2Id.put(field.getName(), i);
       switch (fieldType) {
@@ -217,5 +210,9 @@ public class TableSchema {
 
   public FieldSchema getFieldSchema(String name) {
     return getFieldSchema(getFieldID(name));
+  }
+
+  public List<Integer> getInvariantFields(){
+    return this.invariantFields;
   }
 }
