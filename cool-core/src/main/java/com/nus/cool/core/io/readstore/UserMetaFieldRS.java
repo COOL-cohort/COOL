@@ -13,7 +13,6 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 import lombok.Getter;
-import lombok.Setter;
 
 public class UserMetaFieldRS implements MetaFieldRS{
     private static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;

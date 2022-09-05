@@ -19,7 +19,6 @@
 package com.nus.cool.core.cohort.filter;
 
 import com.nus.cool.core.schema.FieldSchema;
-import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.converter.StringIntConverter;
 import com.nus.cool.core.cohort.ExtendedFieldSet;

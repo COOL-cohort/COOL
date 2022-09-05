@@ -161,7 +161,6 @@ public class SetFieldFilter implements FieldFilter {
   @Override
   public boolean accept(InputVector inputVector) {
     if(this.isAll) return true;
-    boolean flag=false;
     for(int i =0;i<this.values.size();i++){
       if(inputVector.find(rhash.hash(this.values.get(i)))>=0){
         return true;

@@ -16,7 +16,6 @@ import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.valueSelect.ValueSelection;
 import com.nus.cool.core.io.readstore.*;
-import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;

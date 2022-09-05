@@ -25,14 +25,14 @@ import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.schema.TableSchema;
 import com.rabinhash.RabinHashFunction32;
-import lombok.Getter;
 
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

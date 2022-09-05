@@ -32,7 +32,6 @@ import lombok.Getter;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Range MetaField write store

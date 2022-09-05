@@ -23,7 +23,10 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BirthSumAggregator is used to aggregate the cohort results

@@ -19,7 +19,6 @@
 package com.nus.cool.core.cohort.aggregator;
 
 import java.util.BitSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 

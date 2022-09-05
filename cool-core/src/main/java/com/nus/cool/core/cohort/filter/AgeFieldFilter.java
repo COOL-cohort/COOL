@@ -32,7 +32,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class AgeFieldFilter implements FieldFilter {
 	
 	private final int minAge;
-	private FieldType fieldType;
 	
 	private final int maxAge;
 	

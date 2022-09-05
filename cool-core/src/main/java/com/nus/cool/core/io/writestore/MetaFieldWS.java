@@ -21,10 +21,6 @@ package com.nus.cool.core.io.writestore;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.FieldType;
 
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.List;
-
 public interface MetaFieldWS extends Output {
 
   /**
