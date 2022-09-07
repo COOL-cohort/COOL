@@ -52,23 +52,23 @@ import java.util.stream.Collectors;
  */
 public class MetaHashFieldWS implements MetaFieldWS {
 
-    private final Charset charset;
-    private final FieldType fieldType;
-    private final OutputCompressor compressor;
-    private final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
+    protected final Charset charset;
+    protected final FieldType fieldType;
+    protected final OutputCompressor compressor;
+    protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
     /**
      * Global hashToTerm, keys are hashed by the indexed string
      */
 
     // hash of one tuple field : Term {origin value of tuple filed, global ID. }
-    private final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
+    protected final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
 
     // store keys of hashToTerm
-    private final List<Integer> gidToHash = new ArrayList<>();
+    protected final List<Integer> gidToHash = new ArrayList<>();
 
     // global id
-    private int nextGid = 0;
+    protected int nextGid = 0;
 
     public MetaHashFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
         this.fieldType = type;

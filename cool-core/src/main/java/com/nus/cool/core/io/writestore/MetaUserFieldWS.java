@@ -25,7 +25,6 @@ import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
-import com.rabinhash.RabinHashFunction32;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -33,51 +32,32 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
- * Hash MetaField write store
+ * User MetaField write store
  * <p>
- * Hash MetaField layout
- * ---------------------------------------
- * | finger codec | fingers | value data |
- * ---------------------------------------
+ * User MetaField layout
+ * -------------------------------------------------------------------
+ * | finger codec | fingers | mapping of invariant data | value data |
+ * -------------------------------------------------------------------
  * <p>
- * if fieldType == AppId, we do NOT store values
+ * invariant data layout
+ * -------------------------------------------------------------
+ * | invariant field 1 | invariant field 2 | invariant field 3 |
+ * -------------------------------------------------------------
  * <p>
  * value data layout
  * --------------------------------------------------
  * | #values | value codec | value offsets | values |
  * --------------------------------------------------
  */
-public class MetaUserFieldWS implements MetaFieldWS {
-
-    private final Charset charset;
-    private final FieldType fieldType;
-    private final OutputCompressor compressor;
-    private final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
-
-    /**
-     * Global hashToTerm, keys are hashed by the indexed string
-     */
-
-    // hash of one tuple field : Term {origin value of tuple filed, global ID. }
-    private final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
-
-    // store keys of hashToTerm
-    private final List<Integer> gidToHash = new ArrayList<>();
+public class MetaUserFieldWS extends MetaHashFieldWS {
 
     private Map<Integer, List<Object>> userToInvariant = Maps.newTreeMap();
-    // global id
-    private int nextGid = 0;
-
     private int invatiantSize;
 
-
     public MetaUserFieldWS(FieldType type, Charset charset, OutputCompressor compressor, int invatiantSize) {
-        this.fieldType = type;
-        this.charset = charset;
-        this.compressor = compressor;
+        super(type, charset, compressor);
         this.invatiantSize=invatiantSize;
     }
 
@@ -99,33 +79,6 @@ public class MetaUserFieldWS implements MetaFieldWS {
                     this.userToInvariant.get(hashKey).add(invariantHashKey);
                 }
             }
-        }
-    }
-
-    @Override
-    public int find(String v) {
-        // TODO: Need to handle the case where v is null
-        int fp = this.rhash.hash(v);
-        return this.hashToTerm.containsKey(fp) ? this.hashToTerm.get(fp).globalId : -1;
-    }
-
-    @Override
-    public int count() {
-        return this.hashToTerm.size();
-    }
-
-    @Override
-    public FieldType getFieldType() {
-        return this.fieldType;
-    }
-
-    @Override
-    public void complete() {
-        int gID = 0;
-        // Set globalIDs
-        for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-            // temp fix to not delete complete logic, while preserving correctness of using update.
-            if (en.getValue().globalId == 0) en.getValue().globalId = gID++;
         }
     }
 
@@ -171,6 +124,7 @@ public class MetaUserFieldWS implements MetaFieldWS {
         this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
         bytesWritten += this.compressor.writeTo(out);
 
+        // mapping of user and it's invariant data
         for (int j = 0; j < this.invatiantSize; j++) {
             int[] userCorrespondingInvariant = new int[this.hashToTerm.size()];
             int index = 0;
@@ -218,41 +172,5 @@ public class MetaUserFieldWS implements MetaFieldWS {
             }
         }
         return bytesWritten;
-    }
-
-    @Override
-    public String toString() {
-        return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
-    }
-
-    @Override
-    public void put(String v) {
-
-    }
-
-    @Override
-    public void update(String tuple) {
-        throw new UnsupportedOperationException("Doesn't support update now");
-    }
-
-    /**
-     * Convert string to globalIDs
-     */
-    public static class Term {
-
-        // the real value in each row of the csv file
-        String term;
-        // assigned global ID.
-        int globalId;
-
-        public Term(String term, int globalId) {
-            this.term = term;
-            this.globalId = globalId;
-        }
-
-        @Override
-        public String toString() {
-            return "{term: " + term + ", globalId: " + globalId + "}";
-        }
     }
 }
