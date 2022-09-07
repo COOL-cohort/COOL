@@ -34,6 +34,7 @@ import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 
 import lombok.Getter;
+import com.nus.cool.core.cohort.refactor.filter.Filter;
 
 public class CohortProcessor {
 
