@@ -1,10 +1,13 @@
 package com.nus.cool.core.cohort.refactor.storage;
 
+import lombok.Getter;
+
 /**
  * represent a range from left to right
  * [left, right)
  */
 public class Scope {
+    @Getter
     private Integer left, right;
 
     public Scope(Integer l, Integer r){
@@ -14,7 +17,11 @@ public class Scope {
 
     public Boolean IsInScope(Integer i){
         return i < this.right && i >= this.left;
-    }  
+    }
+
+    public Boolean IsIntersection(Scope scope){
+        return !(scope.getLeft() >= this.right || scope.getRight() <= this.left);
+    }
 
 
     @Override

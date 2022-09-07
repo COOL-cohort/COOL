@@ -1,5 +1,7 @@
 package com.nus.cool.core.cohort.refactor.filter;
 
+import com.nus.cool.core.cohort.refactor.storage.Scope;
+
 import java.util.BitSet;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public interface Filter {
      * @param values the batch of input value to check
      * @return List of bool stored in BitSet
      */
-    public BitSet accpet(List<String> values) throws RuntimeException;
+    public BitSet accept(String[] values) throws RuntimeException;
     
     /**
      * Range Filter implements this function 
@@ -35,6 +37,13 @@ public interface Filter {
      * @return List of bool stored in BitSet
      */
     public BitSet accept(List<Integer> values) throws RuntimeException;
+
+    /**
+     * Range Filter implements this function
+     * @param values Scope of time_min-time_max
+     * @return List of bool stored in BitSet
+     */
+    public BitSet accept(Scope values) throws RuntimeException;
 
     /**
      * @return the type of Filter

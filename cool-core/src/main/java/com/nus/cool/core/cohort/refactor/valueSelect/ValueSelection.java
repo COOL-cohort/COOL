@@ -10,11 +10,12 @@ import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
-
+import lombok.Getter;
 
 
 public class ValueSelection {
 
+    @Getter
     private List<Filter> filterList;
 
 
