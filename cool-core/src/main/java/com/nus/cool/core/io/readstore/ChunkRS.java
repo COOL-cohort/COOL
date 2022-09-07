@@ -20,6 +20,7 @@ package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
+import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import java.nio.ByteBuffer;
 
@@ -62,8 +63,7 @@ public class ChunkRS implements Input {
 
 
   private int[] fieldOffsets;
- 
-  
+
   private TableSchema schema;
 
   public ChunkRS(TableSchema schema) {
@@ -105,10 +105,15 @@ public class ChunkRS implements Input {
      */
 
     this.fields = new FieldRS[fields];
-    for (int i = 0; i < fields; i++) {
+    int fieldIndex=0;
+    for (int i = 0; i < schema.getFields().size(); i++) {
       // System.out.println("Reading data chunk's field ="+i+".....");
-      buffer.position(fieldOffsets[i]);
-      this.fields[i] = FieldRS.ReadFieldRS(buffer,this.schema.getField(i).getFieldType());
+      if(schema.isInvariantField(i)){
+        continue;
+      }
+      buffer.position(fieldOffsets[fieldIndex]);
+
+      this.fields[fieldIndex++] = FieldRS.ReadFieldRS(buffer, this.schema.getField(i).getFieldType());
     }
   }
 
@@ -123,7 +128,18 @@ public class ChunkRS implements Input {
   }
 
   public FieldRS getField(String fieldName) {
-    return getField(schema.getFieldID(fieldName));
+    return getField(schema.getDataChunkFieldID(fieldName));
   }
 
+  public boolean isInvariantFieldByName(String name){
+    return this.schema.isInvariantField(name);
+  }
+
+  public String getUserFieldName(){
+    return this.schema.getField(this.schema.getUserKeyField()).getName();
+  }
+
+  public FieldType getFieldTypeByName(String name){
+    return this.schema.getFieldType(name);
+  }
 }

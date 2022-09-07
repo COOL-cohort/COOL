@@ -47,6 +47,8 @@ public class FieldSchema {
 
   private boolean preCal;
 
+  private boolean invariantField;
+
   // /**
   //  * @return the aggregator
   //  */

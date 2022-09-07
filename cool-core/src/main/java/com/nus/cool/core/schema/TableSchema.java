@@ -26,8 +26,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -57,6 +60,16 @@ public class TableSchema {
   @Getter
   private int userKeyField = -1;
 
+  @Getter
+  private List<Integer> invariantFields = new ArrayList<>();
+
+  private Map<String, Integer> invariantName2Id = Maps.newHashMap();
+
+  private Map<String, Integer> dataChunkFieldName2Id = Maps.newHashMap();
+
+  @Getter
+  private List<FieldType>invariantType=new ArrayList<>();
+
   /**
    * AppKeyField index, assign -1 if this field type not exist.
    */
@@ -74,6 +87,9 @@ public class TableSchema {
    */
   @Getter
   private int actionTimeField = -1;
+
+  @Getter
+  private int actionTimeMetaField=-1;
 
   /**
    * Obtain the content of a table from input stream
@@ -100,22 +116,34 @@ public class TableSchema {
   public void setFields(List<FieldSchema> fields) {
     this.fields = fields;
     this.name2Id.clear();
+    int invariantFieldSize=0;
     for (int i = 0; i < fields.size(); i++) {
       FieldSchema field = fields.get(i);
       FieldType fieldType = field.getFieldType();
+      boolean invariantField=field.isInvariantField();
+      if(invariantField) {
+        invariantFieldSize++;
+        this.invariantFields.add(i);
+        invariantName2Id.put(field.getName(),invariantFieldSize);
+        this.invariantType.add(fieldType);
+      }
+      else{
+        this.dataChunkFieldName2Id.put(field.getName(),this.dataChunkFieldName2Id.size());
+      }
       this.name2Id.put(field.getName(), i);
       switch (fieldType) {
         case AppKey:
-          this.appKeyField = i;
+          this.appKeyField = this.dataChunkFieldName2Id.get(field.getName());
           break;
         case UserKey:
-          this.userKeyField = i;
+          this.userKeyField = this.dataChunkFieldName2Id.get(field.getName());
           break;
         case Action:
-          this.actionField = i;
+          this.actionField = this.dataChunkFieldName2Id.get(field.getName());
           break;
         case ActionTime:
-          this.actionTimeField = i;
+          this.actionTimeField = this.dataChunkFieldName2Id.get(field.getName());
+          this.actionTimeMetaField=i;
           break;
         default:
           break;
@@ -183,5 +211,27 @@ public class TableSchema {
 
   public FieldSchema getFieldSchema(String name) {
     return getFieldSchema(getFieldID(name));
+  }
+
+  public int getInvariantSize(){return this.invariantName2Id.size();}
+
+  public boolean isInvariantField(String fieldName){
+    return this.invariantName2Id.containsKey(fieldName);
+  }
+
+  public boolean isInvariantField(int fieldIndex){
+    return this.invariantFields.contains(fieldIndex);
+  }
+
+  public int getDataChunkFieldID(String name){
+    return this.dataChunkFieldName2Id.get(name);
+  }
+
+  public Set<String> getInvariantNames(){
+    return this.invariantName2Id.keySet();
+  }
+
+  public int getInvariantIDFromName(String name){
+    return this.invariantName2Id.get(name);
   }
 }

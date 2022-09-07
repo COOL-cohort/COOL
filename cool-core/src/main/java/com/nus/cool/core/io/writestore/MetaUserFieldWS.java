@@ -25,7 +25,6 @@ import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
-import com.rabinhash.RabinHashFunction32;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -33,86 +32,56 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
- * Hash MetaField write store
+ * User MetaField write store
  * <p>
- * Hash MetaField layout
- * ---------------------------------------
- * | finger codec | fingers | value data |
- * ---------------------------------------
+ * User MetaField layout
+ * -------------------------------------------------------------------
+ * | finger codec | fingers | mapping of invariant data | value data |
+ * -------------------------------------------------------------------
  * <p>
- * if fieldType == AppId, we do NOT store values
+ * invariant data layout
+ * -------------------------------------------------------------
+ * | invariant field 1 | invariant field 2 | invariant field 3 |
+ * -------------------------------------------------------------
  * <p>
  * value data layout
  * --------------------------------------------------
  * | #values | value codec | value offsets | values |
  * --------------------------------------------------
  */
-public class MetaHashFieldWS implements MetaFieldWS {
+public class MetaUserFieldWS extends MetaHashFieldWS {
 
-    protected final Charset charset;
-    protected final FieldType fieldType;
-    protected final OutputCompressor compressor;
-    protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
+    private Map<Integer, List<Object>> userToInvariant = Maps.newTreeMap();
+    private int invatiantSize;
 
-    /**
-     * Global hashToTerm, keys are hashed by the indexed string
-     */
-
-    // hash of one tuple field : Term {origin value of tuple filed, global ID. }
-    protected final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
-
-    // store keys of hashToTerm
-    protected final List<Integer> gidToHash = new ArrayList<>();
-
-    // global id
-    protected int nextGid = 0;
-
-    public MetaHashFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
-        this.fieldType = type;
-        this.charset = charset;
-        this.compressor = compressor;
+    public MetaUserFieldWS(FieldType type, Charset charset, OutputCompressor compressor, int invatiantSize) {
+        super(type, charset, compressor);
+        this.invatiantSize=invatiantSize;
     }
 
-    @Override
-    public void put(String tupleValue) {
-        int hashKey = rhash.hash(tupleValue);
+    public void put(String[] tupleValue, List<FieldType> invariantType) {
+        int hashKey = rhash.hash(tupleValue[0]);
         if (!this.hashToTerm.containsKey(hashKey)) {
-            this.hashToTerm.put(hashKey, new Term(tupleValue, nextGid++));
+            this.hashToTerm.put(hashKey, new Term(tupleValue[0], nextGid++));
             this.gidToHash.add(hashKey);
         }
-    }
-
-    @Override
-    public int find(String v) {
-        // TODO: Need to handle the case where v is null
-        int fp = this.rhash.hash(v);
-        return this.hashToTerm.containsKey(fp) ? this.hashToTerm.get(fp).globalId : -1;
-    }
-
-    @Override
-    public int count() {
-        return this.hashToTerm.size();
-    }
-
-    @Override
-    public FieldType getFieldType() {
-        return this.fieldType;
-    }
-
-    @Override
-    public void complete() {
-        int gID = 0;
-        // Set globalIDs
-        for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-            // temp fix to not delete complete logic, while preserving correctness of using update.
-            if (en.getValue().globalId == 0) en.getValue().globalId = gID++;
+        if (tupleValue.length == 1) return;
+        else {
+            this.userToInvariant.put(hashKey, new ArrayList<>());
+            int invariantSize = tupleValue.length - 1;
+            for (int i = 0; i < invariantSize; i++) {
+                if (invariantType.get(i) == FieldType.ActionTime || invariantType.get(i) == FieldType.Metric) {
+                    this.userToInvariant.get(hashKey).add(Integer.parseInt(tupleValue[i + 1]));
+                } else {
+                    int invariantHashKey = rhash.hash(tupleValue[i + 1]);
+                    this.userToInvariant.get(hashKey).add(invariantHashKey);
+                }
+            }
         }
     }
 
-    @Override
     public int writeTo(DataOutput out) throws IOException {
         int bytesWritten = 0;
 
@@ -125,7 +94,8 @@ public class MetaHashFieldWS implements MetaFieldWS {
         int i = 0;
         for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
             globalIDs[i] = en.getValue().globalId;
-            fingers[i++] = en.getKey();
+            fingers[i] = en.getKey();
+            i++;
         }
 
         // generate finger bytes
@@ -142,6 +112,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
         // Actually data is not compressed here
         bytesWritten += this.compressor.writeTo(out);
 
+
         // generate globalID bytes
         hist = Histogram.builder()
                 .min(0)
@@ -153,12 +124,31 @@ public class MetaHashFieldWS implements MetaFieldWS {
         this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
         bytesWritten += this.compressor.writeTo(out);
 
+        // mapping of user and it's invariant data
+        for (int j = 0; j < this.invatiantSize; j++) {
+            int[] userCorrespondingInvariant = new int[this.hashToTerm.size()];
+            int index = 0;
+            for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
+                userCorrespondingInvariant[index++] = (int) this.userToInvariant.get(en.getKey()).get(j);
+            }
+            hist = Histogram.builder()
+                    .min(0)
+                    .max(this.hashToTerm.size())
+                    .numOfValues(userCorrespondingInvariant.length)
+                    .rawSize(Ints.BYTES * userCorrespondingInvariant.length)
+                    .type(CompressType.KeyFinger)
+                    .build();
+            this.compressor.reset(hist, userCorrespondingInvariant, 0, userCorrespondingInvariant.length);
+            bytesWritten += this.compressor.writeTo(out);
+        }
+
+
         // Write values
         if (this.fieldType == FieldType.Segment || this.fieldType == FieldType.Action
                 || this.fieldType == FieldType.UserKey) {
             try (DataOutputBuffer buffer = new DataOutputBuffer()) {
-                // Store offsets into the buffer first
                 buffer.writeInt(this.hashToTerm.size());
+                // Store offsets into the buffer first
                 // Value offsets begin with 0
                 int off = 0;
                 for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
@@ -182,37 +172,5 @@ public class MetaHashFieldWS implements MetaFieldWS {
             }
         }
         return bytesWritten;
-    }
-
-
-    @Override
-    public String toString() {
-        return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
-    }
-
-    @Override
-    public void update(String tuple) {
-        throw new UnsupportedOperationException("Doesn't support update now");
-    }
-
-    /**
-     * Convert string to globalIDs
-     */
-    public static class Term {
-
-        // the real value in each row of the csv file
-        String term;
-        // assigned global ID.
-        int globalId;
-
-        public Term(String term, int globalId) {
-            this.term = term;
-            this.globalId = globalId;
-        }
-
-        @Override
-        public String toString() {
-            return "{term: " + term + ", globalId: " + globalId + "}";
-        }
     }
 }

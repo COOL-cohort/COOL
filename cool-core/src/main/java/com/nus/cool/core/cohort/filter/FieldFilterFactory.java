@@ -40,11 +40,11 @@ public class FieldFilterFactory {
       case UserKey:
       case Segment:
       case Action:
-        return new SetFieldFilter(fieldSet, values);
+        return new SetFieldFilter(fieldSet, values, schema.getFieldType());
       case ActionTime:
-        return new RangeFieldFilter(fieldSet, values, new DayIntConverter());
+        return new RangeFieldFilter(fieldSet, values, new DayIntConverter(),schema.getFieldType());
       case Metric:
-        return new RangeFieldFilter(fieldSet, values, new StringIntConverter());
+        return new RangeFieldFilter(fieldSet, values, new StringIntConverter(),schema.getFieldType());
       default:
         throw new IllegalArgumentException("Unsupported field type: " + schema.getFieldType());
     }

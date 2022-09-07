@@ -26,6 +26,7 @@ import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.ArrayUtil;
 import com.nus.cool.core.util.converter.NumericConverter;
 import com.nus.cool.core.util.parser.TupleParser;
@@ -70,18 +71,21 @@ public class RangeFieldFilter implements FieldFilter {
    */
   private ExtendedFieldSet fieldSet;
 
+  private FieldType fieldType;
+
   /**
    * Get the range of the field
    *
    * @param values the values of the conditions
    * @param converter the converter to convert the values to integer
    */
-  public RangeFieldFilter(ExtendedFieldSet fieldSet, List<String> values, NumericConverter converter) {
+  public RangeFieldFilter(ExtendedFieldSet fieldSet, List<String> values, NumericConverter converter, FieldType fieldType) {
     this.fieldSet = fieldSet;
     checkNotNull(values);
     checkArgument(!values.isEmpty());
     this.minValues = new int[values.size()];
     this.maxValues = new int[values.size()];
+    this.fieldType=fieldType;
 
     TupleParser parser = new VerticalTupleParser();
     for (int i = 0; i < values.size(); i++) {
@@ -139,6 +143,22 @@ public class RangeFieldFilter implements FieldFilter {
 
 
   /**
+   * Indicate whether the invariant field is eligible i.e. whether we can find eligible values in the invariant field
+   * @param inputVector the vector of invariant data to be checked
+   * @return false indicates the invariant field is not eligible and true indicates the invariant field is eligible
+   */
+  @Override
+  public boolean accept(InputVector inputVector) {
+    for(int i =0;i<inputVector.size();i++){
+      if(inputVector.get(i)<this.max && inputVector.get(i)>this.min){
+        return true;
+      }
+    }
+    return false;
+  }
+
+
+  /**
    * Indicate whether the integer v is eligible
    * 
    * @param v the integer to be checked
@@ -185,6 +205,11 @@ public class RangeFieldFilter implements FieldFilter {
     chunkValues.skipTo(start);
     while(start < to && !accept(chunkValues.next())) ++start;
     return start;
+  }
+
+  @Override
+  public FieldType getFieldType() {
+    return fieldType;
   }
 
 }

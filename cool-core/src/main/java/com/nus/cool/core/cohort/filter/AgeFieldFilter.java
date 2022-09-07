@@ -22,6 +22,8 @@ package com.nus.cool.core.cohort.filter;
 import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldType;
 
 import java.util.List;
 
@@ -61,6 +63,11 @@ public class AgeFieldFilter implements FieldFilter {
 	}
 
 	@Override
+	public boolean accept(InputVector inputVector) {
+		return true;
+	}
+
+	@Override
 	public boolean accept(int v) {
 		return (v >= minAge && v <= maxAge);
 	}
@@ -85,6 +92,9 @@ public class AgeFieldFilter implements FieldFilter {
 		throw new UnsupportedOperationException();
 	}
 
-
+	@Override
+	public FieldType getFieldType() {
+		return fieldType;
+	}
 
 }

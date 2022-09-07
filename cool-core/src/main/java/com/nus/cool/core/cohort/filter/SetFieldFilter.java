@@ -24,7 +24,9 @@ import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.ArrayUtil;
+import com.rabinhash.RabinHashFunction32;
 import java.util.BitSet;
 import java.util.List;
 
@@ -66,11 +68,16 @@ public class SetFieldFilter implements FieldFilter {
    */
   private ExtendedFieldSet fieldSet;
 
-  public SetFieldFilter(ExtendedFieldSet set, List<String> values) {
+  private FieldType fieldType;
+
+  private static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
+
+  public SetFieldFilter(ExtendedFieldSet set, List<String> values, FieldType fieldType) {
     this.fieldSet = set;
     this.values = checkNotNull(values);
     this.isAll = this.values.contains("ALL");
     this.contentIDs = this.isAll ? new int[2] : new int[values.size()];
+    this.fieldType=fieldType;
   }
 
   /**
@@ -147,6 +154,22 @@ public class SetFieldFilter implements FieldFilter {
   }
 
   /**
+   * Indicate whether the invariant field is eligible i.e. whether we can find eligible values in the invariant field
+   * @param inputVector the vector of invariant data to be checked
+   * @return false indicates the invariant field is not eligible and true indicates the invariant field is eligible
+   */
+  @Override
+  public boolean accept(InputVector inputVector) {
+    if(this.isAll) return true;
+    for(int i =0;i<this.values.size();i++){
+      if(inputVector.find(rhash.hash(this.values.get(i)))>=0){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Indicate whether the integer is eligible
    * 
    * @param v the integer to be checked
@@ -186,6 +209,11 @@ public class SetFieldFilter implements FieldFilter {
     chunkValues.skipTo(start);
     while(start < to && !accept(chunkValues.next())) ++start;
     return start;
+  }
+
+  @Override
+  public FieldType getFieldType() {
+    return fieldType;
   }
 
 }

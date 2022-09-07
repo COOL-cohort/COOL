@@ -32,21 +32,21 @@ import java.util.Map;
 
 public class HashMetaFieldRS implements MetaFieldRS {
 
-  private static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
+  protected static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
-  private Charset charset;
+  protected Charset charset;
 
-  private FieldType fieldType;
+  protected FieldType fieldType;
 
-  private InputVector fingerVec;
+  protected InputVector fingerVec;
 
-  private InputVector globalIDVec;
+  protected InputVector globalIDVec;
 
-  private InputVector valueVec;
+  protected InputVector valueVec;
 
   // inverse map from global id to the offset in values.
   //  only populated once when getString is called to retrieve from valueVec
-  private Map<Integer, Integer> id2offset;
+  protected Map<Integer, Integer> id2offset;
 
   public HashMetaFieldRS(Charset charset) {
     this.charset = checkNotNull(charset);
@@ -107,7 +107,6 @@ public class HashMetaFieldRS implements MetaFieldRS {
     FieldType fieldType = FieldType.fromInteger(buffer.get());
     this.readFromWithFieldType(buffer, fieldType);
   }
-
 
   public String[] getGidMap(){
     // Can store it and reuse ret (suggestion)

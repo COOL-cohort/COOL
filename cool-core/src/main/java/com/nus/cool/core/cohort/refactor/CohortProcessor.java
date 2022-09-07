@@ -3,7 +3,10 @@ package com.nus.cool.core.cohort.refactor;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,13 +15,20 @@ import com.nus.cool.core.cohort.refactor.birthSelect.BirthSelection;
 import com.nus.cool.core.cohort.refactor.birthSelect.EventSelection;
 import com.nus.cool.core.cohort.refactor.cohortSelect.CohortSelector;
 import com.nus.cool.core.cohort.refactor.filter.FilterType;
+import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.valueSelect.ValueSelection;
-import com.nus.cool.core.io.readstore.*;
+import com.nus.cool.core.io.readstore.ChunkRS;
+import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.core.io.readstore.CubletRS;
+import com.nus.cool.core.io.readstore.HashMetaFieldRS;
+import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.readstore.UserMetaFieldRS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
@@ -47,7 +57,7 @@ public class CohortProcessor {
     private String UserIdSchema;
 
     private String ActionTimeSchema;
-    
+
     private final HashSet<String> projectedSchemaSet;
 
     public CohortProcessor(CohortQueryLayout layout){
@@ -62,14 +72,14 @@ public class CohortProcessor {
         this.result =  new CohortRet(layout.getAgetSelectionLayout());
     }
 
-   
+
     /**
      * Public interface, Scan whole table and return CohortResult
-     * 
+     *
      * @param cube
      * @return CohortRet
      */
-    public CohortRet process(CubeRS cube) throws Exception {
+    public CohortRet process(CubeRS cube) throws IOException {
         // initialize the UserId and KeyId
         TableSchema tableschema = cube.getSchema();
         for(FieldSchema fieldSchema : tableschema.getFields()){
@@ -91,7 +101,7 @@ public class CohortProcessor {
 
     /**
      * Process one Cublet
-     * 
+     *
      * @param cublet
      */
     private void processCublet(CubletRS cublet) {
@@ -102,11 +112,18 @@ public class CohortProcessor {
         // for Hash Value, Maintain HashMap<Schema, String[]>, the String[] is gid ->
         // True Value
         HashMap<String, String[]> gidMapBySchema = new HashMap<>();
+        HashMap<String, int[]> invariantGidMap = new HashMap<>();
 
         // we only get used schema;
+        UserMetaFieldRS userMetaField;
         for (String schema : this.projectedSchemaSet) {
             MetaFieldRS metaField = metaChunk.getMetaField(schema);
-            if (FieldType.IsHashType(metaField.getFieldType())) {
+            if(metaField.getFieldType()==FieldType.UserKey){
+                userMetaField=(UserMetaFieldRS) metaField;
+                gidMapBySchema.put(schema,userMetaField.getGidMap());
+                invariantGidMap=loadInvariantGidMaps(userMetaField);
+            }
+            else if (FieldType.IsHashType(metaField.getFieldType())) {
                 gidMapBySchema.put(schema, ((HashMetaFieldRS) metaField).getGidMap());
             }
         }
@@ -118,24 +135,55 @@ public class CohortProcessor {
         // Now start to pass the DataChunk
         for (ChunkRS chunk : cublet.getDataChunks()) {
             if (this.checkDataChunk(chunk)){
-                this.processDataChunk(chunk, gidMapBySchema);
+                this.processDataChunk(chunk, metaChunk, gidMapBySchema, invariantGidMap);
             }
         }
     }
 
+    public HashMap<String, int[]> loadInvariantGidMaps(UserMetaFieldRS userMetaField ){
+        HashMap<String, int[]> invariantRangeGidMap=new HashMap<>();
+        Set<String> invariantName=userMetaField.getInvariantName();
+        for( String invariantFieldName : invariantName){
+            invariantRangeGidMap.put(invariantFieldName,userMetaField.getInvariantGidMap(invariantFieldName));
+        }
+        return invariantRangeGidMap;
+    }
+
+
+
     /**
-     * In this section, we load the tuple which is a inner property.
-     * We left the process logic in procesTuple function.
-     * 
+     * In this section, we load the tuple which is an inner property.
+     * We left the process logic in processTuple function.
+     *
      * @param chunk dataChunk
+     * @param metaChunk metaChunk
      * @param hashMapperBySchema map of filedName: []value
+     * @param invariantGidMap map of invariant filedName: []value
      */
-    private void processDataChunk(ChunkRS chunk, HashMap<String, String[]> hashMapperBySchema) {
+    private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk, HashMap<String, String[]> hashMapperBySchema,
+                                  HashMap<String, int[]>invariantGidMap) {
         for (int i = 0; i < chunk.getRecords(); i++) {
             // load data into tuple
             for (String schema : this.projectedSchemaSet) {
                 // if the value is segment type, we should convert it to String from globalId
-                if(hashMapperBySchema.containsKey(schema)){
+                if(chunk.isInvariantFieldByName(schema)){
+                    // get the invariant schema from UserMetaField
+                    String idName=chunk.getUserFieldName();
+                    UserMetaFieldRS userMetaField = (UserMetaFieldRS) metaChunk.getMetaField(idName);
+                    int userGlobalId = chunk.getField(idName).getValueByIndex(i);
+
+                    if (FieldType.IsHashType(chunk.getFieldTypeByName(schema))){
+                        int hash=invariantGidMap.get(schema)[userGlobalId];
+                        int valueGlobalIDLocation= userMetaField.find(hash);
+                        String v =metaChunk.getMetaField(schema).getString(valueGlobalIDLocation);
+                        tuple.loadAttr(v,schema);
+                    }
+                    else{
+                        int v = invariantGidMap.get(schema)[userGlobalId];
+                        tuple.loadAttr(v, schema);
+                    }
+                }
+                else if(hashMapperBySchema.containsKey(schema)){
                     int globalId = chunk.getField(schema).getValueByIndex(i);
                     String v = hashMapperBySchema.get(schema)[globalId];
                     tuple.loadAttr(v, schema);
