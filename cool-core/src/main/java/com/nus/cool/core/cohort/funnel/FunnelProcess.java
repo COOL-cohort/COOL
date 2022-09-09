@@ -154,13 +154,17 @@ public class FunnelProcess implements CohortOperator {
 
         // TODO: later will dynamically determine the scan of cohort users:
         // either do a sequential scan or use the index 
-        
+
+        int beg;
+        int end;
+        ExtendedCohort cohort;
+
         while (userInput.hasNext()) {
 
             userInput.nextBlock(userBlock); // Next user RLE block
 
-            int beg = userBlock.off;
-            int end = userBlock.off + userBlock.len;
+            beg = userBlock.off;
+            end = userBlock.off + userBlock.len;
             
             if (this.cohortUsers != null) {
 				if (curUser != userKey.get(userBlock.value) && curUser >= 0)
@@ -174,7 +178,7 @@ public class FunnelProcess implements CohortOperator {
             totalUsers++;
             
             for (int i = 0; i < validStages && beg < end; i++) {
-            	ExtendedCohort cohort = sigma.get(i).selectUser(beg, end);
+            	cohort = sigma.get(i).selectUser(beg, end);
 
             	if (cohort == null)
             		break;
