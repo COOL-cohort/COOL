@@ -118,7 +118,6 @@ public class ExtendedCohortAggregation implements CohortOperator {
     @Override
     public void process(ChunkRS chunk) {
         totalDataChunks++;
-
         sigma.process(chunk);
         if (!sigma.isUserActiveChunk()) {
             totalSkippedDataChunks++;
@@ -180,7 +179,6 @@ public class ExtendedCohortAggregation implements CohortOperator {
                 totalSkippedUsers++;
                 continue;
             }
-
             Map<Integer, List<Double>> cohortCells = (Map<Integer, List<Double>>) cubletResults.get(cohort);
 
             // init a new cohort cell
@@ -209,10 +207,17 @@ public class ExtendedCohortAggregation implements CohortOperator {
                     ageDelimiter.clear(ageOff, end + 1);
                 }
                 else if (MetricAgeFilterName!=null){
+                    /*
                     InputVector fieldIn = chunk.getField(MetricAgeFilterName).getValueVector();
                     aggr.ageAggregateMetirc(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
                             query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
                             sigma.getAgeFieldFilter(), fieldIn, cohortCells);
+                     */
+                    aggr.ageAggregateMetirc(bv, actionTimeField.getValueVector(), cohort.getBirthDate(),
+                            ageOff, end, query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
+                            sigma.getAgeFieldFilter(), chunk.getField(MetricAgeFilterName).getValueVector(), cohortCells);
+
+
                 } else{
                     aggr.ageAggregate(bv, actionTimeField.getValueVector(), cohort.getBirthDate(), ageOff, end,
                             query.getAgeField().getAgeInterval(), query.getAgeField().getUnit(),
