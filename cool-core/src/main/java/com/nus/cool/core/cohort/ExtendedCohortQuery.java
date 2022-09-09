@@ -46,17 +46,17 @@ public class ExtendedCohortQuery {
 
         private List<String> range;
 
-        private boolean fillWithLastObserved = false;
+        // private boolean fillWithLastObserved = false;
 
         private boolean fillWithNextObserved = false;
 
-        public boolean isFillWithNextObserved() {
-            return fillWithNextObserved;
-        }
+        // public boolean isFillWithNextObserved() {
+        //     return fillWithNextObserved;
+        // }
 
-        public void setFillWithNextObserved(boolean fillWithNextObserved) {
-            this.fillWithNextObserved = fillWithNextObserved;
-        }
+        // public void setFillWithNextObserved(boolean fillWithNextObserved) {
+        //     this.fillWithNextObserved = fillWithNextObserved;
+        // }
     }
 
     private static final Log LOG = LogFactory.getLog(ExtendedCohortQuery.class);
@@ -80,13 +80,12 @@ public class ExtendedCohortQuery {
     private String userId;
 
     @JsonIgnore
-    public boolean isValid() throws IOException {
-        if ((birthSequence != null) &&
-            (birthSequence.isValid()) &&
-            (dataSource != null) &&
-            (ageField != null) &&
-            (measure != null)) return true;
-        else throw new IOException("[x] Invalid cohort query.");
+    public boolean isValid() {
+        return (birthSequence != null) &&
+                (birthSequence.isValid()) &&
+                (dataSource != null) &&
+                (ageField != null) &&
+                (measure != null);
     }
 
     @Override
@@ -100,6 +99,7 @@ public class ExtendedCohortQuery {
         return null;
     }
 
+    /*
     public String toPrettyString() {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -109,6 +109,7 @@ public class ExtendedCohortQuery {
         }
         return null;
     }
+     */
 
     /**
      * Read query from InputStream
