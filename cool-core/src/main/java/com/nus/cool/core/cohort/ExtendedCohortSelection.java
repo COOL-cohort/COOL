@@ -594,16 +594,18 @@ public class ExtendedCohortSelection implements Operator {
 		fieldIn.skipTo(ageOff);
 		if (bs.cardinality() >= ((ageEnd - ageOff) >> 1)) {
 			for (int i = ageOff; i < ageEnd; i++) {
-				int val = fieldIn.next();
-				if (!ageFilter.accept(val)) {
+				// int val = fieldIn.next();
+				// if (!ageFilter.accept(val)) {
+				if (!ageFilter.accept(fieldIn.next())) {
 					bs.clear(i);
 				}
 			}
 		} else {            
 			int pos = bs.nextSetBit(ageOff);
 			while (pos < ageEnd && pos >= 0) {
-				int val = fieldIn.get(pos);
-				if (!ageFilter.accept(val)) {
+				// int val = fieldIn.get(pos);
+				// if (!ageFilter.accept(val)) {
+				if (!ageFilter.accept(fieldIn.get(pos))) {
 					bs.clear(pos);
 				}
 				pos = bs.nextSetBit(pos + 1);
