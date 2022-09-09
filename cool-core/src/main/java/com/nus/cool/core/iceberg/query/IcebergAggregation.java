@@ -249,12 +249,14 @@ public class IcebergAggregation {
 
     public List<BaseResult> process(Aggregation aggregation) {
         String fieldName = aggregation.getFieldName();
-        FieldType fieldType = this.metaChunk.getMetaField(fieldName).getFieldType();;
+        FieldType fieldType = this.metaChunk.getMetaField(fieldName).getFieldType();
+        // store the result
         Map<String, AggregatorResult> resultMap = new HashMap<>();
         for (AggregatorType aggregatorType : aggregation.getOperators()) {
             if (!checkOperatorIllegal(fieldType, aggregatorType)) {
                 throw new IllegalArgumentException(fieldName + " can not process " + aggregatorType);
             }
+            // do the aggregation
             Aggregator aggregator = this.aggregatorFactory.create(aggregatorType);
             //FieldRS field = this.dataChunk.getField(fieldName);
             //aggregator.process(this.group, field, resultMap, this.metaChunk.getMetaField(fieldName));
