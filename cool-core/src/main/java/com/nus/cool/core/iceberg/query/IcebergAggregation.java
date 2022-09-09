@@ -78,7 +78,7 @@ public class IcebergAggregation {
      * @param type group by type
      */
     private void group(FieldRS field, BitSet bs, MetaFieldRS metaField, GroupType type) {
-        long beg = System.currentTimeMillis();
+        // long beg = System.currentTimeMillis();
         Map<String, BitSet> group = new HashMap<>();
         // localID: bitMap, multiple rows may have same localID
         Map<Integer, BitSet> id2Bs = new HashedMap();
@@ -120,7 +120,7 @@ public class IcebergAggregation {
      */
     private void group(FieldRS field, BitSet bs, IcebergQuery.granularityType granularity) {
         assert field.getFieldType() == FieldType.ActionTime;
-        long beg = System.currentTimeMillis();
+        // long beg = System.currentTimeMillis();
         // timeStr: bitMap, multiple rows may have same localID
         Map<String, BitSet> timeStr2Bs = new HashedMap();
 
@@ -193,10 +193,11 @@ public class IcebergAggregation {
             Map<String, BitSet> merged = new HashMap<>();
             for (Map.Entry<String, BitSet> entry : this.group.entrySet()) {
                 for(Map.Entry<String, BitSet> nextEntry : next.entrySet()) {
-                    String groupName = entry.getKey() + "|" + nextEntry.getKey();
                     BitSet bs = (BitSet) entry.getValue().clone();
                     bs.and(nextEntry.getValue());
-                    merged.put(groupName, bs);
+                    // String groupName = entry.getKey() + "|" + nextEntry.getKey();
+                    // merged.put(groupName, bs);
+                    merged.put(entry.getKey() + "|" + nextEntry.getKey(), bs);
                 }
             }
             this.group = merged;
@@ -247,23 +248,18 @@ public class IcebergAggregation {
     }
 
     public List<BaseResult> process(Aggregation aggregation) {
-
         String fieldName = aggregation.getFieldName();
         FieldType fieldType = this.metaChunk.getMetaField(fieldName).getFieldType();;
-
-        // store the result
         Map<String, AggregatorResult> resultMap = new HashMap<>();
-
         for (AggregatorType aggregatorType : aggregation.getOperators()) {
             if (!checkOperatorIllegal(fieldType, aggregatorType)) {
                 throw new IllegalArgumentException(fieldName + " can not process " + aggregatorType);
             }
-            // do the aggregation
             Aggregator aggregator = this.aggregatorFactory.create(aggregatorType);
-            FieldRS field = this.dataChunk.getField(fieldName);
-            aggregator.process(this.group, field, resultMap, this.metaChunk.getMetaField(fieldName));
+            //FieldRS field = this.dataChunk.getField(fieldName);
+            //aggregator.process(this.group, field, resultMap, this.metaChunk.getMetaField(fieldName));
+            aggregator.process(this.group, this.dataChunk.getField(fieldName), resultMap, this.metaChunk.getMetaField(fieldName));
         }
-
         List<BaseResult> results = new ArrayList<>();
         for (Map.Entry<String, AggregatorResult> entry : resultMap.entrySet()) {
             BaseResult result = new BaseResult();
