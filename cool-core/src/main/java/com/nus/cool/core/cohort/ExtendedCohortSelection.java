@@ -186,7 +186,7 @@ public class ExtendedCohortSelection implements Operator {
 			for (Map.Entry<String, FieldFilter> entry : birthFilter.entrySet()) {
 				bUserActiveCublet &= entry.getValue().accept(metaChunk.getMetaField(entry.getKey()));
 			}
- 		}
+		}
 
 		// Process age by and age filter
 		for (Map.Entry<String, FieldFilter> entry : ageFilters.entrySet()) {
@@ -515,7 +515,7 @@ public class ExtendedCohortSelection implements Operator {
 		else
 			return -1;
 	}
-	
+
 	public ExtendedCohort selectUser(int start, int end) {
 		checkArgument(start < end);
 
@@ -531,7 +531,7 @@ public class ExtendedCohortSelection implements Operator {
 			for (int idx = 0; idx < events.size(); ++idx) {
 				BirthSequence.BirthEvent be = events.get(idx);
 				for (BirthSequence.CohortField cf : be.getCohortFields()) {
-					int fieldID = tableSchema.getFieldID(cf.getField());                    
+					int fieldID = tableSchema.getFieldID(cf.getField());
 
 					// cohort by the birth time
 					// However, this code block seems not to be triggered during the test.
@@ -567,7 +567,7 @@ public class ExtendedCohortSelection implements Operator {
 							//level = (v > v.intValue()) ? v.intValue()+1 : v.intValue();
 							//level = (level >= cf.getMinLevel()) ? level : cf.getMinLevel();
 							//if (level >= cf.getMinLevel() + cf.getNumLevel())
-								//level = cf.getMinLevel() + cf.getNumLevel();
+							//level = cf.getMinLevel() + cf.getNumLevel();
 							int v_int = v.intValue();
 							level = Math.max(((v > v_int) ? v_int+1 : v_int), cf.getMinLevel());
 							level = Math.min(level, cf.getMinLevel() + cf.getNumLevel());
@@ -581,7 +581,7 @@ public class ExtendedCohortSelection implements Operator {
 		}
 		return null;
 	}
-	
+
 
 	private void filterAgeActivity(int ageOff, int ageEnd, BitSet bs, InputVector fieldIn, FieldFilter ageFilter) {
 		// update value for this column if necessary
@@ -600,7 +600,7 @@ public class ExtendedCohortSelection implements Operator {
 					bs.clear(i);
 				}
 			}
-		} else {            
+		} else {
 			int pos = bs.nextSetBit(ageOff);
 			while (pos < ageEnd && pos >= 0) {
 				// int val = fieldIn.get(pos);
@@ -610,7 +610,7 @@ public class ExtendedCohortSelection implements Operator {
 				}
 				pos = bs.nextSetBit(pos + 1);
 			}
-		}        
+		}
 	}
 
 	public void selectAgeByActivities(int ageOff, int ageEnd, BitSet bs) {
@@ -622,16 +622,16 @@ public class ExtendedCohortSelection implements Operator {
 		}
 
 		// age by dimension
-		// each qualified activity will make the positions of all neighbouring 
+		// each qualified activity will make the positions of all neighbouring
 		// activities with the same dimension value set
 		int fieldID = tableSchema.getFieldID(query.getAgeField().getField());
 		if (fieldID != tableSchema.getActionField() &&
-				fieldID != tableSchema.getActionTimeField()) {   
+				fieldID != tableSchema.getActionTimeField()) {
 			InputVector inputVector = this.chunk.getField(fieldID).getValueVector();
 			int pos = ageOff;
 			inputVector.skipTo(pos);
 			int lastVal = inputVector.next();
-			while (pos < ageEnd) {                
+			while (pos < ageEnd) {
 				int oldPos = pos;
 				while (++pos < ageEnd) {
 					int v = inputVector.next();
@@ -650,7 +650,7 @@ public class ExtendedCohortSelection implements Operator {
 
 	/**
 	 * Select age activity tuples bounded by [ageOff, ageEnd)
-	 * 
+	 *
 	 * @param ageOff
 	 *            the start position of age tuples
 	 * @param ageEnd
@@ -665,29 +665,30 @@ public class ExtendedCohortSelection implements Operator {
 		// as event-based ageby operator
 		int fieldID = tableSchema.getFieldID(query.getAgeField().getField());
 		if (fieldID != tableSchema.getActionField() &&
-				fieldID != tableSchema.getActionTimeField()) {        	
+				fieldID != tableSchema.getActionTimeField()) {
 			bs.and(ageDelimiters);
 			int pos = ageDelimiters.nextSetBit(ageOff);
 			int lastSetbit = pos;
 			InputVector inputVector = this.chunk.getField(fieldID).getValueVector();
+			int lastValue;
 			while(pos >= 0 && pos < ageEnd) {
 				lastSetbit = pos;
 				inputVector.skipTo(pos);
-				int lastValue = inputVector.next();                
+				lastValue = inputVector.next();
 				while(++pos < ageEnd) {
 					if (ageDelimiters.get(pos) && inputVector.next() == lastValue) {
 						ageDelimiters.clear(pos);
 						lastSetbit = pos;
 					}
 					else {
-						pos = ageDelimiters.nextSetBit(pos);                        
+						pos = ageDelimiters.nextSetBit(pos);
 						break;
 					}
 				}
 			}
 
 			// clear the first setbit and set the the bit next to the last set bit
-			// so as to enable the resulting delimiters 
+			// so as to enable the resulting delimiters
 			// to be consistent with event-based ageby operator
 			if ((pos = ageDelimiters.nextSetBit(ageOff)) >= 0) {
 				ageDelimiters.clear(pos);
@@ -699,10 +700,12 @@ public class ExtendedCohortSelection implements Operator {
 		// Columnar processing strategy ...
 		String metricAgeFilterName = null;
 		for (Map.Entry<String, FieldFilter> entry : ageFilters.entrySet()) {
-			FieldFilter ageFilter = entry.getValue();
+			// FieldFilter ageFilter = entry.getValue();
 			if(tableSchema.getField(entry.getKey()).getFieldType()==FieldType.Metric) metricAgeFilterName = entry.getKey();
-			filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(), ageFilter);
+			// filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(), ageFilter);
+			filterAgeActivity(ageOff, ageEnd, bs, chunk.getField(entry.getKey()).getValueVector(), entry.getValue());
 		}
+
 		return metricAgeFilterName;
 	}
 
@@ -747,3 +750,5 @@ public class ExtendedCohortSelection implements Operator {
 	public void close() throws IOException {
 	}
 }
+
+
