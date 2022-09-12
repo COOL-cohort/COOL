@@ -65,7 +65,6 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
         int hashKey = rhash.hash(tupleValue[0]);
         if (!this.hashToTerm.containsKey(hashKey)) {
             this.hashToTerm.put(hashKey, new Term(tupleValue[0], nextGid++));
-            this.gidToHash.add(hashKey);
         }
         if (tupleValue.length == 1) return;
         else {
