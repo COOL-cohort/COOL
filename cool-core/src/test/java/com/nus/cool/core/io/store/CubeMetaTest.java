@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,8 @@ public class CubeMetaTest {
     }
     this.parser = new CsvTupleParser();
 
-    this.metaws = MetaChunkWS.newMetaChunkWS(this.schema, 0);
+    this.metaws = MetaChunkWS.newMetaChunkWS(this.schema, 0,
+      schema.getUserKeyField(), new ArrayList<Integer>());
   }
 
   @AfterTest
@@ -79,9 +81,9 @@ public class CubeMetaTest {
   }
 
   @Test
-  public void CubeMetaUnbitTest() throws IOException {
+  public void CubeMetaUnitTest() throws IOException {
     while (reader.hasNext()) {
-      metaws.put(parser.parse(reader.next()));
+      metaws.put(parser.parse(reader.next()), this.schema.getInvariantType());
     }
     
     DataOutputBuffer out = new DataOutputBuffer();

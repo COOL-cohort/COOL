@@ -134,7 +134,9 @@ public class MetaChunkWS implements Output {
             if (userKeyIndex == i) {
                 List<String> userData = new ArrayList<>();
                 userData.add(tuple[userKeyIndex]);
-                for (int j = 0; j < invariantFieldIndex.size(); j++) userData.add(tuple[invariantFieldIndex.get(i)]);
+                for (int j = 0; j < invariantFieldIndex.size(); j++) {
+                  userData.add(tuple[invariantFieldIndex.get(i)]);
+                } 
                 ((MetaUserFieldWS) this.metaFields[i]).put((String[])userData.toArray(new String[0]),invariantType);
             } else {
                 this.metaFields[i].put(tuple[i]);
@@ -206,7 +208,7 @@ public class MetaChunkWS implements Output {
     int[] offsets = new int[this.metaFields.length];
     for (int i = 0; i < this.metaFields.length; i++) {
       offsets[i] = this.offset + bytesWritten;
-      bytesWritten += this.metaFields[i].writeTo(out);
+      bytesWritten += this.metaFields[i].writeCubeMeta(out);
     }
 
     // Store header offset for MetaChunk layout
