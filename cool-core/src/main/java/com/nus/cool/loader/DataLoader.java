@@ -20,7 +20,9 @@ package com.nus.cool.loader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
+import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.core.util.parser.TupleParser;
@@ -78,6 +80,23 @@ public class DataLoader {
             writer.Add(parser.parse(reader.next()));
         }
         writer.Finish();
+    }
+
+    /**
+     *
+     * @param schemaFields the fields read from table.yaml
+     * @param fieldNames the field names read from data.csv
+     * @return true indicates the names of the fields between the two files are consistent, and otherwise, they are different.
+     */
+    public static boolean checkConsistency(List<FieldSchema> schemaFields, String[] fieldNames){
+        if(schemaFields.size()!=fieldNames.length){
+            return false;
+        }
+        for(int i=0;i<schemaFields.size();i++){
+            if(!schemaFields.get(i).getName().equals(fieldNames[i]))
+                return false;
+        }
+        return true;
     }
 
     @AllArgsConstructor
