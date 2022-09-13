@@ -3,6 +3,9 @@
 tree.txt
 */tree.txt
 
+# vscode
+.vscode
+
 # product
 target/
 */target/

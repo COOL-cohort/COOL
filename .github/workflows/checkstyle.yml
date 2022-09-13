@@ -1,0 +1,21 @@
+# This workflow will check code formatting with checkstyle
+
+name: COOL checkstyle
+on: [pull_request]
+
+jobs:
+  code-foramtting-check:
+
+    runs-on: ubuntu-latest
+  
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Run checkstyle
+      uses: dbelyaev/action-checkstyle@v0.6.1
+      with:
+        checkstyle_config: 'cool-checkstyle.xml'
+        reporter: 'github-pr-review'
+        filter_mode: nofilter
+        level: error
+        fail_on_error: true
