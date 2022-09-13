@@ -5,53 +5,61 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public class TimeUtils {
 
-    public enum TimeUnit {
-	
-        HOUR("HOUR"),
-        
-        DAY("DAY"),
-        
-        WEEK("WEEK"),
-        
-        MONTH("MONTH"),
+  public enum TimeUnit {
 
-        MINUTE("MINUTE"),
+    HOUR("HOUR"),
 
-        SECOND("SECOND"),
+    DAY("DAY"),
 
-        YEAR("YEAR");
+    WEEK("WEEK"),
 
-        
+    MONTH("MONTH"),
 
-        private final String text;
-        private TimeUnit(final String text) {
-            this.text = text;
-        }
+    MINUTE("MINUTE"),
 
-        @JsonValue
-        @Override
-        public String toString(){
-            return text;
-        }
+    SECOND("SECOND"),
 
-        @JsonCreator
-        public static TimeUnit forValue(String value){
-            switch(value){
-                case "HOUR" : return TimeUnit.HOUR;
-                case "DAY":return TimeUnit.DAY;
-                case "WEEK": return TimeUnit.WEEK;
-                case "MINUTE": return TimeUnit.MINUTE;
-                case "SECOND": return TimeUnit.SECOND;
-                case "YEAR": return TimeUnit.YEAR;
-                case "MONTH": return TimeUnit.MONTH;
-                default:
-                    throw new IllegalArgumentException();
-            }
-        }
+    YEAR("YEAR");
+
+    private final String text;
+
+    private TimeUnit(final String text) {
+      this.text = text;
     }
 
-    public static TimeUnit GenerateTimeUnit(String str){
-        return TimeUnit.forValue(str);
+    @JsonValue
+    @Override
+    public String toString() {
+      return text;
     }
-    
+
+    /**
+     * Return time unit named by a string.
+     */
+    @JsonCreator
+    public static TimeUnit forValue(String value) {
+      switch (value) {
+        case "HOUR":
+          return TimeUnit.HOUR;
+        case "DAY":
+          return TimeUnit.DAY;
+        case "WEEK":
+          return TimeUnit.WEEK;
+        case "MINUTE":
+          return TimeUnit.MINUTE;
+        case "SECOND":
+          return TimeUnit.SECOND;
+        case "YEAR":
+          return TimeUnit.YEAR;
+        case "MONTH":
+          return TimeUnit.MONTH;
+        default:
+          throw new IllegalArgumentException();
+      }
+    }
+  }
+
+  public static TimeUnit generateTimeUnit(String str) {
+    return TimeUnit.forValue(str);
+  }
 }

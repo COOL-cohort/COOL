@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort.aggregator;
 
 import com.nus.cool.core.cohort.TimeUnit;
@@ -28,39 +29,33 @@ import java.util.Map;
 
 public interface EventAggregator {
 
-    void init(InputVector vec);
+  void init(InputVector vec);
 
-    Double birthAggregate(List<Integer> offset);
+  Double birthAggregate(List<Integer> offset);
 
-    /**
-     * @brief  aggregate over @param ageOffset with age defined by @param
-     * ageDelimiter
-     *
-     * @param ageOffset
-     * @param ageDelimiter a bitset with each birthday (including the birth time) 
-     *      position set; there should be at least one set bit.
-     * @param ageMetrics
-     */
-    void ageAggregate(BitSet ageOffset, BitSet ageDelimiter, int ageOff, int ageEnd,
-                      int ageInterval, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics);
+  /**
+   * Aggregate over @param ageOffset with age defined by @param ageDelimiter.
+   *
+   * @param ageDelimiter a bitset with each birthday (including the birth time) 
+   *      position set; there should be at least one set bit.
+   */
+  void ageAggregate(BitSet ageOffset, BitSet ageDelimiter, int ageOff, int ageEnd, int ageInterval,
+      FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics);
 
-    /**
-     * @brief  aggregate over @param ageOffset with age defined by time
-     *
-     * @param ageOffset 
-     * @param time time field
-     * @param ageMetrics
-     */
-    void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
-                      TimeUnit unit, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics);
+  /**
+   * Aggregate over @param ageOffset with age defined by time.
+   * @param time time field
+   */
+  void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd,
+      int ageInterval, TimeUnit unit, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics);
 
-    /**
-     * @brief  aggregate over @param ageOffset with age defined by time for the metric filed
-     *
-     * @param ageOffset
-     * @param time time field
-     * @param filedValue the filed value of the metric filed that is in the ageSelection filter
-     */
-    void ageAggregateMetirc(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
-                      TimeUnit unit, FieldFilter ageFilter, InputVector filedValue, Map<Integer, List<Double>> ageMetrics);
+  /**
+   * Aggregate over @param ageOffset with age defined by time for the metric field.
+   *
+   * @param time time field
+   * @param fieldValue the field value of the metric field that is in the ageSelection filter
+   */
+  void ageAggregateMetirc(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd,
+      int ageInterval, TimeUnit unit, FieldFilter ageFilter, InputVector fieldValue,
+      Map<Integer, List<Double>> ageMetrics);
 }

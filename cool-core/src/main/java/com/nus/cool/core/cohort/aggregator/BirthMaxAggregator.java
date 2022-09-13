@@ -16,16 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort.aggregator;
 
-import com.nus.cool.core.io.storevector.InputVector;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.filter.FieldFilter;
+import com.nus.cool.core.io.storevector.InputVector;
+
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * BirthMaxAggregator is used to aggregate the cohort results
@@ -33,50 +35,52 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class BirthMaxAggregator implements EventAggregator {
 
-    private InputVector values;
+  private InputVector values;
 
-    @Override
-    public void init(InputVector vec) {
-        values = vec;
+  @Override
+  public void init(InputVector vec) {
+    values = vec;
+  }
+
+  /**
+   * Get the maximum value of a list which is the cohort result at a specific age.
+   *
+   * @param offset the cohort result
+   *
+   * @return the maximum of the cohort result
+   */
+  @Override
+  public Double birthAggregate(List<Integer> offset) {
+    if (offset.isEmpty()) {
+      return null;
     }
-
-    /**
-     * @brief  get the maximum value of a list which is the cohort result at a specific age
-     *
-     * @param offset the cohort result
-     *
-     * @return the maximum of the cohort result
-     */
-    @Override
-    public Double birthAggregate(List<Integer> offset) {
-    	if (offset.isEmpty()) return null;
-        checkArgument(offset.size() > 0);
-        long max = offset.get(0);
-        for (Integer i : offset) {
-            long v = this.values.get(i);
-            max = (max < v) ? v : max;
-        }
-        return (double) max;
+    checkArgument(offset.size() > 0);
+    long max = offset.get(0);
+    for (Integer i : offset) {
+      long v = this.values.get(i);
+      max = (max < v) ? v : max;
     }
+    return (double) max;
+  }
 
 
-	@Override
-	public void ageAggregate(BitSet ageOffset, BitSet ageDelimiter, int start, int end, int ageInterval,
-			FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics) {
-		// TODO Auto-generated method stub
-		
-	}
+  @Override
+  public void ageAggregate(BitSet ageOffset, BitSet ageDelimiter, int start, int end,
+      int ageInterval, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics) {
+    // TODO Auto-generated method stub
+  }
 
-	@Override
-	public void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
-			TimeUnit unit, FieldFilter ageFilter, Map<Integer, List<Double>> ageMetrics) {
-		// TODO Auto-generated method stub
-		
-	}
+  @Override
+  public void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff,
+      int ageEnd, int ageInterval, TimeUnit unit, FieldFilter ageFilter,
+      Map<Integer, List<Double>> ageMetrics) {
+    // TODO Auto-generated method stub
+  }
 
-    @Override
-    public void ageAggregateMetirc(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd, int ageInterval,
-                                   TimeUnit unit, FieldFilter ageFilter, InputVector filedValue, Map<Integer, List<Double>> ageMetrics){
-        // TODO Auto-generated method stub
-    }
+  @Override
+  public void ageAggregateMetirc(BitSet ageOffset, InputVector time, int birthDay, int ageOff,
+      int ageEnd, int ageInterval, TimeUnit unit, FieldFilter ageFilter, InputVector fieldValue,
+      Map<Integer, List<Double>> ageMetrics){
+    // TODO Auto-generated method stub
+  }
 }

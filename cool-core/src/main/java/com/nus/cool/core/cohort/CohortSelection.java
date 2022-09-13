@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,34 +38,34 @@ import java.util.Map;
 import lombok.Getter;
 
 /**
- * For each cublet, check whether the cublet contains eligible age tuples
- * It is used to process the cublet when we need to get the age tuples
+ * For each cublet, check whether the cublet contains eligible age tuples It is used to process the
+ * cublet when we need to get the age tuples.
  */
 public class CohortSelection implements Operator {
 
   private TableSchema schema;
 
   /**
-   * Whether the cublet contains eligible tuples
+   * Whether the cublet contains eligible tuples.
    */
   @Getter
-  private boolean bUserActiveCublet;
+  private boolean userActiveCublet;
+
+  // /**
+  // * Whether the cublet contains eligible age tuples.
+  // */
+  // private boolean bAgeActiveCublet;
 
   /**
-   * Whether the cublet contains eligible age tuples
-   */
-  private boolean bAgeActiveCublet;
-
-  /**
-   * Whether the chunk contains eligible tuples
+   * Whether the chunk contains eligible tuples.
    */
   @Getter
-  private boolean bUserActiveChunk;
+  private boolean userActiveChunk;
 
-  /**
-   * Whether the chunk contains eligible age tuples
-   */
-  private boolean bAgeActiveChunk;
+  // /**
+  // * Whether the chunk contains eligible age tuples.
+  // */
+  // private boolean bAgeActiveChunk;
 
   @Getter
   private FieldFilter appFilter;
@@ -78,19 +79,20 @@ public class CohortSelection implements Operator {
   private Map<String, FieldRS> ageFilterFields = Maps.newHashMap();
 
   /**
-   * Init the cohort select conditions
+   * Init the cohort select conditions.
+   * 
    * @param schema the table to be checks
-   * @param query the condition of the selection
+   * @param query  the condition of the selection
    */
   @Override
   public void init(TableSchema schema, CohortQuery query) {
     this.schema = checkNotNull(schema);
     checkNotNull(query);
 
-    //Create AppKey, birthselectors and ageselectors
+    // Create AppKey, birthselectors and ageselectors
     String app = query.getAppKey();
-    this.appFilter = FieldFilterFactory
-        .create(this.schema.getField(this.schema.getAppKeyField()), null, Arrays.asList(app));
+    this.appFilter = FieldFilterFactory.create(this.schema.getField(this.schema.getAppKeyField()),
+        null, Arrays.asList(app));
 
     List<FieldSet> birthSelectors = query.getBirthSelection();
     for (FieldSet fs : birthSelectors) {
@@ -108,61 +110,60 @@ public class CohortSelection implements Operator {
   }
 
   /**
-   * Check whether the metachunk(cublet) contain eligible tuples
+   * Check whether the metachunk(cublet) contain eligible tuples.
    * 
    * @param metaChunk the metachunk(cublet) to be checked
    */
   @Override
   public void process(MetaChunkRS metaChunk) {
-    this.bUserActiveCublet = true;
-    this.bAgeActiveCublet = true;
+    this.userActiveCublet = true;
+    // this.bAgeActiveCublet = true;
 
-    boolean bAccept = this.appFilter
+    boolean accept = this.appFilter
         .accept(metaChunk.getMetaField(this.schema.getAppKeyField(), FieldType.AppKey));
-    if (!bAccept) {
-      this.bUserActiveCublet = false;
+    if (!accept) {
+      this.userActiveCublet = false;
       return;
     }
 
     for (Map.Entry<String, FieldFilter> entry : this.birthFilters.entrySet()) {
       MetaFieldRS metaField = metaChunk.getMetaField(entry.getKey());
-      this.bUserActiveCublet &= entry.getValue().accept(metaField);
+      this.userActiveCublet &= entry.getValue().accept(metaField);
     }
 
-    for (Map.Entry<String, FieldFilter> entry : this.ageFilters.entrySet()) {
-      MetaFieldRS metaField = metaChunk.getMetaField(entry.getKey());
-      this.bAgeActiveCublet &= entry.getValue().accept(metaField);
-    }
+    // for (Map.Entry<String, FieldFilter> entry : this.ageFilters.entrySet()) {
+    //   MetaFieldRS metaField = metaChunk.getMetaField(entry.getKey());
+    //   this.bAgeActiveCublet &= entry.getValue().accept(metaField);
+    // }
   }
 
-
   /**
-   * Check whether the chunk contain eligible tuples and record the corresponding fields
+   * Check whether the chunk contain eligible tuples and record the corresponding fields.
    * 
-   * @param Chunk the chunk to be checked
+   * @param chunk the chunk to be checked
    */
   @Override
   public void process(ChunkRS chunk) {
     this.birthFilterFields.clear();
     this.ageFilterFields.clear();
-    this.bUserActiveChunk = true;
-    this.bAgeActiveChunk = true;
+    this.userActiveChunk = true;
+    // this.bAgeActiveChunk = true;
 
-    boolean bAccept = this.appFilter.accept(chunk.getField(this.schema.getAppKeyField()));
-    if (!bAccept) {
-      this.bUserActiveChunk = false;
+    boolean accept = this.appFilter.accept(chunk.getField(this.schema.getAppKeyField()));
+    if (!accept) {
+      this.userActiveChunk = false;
       return;
     }
 
     for (Map.Entry<String, FieldFilter> entry : this.birthFilters.entrySet()) {
       FieldRS field = chunk.getField(this.schema.getFieldID(entry.getKey()));
-      this.bUserActiveChunk &= entry.getValue().accept(field);
+      this.userActiveChunk &= entry.getValue().accept(field);
       this.birthFilterFields.put(entry.getKey(), field);
     }
 
     for (Map.Entry<String, FieldFilter> entry : this.ageFilters.entrySet()) {
       FieldRS field = chunk.getField(this.schema.getFieldID(entry.getKey()));
-      this.bAgeActiveChunk &= entry.getValue().accept(field);
+      // this.bAgeActiveChunk &= entry.getValue().accept(field);
       this.ageFilterFields.put(entry.getKey(), field);
     }
   }
@@ -172,31 +173,31 @@ public class CohortSelection implements Operator {
   }
 
   /**
-   * Check whether the user is born
+   * Check whether the user is born.
    * 
-   * @param birthoff the birth offset of the user in the table
+   * @param birthOff the birth offset of the user in the table
    * @return 0 indicates the user cannot be born and 1 indicates the user is born
    */
   public boolean selectUser(int birthOff) {
-    boolean bSelected = true;
+    boolean selected = true;
     for (Map.Entry<String, FieldFilter> entry : this.birthFilters.entrySet()) {
       FieldRS field = this.birthFilterFields.get(entry.getKey());
       InputVector fieldInput = field.getValueVector();
       fieldInput.skipTo(birthOff);
-      bSelected = entry.getValue().accept(fieldInput.next());
-        if (!bSelected) {
-            break;
-        }
+      selected = entry.getValue().accept(fieldInput.next());
+      if (!selected) {
+        break;
+      }
     }
-    return bSelected;
+    return selected;
   }
 
   /**
-   * Check the age tuples of a user and record which tuple is needed
+   * Check the age tuples of a user and record which tuple is needed.
    * 
    * @param ageOff the offset of the start position in table
    * @param ageEnd the offset of the end position in table
-   * @param bs the Bitset which indicate which tuple is needed
+   * @param bs     the Bitset which indicate which tuple is needed
    */
   public void selectAgeActivities(int ageOff, int ageEnd, BitSet bs) {
     for (Map.Entry<String, FieldFilter> entry : this.ageFilters.entrySet()) {
@@ -206,17 +207,17 @@ public class CohortSelection implements Operator {
       FieldFilter ageFilter = entry.getValue();
       if ((bs.cardinality() << 1) >= (ageEnd - ageOff)) {
         for (int i = ageOff; i < ageEnd; i++) {
-            if (!ageFilter.accept(fieldInput.next())) {
-                bs.clear(i);
-            }
+          if (!ageFilter.accept(fieldInput.next())) {
+            bs.clear(i);
+          }
         }
       } else {
         int off = bs.nextSetBit(ageOff);
         while (off < ageEnd && off >= 0) {
           fieldInput.skipTo(off);
-            if (!ageFilter.accept(fieldInput.next())) {
-                bs.clear(off);
-            }
+          if (!ageFilter.accept(fieldInput.next())) {
+            bs.clear(off);
+          }
           off = bs.nextSetBit(off + 1);
         }
       }

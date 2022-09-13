@@ -4,32 +4,35 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * enum class for filtertype
+ * Enum class for filtertype.
  */
 public enum FilterType {
-    Range("RANGE"), Set("SET");
+  Range("RANGE"), Set("SET");
 
-    private final String text;
+  private final String text;
 
-    private FilterType(final String text) {
-        this.text =text;
+  private FilterType(final String text) {
+    this.text = text;
+  }
+
+  @JsonValue
+  @Override
+  public String toString() {
+    return text;
+  }
+
+  /**
+   * return FilterType named by string.
+   */
+  @JsonCreator
+  public static FilterType forValue(String value) {
+    switch (value) {
+      case "RANGE":
+        return Range;
+      case "SET":
+        return Set;
+      default:
+        throw new IllegalArgumentException();
     }
-
-    @JsonValue
-    @Override
-    public String toString(){
-        return text;
-    }
-
-    @JsonCreator
-    public static FilterType forValue(String value){
-        switch(value){
-            case "RANGE": return Range;
-            case "SET": return Set;
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
-
+  }
 }

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
 /**
- * In memory data structure to contain and print query result
+ * In memory data structure to contain and print query result.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
@@ -35,6 +36,9 @@ public class QueryResult {
   private long elapsed;
   private Object result;
 
+  /**
+   * Create a query result struct.
+   */
   public QueryResult(QueryStatus status, String errMsg, Object result) {
     this.status = status;
     this.errMsg = errMsg;
@@ -42,8 +46,9 @@ public class QueryResult {
   }
 
   /**
-   * Record the correct result
-   * @param result the correct result 
+   * Record the correct result.
+   * 
+   * @param result the correct result
    */
   public static QueryResult ok(Object result) {
     return new QueryResult(QueryStatus.OK, null, result);
@@ -64,7 +69,6 @@ public class QueryResult {
   }
 
   public enum QueryStatus {
-    OK,
-    ERROR
+    OK, ERROR
   }
 }

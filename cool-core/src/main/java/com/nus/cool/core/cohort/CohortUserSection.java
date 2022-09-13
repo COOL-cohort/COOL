@@ -16,146 +16,148 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
-import com.nus.cool.core.schema.CubeSchema;
 import com.nus.cool.core.schema.TableSchema;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class CohortUserSection implements CohortOperator {
 
-    private static Log LOG = LogFactory.getLog(CohortUserSection.class);
+  private static Log LOG = LogFactory.getLog(CohortUserSection.class);
 
-    private TableSchema tableSchema;
+  private TableSchema tableSchema;
 
-    private ExtendedCohortSelection sigma;
+  private ExtendedCohortSelection sigma;
 
-    private InputVector cohortUsers;
+  private InputVector cohortUsers;
 
-    private int curUser = -1;
+  private int curUser = -1;
 
-    private int totalDataChunks;
+  private int totalDataChunks;
 
-    private int totalSkippedDataChunks;
+  private int totalSkippedDataChunks;
 
-    private int totalUsers;
+  private int totalUsers;
 
-    private int totalSkippedUsers;
+  private int totalSkippedUsers;
 
-    private final List<Integer> cubletResults = new ArrayList<>();
+  private final List<Integer> cubletResults = new ArrayList<>();
 
-    public CohortUserSection(ExtendedCohortSelection sigma) {
-        this.sigma = checkNotNull(sigma);
+  public CohortUserSection(ExtendedCohortSelection sigma) {
+    this.sigma = checkNotNull(sigma);
+  }
+
+  public List<Integer> getCubletResults() {
+    return this.cubletResults;
+  }
+
+  @Override
+  public void close() throws IOException {
+    sigma.close();
+    LOG.info(String.format(
+        "(totalChunks = %d, totalSkippedChunks = %d, totalUsers = %d,totalSkippedUsers = %d)",
+        totalDataChunks, totalSkippedDataChunks, totalUsers, totalSkippedUsers));
+  }
+
+  @Override
+  public void init(TableSchema tableSchema, InputVector cohortUsers, ExtendedCohortQuery query) {
+    LOG.info("Initializing user selection operator ...");
+    checkNotNull(query.getBirthSequence());
+    this.tableSchema = checkNotNull(tableSchema);
+    this.cohortUsers = cohortUsers;
+    curUser = -1;
+    if (cohortUsers != null && cohortUsers.size() > 0) {
+      curUser = cohortUsers.next();
+    }
+    sigma.init(tableSchema, query);
+  }
+
+  @Override
+  public void init(TableSchema schema, CohortQuery query) {
+
+  }
+  
+  @Override
+  public boolean isCohortsInCublet() {
+    return true;
+  }
+  
+  @Override
+  public void process(MetaChunkRS metaChunk) {
+    LOG.info("Processing metaChunk ...");
+    sigma.process(metaChunk);
+  }
+
+  @Override
+  public void process(ChunkRS dataChunk) {
+    totalDataChunks++;
+
+    // process filters
+    sigma.process(dataChunk);
+    if (sigma.isUserActiveChunk() == false) {
+      totalSkippedDataChunks++;
+      return;
     }
 
-    public List<Integer> getCubletResults() {
-        return this.cubletResults;
+    FieldRS userField = dataChunk.getField(tableSchema.getUserKeyField());
+
+    // Skipping non RLE compressed blocks
+
+    if (!(userField.getValueVector() instanceof RLEInputVector)) {
+      LOG.info("The user record corrupted: " + totalDataChunks);
+      return;
     }
 
-    @Override
-    public void close() throws IOException {
-        sigma.close();
-        LOG.info(String.format("(totalChunks = %d, totalSkippedChunks = %d, totalUsers = %d, totalSkippedUsers = %d)",
-                totalDataChunks, totalSkippedDataChunks, totalUsers, totalSkippedUsers));
-    }    
+    RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
+    RLEInputVector.Block userBlock = new RLEInputVector.Block();
+    InputVector userKey = userField.getKeyVector();
 
-	@Override
-	public void init(TableSchema tableSchema, InputVector cohortUsers,
-                     ExtendedCohortQuery query) {
-		LOG.info("Initializing user selection operator ...");
-		checkNotNull(query.getBirthSequence());
-		this.tableSchema = checkNotNull(tableSchema);
-		this.cohortUsers = cohortUsers;
-		curUser = -1;
-		if (cohortUsers != null && cohortUsers.size() > 0) {
-			curUser = cohortUsers.next();
-		}
-		sigma.init(tableSchema, query);
-	}
+    // TODO: later will dynamically determine the scan of cohort users:
+    // either do a sequential scan or use the index
 
-    @Override
-    public void init(TableSchema schema, CohortQuery query) {
+    while (userInput.hasNext()) {
 
-    }
+      userInput.nextBlock(userBlock); // Next user RLE block
 
-    @Override
-    public void process(MetaChunkRS metaChunk) {
-        LOG.info("Processing metaChunk ...");
-        sigma.process(metaChunk);
-    }
+      // Find a new user, user's id is stored continuously, each block store one user.
+      totalUsers++;
+      int beg = userBlock.off;
+      int end = userBlock.off + userBlock.len;
 
-    @Override
-    public boolean isCohortsInCublet() {
-        return true;
-    }
-
-    @Override
-    public void process(ChunkRS dataChunk) {
-        totalDataChunks++;
-
-        // process filters
-        sigma.process(dataChunk);
-        if (sigma.isUserActiveChunk() == false) {
-            totalSkippedDataChunks++;
-            return;
+      if (this.cohortUsers != null) {
+        if (curUser != userKey.get(userBlock.value) && curUser >= 0) {
+          continue;
         }
-
-        FieldRS userField = dataChunk.getField(tableSchema.getUserKeyField());
-        
-        // Skipping non RLE compressed blocks
-
-        if (!(userField.getValueVector() instanceof RLEInputVector)) {
-            LOG.info("The user record corrupted: " + totalDataChunks);
-            return;
+        if (cohortUsers.hasNext()) {
+          curUser = cohortUsers.next();
+        } else {
+          return;
         }
+      }
 
-        RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
-        RLEInputVector.Block userBlock = new RLEInputVector.Block();
-        InputVector userKey = userField.getKeyVector();
+      ExtendedCohort cohort = sigma.selectUser(beg, end);
 
-		// TODO: later will dynamically determine the scan of cohort users:
-		// either do a sequential scan or use the index
+      if (cohort == null) {
+        totalSkippedUsers++;
+        continue;
+      }
 
-		while (userInput.hasNext()) {
-
-			userInput.nextBlock(userBlock); // Next user RLE block
-
-			// Find a new user, user's id is stored continuously, each block store one user.
-			totalUsers++;
-			int beg = userBlock.off;
-			int end = userBlock.off + userBlock.len;
-			
-			if (this.cohortUsers != null) {
-				if (curUser != userKey.get(userBlock.value) && curUser >= 0)
-					continue;
-				if (cohortUsers.hasNext())
-					curUser = cohortUsers.next();
-				else return;
-			}
-
-			ExtendedCohort cohort = sigma.selectUser(beg, end);
-
-			if (cohort == null) {
-				totalSkippedUsers++;
-				continue;
-			}
-			
-			int uid = userKey.get(userBlock.value);
-            cubletResults.add(uid);
-		}
-	}
-
+      int uid = userKey.get(userBlock.value);
+      cubletResults.add(uid);
+    }
+  }
 }

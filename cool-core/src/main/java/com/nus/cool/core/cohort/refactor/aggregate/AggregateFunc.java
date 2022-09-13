@@ -4,18 +4,16 @@ import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 
 /**
- * The Interface for different aggregator
+ * The Interface for different aggregator.
  */
 public interface AggregateFunc {
     
-    /**
-     * modify retUnit in place
-     * @param retUnit
-     * @param value
-     */
-    public void calculate(RetUnit retUnit, ProjectedTuple tuple);
+  /**
+  * Modify retUnit in place.
+  */
+  public void calculate(RetUnit retUnit, ProjectedTuple tuple);
     
-    public AggregateType getType();
+  public AggregateType getType();
 
-    public String getSchema();
+  public String getSchema();
 }

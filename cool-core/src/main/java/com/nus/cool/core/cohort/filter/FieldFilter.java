@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort.filter;
 
 import com.nus.cool.core.cohort.ExtendedFieldSet;
@@ -27,52 +28,56 @@ import com.nus.cool.core.schema.FieldType;
 import java.util.List;
 
 /**
- * FieldFilter is used as a filter of the fields, especially useful when setting up the birth condition and other selections
+ * FieldFilter is used as a filter of the fields, especially useful when setting
+ * up the birth condition and other selections.
  */
 public interface FieldFilter {
 
   /**
-   * Get the global minimum of the conditions
+   * Get the global minimum of the conditions.
    * 
-   * @return the global minimum 
+   * @return the global minimum
    */
   int getMinKey();
 
   /**
-   * Get the global maximum of the conditions
+   * Get the global maximum of the conditions.
    * 
-   * @return the global maximum 
+   * @return the global maximum
    */
   int getMaxKey();
 
   /**
-   * Indicate whether the metafiled is eligible
+   * Indicate whether the metafield is eligible.
    * 
    * @param metaField the metafield to be checked
-   * @return false indicates the metafield is not eligible and true indicates the metafield is eligible
+   * @return false indicates the metafield is not eligible and true indicates the
+   *         metafield is eligible
    */
   boolean accept(MetaFieldRS metaField);
 
   /**
-   * Indicate whether the filed is eligible
+   * Indicate whether the field is eligible.
    * 
    * @param field the field to be checked
-   * @return false indicates the field is not eligible and true indicates the field is eligible
+   * @return false indicates the field is not eligible and true indicates the
+   *         field is eligible
    */
   boolean accept(FieldRS field);
 
   boolean accept(InputVector inputVector);
 
   /**
-   * Indicate whether the interger v is eligible
+   * Indicate whether the interger v is eligible.
    * 
    * @param v the interger to be checked
-   * @return false indicates the interger is not eligible and true indicates the interger is eligible
+   * @return false indicates the interger is not eligible and true indicates the
+   *         interger is eligible
    */
   boolean accept(int v);
 
   /**
-   * Get the conditions set up before
+   * Get the conditions set up before.
    * 
    * @return the conditions and the minimum and maximum are separated by '|'
    */
@@ -80,12 +85,11 @@ public interface FieldFilter {
 
   ExtendedFieldSet getFieldSet();
 
-   FieldType fieldType = null;
+  FieldType fieldType = null;
 
   void updateValues(Double v);
 
   int nextAcceptTuple(int start, int to);
 
   FieldType getFieldType();
-
 }

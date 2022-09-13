@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort.aggregator;
 
 import com.nus.cool.core.io.storevector.InputVector;
