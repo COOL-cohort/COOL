@@ -16,16 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort;
 
 public enum TimeUnit {
-	
-	HOUR,
-	
-	DAY,
-	
-	WEEK,
-	
-	MONTH
+
+  HOUR,
+
+  DAY,
+
+  WEEK,
+
+  MONTH
 
 }

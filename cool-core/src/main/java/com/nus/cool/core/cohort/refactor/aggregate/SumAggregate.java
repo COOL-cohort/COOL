@@ -5,30 +5,29 @@ import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 
 public class SumAggregate implements AggregateFunc {
 
-    private final AggregateType type = AggregateType.SUM;
+  private final AggregateType type = AggregateType.SUM;
 
-    private String schema;
+  private String schema;
 
-    public SumAggregate(String schema) {
-        this.schema = schema;
-    }
+  public SumAggregate(String schema) {
+    this.schema = schema;
+  }
 
-    @Override
-    public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-        int parse_value = (Integer) tuple.getValueBySchema(this.schema);
-        float value =  (float) parse_value;
-        retUnit.setValue(retUnit.getValue() + value);
-        retUnit.setCount(retUnit.getCount() + 1);
-    }
+  @Override
+  public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
+    int parseValue = (Integer) tuple.getValueBySchema(this.schema);
+    float value = (float) parseValue;
+    retUnit.setValue(retUnit.getValue() + value);
+    retUnit.setCount(retUnit.getCount() + 1);
+  }
 
-    @Override
-    public AggregateType getType() {
-        return this.type;
-    }
+  @Override
+  public AggregateType getType() {
+    return this.type;
+  }
 
-    @Override
-    public String getSchema() {
-        return null;
-    }
-
+  @Override
+  public String getSchema() {
+    return null;
+  }
 }

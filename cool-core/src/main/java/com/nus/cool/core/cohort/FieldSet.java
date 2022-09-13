@@ -16,22 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-
 /**
- * Field is mainly used to represent the conditions we set up
+ * Field is mainly used to represent the conditions we set up.
  */
 @Data
 @AllArgsConstructor
 public class FieldSet {
 
   // default constructor
-  public FieldSet() {}
+  public FieldSet() {
+  }
 
   private FieldSetType fieldSetType;
 

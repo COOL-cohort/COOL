@@ -16,8 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort.filter;
 
+import static com.google.common.base.Preconditions.checkArgument;
 
 import com.nus.cool.core.cohort.ExtendedFieldSet;
 import com.nus.cool.core.io.readstore.FieldRS;
@@ -27,74 +29,77 @@ import com.nus.cool.core.schema.FieldType;
 
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 public class AgeFieldFilter implements FieldFilter {
-	
-	private final int minAge;
-	
-	private final int maxAge;
-	
-	public AgeFieldFilter(List<String> values) {
-		checkArgument(values != null && !values.isEmpty());
-		String[] range = values.get(0).split("\\|");
-		this.minAge = Integer.parseInt(range[0]);
-		this.maxAge = Integer.parseInt(range[1]);
-	}
 
-	@Override
-	public int getMinKey() {
-		return minAge;
-	}
+  private final int minAge;
 
-	@Override
-	public int getMaxKey() {
-		return maxAge;
-	}
+  private final int maxAge;
 
-	@Override
-	public boolean accept(MetaFieldRS metaField) {
-		return true;
-	}
+  /**
+   * Construct an filter on age field.
+   * 
+   * @param values the [min, max] accepted value range
+   */
+  public AgeFieldFilter(List<String> values) {
+    checkArgument(values != null && !values.isEmpty());
+    String[] range = values.get(0).split("\\|");
+    this.minAge = Integer.parseInt(range[0]);
+    this.maxAge = Integer.parseInt(range[1]);
+  }
 
-	@Override
-	public boolean accept(FieldRS chunkField) {
-		return true;
-	}
+  @Override
+  public int getMinKey() {
+    return minAge;
+  }
 
-	@Override
-	public boolean accept(InputVector inputVector) {
-		return true;
-	}
+  @Override
+  public int getMaxKey() {
+    return maxAge;
+  }
 
-	@Override
-	public boolean accept(int v) {
-		return (v >= minAge && v <= maxAge);
-	}
+  @Override
+  public boolean accept(MetaFieldRS metaField) {
+    return true;
+  }
 
-	@Override
-	public List<String> getValues() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public boolean accept(FieldRS chunkField) {
+    return true;
+  }
 
-	@Override
-	public ExtendedFieldSet getFieldSet() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public boolean accept(InputVector inputVector) {
+    return true;
+  }
 
-	@Override
-	public void updateValues(Double v) {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public boolean accept(int v) {
+    return (v >= minAge && v <= maxAge);
+  }
 
-	@Override
-	public int nextAcceptTuple(int start, int to) {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public List<String> getValues() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public FieldType getFieldType() {
-		return fieldType;
-	}
+  @Override
+  public ExtendedFieldSet getFieldSet() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void updateValues(Double v) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public int nextAcceptTuple(int start, int to) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public FieldType getFieldType() {
+    return fieldType;
+  }
 
 }

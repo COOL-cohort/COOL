@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,8 +39,7 @@ import java.util.Map;
 import lombok.Getter;
 
 /**
- * CohortAggregation, for each chunk, divide the users into cohorts 
- * and then aggregate the results
+ * CohortAggregation, for each chunk, divide the users into cohorts. and then aggregate the results
  */
 public class CohortAggregation implements Operator {
 
@@ -53,7 +53,7 @@ public class CohortAggregation implements Operator {
 
   private int[] birthActionGlobalIDs;
 
-  private int[] bBirthActionChunkIDs;
+  private int[] birthActionChunkIDs;
 
   @Getter
   private BitSet bs;
@@ -66,7 +66,7 @@ public class CohortAggregation implements Operator {
   }
 
   /**
-   * Initiate with table and query
+   * Initiate with table and query.
    */
   @Override
   public void init(TableSchema schema, CohortQuery query) {
@@ -77,7 +77,7 @@ public class CohortAggregation implements Operator {
   }
 
   /**
-   * metachunk dictionary for birth action
+   * metachunk dictionary for birth action.
    * 
    * @param metaChunk the metachunk to process
    */
@@ -90,47 +90,45 @@ public class CohortAggregation implements Operator {
     this.birthActionGlobalIDs = new int[this.birthActions.length];
     for (int i = 0; i < this.birthActions.length; i++) {
       int id = actionMetaField.find(this.birthActions[i]);
-        if (id < 0) {
-            throw new RuntimeException("Unknown birth action: " + this.birthActions[i]);
-        }
+      if (id < 0) {
+        throw new RuntimeException("Unknown birth action: " + this.birthActions[i]);
+      }
       this.birthActionGlobalIDs[i] = id;
     }
   }
 
   /**
-   * Check whether the chunk has the corresponding birth actions according to
-   * the metachunk dictionary, then divide the users into different cohorts and
-   * compute the results of cohorts
+   * Check whether the chunk has the corresponding birth actions according to the metachunk
+   * dictionary, then divide the users into different cohorts and compute the results of cohorts.
    * 
    * @param chunk the chunk to process
    */
   @Override
   public void process(ChunkRS chunk) {
     this.sigma.process(chunk);
-      if (!this.sigma.isBUserActiveChunk()) {
-          return;
-      }
+    if (!this.sigma.isUserActiveChunk()) {
+      return;
+    }
 
-    FieldRS appField = loadField(chunk, this.schema.getAppKeyField());
     FieldRS userField = loadField(chunk, this.schema.getUserKeyField());
     FieldRS actionField = loadField(chunk, this.schema.getActionField());
     FieldRS actionTimeField = loadField(chunk, this.schema.getActionTimeField());
     FieldRS cohortField = loadField(chunk, this.query.getCohortFields()[0]);
     FieldRS metricField = loadField(chunk, this.query.getMetric());
-    this.bBirthActionChunkIDs = new int[this.birthActionGlobalIDs.length];
+    this.birthActionChunkIDs = new int[this.birthActionGlobalIDs.length];
     for (int i = 0; i < this.birthActionGlobalIDs.length; i++) {
       int id = actionField.getKeyVector().find(this.birthActionGlobalIDs[i]);
-        if (id < 0) {
-            return;
-        }
-      this.bBirthActionChunkIDs[i] = id;
+      if (id < 0) {
+        return;
+      }
+      this.birthActionChunkIDs[i] = id;
     }
-
+    
     int min = cohortField.minKey();
     int cardinality = cohortField.maxKey() - min + 1;
     int cohortSize = actionTimeField.maxKey() - actionTimeField.minKey() + 1 + 1;
     long[][] chunkResults = new long[cardinality][cohortSize];
-
+    
     InputVector cohortInput = cohortField.getValueVector();
     InputVector actionTimeInput = actionTimeField.getValueVector();
     InputVector metricInput = metricField == null ? null : metricField.getValueVector();
@@ -139,7 +137,8 @@ public class CohortAggregation implements Operator {
     int maxAllowedAge = cohortSize - 1;
     aggregator.init(metricInput, actionTimeInput, cohortSize, minAllowedAge, maxAllowedAge,
         this.query.getAgeInterval());
-
+    
+    FieldRS appField = loadField(chunk, this.schema.getAppKeyField());
     RLEInputVector appInput = (RLEInputVector) appField.getValueVector();
     appInput.skipTo(0);
     RLEInputVector.Block appBlock = new RLEInputVector.Block();
@@ -150,20 +149,20 @@ public class CohortAggregation implements Operator {
     while (appInput.hasNext()) {
       appInput.nextBlock(appBlock);
       if (appFilter.accept(appBlock.value)) {
-          if (!(userField.getValueVector() instanceof RLEInputVector)) {
-              continue;
-          }
+        if (!(userField.getValueVector() instanceof RLEInputVector)) {
+          continue;
+        }
         RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
         userInput.skipTo(0);
         RLEInputVector.Block userBlock = new RLEInputVector.Block();
         while (userInput.hasNext()) {
           userInput.nextBlock(userBlock);
-            if (userBlock.off < appBlock.off) {
-                continue;
-            }
-            if (userBlock.off > appBlock.off + appBlock.len) {
-                break;
-            }
+          if (userBlock.off < appBlock.off) {
+            continue;
+          }
+          if (userBlock.off > appBlock.off + appBlock.len) {
+            break;
+          }
 
           int begin = userBlock.off;
           int end = userBlock.off + userBlock.len;
@@ -185,9 +184,9 @@ public class CohortAggregation implements Operator {
             if (ageOff < end) {
               bv.set(birthOff + 1, end);
               this.sigma.selectAgeActivities(birthOff + 1, end, bv);
-                if (!bv.isEmpty()) {
-                    aggregator.processUser(bv, birthTime, birthOff + 1, end, chunkResults[cohort]);
-                }
+              if (!bv.isEmpty()) {
+                aggregator.processUser(bv, birthTime, birthOff + 1, end, chunkResults[cohort]);
+              }
               bv.clear(birthOff + 1, end);
             }
           }
@@ -196,63 +195,63 @@ public class CohortAggregation implements Operator {
     }
 
     InputVector keyVector = null;
-      if (cohortField.isSetField()) {
-          keyVector = cohortField.getKeyVector();
-      }
+    if (cohortField.isSetField()) {
+      keyVector = cohortField.getKeyVector();
+    }
     for (int i = 0; i < cardinality; i++) {
       if (chunkResults[i][0] > 0) {
         int cohort = keyVector == null ? i + min : keyVector.get(i + min);
         for (int j = 0; j < cohortSize; j++) {
           CohortKey key = new CohortKey(cohort, j);
           long value = 0;
-            if (this.cubletResults.containsKey(key)) {
-                value = this.cubletResults.get(key);
-            }
-            if (value + chunkResults[i][j] > 0) {
-                this.cubletResults.put(key, value + chunkResults[i][j]);
-            }
+          if (this.cubletResults.containsKey(key)) {
+            value = this.cubletResults.get(key);
+          }
+          if (value + chunkResults[i][j] > 0) {
+            this.cubletResults.put(key, value + chunkResults[i][j]);
+          }
         }
       }
     }
   }
 
   /**
-   * Load the field in the chunk according to fieldid
+   * Load the field in the chunk according to fieldId.
    */
   private synchronized FieldRS loadField(ChunkRS chunk, int fieldId) {
     return chunk.getField(fieldId);
   }
 
   /**
-   * Load the field in the chunk according to fieldname
+   * Load the field in the chunk according to fieldname.
    */
   private FieldRS loadField(ChunkRS chunk, String fieldName) {
-      if ("Retention".equals(fieldName)) {
-          return null;
-      }
+    if ("Retention".equals(fieldName)) {
+      return null;
+    }
     int id = this.schema.getFieldID(fieldName);
     return loadField(chunk, id);
   }
 
   private Aggregator newAggregator() {
     String metric = this.query.getMetric();
-      if (metric.equals("Retention")) {
-          return new UserCountAggregator();
-      } else {
-          return new SumAggregator();
-      }
+    if (metric.equals("Retention")) {
+      return new UserCountAggregator();
+    } else {
+      return new SumAggregator();
+    }
   }
 
   /**
-   * Find the birth tuple 
+   * Find the birth tuple.
    * 
-   * @param begin the start position to search
-   * @param end the end position to search
+   * @param begin       the start position to search
+   * @param end         the end position to search
    * @param actionInput The birth action
    */
   private int seekToBirthTuple(int begin, int end, InputVector actionInput) {
     int pos = begin - 1;
-    for (int id : this.bBirthActionChunkIDs) {
+    for (int id : this.birthActionChunkIDs) {
       pos++;
       for (; pos < end; pos++) {
         if (actionInput.next() == id) {

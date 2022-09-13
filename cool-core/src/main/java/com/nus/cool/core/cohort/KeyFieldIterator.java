@@ -1,10 +1,10 @@
 package com.nus.cool.core.cohort;
 
-import java.util.Optional;
-
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
+
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -17,8 +17,14 @@ public class KeyFieldIterator {
 
   private RLEInputVector.Block block;
 
+  /**
+   * Iterate to the next item.
+   * @return
+   */
   public boolean next() {
-    if (!input.hasNext()) return false;
+    if (!input.hasNext()) {
+      return false;
+    }
     input.nextBlock(block);
     return true;
   }
@@ -36,19 +42,19 @@ public class KeyFieldIterator {
     return block.off + block.len;
   }
 
-  
   @AllArgsConstructor
   public static class Builder {
     @NonNull
     private final FieldRS keyField;
 
+    /**
+     * Build and iterator over key field.
+     */
     public Optional<KeyFieldIterator> build() {
-      return Optional.ofNullable(
-        (keyField.getValueVector() instanceof RLEInputVector)
-        ? new KeyFieldIterator(
-          (RLEInputVector) keyField.getValueVector(), keyField.getKeyVector(), new RLEInputVector.Block())
-        : null
-      );
+      return Optional.ofNullable((keyField.getValueVector() instanceof RLEInputVector)
+          ? new KeyFieldIterator((RLEInputVector) keyField.getValueVector(),
+              keyField.getKeyVector(), new RLEInputVector.Block())
+          : null);
     }
   }
 }

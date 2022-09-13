@@ -16,29 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort;
 
-import com.nus.cool.core.cohort.aggregator.*;
+import com.nus.cool.core.cohort.aggregator.BirthAvgAggregator;
+import com.nus.cool.core.cohort.aggregator.BirthCountAggregator;
+import com.nus.cool.core.cohort.aggregator.BirthMaxAggregator;
+import com.nus.cool.core.cohort.aggregator.BirthMinAggregator;
+import com.nus.cool.core.cohort.aggregator.BirthSumAggregator;
+import com.nus.cool.core.cohort.aggregator.EventAggregator;
+import com.nus.cool.core.cohort.aggregator.RollingRentionAggregator;
+import com.nus.cool.core.cohort.aggregator.UniqueAggregator;
+import com.nus.cool.core.cohort.aggregator.UserCountAggregatorEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BirthAggregatorFactory {
 
-    private static final Map<String, EventAggregator> aggregators = new HashMap<>();
-    
-    static {
-        aggregators.put("UNIQUE", new UniqueAggregator());
-    	aggregators.put("COUNT", new BirthCountAggregator());
-    	aggregators.put("RETENTION", new UserCountAggregatorEvent());
-    	aggregators.put("SUM", new BirthSumAggregator());
-    	aggregators.put("AVG", new BirthAvgAggregator());
-    	aggregators.put("MAX", new BirthMaxAggregator());
-    	aggregators.put("MIN", new BirthMinAggregator());
-    	aggregators.put("ROLLRETENTION", new RollingRentionAggregator());
-    }
+  private static final Map<String, EventAggregator> aggregators = new HashMap<>();
 
-    public static EventAggregator getAggregator(String op) {
-        return aggregators.get(op);
-    }
+  static {
+    aggregators.put("UNIQUE", new UniqueAggregator());
+    aggregators.put("COUNT", new BirthCountAggregator());
+    aggregators.put("RETENTION", new UserCountAggregatorEvent());
+    aggregators.put("SUM", new BirthSumAggregator());
+    aggregators.put("AVG", new BirthAvgAggregator());
+    aggregators.put("MAX", new BirthMaxAggregator());
+    aggregators.put("MIN", new BirthMinAggregator());
+    aggregators.put("ROLLRETENTION", new RollingRentionAggregator());
+  }
+
+  public static EventAggregator getAggregator(String op) {
+    return aggregators.get(op);
+  }
 }

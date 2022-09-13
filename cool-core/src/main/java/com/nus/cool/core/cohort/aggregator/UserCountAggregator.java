@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort.aggregator;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -26,38 +27,38 @@ import java.util.BitSet;
 
 /**
  * UserCountAggregator is used to aggregate the results of users at different time
- * when the metric is retention
+ * when the metric is retention.
  */
 public class UserCountAggregator implements Aggregator {
 
   /**
-   * The field of action time
+   * The field of action time.
    */
   private InputVector eventDayVec;
 
   /**
-   * Indicates whether the user contain the corresponding result at each age
+   * Indicates whether the user contain the corresponding result at each age.
    */
   private BitSet mask;
 
   /**
-   * Regard how many days or weeks or others as an age 
+   * Regard how many days or weeks or others as an age.
    */
   private int ageDivider;
 
   /**
-   * The start position of the user in the table
+   * The start position of the user in the table.
    */
   private int from;
 
 
   /**
-   * The end position of the user in the table
+   * The end position of the user in the table.
    */
   private int to;
 
   /**
-   * Initiate UserCountAggregator with the configuration of cohort analysis
+   * Initiate UserCountAggregator with the configuration of cohort analysis.
    *
    * @param metricVec the metric field
    * @param maxAges the number of ages we set up
@@ -77,7 +78,7 @@ public class UserCountAggregator implements Aggregator {
   }
 
   /**
-   * Get the Bitset to indicate whether the user contain the corresponding result at each age
+   * Get the Bitset to indicate whether the user contain the corresponding result at each age.
    *
    * @param hitBV the bitset that indicates which record in the table is effective
    * @param sinceDay the birth time of the user
