@@ -205,6 +205,10 @@ public class TableSchema {
     return this.fields.get(this.getActionTimeField()).getName();
   }
 
+  public String getUserKeyFieldName(){
+    return this.fields.get(this.getUserKeyField()).getName();
+  }
+
   public FieldSchema getFieldSchema(int i) {
     return fields.get(i);
   }
