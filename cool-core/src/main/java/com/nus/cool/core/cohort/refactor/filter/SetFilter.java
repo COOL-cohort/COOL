@@ -1,99 +1,101 @@
 package com.nus.cool.core.cohort.refactor.filter;
 
-import com.google.common.base.Preconditions;
-import com.nus.cool.core.cohort.refactor.storage.Scope;
-import java.lang.UnsupportedOperationException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 
+import com.nus.cool.core.cohort.refactor.storage.Scope;
+import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.MetaFieldRS;
 
 /**
- * Set filter.
+ * Set filter
  */
 public class SetFilter implements Filter {
 
-  private static final FilterType type = FilterType.Set;
+    protected final FilterType type = FilterType.Set;
 
-  // O(1) to check whether the value is acceptable or rejectable
-  private HashSet<String> acceptSet;
-  private HashSet<String> rejectSet;
+    protected HashSet<String> valueSet;
+    protected final String fieldSchema;
+    protected HashSet<Integer> gidSet;
 
-  // filter schema
-  private final String fieldSchema;
-
-  /**
-   * Create a SetFilter.
-   */
-  public SetFilter(String fieldSchema, String[] acceptValues, String[] rejectedValues) {
-    Preconditions.checkArgument(acceptValues != null || rejectedValues != null,
-        "acceptValues and rejectValue can not be null at the same time");
-
-    this.fieldSchema = fieldSchema;
-    if (acceptValues != null) {
-      this.acceptSet = new HashSet<>();
-      for (int i = 0; i < acceptValues.length; i++) {
-        this.acceptSet.add(acceptValues[i]);
-      }
+    protected SetFilter(String fieldSchema, String[] Values) {
+        this.fieldSchema = fieldSchema;
+        this.valueSet = new HashSet<>(Arrays.asList(Values));
     }
 
-    if (rejectedValues != null) {
-      this.rejectSet = new HashSet<>();
-      for (int i = 0; i < rejectedValues.length; i++) {
-        this.rejectSet.add(rejectedValues[i]);
-      }
+    public static Filter GenerateSetFilter(String fieldSchema, String[] acceptValues, String[] rejectValues){
+        if(acceptValues != null) 
+            return new SetAcceptFilter(fieldSchema, acceptValues);
+        else if(rejectValues != null)
+            return new SetRejectFilter(fieldSchema, rejectValues);
+        else
+            throw new IllegalArgumentException("For SetFilter, acceptValue and rejectValue aren't equal to null at the same time");
     }
-    // Precondition to check no overlap element between acceptSet and rejectSet
-  }
 
-  @Override
-  public Boolean accept(String value) throws RuntimeException {
-    if (this.acceptSet != null) {
-      return this.acceptSet.contains(value);
-    } else if (this.rejectSet != null) {
-      return !this.rejectSet.contains(value);
+    @Override
+    public Boolean accept(Integer value) throws RuntimeException {
+        throw new UnsupportedOperationException("ChildClass of SetFilter should override to implement Accept");
     }
-    throw new RuntimeException("acList and rejList can not be null at the same time");
-  }
 
-  @Override
-  public Boolean accept(Integer value) throws RuntimeException {
-    throw new UnsupportedOperationException(
-        "SetFilter dosent't implement the Integer accept method");
-  }
-
-  @Override
-  public BitSet accept(String[] values) throws RuntimeException {
-
-    BitSet res = new BitSet(values.length);
-    for (int i = 0; i < values.length; i++) {
-      if (this.accept(values[i])) {
-        res.set(i);
-      }
+    @Override
+    public BitSet accept(List<Integer> values) throws RuntimeException {
+        BitSet res = new BitSet(values.size());
+        for (int i = 0; i < values.size(); i++) {
+            if (this.accept(values.get(i))) {
+                res.set(i);
+            }
+        }
+        return res;
     }
-    return res;
-  }
 
-  @Override
-  public BitSet accept(List<Integer> values) throws RuntimeException {
-    throw new UnsupportedOperationException(
-        "SetFilter doesn't implement the Integer accept method");
-  }
+    @Override
+    public boolean accept(Scope scope) throws RuntimeException {
+        for(int i = scope.getLeft(); i < scope.getRight(); i++){
+            if(!this.accept(i)){
+                return false;
+            }
+        }
+        return true;
+    }
 
-  @Override
-  public BitSet accept(Scope values) throws RuntimeException {
-    throw new UnsupportedOperationException("SetFilter doesn't implement the Scope accept method");
-  }
+    @Override
+    public FilterType getType() {
+        return this.type;
+    }
 
-  @Override
-  public FilterType getType() {
-    return type;
-  }
+    @Override
+    public String getFilterSchema() {
+        return this.fieldSchema;
+    }
 
-  /* ---------------------- Helper function --------------- */
+    @Override
+    public void loadMetaInfo(MetaChunkRS metaChunkRS) {
+        this.gidSet = new HashSet<>();
+        MetaFieldRS metaFieldRS = metaChunkRS.getMetaField(this.fieldSchema);
+        for(String value:this.valueSet){
+            int gid = metaFieldRS.find(value);
+            if(gid == -1){
+                // means this value is not existed in this Cublet
+                continue;
+            }
+            this.gidSet.add(gid);
+        }
+    }
 
-  @Override
-  public String getFilterSchema() {
-    return this.fieldSchema;
-  }
+    @Override
+    public Boolean accept(String value) throws RuntimeException {
+        throw new UnsupportedOperationException("ChildClass of SetFilter should override to implement Accept");
+    }
+
+    @Override
+    public BitSet accept(String[] values) throws RuntimeException {
+        BitSet res = new BitSet(values.length);
+        for (int i = 0; i < values.length; i++) {
+            if (this.accept(values[i])) {
+                res.set(i);
+            }
+        }
+        return res;  }
 }
