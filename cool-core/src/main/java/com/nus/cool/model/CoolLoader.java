@@ -96,8 +96,8 @@ public class CoolLoader {
         if(dataFileName.endsWith(".csv")){
             boolean bconsistency =DataLoader.checkConsistency(schema.getFields(), ((CsvDataLoaderConfig)this.loaderConfig).getDataFieldName());
             if(!bconsistency){
-                logger.error("The field sequence of the table.YAML must be the same as that of data file!");
-                System.exit(-1);
+                logger.error("The field sequence of the data file must be the same as that of the table.YAML!");
+                throw new IOException("Field Sequence");
             }
         }
         loader.load();
