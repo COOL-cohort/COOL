@@ -21,7 +21,6 @@ package com.nus.cool.core.cohort;
 
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.io.Closeable;
 
 /**

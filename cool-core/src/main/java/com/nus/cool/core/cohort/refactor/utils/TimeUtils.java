@@ -3,8 +3,14 @@ package com.nus.cool.core.cohort.refactor.utils;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Utilities to represent and process time related fields.
+ */
 public class TimeUtils {
 
+  /**
+   * time units.
+   */
   public enum TimeUnit {
 
     HOUR("HOUR"),

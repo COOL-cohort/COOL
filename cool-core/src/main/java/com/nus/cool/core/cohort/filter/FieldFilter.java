@@ -24,7 +24,6 @@ import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
-
 import java.util.List;
 
 /**
@@ -35,21 +34,21 @@ public interface FieldFilter {
 
   /**
    * Get the global minimum of the conditions.
-   * 
+
    * @return the global minimum
    */
   int getMinKey();
 
   /**
    * Get the global maximum of the conditions.
-   * 
+
    * @return the global maximum
    */
   int getMaxKey();
 
   /**
    * Indicate whether the metafield is eligible.
-   * 
+
    * @param metaField the metafield to be checked
    * @return false indicates the metafield is not eligible and true indicates the
    *         metafield is eligible
@@ -58,7 +57,7 @@ public interface FieldFilter {
 
   /**
    * Indicate whether the field is eligible.
-   * 
+
    * @param field the field to be checked
    * @return false indicates the field is not eligible and true indicates the
    *         field is eligible
@@ -69,7 +68,7 @@ public interface FieldFilter {
 
   /**
    * Indicate whether the interger v is eligible.
-   * 
+
    * @param v the interger to be checked
    * @return false indicates the interger is not eligible and true indicates the
    *         interger is eligible
@@ -78,7 +77,7 @@ public interface FieldFilter {
 
   /**
    * Get the conditions set up before.
-   * 
+
    * @return the conditions and the minimum and maximum are separated by '|'
    */
   List<String> getValues();

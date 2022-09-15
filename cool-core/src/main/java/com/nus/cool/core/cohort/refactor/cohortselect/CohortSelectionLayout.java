@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
-
 import java.util.ArrayList;
-
 import lombok.Getter;
 
 /**
@@ -69,8 +67,10 @@ public class CohortSelectionLayout {
   }
 
   private CohortSetSelector generateSetSelector() {
-    /**
-     * If set cohort selector, and no rejectValue and acceptValue input. We consider
+    /*
+     * 
+     * If set cohort selector, and no rejectValue and acceptValue input.
+     * We consider
      * the situation that all value in this schema can be chosen as a
      */
     if (this.acceptValue == null && this.rejectValue == null) {

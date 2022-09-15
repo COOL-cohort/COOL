@@ -3,9 +3,11 @@ package com.nus.cool.core.cohort.refactor.ageselect;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
 import com.nus.cool.core.cohort.refactor.utils.TimeUtils;
-
 import lombok.Getter;
 
+/**
+ * Layout class to facilitate age selection.
+ */
 @Getter
 public class AgeSelectionLayout {
   private TimeUtils.TimeUnit unit;

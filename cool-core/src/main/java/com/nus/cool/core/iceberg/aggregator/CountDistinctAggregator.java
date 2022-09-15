@@ -19,57 +19,61 @@
 
 package com.nus.cool.core.iceberg.aggregator;
 
-import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.iceberg.result.AggregatorResult;
-import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldType;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
+/**
+ * Count distinct aggregator.
+ */
+public class CountDistinctAggregator implements Aggregator {
+  @Override
+  public void process(Map<String, BitSet> groups, FieldRS field,
+      Map<String, AggregatorResult> resultMap, MetaFieldRS metaFieldRs) {
 
+    for (Map.Entry<String, BitSet> entry : groups.entrySet()) {
+      if (resultMap.get(entry.getKey()) == null) {
+        String groupName = entry.getKey();
+        AggregatorResult aggregatorResult = new AggregatorResult();
+        resultMap.put(groupName, aggregatorResult);
+      }
 
-public class CountDistinctAggregator implements Aggregator{
-    @Override
-    public void process(Map<String, BitSet> groups, FieldRS field,
-                        Map<String, AggregatorResult> resultMap, MetaFieldRS metaFieldRS) {
+      AggregatorResult result = resultMap.get(entry.getKey());
 
-
-        for (Map.Entry<String, BitSet> entry : groups.entrySet()) {
-            if (resultMap.get(entry.getKey()) == null) {
-                String groupName = entry.getKey();
-                AggregatorResult aggregatorResult = new AggregatorResult();
-                resultMap.put(groupName, aggregatorResult);
-            }
-
-            AggregatorResult result = resultMap.get(entry.getKey());
-
-            if (result.getCountDistinct() == null) {
-                if (field.getFieldType() == FieldType.Metric) {
-                    throw new UnsupportedOperationException();
-                }
-
-                BitSet bs = entry.getValue();
-                InputVector key = field.getKeyVector(); // globalIDs,
-                InputVector value = field.getValueVector(); // localIDs
-
-                ArrayList<Integer> debugInt = new ArrayList<>();
-
-                Set<Integer> localIdSet = new HashSet<>();
-                for (int i = 0; i < bs.size(); i++) {
-                    int nextPos = bs.nextSetBit(i);
-                    if (nextPos < 0) {
-                        break;
-                    }
-                    localIdSet.add(value.get(nextPos));
-                    i = nextPos;
-                    debugInt.add(i);
-                }
-                for (Integer i : localIdSet) {
-                    result.getDistinctSet().add(metaFieldRS.getString(key.get(i)));
-                }
-
-                result.setCountDistinct((float) result.getDistinctSet().size());
-            }
+      if (result.getCountDistinct() == null) {
+        if (field.getFieldType() == FieldType.Metric) {
+          throw new UnsupportedOperationException();
         }
+
+        BitSet bs = entry.getValue();
+        InputVector key = field.getKeyVector(); // globalIDs,
+        InputVector value = field.getValueVector(); // localIDs
+
+        ArrayList<Integer> debugInt = new ArrayList<>();
+
+        Set<Integer> localIdSet = new HashSet<>();
+        for (int i = 0; i < bs.size(); i++) {
+          int nextPos = bs.nextSetBit(i);
+          if (nextPos < 0) {
+            break;
+          }
+          localIdSet.add(value.get(nextPos));
+          i = nextPos;
+          debugInt.add(i);
+        }
+        for (Integer i : localIdSet) {
+          result.getDistinctSet().add(metaFieldRs.getString(key.get(i)));
+        }
+
+        result.setCountDistinct((float) result.getDistinctSet().size());
+      }
     }
+  }
 }

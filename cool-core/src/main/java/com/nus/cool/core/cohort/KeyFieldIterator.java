@@ -3,12 +3,13 @@ package com.nus.cool.core.cohort;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
-
 import java.util.Optional;
-
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
+/**
+ * Iterator class of a key field. (used for UserKey)
+ */
 @AllArgsConstructor
 public class KeyFieldIterator {
   private final RLEInputVector input;
@@ -19,7 +20,6 @@ public class KeyFieldIterator {
 
   /**
    * Iterate to the next item.
-   * @return
    */
   public boolean next() {
     if (!input.hasNext()) {
@@ -42,6 +42,9 @@ public class KeyFieldIterator {
     return block.off + block.len;
   }
 
+  /**
+   * Builder class of KeyFieldIterator.
+   */
   @AllArgsConstructor
   public static class Builder {
     @NonNull

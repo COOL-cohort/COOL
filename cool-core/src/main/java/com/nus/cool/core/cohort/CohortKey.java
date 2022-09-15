@@ -45,7 +45,7 @@ public class CohortKey {
 
   /**
    * construction function of the class.
-   * 
+
    * @param cohort   the cohort id of the target cohort
    * @param age      the age of the target cohort
    * @param userlist the Userlist of the target cohort
@@ -59,7 +59,7 @@ public class CohortKey {
 
   /**
    * construction function of the class.
-   * 
+
    * @param cohort the cohort id of the target cohort
    * @param age    the age of the target cohort
    */
@@ -95,7 +95,7 @@ public class CohortKey {
 
   /**
    * Whether the target CohortKey class equals this object.
-   * 
+
    * @return 0 inidcates they are different and 1 indicates they are the same
    */
   @Override

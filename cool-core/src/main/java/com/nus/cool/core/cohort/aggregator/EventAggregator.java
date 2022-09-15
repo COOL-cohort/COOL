@@ -22,11 +22,13 @@ package com.nus.cool.core.cohort.aggregator;
 import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
-
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Event aggregator.
+ */
 public interface EventAggregator {
 
   void init(InputVector vec);
@@ -44,6 +46,7 @@ public interface EventAggregator {
 
   /**
    * Aggregate over @param ageOffset with age defined by time.
+
    * @param time time field
    */
   void ageAggregate(BitSet ageOffset, InputVector time, int birthDay, int ageOff, int ageEnd,
@@ -51,7 +54,7 @@ public interface EventAggregator {
 
   /**
    * Aggregate over @param ageOffset with age defined by time for the metric field.
-   *
+
    * @param time time field
    * @param fieldValue the field value of the metric field that is in the ageSelection filter
    */

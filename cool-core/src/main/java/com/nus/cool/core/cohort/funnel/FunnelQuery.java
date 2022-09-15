@@ -2,11 +2,13 @@ package com.nus.cool.core.cohort.funnel;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.BirthSequence;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Funnel query.
+ */
 public class FunnelQuery {
 
   private String dataSource;

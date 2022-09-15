@@ -20,35 +20,37 @@
 package com.nus.cool.core.iceberg.query;
 
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
-
 import java.util.List;
 
-
+/**
+ * Aggregator query structure defines a set of aggregators on a field.
+ */
 public class Aggregation {
-    private String fieldName;
+  private String fieldName;
 
-    private List<AggregatorFactory.AggregatorType> operators;
+  private List<AggregatorFactory.AggregatorType> operators;
 
-    public String getFieldName() {
-        return fieldName;
-    }
+  public String getFieldName() {
+    return fieldName;
+  }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
+  public void setFieldName(String fieldName) {
+    this.fieldName = fieldName;
+  }
 
-    public List<AggregatorFactory.AggregatorType> getOperators() {
-        return operators;
-    }
+  public List<AggregatorFactory.AggregatorType> getOperators() {
+    return operators;
+  }
 
-    public void setOperators(List<AggregatorFactory.AggregatorType> operators) {
-        this.operators = operators;
-    }
+  public void setOperators(List<AggregatorFactory.AggregatorType> operators) {
+    this.operators = operators;
+  }
 
-    public Aggregation(String fieldName, List<AggregatorFactory.AggregatorType> operators) {
-        this.fieldName = fieldName;
-        this.operators = operators;
-    }
+  public Aggregation(String fieldName, List<AggregatorFactory.AggregatorType> operators) {
+    this.fieldName = fieldName;
+    this.operators = operators;
+  }
 
-    public Aggregation() {}
+  public Aggregation() {
+  }
 }

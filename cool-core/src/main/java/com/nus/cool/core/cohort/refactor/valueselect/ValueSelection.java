@@ -7,12 +7,13 @@ import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Getter;
 
+/**
+ * value selection criteria of a query.
+ */
 public class ValueSelection {
 
   @Getter

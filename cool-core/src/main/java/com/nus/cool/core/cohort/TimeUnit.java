@@ -19,6 +19,9 @@
 
 package com.nus.cool.core.cohort;
 
+/**
+ * Time units.
+ */
 public enum TimeUnit {
 
   HOUR,

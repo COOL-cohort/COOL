@@ -23,12 +23,14 @@ import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.TimeUtils;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * User count aggregator event.
+ */
 public class UserCountAggregatorEvent implements EventAggregator {
 
   @Override

@@ -1,7 +1,6 @@
 package com.nus.cool.core.cohort.refactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.nus.cool.core.cohort.refactor.ageselect.AgeSelection;
 import com.nus.cool.core.cohort.refactor.birthselect.BirthSelection;
 import com.nus.cool.core.cohort.refactor.birthselect.EventSelection;
@@ -24,7 +23,6 @@ import com.nus.cool.core.io.readstore.UserMetaFieldRS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -32,9 +30,11 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
 import lombok.Getter;
 
+/**
+ * Cohort query processor.
+ */
 public class CohortProcessor {
 
   private final AgeSelection ageSelector;
@@ -229,7 +229,7 @@ public class CohortProcessor {
 
   /**
    * Check if this cublet contains the required field.
-   * 
+
    * @param metaChunk hashMetaFields result
    * @return true: this metaChunk is valid, false: this metaChunk is invalid.
    */
@@ -296,7 +296,7 @@ public class CohortProcessor {
 
   /**
    * Read from json file and create a instance of CohortProcessor.
-   * 
+
    * @param in File
    * @return instance of file
    * @throws IOException IOException

@@ -28,6 +28,9 @@ import java.util.List;
  */
 public class ExtendedFieldSet {
 
+  /**
+   * Field value types.
+   */
   public static enum FieldValueType {
 
     AbsoluteValue,
@@ -42,6 +45,9 @@ public class ExtendedFieldSet {
 
   }
 
+  /**
+   * Field types.
+   */
   public static enum FieldSetType {
 
     Set,
@@ -50,6 +56,9 @@ public class ExtendedFieldSet {
 
   }
 
+  /**
+   * Field value.
+   */
   public static class FieldValue {
 
     private FieldValueType type = FieldValueType.AbsoluteValue;
@@ -82,6 +91,10 @@ public class ExtendedFieldSet {
   private String field;
 
   private FieldValue fieldValue;
+
+  public FieldSetType getFilterType() {
+    return setType;
+  }
 
   public void setFilterType(FieldSetType setType) {
     this.setType = setType;

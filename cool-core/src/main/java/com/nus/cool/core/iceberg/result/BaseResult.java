@@ -19,74 +19,93 @@
 
 package com.nus.cool.core.iceberg.result;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
-
+/**
+ * Base result class.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BaseResult {
 
-    private String timeRange;
+  private String timeRange;
 
-    private String key;
+  private String key;
 
-    private String fieldName;
+  private String fieldName;
 
-    private AggregatorResult aggregatorResult;
+  private AggregatorResult aggregatorResult;
 
-    private boolean equalsKey(BaseResult another) {
-        Set<String> set1 = new HashSet<>(Arrays.asList(this.getKey().split("|")));
-        Set<String> set2 = new HashSet<>(Arrays.asList(another.getKey().split("|")));
-        return set1.equals(set2);
+  private boolean equalsKey(BaseResult another) {
+    Set<String> set1 = new HashSet<>(Arrays.asList(this.getKey().split("|")));
+    Set<String> set2 = new HashSet<>(Arrays.asList(another.getKey().split("|")));
+    return set1.equals(set2);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if ((o instanceof BaseResult)) {
-            BaseResult another = (BaseResult) o;
-            if (this.equalsKey(another)) {
-                if (this.getTimeRange().equals(another.getTimeRange()) && this.getFieldName().equals(another.getFieldName())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
+    if ((o instanceof BaseResult)) {
+      BaseResult another = (BaseResult) o;
+      if (this.equalsKey(another)) {
+        if (this.getTimeRange().equals(another.getTimeRange())
+            && this.getFieldName().equals(another.getFieldName())) {
+          return true;
         } else {
-            return false;
+          return false;
         }
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
+  }
 
-    public static List<BaseResult> merge(List<BaseResult> results) {
-        BitSet bs = new BitSet();
-        bs.set(0, results.size());
-        for (int i = 0; i < bs.size(); i++) {
-            i = bs.nextSetBit(i);
-            if (i < 0) break;
-            BaseResult res1 = results.get(i);
-            for (int j = i + 1; j < bs.size(); j++) {
-                j = bs.nextSetBit(j);
-                if (j < 0) break;
-                BaseResult res2 = results.get(j);
-                if (res1.equals(res2)) {
-                    res1.getAggregatorResult().merge(res2.getAggregatorResult());
-                    bs.clear(j);
-                }
-            }
+  /**
+   * Merge two base results.
+   */
+  public static List<BaseResult> merge(List<BaseResult> results) {
+    BitSet bs = new BitSet();
+    bs.set(0, results.size());
+    for (int i = 0; i < bs.size(); i++) {
+      i = bs.nextSetBit(i);
+      if (i < 0) {
+        break;
+      }
+      BaseResult res1 = results.get(i);
+      for (int j = i + 1; j < bs.size(); j++) {
+        j = bs.nextSetBit(j);
+        if (j < 0) {
+          break;
         }
-        List<BaseResult> finalRes = new ArrayList<>();
-        for (int i = 0; i < bs.size(); i++) {
-            i = bs.nextSetBit(i);
-            if (i < 0) break;
-            finalRes.add(results.get(i));
+        BaseResult res2 = results.get(j);
+        if (res1.equals(res2)) {
+          res1.getAggregatorResult().merge(res2.getAggregatorResult());
+          bs.clear(j);
         }
-        //System.out.println("bs: " + finalRes.size());
-        return finalRes;
+      }
     }
+    List<BaseResult> finalRes = new ArrayList<>();
+    for (int i = 0; i < bs.size(); i++) {
+      i = bs.nextSetBit(i);
+      if (i < 0) {
+        break;
+      }
+      finalRes.add(results.get(i));
+    }
+    // System.out.println("bs: " + finalRes.size());
+    return finalRes;
+  }
 }

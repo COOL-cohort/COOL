@@ -22,11 +22,13 @@ package com.nus.cool.core.cohort.aggregator;
 import com.nus.cool.core.cohort.TimeUnit;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.io.storevector.InputVector;
-
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Unique aggregator.
+ */
 public class UniqueAggregator implements EventAggregator {
 
   private InputVector values;

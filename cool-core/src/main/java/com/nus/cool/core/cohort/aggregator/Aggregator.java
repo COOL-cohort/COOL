@@ -32,5 +32,5 @@ public interface Aggregator {
   void init(InputVector metricVec, InputVector eventDayVec, int maxAges, int from, int to,
       int ageDivider);
 
-  void processUser(BitSet hitBV, int sinceDay, int start, int end, long[] row);
+  void processUser(BitSet hitBv, int sinceDay, int start, int end, long[] row);
 }

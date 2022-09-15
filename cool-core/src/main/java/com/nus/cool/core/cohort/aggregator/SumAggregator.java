@@ -79,8 +79,8 @@ public class SumAggregator implements Aggregator {
 
   /**
    * Aggregate the results of the user at each time.
-   *
-   * @param hitBV    the bitset that indicates which record in the table is
+
+   * @param hitBv    the bitset that indicates which record in the table is
    *                 effective
    * @param sinceDay the birth time of the user
    * @param start    the position for the first age tuple of the user
@@ -88,9 +88,9 @@ public class SumAggregator implements Aggregator {
    * @param row      the array that store the aggregation result
    */
   @Override
-  public void processUser(BitSet hitBV, int sinceDay, int start, int end, long[] row) {
+  public void processUser(BitSet hitBv, int sinceDay, int start, int end, long[] row) {
     for (int i = start; i < end; i++) {
-      int nextPos = hitBV.nextSetBit(i);
+      int nextPos = hitBv.nextSetBit(i);
       if (nextPos < 0) {
         return;
       }

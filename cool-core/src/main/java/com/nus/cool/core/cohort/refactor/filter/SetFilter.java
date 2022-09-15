@@ -2,7 +2,6 @@ package com.nus.cool.core.cohort.refactor.filter;
 
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
-
 import java.lang.UnsupportedOperationException;
 import java.util.BitSet;
 import java.util.HashSet;

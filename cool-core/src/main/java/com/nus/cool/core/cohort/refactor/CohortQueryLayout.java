@@ -2,18 +2,18 @@ package com.nus.cool.core.cohort.refactor;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.nus.cool.core.cohort.refactor.ageselect.AgeSelectionLayout;
 import com.nus.cool.core.cohort.refactor.birthselect.BirthSelectionLayout;
 import com.nus.cool.core.cohort.refactor.cohortselect.CohortSelectionLayout;
 import com.nus.cool.core.cohort.refactor.valueselect.ValueSelectionLayout;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-
 import lombok.Getter;
 
+/**
+ * Layout class to facilitate json serialization of cohort query.
+ */
 @Getter
 public class CohortQueryLayout {
 

@@ -29,16 +29,17 @@ import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Extended cohort aggregation operator.
+ */
 public class ExtendedCohortAggregation implements CohortOperator {
 
   private static Log LOG = LogFactory.getLog(ExtendedCohortAggregation.class);

@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.filter.FilterLayout;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Getter;
 
+/**
+ * Layout class to facilitate json serialization of event selection criteria.
+ */
 public class EventSelectionLayout {
   @Getter
   @JsonProperty("filters")

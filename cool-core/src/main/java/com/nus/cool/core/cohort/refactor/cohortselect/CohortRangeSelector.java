@@ -4,7 +4,6 @@ import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.filter.RangeFilter;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
-
 import java.util.List;
 
 /**

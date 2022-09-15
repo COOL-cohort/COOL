@@ -28,10 +28,12 @@ import com.nus.cool.core.cohort.aggregator.EventAggregator;
 import com.nus.cool.core.cohort.aggregator.RollingRentionAggregator;
 import com.nus.cool.core.cohort.aggregator.UniqueAggregator;
 import com.nus.cool.core.cohort.aggregator.UserCountAggregatorEvent;
-
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Factory class of birth aggregators.
+ */
 public class BirthAggregatorFactory {
 
   private static final Map<String, EventAggregator> aggregators = new HashMap<>();

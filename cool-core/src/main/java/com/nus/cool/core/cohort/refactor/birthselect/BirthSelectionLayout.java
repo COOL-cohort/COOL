@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
 import lombok.Getter;
 
+/**
+ * Layout class to faciliate json serialization of birth selection criteria.
+ */
 @Getter
 public class BirthSelectionLayout {
 

@@ -2,11 +2,9 @@ package com.nus.cool.core.cohort.refactor.filter;
 
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.storage.Scope;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-
 import lombok.Getter;
 
 /**
@@ -44,7 +42,7 @@ public class RangeFilter implements Filter {
 
   /**
    * Need add Scope in the next steps.
-   * 
+
    * @param fieldSchema String
    */
   public RangeFilter(String fieldSchema, List<Scope> scopeList) {
@@ -104,7 +102,7 @@ public class RangeFilter implements Filter {
   /**
    * Parse string to RangeUnit Exmaple [145 - 199] = RangeUnit{left:145 ,
    * right:199}.
-   * 
+
    * @param str string
    * @return RangeUnit
    */

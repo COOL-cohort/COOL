@@ -36,7 +36,6 @@ import com.nus.cool.core.schema.DataType;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -47,6 +46,9 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * Extended cohort selection operator.
+ */
 public class ExtendedCohortSelection implements Operator {
 
   // private final FieldFilterFactory filterFactory = new FieldFilterFactory();
@@ -137,8 +139,8 @@ public class ExtendedCohortSelection implements Operator {
     List<ExtendedFieldSet> selectors;
     
     // process ageField
-    int fieldID = tableSchema.getFieldID(q.getAgeField().getField());
-    checkArgument(fieldID >= 0);
+    int fieldId = tableSchema.getFieldID(q.getAgeField().getField());
+    checkArgument(fieldId >= 0);
     selectors = q.getAgeField().getEventSelection();
     List<String> ageRange = q.getAgeField().getRange();
     if (ageRange == null || ageRange.isEmpty()) {
@@ -355,6 +357,7 @@ public class ExtendedCohortSelection implements Operator {
 
   /**
    * Evaluate the birth filters against tuples within the given offset range.
+
    * @param eventId    the id of birth event
    * @param fromOffset the starting point
    */
@@ -371,10 +374,9 @@ public class ExtendedCohortSelection implements Operator {
 
   /**
    * Calculate users birth time within the start and end record range.
-   *
+
    * @param start start offset
    * @param end   end offset
-   * @return
    */
   private int getUserBirthTime(int start, int end) {
 
@@ -559,23 +561,23 @@ public class ExtendedCohortSelection implements Operator {
       for (int idx = 0; idx < events.size(); ++idx) {
         BirthSequence.BirthEvent be = events.get(idx);
         for (BirthSequence.CohortField cf : be.getCohortFields()) {
-          int fieldID = tableSchema.getFieldID(cf.getField());
+          int fieldId = tableSchema.getFieldID(cf.getField());
 
           // cohort by the birth time
           // However, this code block seems not to be triggered during the test.
-          if (fieldID == tableSchema.getActionTimeField()) {
+          if (fieldId == tableSchema.getActionTimeField()) {
             cohort.addDimension(TimeUtils.getDateofNextTimeUnitN(cohort.getBirthDate(),
                 query.getAgeField().getUnit(), 0));
             continue;
           }
 
-          Double value = getBirthAttribute(idx, fieldID);
+          Double value = getBirthAttribute(idx, fieldId);
           if (value == null) {
             return null;
           }
 
           // determine the dimension
-          FieldSchema schema = tableSchema.getField(fieldID);
+          FieldSchema schema = tableSchema.getField(fieldId);
           if (schema.getDataType() == DataType.String) {
             // use the global id as the cohort dimension
             int gid = chunk.getField(cf.getField()).getKeyVector().get(value.intValue());
@@ -654,9 +656,9 @@ public class ExtendedCohortSelection implements Operator {
     // age by dimension
     // each qualified activity will make the positions of all neighbouring
     // activities with the same dimension value set
-    int fieldID = tableSchema.getFieldID(query.getAgeField().getField());
-    if (fieldID != tableSchema.getActionField() && fieldID != tableSchema.getActionTimeField()) {
-      InputVector inputVector = this.chunk.getField(fieldID).getValueVector();
+    int fieldId = tableSchema.getFieldID(query.getAgeField().getField());
+    if (fieldId != tableSchema.getActionField() && fieldId != tableSchema.getActionTimeField()) {
+      InputVector inputVector = this.chunk.getField(fieldId).getValueVector();
       int pos = ageOff;
       inputVector.skipTo(pos);
       int lastVal = inputVector.next();
@@ -679,7 +681,7 @@ public class ExtendedCohortSelection implements Operator {
 
   /**
    * Select age activity tuples bounded by [ageOff, ageEnd).
-   * 
+
    * @param ageOff the start position of age tuples
    * @param ageEnd the end position of age tuples
    * @param bs     the hit position list of all qualified tuples
@@ -689,12 +691,12 @@ public class ExtendedCohortSelection implements Operator {
     checkArgument(ageOff < ageEnd);
     // enable the dimension-based ageby operator to be processed in the same way
     // as event-based ageby operator
-    int fieldID = tableSchema.getFieldID(query.getAgeField().getField());
-    if (fieldID != tableSchema.getActionField() && fieldID != tableSchema.getActionTimeField()) {
+    int fieldId = tableSchema.getFieldID(query.getAgeField().getField());
+    if (fieldId != tableSchema.getActionField() && fieldId != tableSchema.getActionTimeField()) {
       bs.and(ageDelimiters);
       int pos = ageDelimiters.nextSetBit(ageOff);
       int lastSetbit = pos;
-      InputVector inputVector = this.chunk.getField(fieldID).getValueVector();
+      InputVector inputVector = this.chunk.getField(fieldId).getValueVector();
       while (pos >= 0 && pos < ageEnd) {
         lastSetbit = pos;
         inputVector.skipTo(pos);
@@ -733,17 +735,17 @@ public class ExtendedCohortSelection implements Operator {
     return metricAgeFilterName;
   }
 
-  private Double getBirthAttribute(int baseEvent, int fieldID) {
-    FieldSchema schema = tableSchema.getField(fieldID);
+  private Double getBirthAttribute(int baseEvent, int fieldId) {
+    FieldSchema schema = tableSchema.getField(fieldId);
     EventAggregator aggregator;
 
     if (schema.getDataType() != DataType.Aggregate) {
       aggregator = BirthAggregatorFactory.getAggregator("UNIQUE");
     } else {
       aggregator = BirthAggregatorFactory.getAggregator(schema.getAggregator());
-      // fieldID = tableSchema.getFieldID(schema.getBaseField());
+      // fieldId = tableSchema.getFieldID(schema.getBaseField());
     }
-    aggregator.init(chunk.getField(fieldID).getValueVector());
+    aggregator.init(chunk.getField(fieldId).getValueVector());
     return aggregator.birthAggregate(eventOffset.get(baseEvent));
   }
 
