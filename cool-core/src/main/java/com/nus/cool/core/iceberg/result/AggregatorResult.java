@@ -20,42 +20,57 @@
 package com.nus.cool.core.iceberg.result;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
-
+/**
+ * Aggregation result class.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AggregatorResult {
 
-    private Integer count;
+  private Integer count;
 
-    private Long sum;
+  private Long sum;
 
-    private Float average;
+  private Float average;
 
-    private Integer max;
+  private Integer max;
 
-    private Integer min;
+  private Integer min;
 
-    private Float countDistinct;
+  private Float countDistinct;
 
-    @JsonIgnore
-    private Set<String> distinctSet = new HashSet<>();
+  @JsonIgnore
+  private Set<String> distinctSet = new HashSet<>();
 
-    public void merge(AggregatorResult res) {
-        if (this.countDistinct != null) {
-            this.distinctSet.addAll(res.getDistinctSet());
-            this.countDistinct = (float) this.distinctSet.size();
-        }
-        if (this.max != null) this.max = this.max >= res.getMax() ? this.max : res.getMax();
-        if (this.min != null) this.min = this.min <= res.getMin() ? this.min : res.getMin();
-        if (this.count != null) this.count += res.getCount();
-        if (this.sum != null) this.sum += res.getSum();
-        if (this.average != null) this.average = this.sum / (float)this.count;
-     }
+  /**
+   * Merge aggregation results.
+   */
+  public void merge(AggregatorResult res) {
+    if (this.countDistinct != null) {
+      this.distinctSet.addAll(res.getDistinctSet());
+      this.countDistinct = (float) this.distinctSet.size();
+    }
+    if (this.max != null) {
+      this.max = this.max >= res.getMax() ? this.max : res.getMax();
+    }
+    if (this.min != null) {
+      this.min = this.min <= res.getMin() ? this.min : res.getMin();
+    }
+    if (this.count != null) {
+      this.count += res.getCount();
+    }
+    if (this.sum != null) {
+      this.sum += res.getSum();
+    }
+    if (this.average != null) {
+      this.average = this.sum / (float) this.count;
+    }
+  }
 }

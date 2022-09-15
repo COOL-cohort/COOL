@@ -1,7 +1,6 @@
 package com.nus.cool.core.cohort.refactor.storage;
 
 import java.util.HashSet;
-
 import lombok.Data;
 
 /**

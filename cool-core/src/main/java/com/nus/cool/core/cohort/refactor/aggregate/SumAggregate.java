@@ -3,6 +3,9 @@ package com.nus.cool.core.cohort.refactor.aggregate;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 
+/**
+ * Sum aggregator.
+ */
 public class SumAggregate implements AggregateFunc {
 
   private final AggregateType type = AggregateType.SUM;

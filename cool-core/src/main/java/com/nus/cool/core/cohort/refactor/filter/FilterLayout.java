@@ -2,7 +2,6 @@ package com.nus.cool.core.cohort.refactor.filter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Preconditions;
-
 import lombok.Getter;
 
 /**

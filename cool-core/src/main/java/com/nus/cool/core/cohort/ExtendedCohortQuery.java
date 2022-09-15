@@ -22,20 +22,23 @@ package com.nus.cool.core.cohort;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Data;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Extended cohort query.
+ */
 @Data
 public class ExtendedCohortQuery {
 
+  /**
+   * Age field.
+   */
   @Data
   public static class AgeField {
 
@@ -121,7 +124,7 @@ public class ExtendedCohortQuery {
 
   /**
    * Read query from InputStream.
-   * 
+
    * @param in InputStream
    * @return query instance
    */

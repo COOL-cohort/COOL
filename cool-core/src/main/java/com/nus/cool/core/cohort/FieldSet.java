@@ -40,6 +40,9 @@ public class FieldSet {
 
   private List<String> values;
 
+  /**
+   * Field types.
+   */
   public enum FieldSetType {
 
     Set,

@@ -20,12 +20,17 @@
 package com.nus.cool.core.cohort;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Birth sequence.
+ */
 public class BirthSequence {
 
+  /**
+   * Cohort field.
+   */
   public static class CohortField {
 
     private String field;
@@ -64,6 +69,9 @@ public class BirthSequence {
     }
   }
 
+  /**
+   * Anchor class.
+   */
   public static class Anchor {
 
     private int anchor;
@@ -91,10 +99,16 @@ public class BirthSequence {
     }
   }
 
+  /**
+   * Time window unit.
+   */
   public static enum TimeWindowUnit {
     DAY, WEEK, MONTH
   }
 
+  /**
+   * Time window.
+   */
   public static class TimeWindow {
 
     private int length;
@@ -122,6 +136,9 @@ public class BirthSequence {
     }
   }
 
+  /**
+   * Birth event.
+   */
   public static class BirthEvent {
     private int minTrigger = 0;
     private int maxTrigger = -1;

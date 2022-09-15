@@ -101,7 +101,7 @@ public class RangeFieldFilter implements FieldFilter {
 
   /**
    * Get the global minimum of the conditions.
-   * 
+
    * @return the global minimum
    */
   @Override
@@ -111,7 +111,7 @@ public class RangeFieldFilter implements FieldFilter {
 
   /**
    * Get the global maximum of the conditions.
-   * 
+
    * @return the global maximum
    */
   @Override
@@ -122,7 +122,7 @@ public class RangeFieldFilter implements FieldFilter {
   /**
    * Indicate whether the metafield is eligible i.e. whether we can find eligible
    * values in the metafield
-   * 
+
    * @param metaField the metafield to be checked
    * @return false indicates the metafield is not eligible and true indicates the
    *         metafield is eligible
@@ -135,7 +135,7 @@ public class RangeFieldFilter implements FieldFilter {
   /**
    * Indicate whether the field is eligible i.e. whether we can find eligible
    * values in the field
-   * 
+
    * @param field the field to be checked
    * @return false indicates the field is not eligible and true indicates the
    *         field is eligible
@@ -149,7 +149,7 @@ public class RangeFieldFilter implements FieldFilter {
   /**
    * Indicate whether the invariant field is eligible i.e. whether we can find
    * eligible values in the invariant field
-   * 
+
    * @param inputVector the vector of invariant data to be checked
    * @return false indicates the invariant field is not eligible and true
    *         indicates the invariant field is eligible
@@ -166,7 +166,7 @@ public class RangeFieldFilter implements FieldFilter {
 
   /**
    * Indicate whether the integer v is eligible.
-   * 
+
    * @param v the integer to be checked
    * @return false indicates the integer is not eligible and true indicates the
    *         integer is eligible
@@ -184,7 +184,7 @@ public class RangeFieldFilter implements FieldFilter {
 
   /**
    * Get the conditions set up before.
-   * 
+
    * @return the conditions and the minimum and maximum are separated by '|'
    */
   @Override

@@ -22,6 +22,9 @@ package com.nus.cool.core.cohort;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Extended cohort representation.
+ */
 public class ExtendedCohort {
 
   private List<Integer> dimensions = new ArrayList<>();

@@ -5,6 +5,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.TimeZone;
 
+/**
+ * Utilities to process time related fields.
+ */
 public class DateUtils {
   /**
    * Create a LocalDateTime Instance from a unix timestamp.
@@ -47,7 +50,7 @@ public class DateUtils {
 
   /**
    * Calculate the difference of two time at a certain unit.
-   * 
+
    * @param ts1  the start localDateTime
    * @param ts2  the compared lis duration.
    * @param unit duration's unit

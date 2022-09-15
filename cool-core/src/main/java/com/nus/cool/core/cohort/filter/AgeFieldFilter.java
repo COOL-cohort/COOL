@@ -26,9 +26,11 @@ import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
-
 import java.util.List;
 
+/**
+ * Age field filter.
+ */
 public class AgeFieldFilter implements FieldFilter {
 
   private final int minAge;
@@ -37,7 +39,7 @@ public class AgeFieldFilter implements FieldFilter {
 
   /**
    * Construct an filter on age field.
-   * 
+
    * @param values the [min, max] accepted value range
    */
   public AgeFieldFilter(List<String> values) {

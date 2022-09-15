@@ -3,6 +3,9 @@ package com.nus.cool.core.cohort.refactor.aggregate;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 
+/**
+ * Max aggregator.
+ */
 public class MaxAggregate implements AggregateFunc {
 
   private final AggregateType type = AggregateType.MAX;

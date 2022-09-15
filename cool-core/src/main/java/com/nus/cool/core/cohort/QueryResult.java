@@ -47,7 +47,7 @@ public class QueryResult {
 
   /**
    * Record the correct result.
-   * 
+
    * @param result the correct result
    */
   public static QueryResult ok(Object result) {
@@ -68,6 +68,9 @@ public class QueryResult {
     }
   }
 
+  /**
+   * Query status.
+   */
   public enum QueryStatus {
     OK, ERROR
   }

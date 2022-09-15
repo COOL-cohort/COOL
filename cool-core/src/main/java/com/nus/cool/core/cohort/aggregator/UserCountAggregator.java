@@ -79,20 +79,20 @@ public class UserCountAggregator implements Aggregator {
 
   /**
    * Get the Bitset to indicate whether the user contain the corresponding result at each age.
-   *
-   * @param hitBV the bitset that indicates which record in the table is effective
+
+   * @param hitBv the bitset that indicates which record in the table is effective
    * @param sinceDay the birth time of the user
    * @param start the position for the first age tuple of the user
    * @param end the end position of the user's age tuples in the table
    * @param row the array that store the aggregation result
    */
   @Override
-  public void processUser(BitSet hitBV, int sinceDay, int start, int end, long[] row) {
+  public void processUser(BitSet hitBv, int sinceDay, int start, int end, long[] row) {
     this.mask.clear();
     this.eventDayVec.skipTo(start);
     for (int i = start; i < end; i++) {
       int eventDay = this.eventDayVec.next();
-      if (hitBV.get(i)) {
+      if (hitBv.get(i)) {
         int age = (eventDay - sinceDay) / this.ageDivider;
         if (age <= 0 || age >= row.length || this.mask.get(age)) {
           continue;

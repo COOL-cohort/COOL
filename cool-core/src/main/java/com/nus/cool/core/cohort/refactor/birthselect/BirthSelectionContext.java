@@ -2,7 +2,6 @@ package com.nus.cool.core.cohort.refactor.birthselect;
 
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
-
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Set;
@@ -93,7 +92,7 @@ public class BirthSelectionContext {
 
   /**
    * Get the birthEvent's datetime of certain user.
-   * 
+
    * @return null if user is not selected
    */
   public LocalDateTime getUserBirthEventDate(String userId) {
@@ -102,8 +101,6 @@ public class BirthSelectionContext {
 
   /**
    * Check whether in ContextWindow the birthEvent requirement is satisfied.
-   * 
-   * @return
    */
   private boolean isSatisfied(int[] eventState) {
     for (int i = 0; i < eventMinFrequency.length; i++) {

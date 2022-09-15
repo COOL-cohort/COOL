@@ -1,11 +1,9 @@
 package com.nus.cool.core.cohort.refactor.birthselect;
 
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-
 import lombok.Getter;
 
 /**
@@ -32,7 +30,7 @@ public class BirthSelection {
 
   /**
    * If user's birthEvent is selected return true else return false.
-   * 
+
    * @return whether the user's birthEvent is selected
    */
   public boolean isUserSelected(String userId) {
@@ -43,8 +41,6 @@ public class BirthSelection {
    * If user's birthEvent is selected, Get the birthEvent's Date. If cohort query
    * requires a collection of event we take the first event in whole collection as
    * user's birthEvent
-   * 
-   * @return
    */
   public LocalDateTime getUserBirthEventDate(String userId) {
     return context.getUserBirthEventDate(userId);
@@ -54,9 +50,8 @@ public class BirthSelection {
    * Select input Action Tuple, if it can not be selected as event return false
    * Else return true and add this event into BirthSelectionContext for further
    * check.
-   * 
+
    * @param tuple  Partial Action Tuple,
-   * @return
    */
   public boolean selectEvent(String userId, LocalDateTime date, ProjectedTuple tuple) {
     int eventIdx = 0;

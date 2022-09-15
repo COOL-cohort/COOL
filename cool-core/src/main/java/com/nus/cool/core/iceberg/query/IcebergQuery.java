@@ -21,64 +21,72 @@ package com.nus.cool.core.iceberg.query;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import lombok.Data;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
+/**
+ * Iceberg query class.
+ */
 @Data
 public class IcebergQuery {
 
-    public enum granularityType{
-        DAY,
-        MONTH,
-        YEAR,
-        NULL
+  /**
+   * Type to specify query granularity.
+   */
+  public enum GranularityType {
+    DAY,
+    MONTH,
+    YEAR,
+    NULL
+  }
+
+  private static final Log LOG = LogFactory.getLog(IcebergQuery.class);
+  // dataSource path
+  private String dataSource;
+  // select condition
+  private SelectionQuery selection;
+  // a list a groupFields
+  private List<String> groupFields;
+  // a list of aggregation functions, sum, count etc
+  private List<Aggregation> aggregations;
+  // selected time range
+  private String timeRange;
+
+  // granularity for time range
+  private GranularityType granularity;
+  // granularity for groupBy, if the groupBy field is dataType,
+  private GranularityType groupFieldsGranularity;
+
+  @Override
+  public String toString() {
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      return mapper.writeValueAsString(this);
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
     }
+    return null;
+  }
 
-    private static final Log LOG = LogFactory.getLog(IcebergQuery.class);
-    // dataSource path
-    private String dataSource;
-    // select condition
-    private SelectionQuery selection;
-    // a list a groupFields
-    private List<String> groupFields;
-    // a list of aggregation functions, sum, count etc
-    private List<Aggregation> aggregations;
-    // selected time range
-    private String timeRange;
-
-    // granularity for time range
-    private granularityType granularity;
-    // granularity for groupBy, if the groupBy field is dataType,
-    private granularityType groupFields_granularity;
-
-    @Override
-    public String toString() {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return null;
+  /**
+   * Pretty print of icerberg query.
+   */
+  public String toPrettyString() {
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+    } catch (JsonProcessingException e) {
+      LOG.info(e);
     }
+    return null;
+  }
 
-    public String toPrettyString() {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            LOG.info(e);
-        }
-        return null;
-    }
-
-    public static IcebergQuery read(InputStream in) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(in, IcebergQuery.class);
-    }
+  public static IcebergQuery read(InputStream in) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.readValue(in, IcebergQuery.class);
+  }
 }

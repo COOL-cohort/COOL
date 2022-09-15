@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
-
 import java.util.List;
-
 import lombok.Getter;
 
 /**
@@ -26,7 +24,7 @@ public class EventSelection {
 
   /**
    * Check if the data item pass event criteria.
-   * 
+
    * @param projectTuple partial row of a data tuple
    * @return whether this item can be chosen as a birthEvents
    */

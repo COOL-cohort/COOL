@@ -2,7 +2,6 @@ package com.nus.cool.core.cohort.refactor.storage;
 
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.ageselect.AgeSelectionLayout;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,8 +49,6 @@ public class CohortRet {
 
   /**
    * Initialize the missing intance Get the certain RetUnit, user can modify RetUnit in place.
-   * 
-   * @return
    */
   public RetUnit getByAge(String cohort, int age) {
     if (!this.cohortToValueList.containsKey(cohort)) {

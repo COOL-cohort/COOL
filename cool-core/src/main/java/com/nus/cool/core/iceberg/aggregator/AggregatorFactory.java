@@ -20,39 +20,51 @@
 
 package com.nus.cool.core.iceberg.aggregator;
 
+/**
+ * Factory class of OLAP aggregators.
+ */
 public class AggregatorFactory {
 
-    public enum AggregatorType {
+  /**
+   * OLAP Aggregator types.
+   */
+  public enum AggregatorType {
 
-        COUNT,
+    COUNT,
 
-        SUM,
+    SUM,
 
-        AVERAGE,
+    AVERAGE,
 
-        MAX,
+    MAX,
 
-        MIN,
+    MIN,
 
-        DISTINCTCOUNT
+    DISTINCTCOUNT
+  }
+
+  /**
+   * Create an OLAP aggregator of a type.
+
+   * @param operator type of aggregator
+   * @return constructed aggregagtor
+   */
+  public Aggregator create(AggregatorType operator) {
+    switch (operator) {
+      case COUNT:
+        return new CountAggregator();
+      case SUM:
+        return new SumAggregator();
+      case AVERAGE:
+        return new AverageAggregator();
+      case MAX:
+        return new MaxAggregator();
+      case MIN:
+        return new MinAggregator();
+      case DISTINCTCOUNT:
+        return new CountDistinctAggregator();
+      default:
+        throw new IllegalArgumentException("Unknown aggregator operator: " + operator);
     }
-
-    public Aggregator create(AggregatorType operator) {
-        switch (operator) {
-            case COUNT:
-                return new CountAggregator();
-            case SUM:
-                return new SumAggregator();
-            case AVERAGE:
-                return new AverageAggregator();
-            case MAX:
-                return new MaxAggregator();
-            case MIN:
-                return new MinAggregator();
-            case DISTINCTCOUNT:
-                return new CountDistinctAggregator();
-            default:
-                throw new IllegalArgumentException("Unknown aggregator operator: " + operator);
-        }
-    }
+  }
 }

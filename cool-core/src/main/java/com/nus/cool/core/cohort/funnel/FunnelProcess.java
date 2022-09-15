@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 package com.nus.cool.core.cohort.funnel;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -18,15 +14,16 @@ import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
+/**
+ * Funnel query operator.
+ */
 public class FunnelProcess implements CohortOperator {
 
   private static Log LOG = LogFactory.getLog(FunnelProcess.class);
@@ -82,7 +79,7 @@ public class FunnelProcess implements CohortOperator {
 
   /**
    * Initialize funnel processing.
-   * 
+
    * @param cohortUsers existing cohort
    */
   public void init(TableSchema tableSchema, InputVector cohortUsers, FunnelQuery query) {

@@ -3,10 +3,8 @@ package com.nus.cool.core.cohort.refactor.birthselect;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
-
 import java.time.LocalDateTime;
 import java.util.LinkedList;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -33,6 +31,7 @@ public class BirthContextWindow {
 
   /**
    * Create a BirthContextWindow for window operation over disjoint user records.
+
    * @param maxTimeWindow time window size limit
    */
   public BirthContextWindow(TimeWindow maxTimeWindow, int eventNum) {

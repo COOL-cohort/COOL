@@ -51,9 +51,9 @@ public class CohortAggregation implements Operator {
 
   private String[] birthActions;
 
-  private int[] birthActionGlobalIDs;
+  private int[] birthActionGlobalIds;
 
-  private int[] birthActionChunkIDs;
+  private int[] birthActionChunkIds;
 
   @Getter
   private BitSet bs;
@@ -78,7 +78,7 @@ public class CohortAggregation implements Operator {
 
   /**
    * metachunk dictionary for birth action.
-   * 
+
    * @param metaChunk the metachunk to process
    */
   @Override
@@ -87,20 +87,20 @@ public class CohortAggregation implements Operator {
 
     int actionField = this.schema.getActionField();
     MetaFieldRS actionMetaField = metaChunk.getMetaField(actionField, FieldType.Action);
-    this.birthActionGlobalIDs = new int[this.birthActions.length];
+    this.birthActionGlobalIds = new int[this.birthActions.length];
     for (int i = 0; i < this.birthActions.length; i++) {
       int id = actionMetaField.find(this.birthActions[i]);
       if (id < 0) {
         throw new RuntimeException("Unknown birth action: " + this.birthActions[i]);
       }
-      this.birthActionGlobalIDs[i] = id;
+      this.birthActionGlobalIds[i] = id;
     }
   }
 
   /**
    * Check whether the chunk has the corresponding birth actions according to the metachunk
    * dictionary, then divide the users into different cohorts and compute the results of cohorts.
-   * 
+
    * @param chunk the chunk to process
    */
   @Override
@@ -115,13 +115,13 @@ public class CohortAggregation implements Operator {
     FieldRS actionTimeField = loadField(chunk, this.schema.getActionTimeField());
     FieldRS cohortField = loadField(chunk, this.query.getCohortFields()[0]);
     FieldRS metricField = loadField(chunk, this.query.getMetric());
-    this.birthActionChunkIDs = new int[this.birthActionGlobalIDs.length];
-    for (int i = 0; i < this.birthActionGlobalIDs.length; i++) {
-      int id = actionField.getKeyVector().find(this.birthActionGlobalIDs[i]);
+    this.birthActionChunkIds = new int[this.birthActionGlobalIds.length];
+    for (int i = 0; i < this.birthActionGlobalIds.length; i++) {
+      int id = actionField.getKeyVector().find(this.birthActionGlobalIds[i]);
       if (id < 0) {
         return;
       }
-      this.birthActionChunkIDs[i] = id;
+      this.birthActionChunkIds[i] = id;
     }
     
     int min = cohortField.minKey();
@@ -244,14 +244,14 @@ public class CohortAggregation implements Operator {
 
   /**
    * Find the birth tuple.
-   * 
+
    * @param begin       the start position to search
    * @param end         the end position to search
    * @param actionInput The birth action
    */
   private int seekToBirthTuple(int begin, int end, InputVector actionInput) {
     int pos = begin - 1;
-    for (int id : this.birthActionChunkIDs) {
+    for (int id : this.birthActionChunkIds) {
       pos++;
       for (; pos < end; pos++) {
         if (actionInput.next() == id) {

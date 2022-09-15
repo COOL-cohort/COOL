@@ -27,14 +27,15 @@ import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Cohort user selection operator.
+ */
 public class CohortUserSection implements CohortOperator {
 
   private static Log LOG = LogFactory.getLog(CohortUserSection.class);

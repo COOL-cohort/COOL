@@ -51,7 +51,7 @@ public class SetFieldFilter implements FieldFilter {
   /**
    * Which condition it contains.
    */
-  private int[] contentIDs;
+  private int[] contentIds;
 
   /**
    * Indicate which tuple in the table is eligible.
@@ -74,41 +74,41 @@ public class SetFieldFilter implements FieldFilter {
 
   /**
    * construct a filter on a set field.
-   * 
+
    * @param values accepted values
    */
   public SetFieldFilter(ExtendedFieldSet set, List<String> values, FieldType fieldType) {
     this.fieldSet = set;
     this.values = checkNotNull(values);
     this.isAll = this.values.contains("ALL");
-    this.contentIDs = this.isAll ? new int[2] : new int[values.size()];
+    this.contentIds = this.isAll ? new int[2] : new int[values.size()];
     this.fieldType = fieldType;
   }
 
   /**
    * Get the minimum cube id of the field.
-   * 
+
    * @return the minimum cube id
    */
   @Override
   public int getMinKey() {
-    return ArrayUtil.min(this.contentIDs);
+    return ArrayUtil.min(this.contentIds);
   }
 
   /**
    * Get the maximum cube id of the field.
-   * 
+
    * @return the maximum cube id
    */
   @Override
   public int getMaxKey() {
-    return ArrayUtil.max(this.contentIDs);
+    return ArrayUtil.max(this.contentIds);
   }
 
   /**
    * Indicate whether the metafield is eligible i.e. whether we can find eligible
    * values in the metafield.
-   * 
+
    * @param metaField the metafield to be checked
    * @return false indicates the metafield is not eligible and true indicates the
    *         metafield is eligible
@@ -116,15 +116,15 @@ public class SetFieldFilter implements FieldFilter {
   @Override
   public boolean accept(MetaFieldRS metaField) {
     if (this.isAll) {
-      this.contentIDs[1] = metaField.count() - 1;
+      this.contentIds[1] = metaField.count() - 1;
       return true;
     }
     boolean hit = false;
     int i = 0;
-    // Set up the contentIDs that are the selected conditions
+    // Set up the contentIds that are the selected conditions
     for (String v : this.values) {
       int tmp = metaField.find(v);
-      contentIDs[i++] = tmp;
+      contentIds[i++] = tmp;
       hit |= (tmp >= 0);
     }
     return hit || (this.values.isEmpty());
@@ -133,7 +133,7 @@ public class SetFieldFilter implements FieldFilter {
   /**
    * Indicate whether the field is eligible i.e. whether we can find eligible
    * values in the field.
-   * 
+
    * @param field the field to be checked
    * @return false indicates the field is not eligible and true indicates the
    *         field is eligible
@@ -150,9 +150,9 @@ public class SetFieldFilter implements FieldFilter {
 
     boolean  hit = false;
     // build a hitset for the filters to check records
-    for (int contentID : this.contentIDs) {
-      if (contentID >= 0) {
-        int tmp = keyVec.find(contentID);
+    for (int contentId : this.contentIds) {
+      if (contentId >= 0) {
+        int tmp = keyVec.find(contentId);
         hit |= (tmp >= 0);
         if (tmp >= 0) {
           this.filter.set(tmp);
@@ -165,7 +165,7 @@ public class SetFieldFilter implements FieldFilter {
   /**
    * Indicate whether the invariant field is eligible i.e. whether we can find
    * eligible values in the invariant field.
-   * 
+
    * @param inputVector the vector of invariant data to be checked
    * @return false indicates the invariant field is not eligible and true
    *         indicates the invariant field is eligible
@@ -185,7 +185,7 @@ public class SetFieldFilter implements FieldFilter {
 
   /**
    * Indicate whether the integer is eligible.
-   * 
+
    * @param v the integer to be checked
    * @return false indicates the integer is not eligible and true indicates the
    *         integer is eligible
@@ -200,7 +200,7 @@ public class SetFieldFilter implements FieldFilter {
 
   /**
    * Get the conditions set up before.
-   * 
+
    * @return the string conditions we set up
    */
   @Override
