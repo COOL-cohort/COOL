@@ -1,0 +1,34 @@
+charset: utf-8
+fields:
+- preCal: false
+  fieldType: Metric
+  invariantField: true
+  name: birthyear
+- preCal: false
+  fieldType: UserKey
+  invariantField: false
+  name: id
+- preCal: false
+  fieldType: Action
+  invariantField: false
+  name: event
+- preCal: false
+  fieldType: Segment
+  invariantField: false
+  name: diagnose
+- preCal: false
+  fieldType: Segment
+  invariantField: false
+  name: prescribe
+- preCal: false
+  fieldType: Segment
+  invariantField: false
+  name: labtest
+- preCal: false
+  fieldType: Metric
+  invariantField: false
+  name: value
+- preCal: false
+  fieldType: ActionTime
+  invariantField: false
+  name: time
