@@ -41,11 +41,10 @@ public class CohortWS implements Output {
   /**
    * a list userid for each cublet (a user can have different id across cublet)
    */
-  private List<List<Integer>> usersByCublet;
+  private final List<List<Integer>> usersByCublet;
   
   public CohortWS(int numCublets) {
-    this.usersByCublet = new ArrayList<>(
-      (numCublets > 0) ? numCublets : 0);
+    this.usersByCublet = new ArrayList<>(Math.max(numCublets, 0));
   }
 
   /**
@@ -60,7 +59,7 @@ public class CohortWS implements Output {
   /**
    * write the users' id of one cublet
    * 
-   * @param out
+   * @param out int
    * @return
    */
   private int writeTo(List<Integer> users, DataOutput out) throws IOException {
@@ -85,10 +84,10 @@ public class CohortWS implements Output {
     // initial offset is 0
     offsets[0] = 0;
     for (int i = 0; i < usersByCublet.size()-1; i++) {
-      offsets[i+1] = offsets[0] + writeTo(usersByCublet.get(i), out);
+      offsets[i+1] = offsets[i] + writeTo(usersByCublet.get(i), out);
     }
     int headerOffset = offsets[offsets.length-1]
-      + writeTo(usersByCublet.get(usersByCublet.size()), out);
+      + writeTo(usersByCublet.get(usersByCublet.size()-1), out);
     for (int offset : offsets) {
       out.writeInt(IntegerUtil.toNativeByteOrder(offset));
     }

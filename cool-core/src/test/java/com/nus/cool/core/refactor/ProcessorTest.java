@@ -10,6 +10,7 @@ import com.nus.cool.functionality.CsvLoaderTest;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -52,12 +53,15 @@ public class ProcessorTest extends CsvLoaderTest {
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
 
+
     // start a new cool model and reload the cube
     this.coolModel = new CoolModel(this.cubeRepo);
     coolModel.reload(cohortProcessor.getDataSource());
     CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
-    CohortRet ret = cohortProcessor.process(cube);
 
+    // get current dir path
+    File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
+    CohortRet ret = cohortProcessor.process(cube, currentVersion.toString());
     String queryResultPath = Paths.get(queryDir, this.resultName).toString();
     ObjectMapper mapper = new ObjectMapper();
     // HashMap<String, List<Integer>> cohortData = mapper.readValue(new
@@ -76,7 +80,7 @@ public class ProcessorTest extends CsvLoaderTest {
       // System.out.printf("True Result %s\n", cohortData.get(cohortName).toString());
       // System.out.printf("Get Result %s\n", ret.getValuesByCohort(cohortName));
       Assert.assertEquals(cohortData.get(cohortName), ret.getValuesByCohort(cohortName));
-
+    System.out.println(ret.getCohortList());
     }
   }
 
