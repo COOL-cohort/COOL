@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import lombok.Getter;
 
 /**
  * Class for Cohort Analysis Result We consider the Cohort Analysis Result as a
@@ -26,6 +27,9 @@ public class CohortRet {
   private int interval;
 
   private int size;
+
+  @Getter
+  private final HashMap<String, List<String>> cohortToUserIdList = new HashMap<>();
 
   /**
    * Create a cohort ret.
@@ -108,6 +112,21 @@ public class CohortRet {
       return "Xaxis [retUnits=" + Arrays.toString(retUnits) + "]";
     }
 
+  }
+
+  public void addUserid(String cohortName, String userId){
+    if (!this.cohortToUserIdList.containsKey(cohortName)){
+      List<String> userIdList = new ArrayList<>();
+      this.cohortToUserIdList.put(cohortName ,userIdList);
+    }
+    this.cohortToUserIdList.get(cohortName).add(userId);
+  }
+
+  /**
+   * After processing each cublet, clear the cohortToUserIdList mapper,
+   */
+  public void ClearUserIds(){
+      this.cohortToUserIdList.clear();
   }
 
   public List<String> getCohortList() {

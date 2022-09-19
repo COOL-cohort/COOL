@@ -1,5 +1,15 @@
 package com.nus.cool.core.cohort.refactor;
 
+import com.nus.cool.core.cohort.refactor.storage.CohortWS;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.ageselect.AgeSelection;
 import com.nus.cool.core.cohort.refactor.birthselect.BirthSelection;
@@ -18,10 +28,6 @@ import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import lombok.Getter;
 
 /**
@@ -74,7 +80,7 @@ public class CohortProcessor {
    * @param cube Cube
    * @return CohortRet
    */
-  public CohortRet process(CubeRS cube) throws IOException {
+  public CohortRet process(CubeRS cube, String outputDir) throws IOException {
     // initialize the UserId and KeyId
     TableSchema tableschema = cube.getSchema();
     for (FieldSchema fieldSchema : tableschema.getFields()) {
@@ -88,9 +94,37 @@ public class CohortProcessor {
     this.projectedSchemaSet.add(this.userIdSchema);
     this.projectedSchemaSet.add(this.actionTimeSchema);
     this.tuple = new ProjectedTuple(this.projectedSchemaSet);
+
+    // initialize cohort result write store
+    HashMap<String, CohortWS > CohortUserMapper = new HashMap<>();
+
     for (CubletRS cublet : cube.getCublets()) {
       processCublet(cublet);
+
+      // record result user id list
+      for (Map.Entry<String, List<String>> ele: this.result.getCohortToUserIdList().entrySet()){
+
+        String cohortName = ele.getKey();
+        List<String> users = ele.getValue();
+        if (!CohortUserMapper.containsKey(cohortName)){
+          CohortUserMapper.put(cohortName, new CohortWS(cube.getCublets().size()));
+        }
+
+        CohortUserMapper.get(cohortName).addCubletResults(users);
+      }
+      this.result.ClearUserIds();
     }
+
+    // iterate all the write-store in CohortUserMapper, and sync it to disk
+    for (Map.Entry<String, CohortWS > ele: CohortUserMapper.entrySet()){
+
+      String fileName = ele.getKey();
+      File cubemeta = new File(outputDir, fileName);
+      DataOutputStream out = new DataOutputStream(
+          new FileOutputStream(cubemeta));
+      ele.getValue().writeTo(out);
+    }
+
     return this.result;
   }
 
@@ -121,21 +155,26 @@ public class CohortProcessor {
    * In this section, we load the tuple which is an inner property.
    * We left the process logic in processTuple function.
    *
+<<<<<<< HEAD
    * @param chunk     dataChunk
    * @param metaChunk metaChunk
+=======
+   * @param chunk              dataChunk
+   * @param metaChunk          metaChunk
+>>>>>>> c906bf6 (Store cohort result after cohort-processing)
    */
-  private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk) {
-    for (int i = 0; i < chunk.getRecords(); i++) {
-      // load data into tuple
-      for (String schema : this.projectedSchemaSet) {
-        int value = chunk.getField(schema).getValueByIndex(i);
-        this.tuple.loadAttr(value, schema);
-      }
+    private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk) {
+      for (int i = 0; i < chunk.getRecords(); i++) {
+        // load data into tuple
+        for (String schema : this.projectedSchemaSet) {
+          int value = chunk.getField(schema).getValueByIndex(i);
+          this.tuple.loadAttr(value, schema);
+        }
 
-      this.processTuple(metaChunk);
+        this.processTuple(metaChunk);
+      }
     }
 
-  }
 
   /**
    * process the inner tuple.
@@ -174,7 +213,7 @@ public class CohortProcessor {
       // Pass all above filter, we can store value into CohortRet
       // get the temporay result for this CohortGroup and this age
       RetUnit ret = this.result.getByAge(cohortName, age);
-
+      this.result.addUserid(cohortName, userId);
       this.valueSelector.getAggregateFunc().calculate(ret, tuple);
     }
   }
