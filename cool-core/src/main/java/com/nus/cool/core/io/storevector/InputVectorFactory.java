@@ -36,11 +36,11 @@ public class InputVectorFactory {
     InputVector result = null;
     switch (codec) {
       case INT8:
-        return (InputVector) ZInt8Store.load(buffer, buffer.getInt());
+        return (InputVector) ZInt8Store.load(buffer);
       case INT16:
-        return (InputVector) ZInt16Store.load(buffer, buffer.getInt());
+        return (InputVector) ZInt16Store.load(buffer);
       case INT32:
-        return (InputVector) ZInt32Store.load(buffer, buffer.getInt());
+        return (InputVector) ZInt32Store.load(buffer);
       case BitVector:
         result = new BitVectorInputVector();
         result.readFrom(buffer);

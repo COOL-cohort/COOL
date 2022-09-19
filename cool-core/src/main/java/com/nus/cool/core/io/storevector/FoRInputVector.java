@@ -73,13 +73,13 @@ public class FoRInputVector implements InputVector {
     Codec codec = Codec.fromInteger(buffer.get());
     switch (codec) {
       case INT8:
-        this.vecIn = (InputVector) ZInt8Store.load(buffer, buffer.getInt());
+        this.vecIn = (InputVector) ZInt8Store.load(buffer);
         break;
       case INT16:
-        this.vecIn = (InputVector) ZInt16Store.load(buffer, buffer.getInt());
+        this.vecIn = (InputVector) ZInt16Store.load(buffer);
         break;
       case INT32:
-        this.vecIn = (InputVector) ZInt32Store.load(buffer, buffer.getInt());
+        this.vecIn = (InputVector) ZInt32Store.load(buffer);
         break;
       default:
         throw new IllegalArgumentException("Unsupported codec: " + codec);
