@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -25,7 +26,6 @@ import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -55,22 +55,22 @@ import java.util.Map;
 public class MetaChunkRS implements Input {
 
   /**
-   * TableSchema for this meta chunk
+   * TableSchema for this meta chunk.
    */
   private TableSchema schema;
 
   /**
-   * charset defined in table schema
+   * charset defined in table schema.
    */
   private Charset charset;
 
   /**
-   * stored data byte buffer
+   * stored data byte buffer.
    */
   private ByteBuffer buffer;
 
   /**
-   * offsets for fields in this meta chunk
+   * offsets for fields in this meta chunk.
    */
   private int[] fieldOffsets;
 
@@ -87,36 +87,39 @@ public class MetaChunkRS implements Input {
     // Get chunk type
     this.buffer = checkNotNull(buffer);
     ChunkType chunkType = ChunkType.fromInteger(this.buffer.get());
-      if (chunkType != ChunkType.META) {
-          throw new IllegalStateException("Expect MetaChunk, but reads: " + chunkType);
-      }
+    if (chunkType != ChunkType.META) {
+      throw new IllegalStateException("Expect MetaChunk, but reads: " + chunkType);
+    }
 
     // Get #fields
     int fields = this.buffer.getInt();
     // Get field offsets
     this.fieldOffsets = new int[fields];
     for (int i = 0; i < fields; i++) {
-        fieldOffsets[i] = this.buffer.getInt();
+      fieldOffsets[i] = this.buffer.getInt();
     }
     // Fields are loaded only if they are called
   }
 
+  /**
+   * Create and return a read store of a selected field.
+   */
   public synchronized MetaFieldRS getMetaField(int i, FieldType type) {
     // Return the meta field if it had been read before
     if (this.fields.containsKey(i)) {
-        return this.fields.get(i);
+      return this.fields.get(i);
     }
     // Read the meta field from the buffer if it is called at the first time
     int fieldOffset = this.fieldOffsets[i];
     this.buffer.position(fieldOffset);
     MetaFieldRS metaField = null;
-    Map<String, Integer> invariantName2Id=new HashMap<>();
-    for(String invariantName : this.schema.getInvariantNames()){
+    Map<String, Integer> invariantName2Id = new HashMap<>();
+    for (String invariantName : this.schema.getInvariantNames()) {
       invariantName2Id.put(invariantName, this.schema.getInvariantIDFromName(invariantName));
     }
     switch (type) {
       case UserKey:
-        metaField=new UserMetaFieldRS(this.charset,invariantName2Id);
+        metaField = new UserMetaFieldRS(this.charset, invariantName2Id);
         break;
       case AppKey:
       case Action:
@@ -135,6 +138,9 @@ public class MetaChunkRS implements Input {
     return metaField;
   }
 
+  /**
+   * Create and return a read store of a selected field.
+   */  
   public MetaFieldRS getMetaField(String fieldName) {
     int id = this.schema.getFieldID(fieldName);
     FieldType type = this.schema.getFieldType(fieldName);

@@ -16,13 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.storevector;
 
 import com.nus.cool.core.util.ByteBuffers;
 import java.nio.ByteBuffer;
 
 /**
- * Decompress data which stores integers in one byte
+ * Decompress data which stores integers in one byte.
  * <p>
  * The data layout is as follows
  * ------------------------------------
@@ -32,12 +33,12 @@ import java.nio.ByteBuffer;
 public class ZInt8Store implements InputVector, ZIntStore {
 
   /**
-   * number of values
+   * number of values.
    */
   private int count;
 
   /**
-   * compressed data
+   * compressed data.
    */
   private ByteBuffer buffer;
 
@@ -45,6 +46,9 @@ public class ZInt8Store implements InputVector, ZIntStore {
     this.count = count;
   }
 
+  /**
+   * Create input vector on a buffer that is ZInt8 encoded.
+   */
   public static ZIntStore load(ByteBuffer buffer, int n) {
     ZIntStore store = new ZInt8Store(n);
     store.readFrom(buffer);
@@ -59,7 +63,7 @@ public class ZInt8Store implements InputVector, ZIntStore {
   @Override
   public int find(int key) {
     if (key > Byte.MAX_VALUE || key < 0) {
-        return -1;
+      return -1;
     }
     return ByteBuffers.binarySearchUnsigned(this.buffer, 0, this.buffer.limit(), (byte) key);
   }

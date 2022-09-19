@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.nus.cool.core.schema.Codec;
@@ -23,8 +24,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Compress integers using the leading zero suppressed schema. Each compressed integer is formatted
+ * Compress integers using the leading zero suppressed schema. Each compressed
+ * integer is formatted
  * to align to byte boundary and stored in native byte order
+ * 
  * <p>
  * The data layout is as follows
  * ------------------------------------
@@ -34,20 +37,23 @@ import java.nio.ByteOrder;
 public class ZIntCompressor implements Compressor {
 
   /**
-   * Bytes number for count
+   * Bytes number for count.
    */
   public static final int HEADACC = 4;
 
   /**
-   * Bytes number for compressed integer
+   * Bytes number for compressed integer.
    */
   private final int width;
 
   /**
-   * Maximum size of compressed data
+   * Maximum size of compressed data.
    */
   private final int maxCompressedLength;
 
+  /**
+   * Create a ZintCompressor.
+   */
   public ZIntCompressor(Codec codec, int numValues) {
     switch (codec) {
       case INT8:
@@ -98,6 +104,8 @@ public class ZIntCompressor implements Compressor {
         case 4:
           buffer.putInt(src[i]);
           break;
+        default:
+          System.err.println("ZintCompressor length should be one of (1, 2, 4).");
       }
     }
     return buffer.position() - destOff;

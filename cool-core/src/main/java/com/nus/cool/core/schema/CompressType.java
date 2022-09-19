@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.schema;
 
 /**
- * CompressType defines the types for different kinds of values
+ * CompressType defines the types for different kinds of values.
  */
 public enum CompressType {
 
@@ -34,17 +35,17 @@ public enum CompressType {
   KeyString,
 
   /**
-   * Compress type for keys of HashField
+   * Compress type for keys of HashField.
    */
   KeyHash,
 
   /**
-   * Compress type for values of hashField
+   * Compress type for values of hashField.
    */
   Value,
 
   /**
-   * Compress type for values of rangeField
+   * Compress type for values of rangeField.
    */
   ValueFast
 

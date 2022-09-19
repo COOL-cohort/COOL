@@ -19,47 +19,45 @@
 
 package com.nus.cool.functionality;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.model.CoolOlapEngine;
-
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
+/**
+ * Cohort profiling operation.
+ */
 public class CohortProfiling {
 
-    /**
-     * IcebergLoader model for cool
-     *
-     * @param args [0] the output data dir (eg, dir of .dz file)
-     *        args [1] query's path, eg olap-tpch/query0.json
-     * @throws IOException
-     */
-    public static void main(String[] args) throws Exception {
-        // the path of dz file eg "COOL/cube"
-        String dzFilePath = args[0];
-        // query path  eg. tmp/2/query.json
-        String queryFilePath = args[1];
+  /**
+   * IcebergLoader model for cool.
+   *
+   * @param args [0] the output data dir (eg, dir of .dz file)
+   *             args [1] query's path, eg olap-tpch/query0.json
+   */
+  public static void main(String[] args) throws Exception {
+    // the path of dz file eg "COOL/cube"
+    String dzFilePath = args[0];
+    // query path eg. tmp/2/query.json
+    String queryFilePath = args[1];
 
-        // load query
-        ObjectMapper mapper = new ObjectMapper();
-        IcebergQuery query = mapper.readValue(new File(queryFilePath), IcebergQuery.class);
+    // load query
+    ObjectMapper mapper = new ObjectMapper();
+    IcebergQuery query = mapper.readValue(new File(queryFilePath), IcebergQuery.class);
 
-        // load .dz file
-        String dataSourceName = query.getDataSource();
-        CoolModel coolModel = new CoolModel(dzFilePath);
-        coolModel.reload(dataSourceName);
-        CubeRS cube = coolModel.getCube(dataSourceName);
-        // execute query
-        List<BaseResult> results = coolModel.olapEngine.performOlapQuery(cube, query);
+    // load .dz file
+    String dataSourceName = query.getDataSource();
+    CoolModel coolModel = new CoolModel(dzFilePath);
+    coolModel.reload(dataSourceName);
+    CubeRS cube = coolModel.getCube(dataSourceName);
+    // execute query
+    List<BaseResult> results = coolModel.olapEngine.performOlapQuery(cube, query);
 
-        CoolOlapEngine.profiling(results);
-    }
-
-
+    CoolOlapEngine.profiling(results);
+    coolModel.close();
+  }
 }

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.nus.cool.core.util.IntegerUtil;
@@ -24,8 +25,10 @@ import java.nio.ByteOrder;
 import java.util.BitSet;
 
 /**
- * Compress a list of integers with BitVector encoding. The final BitSet is encoded in native byte
+ * Compress a list of integers with BitVector encoding. The final BitSet is
+ * encoded in native byte
  * order format.
+ * 
  * <p>
  * Data layout
  * ---------------
@@ -36,20 +39,24 @@ import java.util.BitSet;
 public class BitVectorCompressor implements Compressor {
 
   /**
-   * Bit vector
+   * Bit vector.
    */
   private BitSet bitSet;
 
   /**
-   * Maximum size of compressed data
+   * Maximum size of compressed data.
    */
   private int maxLength;
 
+  /**
+   * Compression operator for bit vector.
+   */
   public BitVectorCompressor(int max) {
     int bitLength = IntegerUtil.numOfBits(max);
     this.bitSet = new BitSet(bitLength);
-    this.maxLength = (bitLength >>> 3) + 1;  
+    this.maxLength = (bitLength >>> 3) + 1;
   }
+
   public BitVectorCompressor(Histogram hist) {
     this((int) hist.getMax());
   }
@@ -67,16 +74,16 @@ public class BitVectorCompressor implements Compressor {
 
   @Override
   public int compress(int[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen) {
-      for (int i = srcOff; i < srcOff + srcLen; i++) {
-          this.bitSet.set(src[i]);
-      }
+    for (int i = srcOff; i < srcOff + srcLen; i++) {
+      this.bitSet.set(src[i]);
+    }
     long[] words = this.bitSet.toLongArray();
     ByteBuffer buffer = ByteBuffer.wrap(dest, destOff, maxDestLen);
     buffer.order(ByteOrder.nativeOrder());
     buffer.put((byte) words.length);
-      for (long w : words) {
-          buffer.putLong(w);
-      }
+    for (long w : words) {
+      buffer.putLong(w);
+    }
     return buffer.position();
   }
 }

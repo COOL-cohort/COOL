@@ -16,26 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.nus.cool.core.io.writestore;
 
-import java.io.DataOutput;
-import java.io.IOException;
+package com.nus.cool.core.io.writestore;
 
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.FieldType;
+import java.io.DataOutput;
+import java.io.IOException;
 
+/**
+ * Interface for write stores for meta chunks.
+ */
 public interface MetaFieldWS extends Output {
 
   /**
-   * Put value into this field
+   * Put value into this field.
    *
    * @param v value
    */
   void put(String v);
 
-
   /**
-   * Find the index of value in this meta field, return -1 if no such value exists
+   * Find the index of value in this meta field, return -1 if no such value exists.
    *
    * @param v target value
    * @return index of value in this meta field
@@ -43,37 +45,36 @@ public interface MetaFieldWS extends Output {
   int find(String v);
 
   /**
-   * Number of entries in this field
+   * Number of entries in this field.
    *
    * @return number of entries in this field
    */
   int count();
 
   /**
-   * Get field type of this field
+   * Get field type of this field.
    *
    * @return fieldType of this field
    */
   FieldType getFieldType();
 
   /**
-   * Call this method before writeTo when no more values are put into this meta field. After the
-   * method returns, this meta field is frozen for writing.
+   * Call this method before writeTo when no more values are put into this meta field.
+   *  After the method returns, this meta field is frozen for writing.
    */
   void complete();
 
   /**
-   * clean internal data for processing next cublet
+   * clean internal data for processing next cublet.
    */
   void cleanForNextCublet();
 
-
   /**
-   * write the summary of this field to cube meta file
-   * @param out: the cube meta file
+   * write the summary of this field to cube meta file.
+   *
+   * @param out the cube meta file
    * @return bytes written
-   * @throws IOException
    */
   public int writeCubeMeta(DataOutput out) throws IOException;
-  
+
 }

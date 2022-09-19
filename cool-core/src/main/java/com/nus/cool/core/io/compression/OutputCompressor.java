@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.nus.cool.core.io.Output;
@@ -42,6 +43,8 @@ public class OutputCompressor implements Output {
   private Histogram hist;
 
   /**
+   * Reset the Histogram with an int array.
+   *
    * @param h   histogram of compress data
    * @param vec compress data
    * @param off the start offset in the data
@@ -56,6 +59,8 @@ public class OutputCompressor implements Output {
   }
 
   /**
+   * Reset the histogram with a byte array.
+   *
    * @param h   histogram of compress data
    * @param vec compress data
    * @param off the start offset in the data
@@ -79,8 +84,8 @@ public class OutputCompressor implements Output {
     int maxLen = compressor.maxCompressedLength();
     // 3. compress it and record output to compressed array
     byte[] compressed = new byte[maxLen];
-    int compressLen = this.dataType == DataType.INTEGER ?
-        compressor.compress(this.vec, this.off, this.len, compressed, 0, maxLen)
+    int compressLen = this.dataType == DataType.INTEGER
+        ? compressor.compress(this.vec, this.off, this.len, compressed, 0, maxLen)
         : compressor.compress(this.strVec, this.off, this.len, compressed, 0, maxLen);
 
     // Write compressor type
@@ -92,5 +97,7 @@ public class OutputCompressor implements Output {
     return bytesWritten;
   }
 
-  private enum DataType {INTEGER, STRING}
+  private enum DataType {
+    INTEGER, STRING
+  }
 }

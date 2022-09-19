@@ -18,31 +18,40 @@
  */
 
 package com.nus.cool.functionality;
+
 import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.model.CoolModel;
 import java.util.List;
 
-
+/**
+ * Relational algebra operation.
+ */
 public class RelationalAlgebra {
 
-   public static void main(String[] args) throws Exception {
-       // the path of dz file eg "COOL/cube"
-       String datasetPath = args[0];         // e.g., "../datasetSource";=
-       String cubeName = args[1];     // e.g., "tpc-h-10g"
-       String operation = args[2];          // e.g., "select, O_ORDERPRIORITY, 2-HIGH"
+  /**
+   * Execute relational query.
+   */
+  public static void main(String[] args) throws Exception {
+    // the path of dz file eg "COOL/cube"
+    String datasetPath = args[0]; // e.g., "../datasetSource";=
+    String cubeName = args[1]; // e.g., "tpc-h-10g"
+    String operation = args[2]; // e.g., "select, O_ORDERPRIORITY, 2-HIGH"
 
-       // load .dz file
-       CoolModel coolModel = new CoolModel(datasetPath);
-       coolModel.reload(cubeName);
+    // load .dz file
+    CoolModel coolModel = new CoolModel(datasetPath);
+    coolModel.reload(cubeName);
 
-       IcebergQuery query = coolModel.olapEngine.generateQuery(operation, cubeName);
-       if (query == null){
-           return;
-       }
+    IcebergQuery query = coolModel.olapEngine.generateQuery(operation, cubeName);
+    if (query == null) {
+      coolModel.close();
+      return;
+    }
 
-       // execute query
-       List<BaseResult> result = coolModel.olapEngine.performOlapQuery(coolModel.getCube(cubeName), query);
-       System.out.println(result.toString());
-   }
+    // execute query
+    List<BaseResult> result = coolModel.olapEngine.performOlapQuery(
+        coolModel.getCube(cubeName), query);
+    System.out.println(result.toString());
+    coolModel.close();
+  }
 }

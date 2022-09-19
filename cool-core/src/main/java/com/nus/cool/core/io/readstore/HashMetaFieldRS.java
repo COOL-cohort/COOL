@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -30,6 +31,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
 
+/**
+ * Read store of meta of a string field in meta chunks.
+ */
 public class HashMetaFieldRS implements MetaFieldRS {
 
   protected static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
@@ -45,7 +49,7 @@ public class HashMetaFieldRS implements MetaFieldRS {
   protected InputVector valueVec;
 
   // inverse map from global id to the offset in values.
-  //  only populated once when getString is called to retrieve from valueVec
+  // only populated once when getString is called to retrieve from valueVec
   protected Map<Integer, Integer> id2offset;
 
   public HashMetaFieldRS(Charset charset) {
@@ -78,7 +82,7 @@ public class HashMetaFieldRS implements MetaFieldRS {
       }
     }
     return ((LZ4InputVector) this.valueVec)
-      .getString(this.id2offset.get(i), this.charset);
+        .getString(this.id2offset.get(i), this.charset);
   }
 
   @Override
@@ -96,10 +100,10 @@ public class HashMetaFieldRS implements MetaFieldRS {
     this.fieldType = fieldType;
     this.fingerVec = InputVectorFactory.readFrom(buffer);
     this.globalIDVec = InputVectorFactory.readFrom(buffer);
-      if (this.fieldType == FieldType.Action || this.fieldType == FieldType.Segment
-          || this.fieldType == FieldType.UserKey) {
-          this.valueVec = InputVectorFactory.readFrom(buffer);
-      }
+    if (this.fieldType == FieldType.Action || this.fieldType == FieldType.Segment
+        || this.fieldType == FieldType.UserKey) {
+      this.valueVec = InputVectorFactory.readFrom(buffer);
+    }
   }
 
   @Override
@@ -108,11 +112,14 @@ public class HashMetaFieldRS implements MetaFieldRS {
     this.readFromWithFieldType(buffer, fieldType);
   }
 
-  public String[] getGidMap(){
+  /**
+   * Get cublet global id mapping of this field.
+   */
+  public String[] getGidMap() {
     // Can store it and reuse ret (suggestion)
     String[] ret = new String[this.count()];
     LZ4InputVector strlist = (LZ4InputVector) this.valueVec;
-    for(int i = 0; i < ret.length; i++){
+    for (int i = 0; i < ret.length; i++) {
       ret[this.globalIDVec.get(i)] = strlist.getString(i, this.charset);
     }
     return ret;

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -25,14 +26,13 @@ import com.google.common.primitives.Ints;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.converter.DayIntConverter;
-
-import lombok.Getter;
-
 import java.io.DataOutput;
 import java.io.IOException;
+import lombok.Getter;
 
 /**
- * Range MetaField write store
+ * Range MetaField write store.
+ * 
  * <p>
  * Data Layout
  * -------------
@@ -53,6 +53,9 @@ public class MetaRangeFieldWS implements MetaFieldWS {
 
   private int cubeMin;
 
+  /**
+   * Create a write store of a int field for meta chunks.
+   */
   public MetaRangeFieldWS(FieldType type) {
     this.fieldType = type;
     this.min = Integer.MAX_VALUE;
@@ -60,7 +63,6 @@ public class MetaRangeFieldWS implements MetaFieldWS {
     this.cubeMax = this.max;
     this.cubeMin = this.min;
   }
-
 
   @Override
   public void put(String v) {
@@ -98,7 +100,9 @@ public class MetaRangeFieldWS implements MetaFieldWS {
 
   @Override
   public void complete() {
-    if (min > max) return; // empty
+    if (min > max) {
+      return; // empty
+    }
     this.cubeMax = Math.max(this.max, this.cubeMax);
     this.cubeMin = Math.min(this.min, this.cubeMin);
   }
@@ -112,7 +116,7 @@ public class MetaRangeFieldWS implements MetaFieldWS {
   // guoyu0724 outdated
   // @Override
   // public void update(String v) {
-  //   throw new UnsupportedOperationException("Doesn't support update now");
+  // throw new UnsupportedOperationException("Doesn't support update now");
   // }
 
   @Override
@@ -123,7 +127,7 @@ public class MetaRangeFieldWS implements MetaFieldWS {
     bytesWritten += 2 * Ints.BYTES;
     return bytesWritten;
   }
-  
+
   @Override
   public int writeCubeMeta(DataOutput out) throws IOException {
     int bytesWritten = 0;

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
@@ -25,10 +26,10 @@ import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
-import java.util.List;
 
 /**
- * Cool field read store, both hash field and range field
+ * Cool field read store, both hash field and range field.
+ * 
  * <p>
  * hash field Layout
  * -----------------
@@ -50,7 +51,7 @@ public class CoolFieldRS implements FieldRS {
 
   private FieldType fieldType;
 
-  private boolean bRangeField;
+  // private boolean bRangeField;
 
   private boolean bSetField;
 
@@ -59,17 +60,17 @@ public class CoolFieldRS implements FieldRS {
   private int maxKey;
 
   /**
-   * key vector for hash field, store globalIDs
+   * key vector for hash field, store globalIDs.
    */
   private InputVector keyVec = null;
 
   /**
-   * value vector for hash field
+   * value vector for hash field.
    */
   private InputVector valueVec = null;
 
   /**
-   * BitSet array if this field has been pre-calculated
+   * BitSet array if this field has been pre-calculated.
    */
   private BitSet[] bitSets = null;
 
@@ -119,7 +120,7 @@ public class CoolFieldRS implements FieldRS {
       // Range field case
       this.minKey = buffer.getInt();
       this.maxKey = buffer.getInt();
-      this.bRangeField = true;
+      // this.bRangeField = true;
     } else {
       // Hash field case
       buffer.position(buffer.position() - 1);
@@ -134,16 +135,14 @@ public class CoolFieldRS implements FieldRS {
     if (codec == Codec.PreCAL) {
       int values = buffer.get();
       this.bitSets = new BitSet[values];
-        for (int i = 0; i < values; i++) {
-            this.bitSets[i] = SimpleBitSetCompressor.read(buffer);
-        }
+      for (int i = 0; i < values; i++) {
+        this.bitSets[i] = SimpleBitSetCompressor.read(buffer);
+      }
     } else {
       buffer.position(buffer.position() - 1);
       this.valueVec = InputVectorFactory.readFrom(buffer);
     }
   }
-
-
 
   // ------ no used, keep compatiable with new version code
   @Override
@@ -151,5 +150,4 @@ public class CoolFieldRS implements FieldRS {
     // TODO Auto-generated method stub
     return 0;
   }
-
 }

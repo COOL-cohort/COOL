@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util.converter;
 
 import org.joda.time.DateTime;
@@ -23,7 +24,7 @@ import org.joda.time.Days;
 
 /**
  * DayIntConverter converts the input day represented in format yyyy-MM-dd
- * to integer which is the number of days past the reference day
+ * to integer which is the number of days past the reference day.
  */
 public class DayIntConverter implements NumericConverter {
 

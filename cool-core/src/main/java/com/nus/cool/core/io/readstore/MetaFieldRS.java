@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.Input;
@@ -25,34 +26,27 @@ public interface MetaFieldRS extends Input {
   FieldType getFieldType();
 
   /**
-   * Return the id of the given value
-   *
-   * @param key
-   * @return
+   * Return the id of the given value.
    */
-
   int find(String key);
 
   /**
-   * Return number of values in the field
+   * Return number of values in the field.
    */
   int count();
 
   /**
-   * Return the value for the given id
-   *
-   * @param i
-   * @return
+   * Return the value for the given id.
    */
   String getString(int i);
 
   /**
-   * Return the max value of the field
+   * Return the max value of the field.
    */
   int getMaxValue();
 
   /**
-   * Return the min value of the field
+   * Return the min value of the field.
    */
   int getMinValue();
 

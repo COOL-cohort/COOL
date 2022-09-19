@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
 
 import com.google.common.collect.Maps;
@@ -27,18 +28,15 @@ import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
-
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Hash MetaField write store
+ * Hash MetaField write store.
  * <p>
  * Hash MetaField layout
  * ---------------------------------------
@@ -60,10 +58,9 @@ public class MetaHashFieldWS implements MetaFieldWS {
   protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
   /**
-   * Global hashToTerm, keys are hashed by the indexed string
+   * Global hashToTerm, keys are hashed by the indexed string.
+   * hash of one tuple field : Term {origin value of tuple field, global ID. }
    */
-
-  // hash of one tuple field : Term {origin value of tuple filed, global ID. }
   protected final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
 
   // all possible values of the field.
@@ -72,6 +69,9 @@ public class MetaHashFieldWS implements MetaFieldWS {
   // global id
   protected int nextGid = 0;
 
+  /**
+   * Create a write store of a string field for meta chunks.
+   */
   public MetaHashFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
     this.fieldType = type;
     this.charset = charset;
@@ -191,40 +191,40 @@ public class MetaHashFieldWS implements MetaFieldWS {
   public int writeCubeMeta(DataOutput out) throws IOException {
     int bytesWritten = 0;
     if (this.fieldType == FieldType.Segment
-      || this.fieldType == FieldType.Action
-      || this.fieldType == FieldType.UserKey) {
-        try (DataOutputBuffer buffer = new DataOutputBuffer()) {
-          buffer.writeInt(this.fieldValues.size());
-          int off = 0;
-  
-          for (String s : this.fieldValues) {
-            buffer.writeInt(off);
-            off += s.getBytes(this.charset).length;
-          }
+        || this.fieldType == FieldType.Action
+        || this.fieldType == FieldType.UserKey) {
+      try (DataOutputBuffer buffer = new DataOutputBuffer()) {
+        buffer.writeInt(this.fieldValues.size());
+        int off = 0;
 
-          for (String s : this.fieldValues) {
-            buffer.write(s.getBytes(this.charset));
-          }
-
-          Histogram hist = Histogram.builder()
-          .type(CompressType.KeyString)
-          .rawSize(buffer.size())
-          .build();
-          this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
-          bytesWritten = this.compressor.writeTo(out);
+        for (String s : this.fieldValues) {
+          buffer.writeInt(off);
+          off += s.getBytes(this.charset).length;
         }
+
+        for (String s : this.fieldValues) {
+          buffer.write(s.getBytes(this.charset));
+        }
+
+        Histogram hist = Histogram.builder()
+            .type(CompressType.KeyString)
+            .rawSize(buffer.size())
+            .build();
+        this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
+        bytesWritten = this.compressor.writeTo(out);
       }
+    }
     return bytesWritten;
   }
 
   @Override
   public String toString() {
-    return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() + "-" + x.getValue()).collect(Collectors.toList());
+    return "HashMetaField: " + hashToTerm.entrySet().stream().map(x -> x.getKey() 
+      + "-" + x.getValue()).collect(Collectors.toList());
   }
 
-
   /**
-   * Convert string to globalIDs
+   * Convert string to globalIDs.
    */
   public static class Term {
 

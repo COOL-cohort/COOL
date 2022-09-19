@@ -16,17 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util.converter;
 
 /**
  * StringIntConverter could convert string to interger or
- * convert interger to string
+ * convert interger to string.
  */
 public class StringIntConverter implements NumericConverter {
 
-  
   /**
-   * Convert string to interger
+   * Convert string to interger.
    *
    * @param v string to be converted
    * @return the interger from the string
@@ -36,9 +36,8 @@ public class StringIntConverter implements NumericConverter {
     return Integer.parseInt(v);
   }
 
-
   /**
-   * Convert interger to string
+   * Convert interger to string.
    *
    * @param i the interger to be converted
    * @return the string from the interger

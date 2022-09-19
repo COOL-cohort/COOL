@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.storevector;
 
 import com.google.common.primitives.Shorts;
@@ -23,6 +24,14 @@ import com.nus.cool.core.util.ShortBuffers;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
+/**
+ * Decompress data which stores integers in two bytes.
+ * <p>
+ * The data layout is as follows
+ * ------------------------------------
+ * | count | ZInt compressed integers |
+ * ------------------------------------
+ */
 public class ZInt16Store implements ZIntStore, InputVector {
 
   private int count;
@@ -33,6 +42,9 @@ public class ZInt16Store implements ZIntStore, InputVector {
     this.count = count;
   }
 
+  /**
+   * Create input vector on a buffer that is ZInt16 encoded.
+   */
   public static ZIntStore load(ByteBuffer buffer, int n) {
     ZIntStore store = new ZInt16Store(n);
     store.readFrom(buffer);
@@ -46,9 +58,9 @@ public class ZInt16Store implements ZIntStore, InputVector {
 
   @Override
   public int find(int key) {
-      if (key > Short.MAX_VALUE || key < 0) {
-          return -1;
-      }
+    if (key > Short.MAX_VALUE || key < 0) {
+      return -1;
+    }
     return ShortBuffers.binarySearchUnsigned(this.buffer, 0, this.buffer.limit(), (short) key);
   }
 

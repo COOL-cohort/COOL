@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.nus.cool.core.schema.Codec;
@@ -23,15 +24,19 @@ import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.util.IntegerUtil;
 
 /**
- * Advise codec according to compress type
+ * Advise codec according to compress type.
+ * 
  * <p>
- * KeyFinger    -> LZ4
- * KeyString    -> INT32
- * KeyHash      -> { BitVector, INT8, INT16, INT32 }
- * Value        -> { RLE, INT8, INT16, INT32, INTBit }
+ * KeyFinger -> LZ4
+ * KeyString -> INT32
+ * KeyHash -> { BitVector, INT8, INT16, INT32 }
+ * Value -> { RLE, INT8, INT16, INT32, INTBit }
  */
 public class CompressorAdviser {
 
+  /**
+   * Advise the type of compressor to use.
+   */
   public static Codec advise(Histogram hist) {
     CompressType type = hist.getType();
     switch (type) {
@@ -49,9 +54,10 @@ public class CompressorAdviser {
         throw new IllegalArgumentException("Unsupported compress type: " + type);
     }
   }
+
   // This assumes the values in the bytes buffer stored to be in ascending order
-  //  because the use of bitvector will implicitly sort the data during read
-  //  the value retrieved from small to big to populate a vector.
+  // because the use of bitvector will implicitly sort the data during read
+  // the value retrieved from small to big to populate a vector.
   private static Codec adviseForKeyHash(Histogram hist) {
     // max value determine which numeric type is better
     // including INT8, INT16, INT32.
@@ -69,28 +75,23 @@ public class CompressorAdviser {
     if (max < 256) {
       // TODO: Optimize this condition for better performance with INT16 and INT32
       // If byte size >= bitSet size, bitVector is a better choice
-      if (bitmapBytes <= byteAlignLength){
+      if (bitmapBytes <= byteAlignLength) {
         return Codec.BitVector;
       } else {
         return Codec.INT8;
       }
-    }
-    // max < 2^16
-    else if (max < 65536)
-    {
-        return Codec.INT16;
-    }
-
-    // max < 2^32 (Integer.MAX_VALUE)
-    else
-    {
-        return Codec.INT32;
+    } else if (max < 65536) {
+      // max < 2^16
+      return Codec.INT16;
+    } else {
+      // max < 2^32 (Integer.MAX_VALUE)
+      return Codec.INT32;
     }
   }
 
   // TODO: NEED docs
   // this does not implicit assume the values are being sorted.
-  //  RLE and INtBit readstore does not support find. 
+  // RLE and INtBit readstore does not support find.
   private static Codec adviseForValue(Histogram hist) {
     if (hist.isSorted()) {
       return Codec.RLE;

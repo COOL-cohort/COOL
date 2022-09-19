@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -24,13 +25,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.nio.ShortBuffer;
 
 /**
- * ShortBuffers represents a short interger buffer. With ShortBuffers and a key of short,
- * ShortBuffers could find the key in buffer and return the result with binary research
+ * ShortBuffers represents a short interger buffer. With ShortBuffers and a key
+ * of short,
+ * ShortBuffers could find the key in buffer and return the result with binary
+ * research
  */
 public class ShortBuffers {
 
   /**
-   * Search index of key by binary search
+   * Search index of key by binary search.
    *
    * @param buffer    data of short
    * @param fromIndex from index in buffer
@@ -48,13 +51,13 @@ public class ShortBuffers {
     while (fromIndex <= toIndex) {
       int mid = (fromIndex + toIndex) >> 1;
       int e = buffer.get(mid) & 0xFFFF;
-        if (ikey > e) {
-            fromIndex = mid + 1;
-        } else if (ikey < e) {
-            toIndex = mid - 1;
-        } else {
-            return mid;
-        }
+      if (ikey > e) {
+        fromIndex = mid + 1;
+      } else if (ikey < e) {
+        toIndex = mid - 1;
+      } else {
+        return mid;
+      }
     }
     return ~fromIndex;
   }

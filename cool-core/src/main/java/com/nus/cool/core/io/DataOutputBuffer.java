@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -26,6 +27,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Output buffer abstraction.
+ */
 public class DataOutputBuffer extends DataOutputStream {
 
   private Buffer buffer;
@@ -33,7 +37,6 @@ public class DataOutputBuffer extends DataOutputStream {
   public DataOutputBuffer() {
     this(new Buffer());
   }
-
 
   public DataOutputBuffer(Buffer buffer) {
     super(buffer);
@@ -49,7 +52,7 @@ public class DataOutputBuffer extends DataOutputStream {
   }
 
   /**
-   * Write input to the buffer
+   * Write input to the buffer.
    *
    * @param in     the input stream
    * @param length an int specifying the number of bytes to read
@@ -60,7 +63,7 @@ public class DataOutputBuffer extends DataOutputStream {
   }
 
   /**
-   * Write to file stream
+   * Write to file stream.
    *
    * @param out out stream
    * @throws IOException if an I/O error occurs.
@@ -71,8 +74,8 @@ public class DataOutputBuffer extends DataOutputStream {
 
   /**
    * Overwrite an integer into the internal buffer. Note that this call can only be used to
-   * overwrite existing data in the buffer, i.e., buffer#count cannot be increased, and
-   * DataOutputStream#written cannot be increased.
+   *  overwrite existing data in the buffer, i.e., buffer#count cannot be increased, and
+   *  DataOutputStream#written cannot be increased.
    *
    * @param v      overwrite integer
    * @param offset overwrite offset
@@ -96,9 +99,9 @@ public class DataOutputBuffer extends DataOutputStream {
       super();
     }
 
-    public Buffer(int size) {
-      super(size);
-    }
+    // public Buffer(int size) {
+    //   super(size);
+    // }
 
     public byte[] getData() {
       return this.buffer;
@@ -109,7 +112,7 @@ public class DataOutputBuffer extends DataOutputStream {
     }
 
     /**
-     * Write len bytes from an input stream
+     * Write len bytes from an input stream.
      *
      * @param in  the input stream
      * @param len an int specifying the number of bytes to read
@@ -127,7 +130,7 @@ public class DataOutputBuffer extends DataOutputStream {
     }
 
     /**
-     * Set the count for the current buffer
+     * Set the count for the current buffer.
      *
      * @param newCount the new count to set
      * @return the original count

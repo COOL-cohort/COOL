@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.google.common.primitives.Longs;
@@ -24,7 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * ZIntBitCompressor
+ * ZIntBitCompressor.
  */
 public class ZIntBitCompressor implements Compressor {
 
@@ -32,12 +33,15 @@ public class ZIntBitCompressor implements Compressor {
 
   private int maxCompressedLength;
 
+  /**
+   * Create a ZintBitCompressor from a histogram.
+   */
   public ZIntBitCompressor(Histogram hist) {
-      if (hist.getMax() >= (1L << 32)) {
-          numOfBits = 64;
-      } else {
-          this.numOfBits = IntegerUtil.minBits((int) (hist.getMax() + 1));
-      }
+    if (hist.getMax() >= (1L << 32)) {
+      numOfBits = 64;
+    } else {
+      this.numOfBits = IntegerUtil.minBits((int) (hist.getMax() + 1));
+    }
     int numOfVal = hist.getNumOfValues();
 
     int numOfValPerPack = 64 / numOfBits;
@@ -79,7 +83,7 @@ public class ZIntBitCompressor implements Compressor {
       buffer.putLong(packer.pack);
     }
 
-    //System.out.println(packer.offset);
+    // System.out.println(packer.offset);
 
     return buffer.position();
   }

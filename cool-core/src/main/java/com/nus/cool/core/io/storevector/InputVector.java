@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.storevector;
 
 import com.nus.cool.core.io.Input;
@@ -30,14 +31,14 @@ import com.nus.cool.core.io.Input;
 public interface InputVector extends Input {
 
   /**
-   * Get number of values of this vector
+   * Get number of values of this vector.
    *
    * @return number of values
    */
   int size();
 
   /**
-   * Find index by key
+   * Find index by key.
    *
    * @param key target value
    * @return index
@@ -45,7 +46,7 @@ public interface InputVector extends Input {
   int find(int key);
 
   /**
-   * Get value by index
+   * Get value by index.
    *
    * @param index index
    * @return target value
@@ -53,21 +54,21 @@ public interface InputVector extends Input {
   int get(int index);
 
   /**
-   * Get vector has next or not
+   * Get vector has next or not.
    *
    * @return boolean value has next
    */
   boolean hasNext();
 
   /**
-   * Get next value in vector
+   * Get next value in vector.
    *
    * @return next value
    */
   int next();
 
   /**
-   * Skip to specific position
+   * Skip to specific position.
    *
    * @param pos target position
    */

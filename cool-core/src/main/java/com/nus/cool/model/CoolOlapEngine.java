@@ -16,175 +16,197 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
-import com.nus.cool.core.iceberg.query.*;
+import com.nus.cool.core.iceberg.query.Aggregation;
+import com.nus.cool.core.iceberg.query.IcebergAggregation;
+import com.nus.cool.core.iceberg.query.IcebergQuery;
+import com.nus.cool.core.iceberg.query.IcebergSelection;
+import com.nus.cool.core.iceberg.query.SelectionQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
-import com.nus.cool.core.io.readstore.*;
+import com.nus.cool.core.io.readstore.ChunkRS;
+import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.core.io.readstore.CubletRS;
+import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
 
+/**
+ * Cool OLAP encgine.
+ */
 public class CoolOlapEngine {
 
-    /**
-     * execute iceberg query
-     * timeRange, selection => groupBY => aggregate on each group
-     *
-     * @param cube the cube that stores the data we need
-     * @param query the cohort query needed to process
-     * @return the result of the query
-     */
-    public List<BaseResult> performOlapQuery(CubeRS cube, IcebergQuery query) throws Exception{
-        long beg;
-        long end;
-        List<CubletRS> cublets = cube.getCublets();
-        TableSchema tableSchema = cube.getTableSchema();
-        List<BaseResult> results = new ArrayList<>();
+  /**
+   * Execute iceberg query.
+   * timeRange, selection => groupBY => aggregate on each group
+   *
+   * @param cube  the cube that stores the data we need
+   * @param query the cohort query needed to process
+   * @return the result of the query
+   */
+  public List<BaseResult> performOlapQuery(CubeRS cube, IcebergQuery query) throws Exception {
+    // long beg;
+    // long end;
+    List<CubletRS> cublets = cube.getCublets();
+    TableSchema tableSchema = cube.getTableSchema();
+    List<BaseResult> results = new ArrayList<>();
 
-        beg = System.currentTimeMillis();
-        // get selection in query with fields etc
-        IcebergSelection selection = new IcebergSelection();
-        selection.init(tableSchema, query);
-        end = System.currentTimeMillis();
-        //System.out.println("selection init elapsed: " + (end - beg));
-        // for each cubelet,
-        for (CubletRS cubletRS : cublets) {
-            MetaChunkRS metaChunk = cubletRS.getMetaChunk();
-            beg = System.currentTimeMillis();
-            selection.process(metaChunk);
-            end = System.currentTimeMillis();
-            //System.out.println("selection process meta chunk elapsed: " + (end - beg));
-            // if this metaChunk need to be checked, read all data-chunks
-            if (selection.isbActivateCublet()) {
-                List<ChunkRS> datachunks = cubletRS.getDataChunks();
-                for (ChunkRS dataChunk : datachunks) {
-                    beg = System.currentTimeMillis();
+    // beg = System.currentTimeMillis();
+    // get selection in query with fields etc
+    IcebergSelection selection = new IcebergSelection();
+    selection.init(tableSchema, query);
+    // end = System.currentTimeMillis();
+    // System.out.println("selection init elapsed: " + (end - beg));
+    // for each cubelet,
+    for (CubletRS cubletRS : cublets) {
+      MetaChunkRS metaChunk = cubletRS.getMetaChunk();
+      // beg = System.currentTimeMillis();
+      selection.process(metaChunk);
+      // end = System.currentTimeMillis();
+      // System.out.println("selection process meta chunk elapsed: " + (end - beg));
+      // if this metaChunk need to be checked, read all data-chunks
+      if (selection.isactivateCublet()) {
+        List<ChunkRS> datachunks = cubletRS.getDataChunks();
+        for (ChunkRS dataChunk : datachunks) {
+          // beg = System.currentTimeMillis();
 
-                    // 1. find all records in dataChunk meet the timeRange and selection requirements.
-                    ArrayList<IcebergSelection.TimeBitSet> map = selection.process(dataChunk);
+          // 1. find all records in dataChunk meet the timeRange and selection
+          // requirements.
+          ArrayList<IcebergSelection.TimeBitSet> map = selection.process(dataChunk);
 
-                    end = System.currentTimeMillis();
-                    //System.out.println("selection process data chunk elapsed: " + (end - beg));
-                    if (map == null) {
-                        continue;
-                    }
-                    // 2. for each time range, run aggregation
-                    for (int i = 0; i < map.size(); i++){
-                        String timeRange = map.get(i).getTimeRange();
-                        BitSet bs = map.get(i).getMatchedRecords();
+          // end = System.currentTimeMillis();
+          // System.out.println("selection process data chunk elapsed: " + (end - beg));
+          if (map == null) {
+            continue;
+          }
+          // 2. for each time range, run aggregation
+          for (int i = 0; i < map.size(); i++) {
+            String timeRange = map.get(i).getTimeRange();
+            BitSet bs = map.get(i).getMatchedRecords();
 
-                        beg = System.currentTimeMillis();
-                        // 2. run groupBy
-                        IcebergAggregation icebergAggregation = new IcebergAggregation();
-                        icebergAggregation.groupBy(bs, query.getGroupFields(), metaChunk, dataChunk, timeRange, query.getGroupFields_granularity());
-                        end = System.currentTimeMillis();
-                        //System.out.println("init aggregation elapsed: " + (end - beg));
-                        for (Aggregation aggregation : query.getAggregations()) {
-                            beg = System.currentTimeMillis();
-                            List<BaseResult> res = icebergAggregation.process(aggregation);
-                            end = System.currentTimeMillis();
-                            //System.out.println("aggregation process elapsed: " + (end - beg));
-                            results.addAll(res);
-                        }
-                    }
-                }
+            // beg = System.currentTimeMillis();
+            // 2. run groupBy
+            IcebergAggregation icebergAggregation = new IcebergAggregation();
+            icebergAggregation.groupBy(bs, query.getGroupFields(), metaChunk, dataChunk, timeRange,
+                query.getGroupFieldsGranularity());
+            // end = System.currentTimeMillis();
+            // System.out.println("init aggregation elapsed: " + (end - beg));
+            for (Aggregation aggregation : query.getAggregations()) {
+              // beg = System.currentTimeMillis();
+              List<BaseResult> res = icebergAggregation.process(aggregation);
+              // end = System.currentTimeMillis();
+              // System.out.println("aggregation process elapsed: " + (end - beg));
+              results.addAll(res);
             }
-
+          }
         }
-        results = BaseResult.merge(results);
-        return results;
+      }
+
+    }
+    results = BaseResult.merge(results);
+    return results;
+  }
+
+  /**
+   * Profile.
+   */
+  public static void profiling(List<BaseResult> results) {
+
+    HashMap<String, Float> profilingCount = new HashMap<>();
+    HashMap<String, Long> profilingSum = new HashMap<>();
+
+    Float totalCount = (float) 0;
+    Float totalSum = (float) 0;
+    for (BaseResult res : results) {
+      String k = res.getKey();
+      profilingCount.put(k, (float) res.getAggregatorResult().getCount());
+      profilingSum.put(k, res.getAggregatorResult().getSum());
+      totalCount += res.getAggregatorResult().getCount();
+      ;
+      totalSum += res.getAggregatorResult().getSum();
     }
 
-    public static void profiling(List<BaseResult> results) {
-
-        HashMap<String, Float> profilingCount = new HashMap<>();
-        HashMap<String, Long> profilingSum = new HashMap<>();
-
-        Float totalCount = (float) 0;
-        Float totalSum = (float) 0;
-        for (BaseResult res: results){
-            String k = res.getKey();
-            profilingCount.put(k, (float)res.getAggregatorResult().getCount());
-            profilingSum.put(k, res.getAggregatorResult().getSum());
-            totalCount += res.getAggregatorResult().getCount();;
-            totalSum += res.getAggregatorResult().getSum();
-        }
-
-        for (String key : profilingCount.keySet()){
-            Float value = profilingCount.get(key)/totalCount;
-            profilingCount.put(key, value);
-            value = value*100;
-            System.out.println("Key = "+ key +", percentage of matched records = " + value.toString().substring(0,4)+"%");
-        }
-
-        for (String key : profilingSum.keySet()){
-            long sumValue = profilingSum.get(key);
-            float value = sumValue/totalSum;
-            value = value*100;
-            System.out.println("Key = "+ key +", percentage of aggregation = " + Float.toString(value).substring(0,4)+"%");
-        }
+    for (String key : profilingCount.keySet()) {
+      Float value = profilingCount.get(key) / totalCount;
+      profilingCount.put(key, value);
+      value = value * 100;
+      System.out.println("Key = " + key + ", percentage of matched records = "
+          + value.toString().substring(0, 4) + "%");
     }
 
-    public static final String jsonString = "{\n" +
-            "  \"dataSource\": \"default\",\n" +
-            "  \"selection\": {\n" +
-            "    \"type\": \"filter\",\n" +
-            "    \"dimension\": \"default\",\n" +
-            "    \"values\": [ \"default\" ],\n" +
-            "    \"fields\":[]\n" +
-            "  },\n" +
-            "  \"aggregations\":[\n" +
-            "    {\"fieldName\":\"default\",\n" +
-            "      \"operators\":[\"COUNT\"]}]\n" +
-            "}";
+    for (String key : profilingSum.keySet()) {
+      long sumValue = profilingSum.get(key);
+      float value = sumValue / totalSum;
+      value = value * 100;
+      System.out.println("Key = " + key + ", percentage of aggregation = "
+          + Float.toString(value).substring(0, 4) + "%");
+    }
+  }
 
-    public IcebergQuery generateQuery(String operation, String dataSourceName) throws IOException {
+  public static final String jsonString = "{\n"
+      + "  \"dataSource\": \"default\",\n"
+      + "  \"selection\": {\n"
+      + "    \"type\": \"filter\",\n"
+      + "    \"dimension\": \"default\",\n"
+      + "    \"values\": [ \"default\" ],\n"
+      + "    \"fields\":[]\n"
+      + "  },\n"
+      + "  \"aggregations\":[\n"
+      + "    {\"fieldName\":\"default\",\n"
+      + "      \"operators\":[\"COUNT\"]}]\n"
+      + "}";
 
-        String[] parsedOpe = operation.split(", ");
+  /**
+   * Deserialize query structure.
+   */
+  public IcebergQuery generateQuery(String operation, String dataSourceName) throws IOException {
+    String[] parsedOpe = operation.split(", ");
 
-        if (!parsedOpe[0].equals("select")){
-            System.out.println(Arrays.toString(parsedOpe) +", operation Not supported");
-            return null;
-        }
-
-        String filed = parsedOpe[1];
-        String value = parsedOpe[2];
-
-        List<String> values = new ArrayList<>();
-        values.add(value);
-
-        // init query
-        ObjectMapper mapper = new ObjectMapper();
-        IcebergQuery query = mapper.readValue(jsonString, IcebergQuery.class);
-
-        // update query
-        query.setDataSource(dataSourceName);
-
-        SelectionQuery sq = query.getSelection();
-        sq.setType(SelectionQuery.SelectionType.filter);
-        sq.setDimension(filed);
-        sq.setValues(values);
-
-        query.setSelection(sq);
-
-        List<Aggregation> aggregations = new ArrayList<>();
-        Aggregation agg = new Aggregation();
-
-        List<AggregatorFactory.AggregatorType> opt = new ArrayList<>();
-        opt.add(AggregatorFactory.AggregatorType.COUNT);
-
-        agg.setOperators(opt);
-        agg.setFieldName(filed);
-
-        aggregations.add(agg);
-
-        query.setAggregations(aggregations);
-
-        return query;
+    if (!parsedOpe[0].equals("select")) {
+      System.out.println(Arrays.toString(parsedOpe) + ", operation Not supported");
+      return null;
     }
 
+    
+    String value = parsedOpe[2];
+    List<String> values = new ArrayList<>();
+    values.add(value);
+    
+    // init query
+    ObjectMapper mapper = new ObjectMapper();
+    IcebergQuery query = mapper.readValue(jsonString, IcebergQuery.class);
+    
+    // update query
+    query.setDataSource(dataSourceName);
+    
+    String field = parsedOpe[1];
+    SelectionQuery sq = query.getSelection();
+    sq.setType(SelectionQuery.SelectionType.filter);
+    sq.setDimension(field);
+    sq.setValues(values);
+
+    query.setSelection(sq);
+
+    Aggregation agg = new Aggregation();
+    
+    List<AggregatorFactory.AggregatorType> opt = new ArrayList<>();
+    opt.add(AggregatorFactory.AggregatorType.COUNT);
+    
+    agg.setOperators(opt);
+    agg.setFieldName(field);
+    
+    List<Aggregation> aggregations = new ArrayList<>();
+    aggregations.add(agg);
+    query.setAggregations(aggregations);
+
+    return query;
+  }
 }

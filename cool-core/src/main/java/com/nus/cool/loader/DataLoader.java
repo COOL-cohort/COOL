@@ -16,20 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.loader;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.TupleReader;
 import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.core.util.writer.NativeDataWriter;
-
+import java.io.File;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -50,94 +47,83 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class DataLoader {
+  @NonNull
+  private String dataSetName;
+
+  @NonNull
+  private final TupleReader reader;
+
+  @NonNull
+  private final TupleParser parser;
+
+  @NonNull
+  private final DataWriter writer;
+
+  public static Builder builder(String dataSourceName,
+      TableSchema tableSchema, File dataFile,
+      File outputDir, DataLoaderConfig config) {
+    return new Builder(dataSourceName, tableSchema, dataFile, outputDir, config);
+  }
+
+  /**
+   * Load data into cool native format.
+   */
+  public void load() throws IOException {
+    // write dataChunk first
+    writer.initialize();
+    // read the data
+    while (reader.hasNext()) {
+      writer.add(parser.parse(reader.next()));
+    }
+    writer.finish();
+  }
+  
+  /**
+   * Builder of DataLoader.
+   */
+  @AllArgsConstructor
+  public static class Builder {
+    /**
+     * Designate the dataset name in cube repository.
+     */
     @NonNull
     private String dataSetName;
 
-    @NonNull
-    private final TupleReader reader;
-
-    @NonNull
-    private final TupleParser parser;
-
-    @NonNull
-    private final DataWriter writer;
-    
-
-    public static Builder builder(String dataSourceName,
-                                  TableSchema tableSchema, File dataFile,
-                                  File outputDir, DataLoaderConfig config) {
-        return new Builder(dataSourceName, tableSchema, dataFile, outputDir, config);
-    }
-
     /**
-     * load data into cool native format
+     * Table schema of the dataset.
      */
-    public void load() throws IOException {
-        // write dataChunk first
-        writer.Initialize();
-        // read the data
-        while (reader.hasNext()) {
-            writer.Add(parser.parse(reader.next()));
-        }
-        writer.Finish();
-    }
+    @NonNull
+    private final TableSchema tableSchema;
 
     /**
+     * Raw data.
+     */
+    @NonNull
+    private final File dataFile;
+
+    /**
+     * Output directory to store the dataset.
+     */
+    @NonNull
+    private final File outputDir;
+
+    /**
+     * Configuration determines how the raw data is processed.
+     */
+    @NonNull
+    private final DataLoaderConfig config;
+
+    /**
+     * Build Data loader.
      *
-     * @param schemaFields the fields read from table.yaml
-     * @param fieldNames the field names read from data.csv
-     * @return true indicates the names of the fields between the two files are consistent, and otherwise, they are different.
+     * @return DataLoader instance
      */
-    public static boolean checkConsistency(List<FieldSchema> schemaFields, String[] fieldNames){
-        if(schemaFields.size()!=fieldNames.length){
-            return false;
-        }
-        for(int i=0;i<schemaFields.size();i++){
-            if(!schemaFields.get(i).getName().equals(fieldNames[i]))
-                return false;
-        }
-        return true;
+    public DataLoader build() throws IOException {
+      return new DataLoader(dataSetName,
+          config.createTupleReader(dataFile),
+          config.createTupleParser(tableSchema),
+          new NativeDataWriter(
+              tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()));
     }
-
-    @AllArgsConstructor
-    public static class Builder {
-        /**
-         * designate the dataset name in cube repository
-         */
-        @NonNull
-        private String dataSetName;
-        /**
-         * table schema of the dataset
-         */
-        @NonNull
-        private final TableSchema tableSchema;
-        /**
-         * raw data
-         */
-        @NonNull
-        private final File dataFile;
-        /**
-         * output directory to store the dataset
-         */
-        @NonNull
-        private final File outputDir;
-        /**
-         * configuration determines how the raw data is processed
-         */
-        @NonNull
-        private final DataLoaderConfig config;
-
-        /**
-         * Build Data loader
-         * @return DataLoader instance
-         * @throws IOException
-         */
-        public DataLoader build() throws IOException {
-            return new DataLoader(dataSetName,
-                    config.createTupleReader(dataFile),
-                    config.createTupleParser(tableSchema),
-                    new NativeDataWriter(
-                            tableSchema, outputDir, config.getChunkSize(), config.getCubletSize()));
-        }
-    }
+  }
 }

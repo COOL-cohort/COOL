@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -29,7 +30,6 @@ import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.util.ArrayUtil;
 import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import java.io.DataOutput;
@@ -56,11 +56,11 @@ public class DataRangeFieldWS implements DataFieldWS {
 
   private final OutputCompressor compressor;
 
+  /**
+   * Create a write store of int field for data chunk. 
+   */
   public DataRangeFieldWS(FieldType fieldType, int fieldIndex, OutputCompressor compressor) {
-    checkArgument(fieldIndex >= 0);
-    /**
-     * Field index to get data from tuple
-     */
+    checkArgument(fieldIndex >= 0); // Field index to get data from tuple.
     this.fieldType = fieldType;
     this.compressor = checkNotNull(compressor);
   }
@@ -71,19 +71,16 @@ public class DataRangeFieldWS implements DataFieldWS {
   }
 
   /**
-   * UnitTest insert data
-   *
-   * @param TupleValue
-   * @throws IOException
+   * UnitTest insert data.
    */
   @Override
-  public void put(String TupleValue) throws IOException {
-      if (this.fieldType == FieldType.ActionTime) {
-          DayIntConverter converter = new DayIntConverter();
-          this.buffer.writeInt(converter.toInt(TupleValue));
-      } else {
-          this.buffer.writeInt(Integer.parseInt(TupleValue));
-      }
+  public void put(String tupleValue) throws IOException {
+    if (this.fieldType == FieldType.ActionTime) {
+      DayIntConverter converter = new DayIntConverter();
+      this.buffer.writeInt(converter.toInt(tupleValue));
+    } else {
+      this.buffer.writeInt(Integer.parseInt(tupleValue));
+    }
   }
 
   @Override

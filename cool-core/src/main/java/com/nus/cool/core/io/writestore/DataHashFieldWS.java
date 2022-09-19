@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -41,8 +42,7 @@ import java.util.Map;
 
 /**
  * Hash-like indexed field, used to store chunk data for four fieldTypes,
- * including AppKey, UserKey,
- * Action, Segment
+ *  including AppKey, UserKey, Action, Segment.
  * <p>
  * Data Layout
  * -----------------
@@ -55,9 +55,9 @@ import java.util.Map;
 public class DataHashFieldWS implements DataFieldWS {
 
   /**
-   * Field index to get data from tuple
+   * Field index to get data from tuple.
    */
-  private final int fieldIndex;
+  // private final int fieldIndex;
 
   private final MetaFieldWS metaField;
 
@@ -66,7 +66,7 @@ public class DataHashFieldWS implements DataFieldWS {
   private final FieldType fieldType;
 
   /**
-   * Convert globalID to localID
+   * Convert globalID to localID.
    * Key: globalID
    * Value: localID
    */
@@ -79,11 +79,14 @@ public class DataHashFieldWS implements DataFieldWS {
 
   private final Boolean preCal;
 
-  public DataHashFieldWS(FieldType fieldType, int fieldIndex, MetaFieldWS metaField, OutputCompressor compressor,
-                         boolean preCal) {
+  /**
+   * Construct a write store of string fields for data chunk.
+   */
+  public DataHashFieldWS(FieldType fieldType, int fieldIndex, MetaFieldWS metaField,
+      OutputCompressor compressor, boolean preCal) {
     checkArgument(fieldIndex >= 0);
     this.fieldType = fieldType;
-    this.fieldIndex = fieldIndex;
+    // this.fieldIndex = fieldIndex;
     this.metaField = checkNotNull(metaField);
     this.compressor = checkNotNull(compressor);
     this.preCal = preCal;
@@ -96,8 +99,8 @@ public class DataHashFieldWS implements DataFieldWS {
 
   @Override
   public void put(String tupleValue) throws IOException {
-    int gId = this.metaField.find(tupleValue);
-    if (gId == -1){
+    final int gId = this.metaField.find(tupleValue);
+    if (gId == -1) {
       throw new IllegalArgumentException("Value not exist in dimension: " + tupleValue);
     }
     // Write globalIDs as values for temporary
@@ -109,7 +112,6 @@ public class DataHashFieldWS implements DataFieldWS {
 
   @Override
   public int writeTo(DataOutput out) throws IOException {
-    int bytesWritten = 0;
     // number of global id
     int size = this.buffer.size() / Ints.BYTES;
 
@@ -144,7 +146,7 @@ public class DataHashFieldWS implements DataFieldWS {
         }
       }
     }
-//    System.out.println(value);
+    // System.out.println(value);
     // Write compressed key vector (unique global id)
     int min = ArrayUtil.min(key);
     int max = ArrayUtil.max(key);
@@ -158,6 +160,7 @@ public class DataHashFieldWS implements DataFieldWS {
         .type(CompressType.KeyHash)
         .build();
     this.compressor.reset(hist, key, 0, key.length);
+    int bytesWritten = 0;
     bytesWritten += this.compressor.writeTo(out);
 
     // Write compressed bitSetList if pre-calculate

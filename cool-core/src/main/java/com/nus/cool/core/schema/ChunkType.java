@@ -16,23 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.schema;
 
 /**
- * ChunkType defines the Chunk type, 0 for metachunk and 1 for datachunk
+ * ChunkType defines the Chunk type, 0 for metachunk and 1 for datachunk.
  */
 public enum ChunkType {
-  
-  /** 
-   * Chunk type for MetaChunk
-   */ 
+
+  /**
+   * Chunk type for MetaChunk.
+   */
   META,
 
   /**
-   * Chunk type for DataChunk
-   */ 
+   * Chunk type for DataChunk.
+   */
   DATA;
 
+  /**
+   * Translate an interger to the corresponding chunk type.
+   */
   public static ChunkType fromInteger(int c) {
     switch (c) {
       case 0:

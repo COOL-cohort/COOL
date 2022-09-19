@@ -16,11 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util.converter;
 
 /**
  * NumericConverter could obtain an interger object from a string
- * or obtain a string from an interger object
+ * or obtain a string from an interger object.
  */
 public interface NumericConverter {
 

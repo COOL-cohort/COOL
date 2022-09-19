@@ -16,15 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.nus.cool.core.schema.Codec;
 
 /**
- * Product compressor according to codes
+ * Product compressor according to codes.
  */
 public class CompressorFactory {
 
+  /**
+   * Create a compressor.
+   */ 
   public static Compressor newCompressor(Codec codec, Histogram hist) {
     Compressor compressor;
     switch (codec) {
