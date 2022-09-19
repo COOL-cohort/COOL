@@ -58,4 +58,15 @@ public class IntBuffers {
     }
     return ~fromIndex;
   }
+
+  public static int traverseSearch(IntBuffer buffer, int fromIndex, int toIndex, int key) {
+    checkNotNull(buffer);
+    checkArgument(fromIndex < buffer.limit() && toIndex <= buffer.limit());
+    for (int i = fromIndex; i < toIndex; i++) {
+      int e = buffer.get(i);
+      if (e == key)
+        return i;
+    }
+    return -1;
+  }
 }
