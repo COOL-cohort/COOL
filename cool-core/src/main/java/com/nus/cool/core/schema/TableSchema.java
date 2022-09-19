@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.schema;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.Maps;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,27 +30,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * TableSchema defines the schema for data table
+ * TableSchema defines the schema for data table.
  */
 public class TableSchema {
 
   @Getter
   @Setter
   private String charset;
-  
+
   /**
    * fields is a set of field.
    */
   @Getter
   private List<FieldSchema> fields;
-  
+
   /**
-   * name2Id is the mapping of field name and the corresponding id
+   * name2Id is the mapping of field name and the corresponding id.
    */
   private Map<String, Integer> name2Id = Maps.newHashMap();
 
@@ -68,7 +67,7 @@ public class TableSchema {
   private Map<String, Integer> dataChunkFieldName2Id = Maps.newHashMap();
 
   @Getter
-  private List<FieldType>invariantType=new ArrayList<>();
+  private List<FieldType> invariantType = new ArrayList<>();
 
   /**
    * AppKeyField index, assign -1 if this field type not exist.
@@ -89,10 +88,10 @@ public class TableSchema {
   private int actionTimeField = -1;
 
   @Getter
-  private int actionTimeMetaField=-1;
+  private int actionTimeMetaField = -1;
 
   /**
-   * Obtain the content of a table from input stream
+   * Obtain the content of a table from input stream.
    *
    * @param in the stream containing the content of the table
    * @return the content of the table
@@ -103,7 +102,7 @@ public class TableSchema {
   }
 
   /**
-   * Obtain the content of a table from a file
+   * Obtain the content of a table from a file.
    *
    * @param inputFile the File object of the file to be read
    * @return the content of the table
@@ -111,24 +110,25 @@ public class TableSchema {
   public static TableSchema read(File inputFile) throws IOException {
     return read(new FileInputStream(inputFile));
   }
-  
-  // Automatically update the fields according to the input data
+
+  /**
+   * Update the fields according to the input data.
+   */
   public void setFields(List<FieldSchema> fields) {
     this.fields = fields;
     this.name2Id.clear();
-    int invariantFieldSize=0;
+    int invariantFieldSize = 0;
     for (int i = 0; i < fields.size(); i++) {
       FieldSchema field = fields.get(i);
       FieldType fieldType = field.getFieldType();
-      boolean invariantField=field.isInvariantField();
-      if(invariantField) {
+      boolean invariantField = field.isInvariantField();
+      if (invariantField) {
         invariantFieldSize++;
         this.invariantFields.add(i);
-        invariantName2Id.put(field.getName(),invariantFieldSize);
+        invariantName2Id.put(field.getName(), invariantFieldSize);
         this.invariantType.add(fieldType);
-      }
-      else{
-        this.dataChunkFieldName2Id.put(field.getName(),this.dataChunkFieldName2Id.size());
+      } else {
+        this.dataChunkFieldName2Id.put(field.getName(), this.dataChunkFieldName2Id.size());
       }
       this.name2Id.put(field.getName(), i);
       switch (fieldType) {
@@ -143,7 +143,7 @@ public class TableSchema {
           break;
         case ActionTime:
           this.actionTimeField = this.dataChunkFieldName2Id.get(field.getName());
-          this.actionTimeMetaField=i;
+          this.actionTimeMetaField = i;
           break;
         default:
           break;
@@ -151,9 +151,8 @@ public class TableSchema {
     }
   }
 
-
   /**
-   * Get the field by its id
+   * Get the field by its id.
    *
    * @param id the id of the field
    * @return the corresponding field of the id
@@ -163,7 +162,7 @@ public class TableSchema {
   }
 
   /**
-   * Get the field by its name
+   * Get the field by its name.
    *
    * @param name the name of the field
    * @return the corresponding field of the name
@@ -173,7 +172,7 @@ public class TableSchema {
   }
 
   /**
-   * Get the field type by its name
+   * Get the field type by its name.
    *
    * @param name the name of the field
    * @return the corresponding field type of the name
@@ -183,21 +182,22 @@ public class TableSchema {
   }
 
   /**
-   * Get the field id by its name
+   * Get the field id by its name.
    *
    * @param name the name of the field
    * @return the corresponding field id of the name
    */
   public int getFieldID(String name) {
-    if (!this.name2Id.containsKey(name)){
-      throw new IllegalArgumentException("name="+name+" is not in name2Id mapper="+this.name2Id);
+    if (!this.name2Id.containsKey(name)) {
+      throw new IllegalArgumentException("name=" + name + " is not in name2Id mapper="
+        + this.name2Id);
     }
     Integer id = this.name2Id.get(name);
     return id == null ? -1 : id;
   }
 
   /**
-   * Get the field which denotes the action time
+   * Get the field which denotes the action time.
    *
    * @return the corresponding action time field
    */
@@ -213,25 +213,27 @@ public class TableSchema {
     return getFieldSchema(getFieldID(name));
   }
 
-  public int getInvariantSize(){return this.invariantName2Id.size();}
+  public int getInvariantSize() {
+    return this.invariantName2Id.size();
+  }
 
-  public boolean isInvariantField(String fieldName){
+  public boolean isInvariantField(String fieldName) {
     return this.invariantName2Id.containsKey(fieldName);
   }
 
-  public boolean isInvariantField(int fieldIndex){
+  public boolean isInvariantField(int fieldIndex) {
     return this.invariantFields.contains(fieldIndex);
   }
 
-  public int getDataChunkFieldID(String name){
+  public int getDataChunkFieldID(String name) {
     return this.dataChunkFieldName2Id.get(name);
   }
 
-  public Set<String> getInvariantNames(){
+  public Set<String> getInvariantNames() {
     return this.invariantName2Id.keySet();
   }
 
-  public int getInvariantIDFromName(String name){
+  public int getInvariantIDFromName(String name) {
     return this.invariantName2Id.get(name);
   }
 }

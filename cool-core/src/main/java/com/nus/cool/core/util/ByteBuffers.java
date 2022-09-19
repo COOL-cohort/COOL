@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -25,12 +26,13 @@ import java.nio.ByteBuffer;
 
 /**
  * ByteBuffers represents a byte buffer. With ByteBuffers and a key of byte,
- * ByteBuffers could find the key in buffer and return the result with binary research
+ * ByteBuffers could find the key in buffer and return the result with binary
+ * research
  */
 public class ByteBuffers {
 
   /**
-   * Search index of key by binary search
+   * Search index of key by binary search.
    *
    * @param buffer    data of byte
    * @param fromIndex from index in buffer
@@ -47,13 +49,13 @@ public class ByteBuffers {
     while (fromIndex <= toIndex) {
       int mid = (fromIndex + toIndex) >> 1;
       int e = buffer.get(mid) & 0xFF;
-        if (ikey > e) {
-            fromIndex = mid + 1;
-        } else if (ikey < e) {
-            toIndex = mid - 1;
-        } else {
-            return mid;
-        }
+      if (ikey > e) {
+        fromIndex = mid + 1;
+      } else if (ikey < e) {
+        toIndex = mid - 1;
+      } else {
+        return mid;
+      }
     }
     return ~fromIndex;
   }

@@ -16,16 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util;
 
 /**
- * ArrayUtil contains the missing functions we need to use in java Array
+ * ArrayUtil contains the missing functions we need to use in java Array.
  * The class contains the function to get the max and min value of an Array
  */
 public class ArrayUtil {
 
   /**
-   * Find the max value in int array
+   * Find the max value in int array.
    *
    * @param vec target int array
    * @return the max value
@@ -39,7 +40,7 @@ public class ArrayUtil {
   }
 
   /**
-   * Find the min value in int array
+   * Find the min value in int array.
    *
    * @param vec target int array
    * @return the min value

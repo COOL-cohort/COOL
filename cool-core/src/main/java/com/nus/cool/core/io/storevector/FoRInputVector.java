@@ -16,11 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.storevector;
 
 import com.nus.cool.core.schema.Codec;
 import java.nio.ByteBuffer;
 
+/**
+ * FoRInputVector.
+ */
 public class FoRInputVector implements InputVector {
 
   private int min;
@@ -36,9 +40,9 @@ public class FoRInputVector implements InputVector {
 
   @Override
   public int find(int key) {
-      if (key < this.min || key > this.max) {
-          return -1;
-      }
+    if (key < this.min || key > this.max) {
+      return -1;
+    }
     return this.vecIn.find(key - this.min);
   }
 

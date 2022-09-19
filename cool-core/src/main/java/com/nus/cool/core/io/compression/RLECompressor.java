@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.nus.cool.core.util.IntegerUtil;
@@ -23,14 +24,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Compress data sequences in which same data value occurs in many consecutive data elements are
+ * Compress data sequences in which same data value occurs in many consecutive
+ * data elements are
  * stored as single data value and count.
+ * 
  * <p>
  * Data layout
  * ---------------------------------------
- * | zLen | segments | compressed values |
+ * | zlen | segments | compressed values |
  * ---------------------------------------
  * where segments = number of segment in values
+ * 
  * <p>
  * compressed values layout
  * ------------------------
@@ -40,7 +44,7 @@ import java.nio.ByteOrder;
 public class RLECompressor implements Compressor {
 
   /**
-   * Bytes number of z len and number of segments
+   * Bytes number of z len and number of segments.
    */
   public static final int HEADACC = 4 + 4;
 
@@ -53,8 +57,9 @@ public class RLECompressor implements Compressor {
 
   /**
    * Write int value to a given buffer.
-   * @param buf buffer to be filled
-   * @param v value
+   *
+   * @param buf   buffer to be filled
+   * @param v     value
    * @param width length of the valuen
    */
   private void writeInt(ByteBuffer buf, int v, int width) {
@@ -76,6 +81,7 @@ public class RLECompressor implements Compressor {
 
   /**
    * Add value to a given buffer.
+   *
    * @param buf the buffet to filled
    * @param val value
    * @param off offset of the buffer
@@ -83,7 +89,8 @@ public class RLECompressor implements Compressor {
    */
   private void write(ByteBuffer buf, int val, int off, int len) {
     byte b = 0; // store value's width + offset's width + len's width
-    b |= ((IntegerUtil.minBytes(val) << 4) | IntegerUtil.minBytes(off) << 2 | IntegerUtil.minBytes(len));
+    b |= ((IntegerUtil.minBytes(val) << 4) | IntegerUtil.minBytes(off) << 2
+        | IntegerUtil.minBytes(len));
     buf.put(b);
 
     writeInt(buf, val, ((b >> 4) & 3)); // get upper 2 bites
@@ -108,7 +115,9 @@ public class RLECompressor implements Compressor {
     int n = 1; // how many distinct value
     ByteBuffer buf = ByteBuffer.wrap(dest, destOff, maxDestLen).order(ByteOrder.nativeOrder());
     buf.position(HEADACC);
-    int v = src[srcOff], voff = 0, vlen = 1;
+    int v = src[srcOff];
+    int voff = 0;
+    int vlen = 1;
     // for each record,
     for (int i = srcOff + 1; i < srcOff + srcLen; i++) {
       if (src[i] != v) {
@@ -123,10 +132,10 @@ public class RLECompressor implements Compressor {
       }
     }
     write(buf, v, voff, vlen);
-    int zLen = buf.position() - HEADACC;
+    int zlen = buf.position() - HEADACC;
     buf.position(0);
-    buf.putInt(zLen).putInt(n);
-    return zLen + HEADACC;
+    buf.putInt(zlen).putInt(n);
+    return zlen + HEADACC;
   }
 
 }

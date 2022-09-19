@@ -11,10 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.nus.cool.core.io.storevector;
 
 import com.nus.cool.core.io.Input;
 
+/**
+ * Interface for ZIntX encoded structure.
+ */
 public interface ZIntStore extends Input {
 
 }

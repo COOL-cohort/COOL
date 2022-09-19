@@ -16,103 +16,78 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.schema;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.List;
 
+/**
+ * structure representing a dimension (column).
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Dimension {
-	
-	public static enum DimensionType {
-		
-		NORMAL,
-		
-		PROPERTY,
-		
-		CALC
-		
-	}
-	
-	private DimensionType type;
-	
-	private String name;
-	
-	private String tableFieldName;
-	
-	private List<String> values;
-	
-	private FieldType fieldType;
 
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
+  /**
+   * Type of a dimension.
+   */
+  public static enum DimensionType {
 
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+    NORMAL,
 
-	/**
-	 * @return the tableFieldName
-	 */
-	public String getTableFieldName() {
-		return tableFieldName;
-	}
+    PROPERTY,
 
-	/**
-	 * @param tableFieldName the tableFieldName to set
-	 */
-	public void setTableFieldName(String tableFieldName) {
-		this.tableFieldName = tableFieldName;
-	}
+    CALC
 
-	/**
-	 * @return the type
-	 */
-	public DimensionType getDimensionType() {
-		return type;
-	}
+  }
 
-	/**
-	 * @param type the type to set
-	 */
-	public void setDimensionType(DimensionType type) {
-		this.type = type;
-	}
+  private DimensionType type;
 
-	/**
-	 * @return the values
-	 */
-	public List<String> getValues() {
-		return values;
-	}
+  private String name;
 
-	/**
-	 * @param values the values to set
-	 */
-	public void setValues(List<String> values) {
-		this.values = values;
-	}
+  private String tableFieldName;
 
-	/**
-	 * @return the fieldType
-	 */
-	public FieldType getTableFieldType() {
-		return fieldType;
-	}
+  private List<String> values;
 
-	/**
-	 * @param fieldType the fieldType to set
-	 */
-	public void setTableFieldType(FieldType fieldType) {
-		this.fieldType = fieldType;
-	}
-	
+  private FieldType fieldType;
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getTableFieldName() {
+    return tableFieldName;
+  }
+
+  public void setTableFieldName(String tableFieldName) {
+    this.tableFieldName = tableFieldName;
+  }
+
+  public DimensionType getDimensionType() {
+    return type;
+  }
+
+  public void setDimensionType(DimensionType type) {
+    this.type = type;
+  }
+
+  public List<String> getValues() {
+    return values;
+  }
+
+  public void setValues(List<String> values) {
+    this.values = values;
+  }
+
+  public FieldType getTableFieldType() {
+    return fieldType;
+  }
+
+  public void setTableFieldType(FieldType fieldType) {
+    this.fieldType = fieldType;
+  }
 }

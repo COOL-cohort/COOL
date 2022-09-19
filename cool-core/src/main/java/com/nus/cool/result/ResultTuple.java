@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.result;
 
 import java.util.ArrayList;
@@ -26,32 +27,31 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * ResultTuple is used to store the result, including cohort name, age and
- * how to merge the cohorts result
+ * ResultTuple is used to store the result, including cohort name and age.
  */
 @Data
 @AllArgsConstructor
 public class ResultTuple {
 
   /**
-   * cohort name
+   * cohort name.
    */
   private String cohort;
 
   /**
-   * age of the cohort
+   * age of the cohort.
    */
   private int age;
 
   /**
-   * measure of interest
+   * measure of interest.
    */
   private long measure;
 
   /**
    * Merge query results to a distinct set of cohorts.
-   * 
-   * @param resultTuples a list of partial query results 
+   *
+   * @param resultTuples a list of partial query results
    * @return merged results
    */
   public static List<ResultTuple> merge(List<ResultTuple> resultTuples) {

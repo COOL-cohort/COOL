@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.storevector;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -25,6 +26,9 @@ import java.nio.charset.Charset;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 
+/**
+ * Input vector of an LZ4 compressed structure.
+ */
 public class LZ4InputVector implements InputVector {
 
   private int zLen;
@@ -51,22 +55,23 @@ public class LZ4InputVector implements InputVector {
     int values = buffer.getInt();
     // get offsets
     this.offsets = new int[values];
-      for (int i = 0; i < values; i++) {
-          this.offsets[i] = buffer.getInt();
-      }
+    for (int i = 0; i < values; i++) {
+      this.offsets[i] = buffer.getInt();
+    }
     // place the remaining bytes (values) in data
     this.data = new byte[rawLen - 4 - values * 4];
     buffer.get(this.data);
     this.decoded = true;
   }
 
-
   /**
-   * number of items
+   * number of items.
    */
   @Override
   public int size() {
-    if (!decoded) decode();
+    if (!decoded) {
+      decode();
+    }
     return this.offsets.length;
   }
 
@@ -100,7 +105,7 @@ public class LZ4InputVector implements InputVector {
     this.decoded = false;
     this.zLen = buffer.getInt();
     this.rawLen = buffer.getInt();
-    int oldLimit = buffer.limit();
+    final int oldLimit = buffer.limit();
     int newLimit = buffer.position() + this.zLen;
     buffer.limit(newLimit);
     this.buffer = buffer.slice().order(buffer.order());
@@ -108,8 +113,13 @@ public class LZ4InputVector implements InputVector {
     buffer.limit(oldLimit);
   }
 
+  /**
+   * Return the string value given its index.
+   */
   public String getString(int index, Charset charset) {
-    if (!decoded) decode();
+    if (!decoded) {
+      decode();
+    }
     checkArgument(index < this.offsets.length && index >= 0);
     int last = this.offsets.length - 1;
     int off = this.offsets[index];

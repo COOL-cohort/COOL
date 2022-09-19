@@ -1,14 +1,13 @@
 package com.nus.cool.core.util.config;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.TupleReader;
-
+import java.io.File;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 /**
  * Configuration of data loader.
  */
@@ -16,14 +15,17 @@ import lombok.Data;
 @AllArgsConstructor
 public abstract class DataLoaderConfig {
   /**
-   * the threshold value to start new chunk (default 64 KB)
+   * The threshold value to start new chunk. (default 64 KB)
    */
   public final long chunkSize;
   /**
-   * the threshold value to start new cublet (default 1 GB)
+   * The threshold value to start new cublet. (default 1 GB)
    */
-  public final long cubletSize; 
+  public final long cubletSize;
 
+  /**
+   * Basic data loader configuration.
+   */
   public DataLoaderConfig() {
     // unit: Byte
     this.chunkSize = 65536;
@@ -31,7 +33,7 @@ public abstract class DataLoaderConfig {
   }
 
   public abstract TupleReader createTupleReader(File dataFile)
-    throws IOException;
+      throws IOException;
 
   public abstract TupleParser createTupleParser(TableSchema tableSchema);
 }

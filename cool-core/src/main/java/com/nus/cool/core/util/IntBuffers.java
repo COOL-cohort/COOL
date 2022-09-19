@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -25,13 +26,13 @@ import java.nio.IntBuffer;
 
 /**
  * IntBuffers represents an int buffer. With IntBuffers and a key of int,
- * ByteBuffers could find the key in buffer and return the result with binary research
+ * ByteBuffers could find the key in buffer and return the result with binary
+ * research
  */
 public class IntBuffers {
 
-
   /**
-   * Search index of key by binary search
+   * Search index of key by binary search.
    *
    * @param buffer    data of int
    * @param fromIndex from index in buffer
@@ -47,13 +48,13 @@ public class IntBuffers {
     while (fromIndex <= toIndex) {
       int mid = (fromIndex + toIndex) >> 1;
       int e = buffer.get(mid);
-        if (key > e) {
-            fromIndex = mid + 1;
-        } else if (key < e) {
-            toIndex = mid - 1;
-        } else {
-            return mid;
-        }
+      if (key > e) {
+        fromIndex = mid + 1;
+      } else if (key < e) {
+        toIndex = mid - 1;
+      } else {
+        return mid;
+      }
     }
     return ~fromIndex;
   }

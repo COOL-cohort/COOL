@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -58,22 +59,22 @@ import java.util.List;
 public class DataChunkWS implements Output {
 
   /**
-   * Chunk beginning offset, don't update
+   * Chunk beginning offset, don't update.
    */
   private final int chunkBeginOffset;
 
   /**
-   * Number of records
+   * Number of records.
    */
   private int recordCount;
 
   /**
-   * Fields in data chunk
+   * Fields in data chunk.
    */
   private final DataFieldWS[] dataFields;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param offset Offset in out stream
    * @param fields fields for this data chunk
@@ -85,10 +86,11 @@ public class DataChunkWS implements Output {
   }
 
   /**
-   * Data Chunk Builder
-   * @param schema tableSchema
+   * Data Chunk Builder.
+   *
+   * @param schema     tableSchema
    * @param metaFields MetaFields
-   * @param offset Offset in out stream
+   * @param offset     Offset in out stream
    * @return DataChunkWs instance
    */
   public static DataChunkWS newDataChunk(TableSchema schema, MetaFieldWS[] metaFields, int offset) {
@@ -97,19 +99,21 @@ public class DataChunkWS implements Output {
     assert fieldSchemaList.size() == metaFields.length;
 
     // data chunk fields.
-    DataFieldWS[] fields = new DataFieldWS[fieldSchemaList.size()-schema.getInvariantFields().size()];
-    int flag=0;
+    DataFieldWS[] fields = new DataFieldWS[fieldSchemaList.size()
+      - schema.getInvariantFields().size()];
+    int flag = 0;
     for (int i = 0; i < fieldSchemaList.size(); i++) {
       FieldSchema fieldSchema = fieldSchemaList.get(i);
       FieldType fieldType = fieldSchema.getFieldType();
-      boolean invariantField=fieldSchema.isInvariantField();
-      if(!invariantField) {
+      boolean invariantField = fieldSchema.isInvariantField();
+      if (!invariantField) {
         switch (fieldType) {
           case AppKey:
           case UserKey:
           case Action:
           case Segment:
-            fields[flag] = new DataHashFieldWS(fieldType, i, metaFields[i], compressor, fieldSchema.isPreCal());
+            fields[flag] = new DataHashFieldWS(fieldType, i, metaFields[i], compressor,
+              fieldSchema.isPreCal());
             flag++;
             break;
           case ActionTime:
@@ -126,7 +130,7 @@ public class DataChunkWS implements Output {
   }
 
   /**
-   * Put a tuple into the chunk
+   * Put a tuple into the chunk.
    *
    * @param tuple plain data
    * @throws IOException If an I/O error occurs
@@ -162,7 +166,7 @@ public class DataChunkWS implements Output {
 
     // 2. Write header of the Data Chunk.
     // Calculate offset of header
-    int chunkHeadOff = this.chunkBeginOffset + bytesWritten;
+    final int chunkHeadOff = this.chunkBeginOffset + bytesWritten;
     // 2.1 Write chunkType (D ATA)'s position 1 Byte to store the ChunkType
     out.write(ChunkType.DATA.ordinal());
     bytesWritten++;

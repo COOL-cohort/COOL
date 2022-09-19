@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.google.common.primitives.Ints;
@@ -29,6 +30,7 @@ import java.util.List;
 
 /**
  * Compress BitSet using rle schema, prefer sorted BitSet.
+ * 
  * <p>
  * Data layout
  * ------------------------------------
@@ -40,8 +42,13 @@ import java.util.List;
  */
 public class SimpleBitSetCompressor {
 
+  /**
+   * Compress biset.
+   */
   public static int compress(BitSet bs, DataOutput out) throws IOException {
-    int pos1 = 0, pos2, bytesWritten = 0;
+    int pos1 = 0;
+    int pos2;
+    int bytesWritten = 0;
     List<Integer> blks = new ArrayList<>();
     boolean sign = bs.get(pos1);
     while (true) {
@@ -68,11 +75,15 @@ public class SimpleBitSetCompressor {
     return bytesWritten;
   }
 
+  /**
+   * Decompress a compressed biset buffer.
+   */
   public static BitSet read(ByteBuffer buff) {
     boolean sign = buff.get() != 0;
     int blks = buff.getInt();
     BitSet bs = new BitSet();
-    int pos = 0, len;
+    int pos = 0;
+    int len;
     for (int i = 0; i < blks; i++) {
       len = buff.getInt();
       if (sign) {

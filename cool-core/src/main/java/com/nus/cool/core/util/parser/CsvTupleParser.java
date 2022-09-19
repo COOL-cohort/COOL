@@ -16,14 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util.parser;
 
 /**
- * CsvTupleParser is a parser to parse a tuple from a csv file to array
+ * CsvTupleParser is a parser to parse a tuple from a csv file to array.
  */
 public class CsvTupleParser implements TupleParser {
   /**
-   * Parse csv tuple to array
+   * Parse csv tuple to array.
    *
    * @param tuple target tuple
    * @return string array

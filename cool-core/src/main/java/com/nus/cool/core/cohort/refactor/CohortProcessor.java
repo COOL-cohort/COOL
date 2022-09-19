@@ -117,7 +117,7 @@ public class CohortProcessor {
         userMetaField = (UserMetaFieldRS) metaField;
         gidMapBySchema.put(schema, userMetaField.getGidMap());
         invariantGidMap = loadInvariantGidMaps(userMetaField);
-      } else if (FieldType.IsHashType(metaField.getFieldType())) {
+      } else if (FieldType.isHashType(metaField.getFieldType())) {
         gidMapBySchema.put(schema, ((HashMetaFieldRS) metaField).getGidMap());
       }
     }
@@ -165,7 +165,7 @@ public class CohortProcessor {
           UserMetaFieldRS userMetaField = (UserMetaFieldRS) metaChunk.getMetaField(idName);
           int userGlobalId = chunk.getField(idName).getValueByIndex(i);
 
-          if (FieldType.IsHashType(chunk.getFieldTypeByName(schema))) {
+          if (FieldType.isHashType(chunk.getFieldTypeByName(schema))) {
             int hash = invariantGidMap.get(schema)[userGlobalId];
             int valueGlobalIdLocation = userMetaField.find(hash);
             String v = metaChunk.getMetaField(schema).getString(valueGlobalIdLocation);

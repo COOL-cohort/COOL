@@ -16,66 +16,67 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.schema;
 
 /**
- * Codec defines the code of different data types for decompressor
+ * Codec defines the code of different data types for decompressor.
  */
 public enum Codec {
 
   /**
-   * Code for int8 data
+   * Code for int8 data.
    */
   INT8,
 
   /**
-   * Code for int16 data
-   */ 
+   * Code for int16 data.
+   */
   INT16,
 
-  /** 
-   * Code for int32 data
+  /**
+   * Code for int32 data.
    */
   INT32,
 
   /**
-   * Code for bit vector
-   */ 
+   * Code for bit vector.
+   */
   BitVector,
 
   /**
-   * Code for string values data
-   */ 
+   * Code for string values data.
+   */
   LZ4,
 
   /**
-   * Code for pre calculate data
-   */ 
+   * Code for pre calculate data.
+   */
   PreCAL,
 
   /**
-   * Code for sorted data
-   */ 
+   * Code for sorted data.
+   */
   RLE,
 
   // TODO: NEED docs
   INTBit,
 
   /**
-   * Code for range, write a min value and a max value directly
-   */ 
+   * Code for range, write a min value and a max value directly.
+   */
   Range,
 
-  /**
-   * 
-   */
   Set,
 
-  /** 
-   * Code for numeric data, use delta encoding
-   */ 
+  /**
+   * Code for numeric data, use delta encoding.
+   */
   Delta;
 
+  /**
+   * Translate an interger to its corresponding codec.
+   */
   public static Codec fromInteger(int c) {
     switch (c) {
       case 0:

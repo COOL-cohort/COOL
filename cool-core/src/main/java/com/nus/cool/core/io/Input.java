@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.nus.cool.core.io;
 
 import java.nio.ByteBuffer;
 
 /**
- * Base interface for all read-only data structures
+ * Base interface for all read-only data structures.
  */
 public interface Input {
 
   /**
-   * Read data from byte buffer
+   * Read data from byte buffer.
    *
    * @param buffer data byte buffer
    */

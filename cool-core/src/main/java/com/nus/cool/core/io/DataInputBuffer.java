@@ -16,10 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io;
 
 import java.io.DataInputStream;
 
+/**
+ * Input buffer abstraction.
+ */
 public class DataInputBuffer extends DataInputStream {
 
   private Buffer buffer;
@@ -34,7 +38,7 @@ public class DataInputBuffer extends DataInputStream {
   }
 
   /**
-   * Resets te data that the buffer reads
+   * Resets te data that the buffer reads.
    *
    * @param input  the input stream
    * @param length number of bytes to read
@@ -44,7 +48,7 @@ public class DataInputBuffer extends DataInputStream {
   }
 
   /**
-   * Resets te data that the buffer reads
+   * Resets te data that the buffer reads.
    *
    * @param input the input stream
    */
@@ -62,7 +66,8 @@ public class DataInputBuffer extends DataInputStream {
   }
 
   /**
-   * Returns the index one greater than the last valid character in the input stream buffer.
+   * Returns the index one greater than the last valid character in the input
+   * stream buffer.
    */
   public int getLength() {
     return this.buffer.getLength();
@@ -71,7 +76,7 @@ public class DataInputBuffer extends DataInputStream {
   private static class Buffer extends FastInputStream {
 
     public Buffer() {
-      super(new byte[]{});
+      super(new byte[] {});
     }
 
     public void reset(byte[] input, int start, int length) {

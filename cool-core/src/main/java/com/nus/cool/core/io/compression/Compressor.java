@@ -16,19 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
+/**
+ * Interface for compression opertors applying to various data structure used in COOL. 
+ */
 public interface Compressor {
 
   /**
-   * Estimate the maximum size of compressed data in byte
+   * Estimate the maximum size of compressed data in byte.
    *
    * @return number of bytes
    */
   int maxCompressedLength();
 
   /**
-   * Compress a byte array
+   * Compress a byte array.
    *
    * @param src        the compressed data
    * @param srcOff     the start offset in sec
@@ -41,7 +45,7 @@ public interface Compressor {
   int compress(byte[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen);
 
   /**
-   * Compress an integer array
+   * Compress an integer array.
    *
    * @param src        the compressed data
    * @param srcOff     the start offset in sec
@@ -52,5 +56,4 @@ public interface Compressor {
    * @return the compressed size
    */
   int compress(int[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen);
-
 }

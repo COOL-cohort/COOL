@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
 import com.google.common.primitives.Ints;
@@ -25,19 +26,21 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Compress integers using delta encoding, get max delta by max value and min value in integers and
- * choose ZIntCompressor by max delta and compress delta value vector by ZIntCompressor
+ * Compress integers using delta encoding, get max delta by max value and min
+ * value in integers
+ * and choose ZIntCompressor by max delta and compress delta value vector by
+ * ZIntCompressor.
+ * 
  * <p>
  * Data layout is as follows
- * <p>
  * ------------------------------------------------------------------------------------------------
- * |     min     |     max     |     zInt Codec     |            zInt compressed values           |
+ * | min | max | zInt Codec | zInt compressed values |
  * ------------------------------------------------------------------------------------------------
  */
 public class DeltaCompressor implements Compressor {
 
   /**
-   * Head account for min, max and zInt codec
+   * Head account for min, max and zInt codec.
    */
   public static final int HEADACC = 8 + 1;
 

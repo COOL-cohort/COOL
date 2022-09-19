@@ -16,25 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.util.reader;
 
 import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * TupleReader is a data loader to read tuple from source
+ * TupleReader is a data loader to read tuple from source.
  */
 public interface TupleReader extends Closeable {
 
   /**
-   * Check if source has next tuple
+   * Check if source has next tuple.
    *
    * @return boolean value
    */
   boolean hasNext();
 
   /**
-   * Reads tuple
+   * Reads tuple.
    *
    * @return tuple
    * @throws IOException If an I/O error occurs
