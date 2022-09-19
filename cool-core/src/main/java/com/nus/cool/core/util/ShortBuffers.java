@@ -61,4 +61,17 @@ public class ShortBuffers {
     }
     return ~fromIndex;
   }
+
+  public static int traverseSearch(ShortBuffer buffer, int fromIndex, int toIndex, short key) {
+    checkNotNull(buffer);
+    checkArgument(fromIndex < buffer.limit() && toIndex <= buffer.limit());
+    int ikey = key & 0xFFFF;
+    for (int i = fromIndex; i < toIndex; i++) {
+      int e = buffer.get(i) & 0xFFFF;
+      if (ikey == e)
+        return i;
+    }
+
+    return -1;
+  }
 }

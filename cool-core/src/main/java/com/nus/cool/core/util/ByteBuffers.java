@@ -59,4 +59,17 @@ public class ByteBuffers {
     }
     return ~fromIndex;
   }
+
+  public static int traverseSearch(ByteBuffer buffer, int fromIndex, int toIndex, byte key) {
+    checkNotNull(buffer);
+    checkArgument(fromIndex < buffer.limit() && toIndex <= buffer.limit());
+    // int ikey =
+    int ikey = key & 0xFF;
+    for (int i = fromIndex; i < toIndex; i++) {
+      int e = buffer.get(i) & 0xFF;
+      if (e == ikey)
+        return i;
+    }
+    return -1;
+  }
 }
