@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.nus.cool.core.io.storevector;
 
 import com.google.common.primitives.Ints;
@@ -24,29 +23,24 @@ import com.nus.cool.core.util.IntBuffers;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-/**
- * Decompress data which stores integers in four bytes.
- * <p>
- * The data layout is as follows
- * ------------------------------------
- * | count | ZInt compressed integers |
- * ------------------------------------
- */
 public class ZInt32Store implements ZIntStore, InputVector {
 
-  private int count;
+  private final int count;
+
+  private final boolean sorted;
 
   private IntBuffer buffer;
 
-  public ZInt32Store(int count) {
+  public ZInt32Store(int count, boolean sorted) {
     this.count = count;
+    this.sorted = sorted;
   }
 
-  /**
-   * Create input vector on a buffer that is ZInt32 encoded.
-   */
-  public static ZIntStore load(ByteBuffer buffer, int n) {
-    ZIntStore store = new ZInt32Store(n);
+  public static ZIntStore load(ByteBuffer buffer) {
+    int n = buffer.getInt();
+    int flag = buffer.get(); // get byte into int
+    boolean sorted = flag == 1 ? true : false;
+    ZIntStore store = new ZInt32Store(n, sorted);
     store.readFrom(buffer);
     return store;
   }
@@ -58,7 +52,10 @@ public class ZInt32Store implements ZIntStore, InputVector {
 
   @Override
   public int find(int key) {
-    return IntBuffers.binarySearch(this.buffer, 0, this.buffer.limit(), key);
+    if(this.sorted)
+      return IntBuffers.binarySearch(this.buffer, 0, this.buffer.limit(), key);
+    else
+      return IntBuffers.traverseSearch(this.buffer, 0, this.buffer.limit(), key);
   }
 
   @Override

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.nus.cool.core.io.compression;
 
 import com.nus.cool.core.schema.Codec;
@@ -24,10 +23,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Compress integers using the leading zero suppressed schema. Each compressed
- * integer is formatted
+ * Compress integers using the leading zero suppressed schema. Each compressed integer is formatted
  * to align to byte boundary and stored in native byte order
- * 
  * <p>
  * The data layout is as follows
  * ------------------------------------
@@ -37,24 +34,26 @@ import java.nio.ByteOrder;
 public class ZIntCompressor implements Compressor {
 
   /**
-   * Bytes number for count.
+   * Bytes number for count and sorted
    */
-  public static final int HEADACC = 4;
+  public static final int HEADACC = 5;
 
   /**
-   * Bytes number for compressed integer.
+   * Bytes number for compressed integer
    */
   private final int width;
+  
+  /**
+   *  Whether these value are sorted
+   */
+  private final boolean sorted;
 
   /**
-   * Maximum size of compressed data.
+   * Maximum size of compressed data
    */
   private final int maxCompressedLength;
 
-  /**
-   * Create a ZintCompressor.
-   */
-  public ZIntCompressor(Codec codec, int numValues) {
+  public ZIntCompressor(Codec codec, int numValues, boolean sorted) {
     switch (codec) {
       case INT8:
         this.width = 1;
@@ -68,11 +67,12 @@ public class ZIntCompressor implements Compressor {
       default:
         throw new IllegalArgumentException("Unsupported codec: " + codec);
     }
+    this.sorted = sorted;
     this.maxCompressedLength = this.width * numValues + HEADACC;
   }
 
   public ZIntCompressor(Codec codec, Histogram hist) {
-    this(codec, hist.getNumOfValues());
+    this(codec, hist.getNumOfValues(), hist.isSorted());
   }
 
   @Override
@@ -92,6 +92,8 @@ public class ZIntCompressor implements Compressor {
     buffer.order(ByteOrder.nativeOrder());
     // Write count, save srcLen for decompressing
     buffer.putInt(srcLen);
+    byte sorted = this.sorted ? (byte) 1 : (byte) 0;
+    buffer.put(sorted);
     // Write compressed data
     for (int i = srcOff; i < srcOff + srcLen; i++) {
       switch (this.width) {
@@ -104,8 +106,6 @@ public class ZIntCompressor implements Compressor {
         case 4:
           buffer.putInt(src[i]);
           break;
-        default:
-          System.err.println("ZintCompressor length should be one of (1, 2, 4).");
       }
     }
     return buffer.position() - destOff;
