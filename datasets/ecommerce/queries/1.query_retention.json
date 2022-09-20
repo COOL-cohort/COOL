@@ -5,6 +5,6 @@
     {"fieldName":"Product_ID","operators":["DISTINCTCOUNT"]}
   ],
   "timeRange":"2021-01-01|2022-01-01",
-  "groupFields_granularity": "MONTH",
+  "groupFieldsGranularity": "MONTH",
   "granularity":"MONTH"
 }
