@@ -138,6 +138,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
         .numOfValues(fingers.length)
         .rawSize(Ints.BYTES * fingers.length)
         .type(CompressType.KeyFinger)
+        .sorted(true)
         .build();
     this.compressor.reset(hist, fingers, 0, fingers.length);
     // Compress and write the fingers

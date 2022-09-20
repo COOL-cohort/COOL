@@ -146,13 +146,13 @@ public class DataHashFieldWS implements DataFieldWS {
         }
       }
     }
-    // System.out.println(value);
     // Write compressed key vector (unique global id)
     int min = ArrayUtil.min(key);
     int max = ArrayUtil.max(key);
     int count = key.length;
     int rawSize = count * Ints.BYTES;
     Histogram hist = Histogram.builder()
+        .sorted(true)
         .min(min)
         .max(max)
         .numOfValues(count)
@@ -182,7 +182,7 @@ public class DataHashFieldWS implements DataFieldWS {
       count = value.length;
       rawSize = count * Ints.BYTES;
       hist = Histogram.builder()
-          .sorted(this.fieldType == FieldType.AppKey || this.fieldType == FieldType.UserKey)
+          // .sorted(this.fieldType == FieldType.AppKey || this.fieldType == FieldType.UserKey)
           .min(min)
           .max(max)
           .numOfValues(count)

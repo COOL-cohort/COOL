@@ -93,9 +93,10 @@ public class CompressorAdviser {
   // this does not implicit assume the values are being sorted.
   // RLE and INtBit readstore does not support find.
   private static Codec adviseForValue(Histogram hist) {
-    if (hist.isSorted()) {
-      return Codec.RLE;
-    }
+    
+    // if (hist.isSorted()) {
+    //   return Codec.RLE;
+    // }
 
     int max = (int) hist.getMax();
     int bitLength = IntegerUtil.minBits(max);
