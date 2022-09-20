@@ -1,5 +1,14 @@
 package com.nus.cool.core.io.store;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.readstore.ChunkRS;
@@ -13,199 +22,144 @@ import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.converter.DayIntConverter;
-import com.nus.cool.core.util.parser.CsvTupleParser;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-/**
- * Testing data chunk read store and write store.
- */
 public class ChunkTest {
 
-  static final Logger logger = LoggerFactory.getLogger(ChunkTest.class);
+    static final Logger logger = LoggerFactory.getLogger(ChunkTest.class);
 
-  @BeforeTest
-  public void setUp() {
-    logger.info("Start UnitTest " + ChunkTest.class.getSimpleName());
-  }
-
-  @AfterTest
-  public void tearDown() {
-    logger.info(String.format("Tear down UnitTest %s\n", ChunkTest.class.getSimpleName()));
-  }
-
-  @Test(dataProvider = "ChunkUnitTestDP")
-  public void chunkUnitTest(String dirPath) throws IOException {
-    logger.info("Input Chunk UnitTest Data: DataPath " + dirPath);
-    // Load Yaml Config
-    String yamlFilePath = Paths.get(dirPath, "table.yaml").toString();
-    File yamlFile = new File(yamlFilePath);
-    TableSchema schemas = TableSchema.read(yamlFile);
-
-    // Load CSV file, in ArrayList
-    ArrayList<String[]> data = new ArrayList<>();
-    String csvFilePath = Paths.get(dirPath, "table.csv").toString();
-    // File
-    BufferedReader br = new BufferedReader(new FileReader(new File(csvFilePath)));
-    String line;
-    CsvTupleParser parser = new CsvTupleParser();
-    while ((line = br.readLine()) != null) {
-      String[] vec = parser.parse(line);
-      data.add(vec);
+    @BeforeTest
+    public void setUp() {
+        logger.info("Start UnitTest " + ChunkTest.class.getSimpleName());
     }
-    int userKeyIndex = schemas.getUserKeyField();
-    List<Integer> invariantFieldIndex = schemas.getInvariantFields();
-    // Generate MetaChunkWS
-    MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0, userKeyIndex,
-        invariantFieldIndex);
-    DataChunkWS chunkWS = DataChunkWS.newDataChunk(schemas, metaChunkWS.getMetaFields(), 0);
 
-    for (int i = 0; i < data.size(); i++) {
-      // You have to update meta first,
-      // you have to update globalId first
-      metaChunkWS.put(data.get(i), schemas.getInvariantType());
-      chunkWS.put(data.get(i));
+    @AfterTest
+    public void tearDown() {
+        logger.info(String.format("Tear down UnitTest %s\n", ChunkTest.class.getSimpleName()));
     }
-    // We create two Buffer, one for chunkWS, another for metaChunkWS
-    DataOutputBuffer chunkDOB = new DataOutputBuffer();
-    DataOutputBuffer metaDOB = new DataOutputBuffer();
-    final int chunkPOS = chunkWS.writeTo(chunkDOB);
-    int metaPOS = metaChunkWS.writeTo(metaDOB);
 
-    // ReadFrom
-    ByteBuffer metaBF = ByteBuffer.wrap(metaDOB.getData());
-    ByteBuffer chunkBF = ByteBuffer.wrap(chunkDOB.getData());
-    metaBF.order(ByteOrder.nativeOrder());
-    chunkBF.order(ByteOrder.nativeOrder());
+    @Test(dataProvider = "ChunkUnitTestDP")
+    public void ChunkUnitTest(String dirPath) throws IOException {
+        logger.info("Input Chunk UnitTest Data: DataPath " + dirPath);
 
-    // decode these data
-    MetaChunkRS metaChunkRS = new MetaChunkRS(schemas);
-    // Note: we should decode the headerOffset first
-    metaBF.position(metaPOS - Ints.BYTES);
-    int metaHeaderOffset = metaBF.getInt();
-    metaBF.position(metaHeaderOffset);
-    metaChunkRS.readFrom(metaBF);
-    chunkBF.position(chunkPOS - Ints.BYTES);
-    int chunkHeaderOffset = chunkBF.getInt();
-    chunkBF.position(chunkHeaderOffset);
-    ChunkRS chunkRS = new ChunkRS(schemas);
-    chunkRS.readFrom(chunkBF);
-    ArrayList<ArrayList<String>> colTable = toColumnLayout(data);
-    // Check Record Size
-    Assert.assertEquals(chunkRS.getRecords(), data.size(), "Field Record Size");
+        TestTable table = utils.loadTable(dirPath);
+        TableSchema schemas = utils.loadSchema(dirPath);
 
-    int colSize = schemas.getFields().size();
-    for (int i = 0; i < colSize; i++) {
-      ArrayList<String> fieldValue = colTable.get(i);
-      FieldSchema fschema = schemas.getField(i);
-      FieldRS fieldRS = chunkRS.getField(fschema.getName());
-      MetaFieldRS metaFieldRS = metaChunkRS.getMetaField(fschema.getName());
-      Assert.assertTrue(isFieldCorrect(metaFieldRS, fieldRS, fieldValue),
-          String.format("Field %s Failed", fschema.getName()));
-    }
-  }
+        // Generate MetaChunkWS
+        MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0);
+        DataChunkWS chunkWS = DataChunkWS.newDataChunk(schemas, metaChunkWS.getMetaFields(), 0);
 
-  /**
-   * Data provider.
-   */
-  @DataProvider(name = "ChunkUnitTestDP")
-  public Object[][] chunkUnitTestDP() {
-    String sourcePath = Paths.get(System.getProperty("user.dir"),
-        "src",
-        "test",
-        "java",
-        "com",
-        "nus",
-        "cool",
-        "core",
-        "resources").toString();
-    String healthPath = Paths.get(sourcePath, "health").toString();
-    String tpchPath = Paths.get(sourcePath, "olap-tpch").toString();
-    String sogamoPath = Paths.get(sourcePath, "sogamo").toString();
-
-    return new Object[][] {
-        { healthPath },
-        { tpchPath },
-        { sogamoPath },
-    };
-  }
-
-  // ------------------------------ Helper Function -----------------------------
-  // //
-
-  /**
-   * The loaded data is stored in rows, transfer to column layout.
-   *
-   * @return loaded data stored in column layout
-   */
-  private ArrayList<ArrayList<String>> toColumnLayout(ArrayList<String[]> data) {
-    ArrayList<ArrayList<String>> res = new ArrayList<>();
-
-    for (int i = 0; i < data.size(); i++) {
-      for (int j = 0; j < data.get(0).length; j++) {
-
-        if (i == 0) {
-          res.add(new ArrayList<String>());
+        for (int i = 0; i < table.getRowCounts(); i++) {
+            // You have to update meta first,
+            // you have to update globalId first
+            String[] tuple = table.getTuple(i);
+            metaChunkWS.put(tuple);
+            chunkWS.put(tuple);
         }
-        res.get(j).add(data.get(i)[j]);
-      }
+
+        // We create two Buffer, one for chunkWS, another for metaChunkWS
+        DataOutputBuffer chunkDOB = new DataOutputBuffer();
+        DataOutputBuffer metaDOB = new DataOutputBuffer();
+        int chunkPOS = chunkWS.writeTo(chunkDOB);
+        int metaPOS = metaChunkWS.writeTo(metaDOB);
+
+        // ReadFrom
+        ByteBuffer metaBF = ByteBuffer.wrap(metaDOB.getData());
+        ByteBuffer chunkBF = ByteBuffer.wrap(chunkDOB.getData());
+        metaBF.order(ByteOrder.nativeOrder());
+        chunkBF.order(ByteOrder.nativeOrder());
+
+        // decode these data
+        MetaChunkRS metaChunkRS = new MetaChunkRS(schemas);
+        ChunkRS chunkRS = new ChunkRS(schemas, metaChunkRS);
+        // Note: we should decode the headerOffset first
+        metaBF.position(metaPOS - Ints.BYTES);
+        int metaHeaderOffset = metaBF.getInt();
+        metaBF.position(metaHeaderOffset);
+        metaChunkRS.readFrom(metaBF);
+        chunkBF.position(chunkPOS - Ints.BYTES);
+        int chunkHeaderOffset = chunkBF.getInt();
+        chunkBF.position(chunkHeaderOffset);
+        chunkRS.readFrom(chunkBF);
+        
+        // Check Record Size
+        Assert.assertEquals(chunkRS.getRecords(), table.getRowCounts(), "Field Record Size");
+
+        for (int i = 0; i < table.getColCounts(); i++) {
+            ArrayList<String> fieldValue = table.getCols().get(i);
+            FieldSchema fschema = schemas.getField(i);
+            FieldRS fieldRS = chunkRS.getField(fschema.getName());
+            MetaFieldRS metaFieldRS = metaChunkRS.getMetaField(fschema.getName());
+            Assert.assertTrue(isFieldCorrect(metaFieldRS, fieldRS, fieldValue),
+                    String.format("Field %s Failed", fschema.getName()));
+        }
     }
 
-    return res;
-  }
+    @DataProvider(name = "ChunkUnitTestDP")
+    public Object[][] chunkUnitTestDP() {
+        String sourcePath = Paths.get(System.getProperty("user.dir"),
+                "src",
+                "test",
+                "java",
+                "com",
+                "nus",
+                "cool",
+                "core",
+                "resources").toString();
+        String HealthPath = Paths.get(sourcePath, "health").toString();
+        String TPCHPath = Paths.get(sourcePath, "olap-tpch").toString();
+        String SogamoPath = Paths.get(sourcePath, "sogamo").toString();
 
-  /**
-   * Check Weather the decoded Field is correct.
-   *
-   * @return True, correct Field or False something wrong
-   */
-  private Boolean isFieldCorrect(MetaFieldRS metaFieldRS, FieldRS fieldRS,
-      ArrayList<String> fieldValue) {
-    if (fieldRS.isSetField()) {
-      // HashField
-      InputVector local2Gloabl = fieldRS.getKeyVector();
-      InputVector vec = fieldRS.getValueVector();
-
-      for (int i = 0; i < vec.size(); i++) {
-        int localID = vec.get(i);
-        int globalID = local2Gloabl.get(localID);
-        String actual = metaFieldRS.getString(globalID);
-
-        if (!actual.equals(fieldValue.get(i))) {
-          return false;
-        }
-      }
-    } else {
-      // RangeField
-      InputVector vec = fieldRS.getValueVector();
-      DayIntConverter convertor = new DayIntConverter();
-      for (int i = 0; i < vec.size(); i++) {
-        String expect = fieldValue.get(i);
-        if (fieldRS.getFieldType() == FieldType.ActionTime) {
-          expect = Integer.toString(convertor.toInt(expect));
-        }
-        String actual = Integer.toString(vec.get(i));
-
-        if (!actual.equals(expect)) {
-          return false;
-        }
-      }
+        return new Object[][] {
+                { HealthPath },
+                { TPCHPath },
+                { SogamoPath },
+        };
     }
-    return true;
-  }
+
+    // ------------------------------ Helper Function -----------------------------
+
+    /**
+     * Check Weather the decoded Field is correct
+     * 
+     * @param metaFieldRS
+     * @param fieldRS
+     * @param fieldValue
+     * @return True, correct Field or False something wrong
+     */
+    private Boolean isFieldCorrect(MetaFieldRS metaFieldRS, FieldRS fieldRS, ArrayList<String> valueList) {
+        if (FieldType.isHashType(fieldRS.getFieldType())){
+            // HashField
+            for (int i = 0; i < valueList.size(); i++) {
+                int gid = fieldRS.getValueByIndex(i);
+                String actual = metaFieldRS.getString(gid);
+                if (!actual.equals(valueList.get(i))) {
+                    return false;
+                }
+            }
+        } else {
+            // RangeField
+            
+            DayIntConverter convertor = DayIntConverter.getInstance();
+            for (int i = 0; i < valueList.size(); i++) {
+                String expect = valueList.get(i);
+                if (fieldRS.getFieldType() == FieldType.ActionTime) {
+                    expect = Integer.toString(convertor.toInt(expect));
+                }
+                String actual = Integer.toString(fieldRS.getValueByIndex(i));
+                if (!actual.equals(expect)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
 }
