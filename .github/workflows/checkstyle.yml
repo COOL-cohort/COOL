@@ -16,6 +16,6 @@ jobs:
       with:
         checkstyle_config: 'cool-checkstyle.xml'
         reporter: 'github-pr-review'
-        filter_mode: nofilter
+        filter_mode: file
         level: error
         fail_on_error: true
