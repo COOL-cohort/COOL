@@ -1,15 +1,13 @@
 package com.nus.cool.core.io.storevector;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.Charset;
-
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.LZ4JavaCompressor;
 import com.nus.cool.core.schema.CompressType;
-
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -18,6 +16,9 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+/**
+ * Testing LZ4 input vector.
+ */
 public class LZ4InputVectorTest {
 
   static final Logger logger = LoggerFactory.getLogger(LZ4InputVectorTest.class);
@@ -34,8 +35,9 @@ public class LZ4InputVectorTest {
   }
 
   @Test(dataProvider = "LZ4InputVectorDP", enabled = true)
-  public void LZ4InputVectorUnitTest(String[] valueList) throws IOException {
-    logger.info(String.format("Input LZ4InputVector UnitTest Data: ValueList Size %d", valueList.length));
+  public void lz4InputVectorUnitTest(String[] valueList) throws IOException {
+    logger.info(String.format("Input LZ4InputVector UnitTest Data: ValueList Size %d",
+        valueList.length));
 
     DataOutputBuffer buf = new DataOutputBuffer();
     // Write Size
@@ -77,8 +79,11 @@ public class LZ4InputVectorTest {
     }
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "LZ4InputVectorDP", parallel = false)
-  public Object[][] LZ4InputVectorDP() {
+  public Object[][] lz4InputVectorDP() {
     return new Object[][] {
         { generateValueList(10) },
         { generateValueList(100) },

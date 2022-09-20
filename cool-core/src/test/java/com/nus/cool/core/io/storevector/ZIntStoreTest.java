@@ -1,14 +1,13 @@
 package com.nus.cool.core.io.storevector;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.ZIntCompressor;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.util.ArrayUtil;
-
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -17,6 +16,9 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+/**
+ * Testing ZIntStore.
+ */
 public class ZIntStoreTest {
 
   static final Logger logger = LoggerFactory.getLogger(ZIntStoreTest.class.getSimpleName());
@@ -32,14 +34,14 @@ public class ZIntStoreTest {
   }
 
   @Test(dataProvider = "ZIntStoreDP")
-  public void TestZIntStore(int[] numbers, Codec codeType) throws Exception {
-    logger.info(String.format("Input ZIntStore UnitTest Data: Code Type %s Input Data %s", codeType.name(),
-        numbers.toString()));
+  public void testZIntStore(int[] numbers, Codec codeType) throws Exception {
+    logger.info(String.format("Input ZIntStore UnitTest Data: Code Type %s Input Data %s",
+        codeType.name(), numbers.toString()));
 
     int min = ArrayUtil.min(numbers);
     int max = ArrayUtil.max(numbers);
     int count = numbers.length;
-    int rawSize = count * CodecByte(codeType);
+    int rawSize = count * codecByte(codeType);
 
     Histogram hist = Histogram.builder()
         .min(min)
@@ -81,6 +83,9 @@ public class ZIntStoreTest {
     }
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "ZIntStoreDP")
   public Object[][] dpArgs() {
     return new Object[][] {
@@ -90,7 +95,7 @@ public class ZIntStoreTest {
     };
   }
 
-  private int CodecByte(Codec ctype) {
+  private int codecByte(Codec ctype) {
     switch (ctype) {
       case INT32:
         return 4;

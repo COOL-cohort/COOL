@@ -24,7 +24,6 @@ import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
