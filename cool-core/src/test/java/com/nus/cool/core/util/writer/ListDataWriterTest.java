@@ -4,23 +4,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+/**
+ * Testing ListDataWriter.
+ */
 public class ListDataWriterTest {
 
   @Test
   public void testListDataWriter() {
-    String[] input1 = {"s11", "s12"};
-    String[] input2 = {"s21", "s22"};
+    String[] input1 = { "s11", "s12" };
+    String[] input2 = { "s21", "s22" };
     List<String> out = new ArrayList<>();
     ListDataWriter writer = new ListDataWriter(out);
     try {
-      writer.Initialize();
-      writer.Add(input1);
-      writer.Add(input2);
-      writer.Finish();
+      writer.initialize();
+      writer.add(input1);
+      writer.add(input2);
+      writer.finish();
       Assert.assertEquals(out.get(0), Arrays.toString(input1));
       Assert.assertEquals(out.get(1), Arrays.toString(input2));
       writer.close();
