@@ -37,8 +37,9 @@ import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.converter.NumericConverter;
-import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ResultTuple;
+import com.nus.cool.model.CoolModel;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,18 +49,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CohortLoader is a higher level abstraction for cohort query.
+ * CohortLoader is a higher level abstraction for cohort query
  * With CohortLoader, you can easily get the query result
  */
 public class CohortLoader {
 
   /**
-   * Local model for cool.
+   * Local model for cool
    *
    * @param args [0] the output data dir (eg, dir of .dz file)
-   *             args [1] application name, also the folder name under above
-   *             folder
-   *             args [2] query's path, eg sogamo/query0.json
+   *        args [1] application name, also the folder name under above folder
+   *        args [2] query's path, eg sogamo/query0.json
+   * @throws IOException
    */
   public static void main(String[] args) throws IOException {
 
@@ -91,7 +92,7 @@ public class CohortLoader {
             // for each file under such directory
             for (File cubletFile : cubletFiles) {
               outSourceMap.put(cubletFile.getName(),
-                  new DataOutputStream(new FileOutputStream(cubletFile, true)));
+                      new DataOutputStream(new FileOutputStream(cubletFile, true)));
             }
           }
         }
@@ -103,19 +104,19 @@ public class CohortLoader {
     System.out.println(" ------  checking outSourceMap done  ------ ");
 
     List<ResultTuple> resultTuples = executeQuery(
-        coolModel.getCube(query.getDataSource()), query,
-        outSourceMap);
+            coolModel.getCube(query.getDataSource()), query,
+            outSourceMap);
     QueryResult result = QueryResult.ok(resultTuples);
     System.out.println(result.toString());
     coolModel.close();
   }
 
   /**
-   * Execute query.
-   *
-   * @param cube  the cube that stores the data we need
+   * execute query
+   * 
+   * @param cube the cube that stores the data we need
    * @param query the cohort query needed to process
-   * @param map   the cublet and it's data
+   * @param map the cublet and it's data
    * @return the result of the query
    */
   public static List<ResultTuple> executeQuery(CubeRS cube, CohortQuery query,
@@ -134,7 +135,7 @@ public class CohortLoader {
       CohortAggregation gamma = new CohortAggregation(sigma);
       gamma.init(schema, query);
       gamma.process(metaChunk);
-      if (sigma.isUserActiveCublet()) {
+      if (sigma.isBUserActiveCublet()) {
         List<ChunkRS> dataChunks = cublet.getDataChunks();
         for (ChunkRS dataChunk : dataChunks) {
           gamma.process(dataChunk);
@@ -144,9 +145,9 @@ public class CohortLoader {
       if (tag) {
         int end = cublet.getLimit();
         DataOutputStream out = map.get(cublet.getFile());
-        for (BitSet bs : bitSets) {
-          SimpleBitSetCompressor.compress(bs, out);
-        }
+          for (BitSet bs : bitSets) {
+              SimpleBitSetCompressor.compress(bs, out);
+          }
         out.writeInt(IntegerUtil.toNativeByteOrder(end));
         out.writeInt(IntegerUtil.toNativeByteOrder(bitSets.size()));
         out.writeInt(IntegerUtil.toNativeByteOrder(0));
@@ -154,8 +155,8 @@ public class CohortLoader {
 
       String cohortField = query.getCohortFields()[0];
       String actionTimeField = schema.getActionTimeFieldName();
-      NumericConverter converter = cohortField.equals(actionTimeField) 
-          ? new DayIntConverter() : null;
+      NumericConverter converter =
+          cohortField.equals(actionTimeField) ? DayIntConverter.getInstance() : null;
       MetaFieldRS cohortMetaField = metaChunk.getMetaField(cohortField);
       Map<CohortKey, Long> results = gamma.getCubletResults();
       for (Map.Entry<CohortKey, Long> entry : results.entrySet()) {
