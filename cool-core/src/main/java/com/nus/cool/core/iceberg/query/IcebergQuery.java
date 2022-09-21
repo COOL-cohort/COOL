@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import lombok.Data;
+import lombok.Getter;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -59,6 +61,7 @@ public class IcebergQuery {
   // granularity for time range
   private GranularityType granularity;
   // granularity for groupBy, if the groupBy field is dataType,
+  @Getter
   private GranularityType groupFieldsGranularity;
 
   @Override
