@@ -74,13 +74,13 @@ public class DataRangeFieldWS implements DataFieldWS {
    * UnitTest insert data.
    */
   @Override
-  public void put(String tupleValue) throws IOException {
-    if (this.fieldType == FieldType.ActionTime) {
-      DayIntConverter converter = new DayIntConverter();
-      this.buffer.writeInt(converter.toInt(tupleValue));
-    } else {
-      this.buffer.writeInt(Integer.parseInt(tupleValue));
-    }
+  public void put(String TupleValue) throws IOException {
+      if (this.fieldType == FieldType.ActionTime) {
+          DayIntConverter converter = DayIntConverter.getInstance();
+          this.buffer.writeInt(converter.toInt(TupleValue));
+      } else {
+          this.buffer.writeInt(Integer.parseInt(TupleValue));
+      }
   }
 
   @Override

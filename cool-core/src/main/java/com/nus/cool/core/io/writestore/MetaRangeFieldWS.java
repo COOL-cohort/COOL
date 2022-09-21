@@ -65,15 +65,15 @@ public class MetaRangeFieldWS implements MetaFieldWS {
   }
 
   @Override
-  public void put(String v) {
-    v = checkNotNull(v);
+  public void put(String[] tuple, int idx) {
+    String v = checkNotNull(tuple[idx]);
     switch (this.fieldType) {
       case Metric:
         this.min = Math.min(this.min, Integer.parseInt(v));
         this.max = Math.max(this.max, Integer.parseInt(v));
         break;
       case ActionTime:
-        DayIntConverter converter = new DayIntConverter();
+        DayIntConverter converter = DayIntConverter.getInstance();
         this.min = Math.min(this.min, converter.toInt(v));
         this.max = Math.max(this.max, converter.toInt(v));
         break;
