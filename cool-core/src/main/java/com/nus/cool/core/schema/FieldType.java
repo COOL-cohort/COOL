@@ -76,16 +76,14 @@ public enum FieldType {
     }
   }
 
-  /**
-   * Check if a type is a hash type.
-   */
   public static boolean isHashType(FieldType fieldType) {
     switch (fieldType) {
       case Action:
       case AppKey:
       case Segment:
-        return true;
       case UserKey:
+        return true;
+
       case ActionTime:
       case Metric:
         return false;
