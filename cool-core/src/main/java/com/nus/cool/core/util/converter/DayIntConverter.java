@@ -28,6 +28,15 @@ import org.joda.time.Days;
  */
 public class DayIntConverter implements NumericConverter {
 
+  private static class DayIntConverterHolder{
+    private static final DayIntConverter INSTANCE = new DayIntConverter();
+  }
+
+  private DayIntConverter(){}
+
+  public static final DayIntConverter getInstance(){
+    return DayIntConverterHolder.INSTANCE;
+  }
   /**
    * Convert date string value to the number of days past the reference day.
    *
