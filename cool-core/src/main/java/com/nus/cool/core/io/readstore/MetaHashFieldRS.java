@@ -16,12 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Maps;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
 import com.nus.cool.core.io.storevector.LZ4InputVector;
@@ -31,10 +29,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-/**
- * Read store of meta of a string field in meta chunks.
- */
-public class HashMetaFieldRS implements MetaFieldRS {
+public class MetaHashFieldRS implements MetaFieldRS {
 
   protected static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
@@ -49,10 +44,10 @@ public class HashMetaFieldRS implements MetaFieldRS {
   protected InputVector valueVec;
 
   // inverse map from global id to the offset in values.
-  // only populated once when getString is called to retrieve from valueVec
+  //  only populated once when getString is called to retrieve from valueVec
   protected Map<Integer, Integer> id2offset;
 
-  public HashMetaFieldRS(Charset charset) {
+  public MetaHashFieldRS(Charset charset) {
     this.charset = checkNotNull(charset);
   }
 
@@ -64,30 +59,31 @@ public class HashMetaFieldRS implements MetaFieldRS {
   @Override
   public int find(String key) {
     int globalIDIdx = this.fingerVec.find(rhash.hash(key));
-    return this.globalIDVec.get(globalIDIdx);
+    return globalIDIdx == -1 ? -1 :this.globalIDVec.get(globalIDIdx);
   }
 
   @Override
   public int count() {
     return this.fingerVec.size();
   }
-
+  
   @Override
   public String getString(int i) {
-    if (this.id2offset == null) {
-      this.id2offset = Maps.newHashMap();
-      // lazily populate the inverse index only once
-      for (int j = 0; j < this.globalIDVec.size(); j++) {
-        this.id2offset.put(this.globalIDVec.get(j), j);
-      }
-    }
-    return ((LZ4InputVector) this.valueVec)
-        .getString(this.id2offset.get(i), this.charset);
+    // if (this.id2offset == null) {
+    //   this.id2offset = Maps.newHashMap();
+    //   // lazily populate the inverse index only once
+    //   for (int j = 0; j < this.globalIDVec.size(); j++) {
+    //     this.id2offset.put(this.globalIDVec.get(j), j);
+    //   }
+    // }
+    // return ((LZ4InputVector) this.valueVec)
+    //   .getString(this.id2offset.get(i), this.charset);
+    return ((LZ4InputVector) this.valueVec).getString(i, this.charset);
   }
 
   @Override
   public int getMaxValue() {
-    return this.count() - 1;
+    return this.count();
   }
 
   @Override
@@ -101,8 +97,8 @@ public class HashMetaFieldRS implements MetaFieldRS {
     this.fingerVec = InputVectorFactory.readFrom(buffer);
     this.globalIDVec = InputVectorFactory.readFrom(buffer);
     if (this.fieldType == FieldType.Action || this.fieldType == FieldType.Segment
-        || this.fieldType == FieldType.UserKey) {
-      this.valueVec = InputVectorFactory.readFrom(buffer);
+        || this.fieldType == FieldType.AppKey) {
+        this.valueVec = InputVectorFactory.readFrom(buffer);
     }
   }
 
@@ -112,16 +108,4 @@ public class HashMetaFieldRS implements MetaFieldRS {
     this.readFromWithFieldType(buffer, fieldType);
   }
 
-  /**
-   * Get cublet global id mapping of this field.
-   */
-  public String[] getGidMap() {
-    // Can store it and reuse ret (suggestion)
-    String[] ret = new String[this.count()];
-    LZ4InputVector strlist = (LZ4InputVector) this.valueVec;
-    for (int i = 0; i < ret.length; i++) {
-      ret[this.globalIDVec.get(i)] = strlist.getString(i, this.charset);
-    }
-    return ret;
-  }
 }
