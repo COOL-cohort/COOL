@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.Input;
@@ -24,23 +23,21 @@ import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import java.nio.ByteBuffer;
+
 import lombok.Getter;
 
 /**
  * DataChunk read store
- * 
  * <p>
  * DataChunk layout
  * ---------------------------------------------
  * | chunk data | chunk header | header offset |
  * ---------------------------------------------
- * 
  * <p>
  * chunk data layout
  * -------------------------------------
  * | field 1 | field 2 | ... | field N |
  * -------------------------------------
- * 
  * <p>
  * chunk header layout
  * ---------------------------------------------------
@@ -54,22 +51,25 @@ import lombok.Getter;
 public class ChunkRS implements Input {
 
   /**
-   * Number of record in this chunk.
+   * number of record in this chunk
    */
   @Getter
   private int records;
 
   /**
-   * Field array in this chunk.
+   * field array in this chunk
    */
   private FieldRS[] fields;
 
   private int[] fieldOffsets;
 
-  private TableSchema schema;
+  private TableSchema tableSchema;
 
-  public ChunkRS(TableSchema schema) {
-    this.schema = schema;
+  private MetaChunkRS metaChunkRS;
+
+  public ChunkRS(TableSchema tableSchema, MetaChunkRS metaChunkRS) {
+    this.tableSchema = tableSchema;
+    this.metaChunkRS = metaChunkRS;
   }
 
   public int records() {
@@ -97,53 +97,51 @@ public class ChunkRS implements Input {
 
     this.fields = new FieldRS[fields];
 
-    // System.out.println("#Records="+this.records + ", # fields="+fields+",
-    // fieldOffsets="+ Arrays.toString(fieldOffsets));
+    MetaUserFieldRS userMetaField = (MetaUserFieldRS) this.metaChunkRS.getMetaField(tableSchema.getUserKeyFieldName());
 
-    /*
-     * TODO(lingze)
-     * lazy load
-     * no need to load all field into memory.
-     * We only load needed field
-     */
+    // initialized UserDataField first, it will become args for invariant field
+    DataHashFieldRS userDataField = new DataHashFieldRS();
 
     this.fields = new FieldRS[fields];
-    int fieldIndex = 0;
-    for (int i = 0; i < schema.getFields().size(); i++) {
-      // System.out.println("Reading data chunk's field ="+i+".....");
-      if (schema.isInvariantField(i)) {
+    for (int i = 0; i < tableSchema.count(); i++) {
+      buffer.position(fieldOffsets[i]);
+      FieldType fieldType = tableSchema.getFieldType(i);
+
+      if (i == tableSchema.getUserKeyFieldIdx()) {
+        userDataField.readFromWithFieldType(buffer, fieldType);
+        this.fields[i] = userDataField;
         continue;
       }
-      buffer.position(fieldOffsets[fieldIndex]);
 
-      this.fields[fieldIndex++] = FieldRS.readFieldRS(buffer,
-        this.schema.getField(i).getFieldType());
+      if (FieldType.isHashType(fieldType)) {
+        if (tableSchema.isInvariantField(i)) {
+          int invariant_idx = tableSchema.getInvariantFieldFlagMap()[i];
+          // invariant_idx != -1;
+          this.fields[i] = new DataInvariantHashFieldRS(fieldType, invariant_idx, userMetaField, userDataField);
+        } else
+          this.fields[i] = DataHashFieldRS.readFrom(buffer, fieldType);
+      } else {
+        if (tableSchema.isInvariantField(i)) {
+          int invariant_idx = tableSchema.getInvariantFieldFlagMap()[i];
+          this.fields[i] = new DataInvariantRangeFieldRS(fieldType, invariant_idx, userMetaField, userDataField);
+        } else
+          this.fields[i] = DataRangeFieldRS.readFrom(buffer, fieldType);
+      }
     }
   }
 
   /**
-   * Get the field information according to index.
-   *
-   * @param i index of field
+   * Get the filed information according to index
+   * 
+   * @param i index of filed
+   * @return
    */
   public FieldRS getField(int i) {
-
     return this.fields[i];
   }
 
   public FieldRS getField(String fieldName) {
-    return getField(schema.getDataChunkFieldID(fieldName));
+    return getField(tableSchema.getFieldID(fieldName));
   }
 
-  public boolean isInvariantFieldByName(String name) {
-    return this.schema.isInvariantField(name);
-  }
-
-  public String getUserFieldName() {
-    return this.schema.getField(this.schema.getUserKeyField()).getName();
-  }
-
-  public FieldType getFieldTypeByName(String name) {
-    return this.schema.getFieldType(name);
-  }
 }
