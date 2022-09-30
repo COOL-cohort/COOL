@@ -34,7 +34,7 @@ public interface MetaFieldWS extends Output {
    *
    * @param v value
    */
-  void put(String v);
+  void put(String[] tuple, int idx);
 
   /**
    * Find the index of value in this meta field, return -1 if no such value exists.

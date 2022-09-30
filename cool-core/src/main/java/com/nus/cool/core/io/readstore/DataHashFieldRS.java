@@ -1,85 +1,89 @@
 package com.nus.cool.core.io.readstore;
 
-import com.google.common.base.Preconditions;
+import java.nio.ByteBuffer;
+
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
 import com.nus.cool.core.schema.FieldType;
-import java.nio.ByteBuffer;
 
-/**
- * Read store of string field.
- */
 public class DataHashFieldRS implements FieldRS {
 
-  private FieldType fieldType;
+    private FieldType fieldType;
 
-  private boolean initialized = false;
+    private InputVector valueVector;
 
-  private InputVector valueVector;
+    // no used in true logic, to keep compatiable with old version code
+    private InputVector keyVector;
 
-  // no used in true logic, to keep compatiable with old version code
-  private InputVector keyVector;
 
-  @Override
-  public FieldType getFieldType() {
-    return this.fieldType;
-  }
+    public static DataHashFieldRS readFrom(ByteBuffer buffer, FieldType ft){
+        DataHashFieldRS instance = new DataHashFieldRS();
+        instance.readFromWithFieldType(buffer, ft);
+        return instance;
+    }
 
-  @Override
-  public boolean isSetField() {
-    validateInitialization();
-    return true;
-  }
 
-  @Override
-  public int getValueByIndex(int idx) {
-    return this.keyVector.get(this.valueVector.get(idx));
-  }
+    public void readFromWithFieldType(ByteBuffer buffer, FieldType ft) {
+        // get codec (no used)
+        // buffer.get();
 
-  @Override
-  public void readFromWithFieldType(ByteBuffer buffer, FieldType ft) {
-    this.initialized = true;
-    this.fieldType = ft;
-    // this.keyVector = InputVectorFactory.readFrom(buf);
+        this.fieldType = ft;
+        // this.keyVector = InputVectorFactory.readFrom(buf);
 
-    // this.valueVector = InputVectorFactory.readFrom(buf);
+        // this.valueVector = InputVectorFactory.readFrom(buf);
 
-    this.keyVector = InputVectorFactory.readFrom(buffer);
-    this.valueVector = InputVectorFactory.readFrom(buffer);
-  }
+        this.keyVector = InputVectorFactory.readFrom(buffer);
+        this.valueVector = InputVectorFactory.readFrom(buffer);
+    }
+    
+    /**
+     * BitSet array if this field has been pre-calculated
+     */
 
-  private void validateInitialization() {
-    Preconditions.checkState(this.initialized, "DataHashFieldRS is not initialized");
-  }
+    @Override
+    public FieldType getFieldType() {
+        return this.fieldType;
+    }
 
-  @Override
-  public void readFrom(ByteBuffer buffer) {
-    FieldType fieldType = FieldType.fromInteger(buffer.get());
-    this.readFromWithFieldType(buffer, fieldType);
-  }
+    /**
+     * 
+     */
+    @Override
+    public int getValueByIndex(int idx) {
+        return this.keyVector.get(this.valueVector.get(idx));
+    }
 
-  // under Method is to keep compatiable with old version code
 
-  @Override
-  public InputVector getKeyVector() {
-    // TODO Auto-generated method stub
-    return this.keyVector;
-  }
 
-  @Override
-  public InputVector getValueVector() {
-    // TODO Auto-generated method stub
-    return this.valueVector;
-  }
+    @Override
+    public void readFrom(ByteBuffer buffer) {
+        FieldType fieldType = FieldType.fromInteger(buffer.get());
+        this.readFromWithFieldType(buffer, fieldType);
+    }
 
-  @Override
-  public int minKey() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
+    // under Method is to keep compatiable with old version code
 
-  @Override
-  public int maxKey() {
-    return this.valueVector.size();
-  }
+    @Override
+    public InputVector getKeyVector() {
+        // TODO Auto-generated method stub
+        return this.keyVector;
+    }
+
+    @Override
+    public InputVector getValueVector() {
+        // TODO Auto-generated method stub
+        return this.valueVector;
+    }
+
+    @Override
+    public int minKey() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int maxKey() {
+        return this.valueVector.size();
+    }
+
 }

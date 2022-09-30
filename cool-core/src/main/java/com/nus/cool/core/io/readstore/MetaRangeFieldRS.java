@@ -16,16 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
 
-/**
- * Read store of meta of a int field in meta chunks.
- */
-public class RangeMetaFieldRS implements MetaFieldRS {
+public class MetaRangeFieldRS implements MetaFieldRS {
 
   private FieldType fieldType;
 
