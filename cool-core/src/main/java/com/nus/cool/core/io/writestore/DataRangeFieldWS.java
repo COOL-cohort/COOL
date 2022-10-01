@@ -16,10 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package com.nus.cool.core.io.writestore;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.primitives.Ints;
@@ -56,11 +54,10 @@ public class DataRangeFieldWS implements DataFieldWS {
 
   private final OutputCompressor compressor;
 
-  /**
-   * Create a write store of int field for data chunk. 
-   */
-  public DataRangeFieldWS(FieldType fieldType, int fieldIndex, OutputCompressor compressor) {
-    checkArgument(fieldIndex >= 0); // Field index to get data from tuple.
+  public DataRangeFieldWS(FieldType fieldType, OutputCompressor compressor) {
+    /**
+     * Field index to get data from tuple
+     */
     this.fieldType = fieldType;
     this.compressor = checkNotNull(compressor);
   }
@@ -71,7 +68,10 @@ public class DataRangeFieldWS implements DataFieldWS {
   }
 
   /**
-   * UnitTest insert data.
+   * UnitTest insert data
+   *
+   * @param TupleValue
+   * @throws IOException
    */
   @Override
   public void put(String TupleValue) throws IOException {
