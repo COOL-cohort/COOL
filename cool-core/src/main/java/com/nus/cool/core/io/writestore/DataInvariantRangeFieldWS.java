@@ -5,16 +5,24 @@ import java.io.IOException;
 
 import com.nus.cool.core.schema.FieldType;
 
-public class DataInvariantFieldWS implements DataFieldWS{ 
-    
-    private FieldType fieldType;
+// TODO(lingze):
+// whether to record the field's meta data in this chunk (min,max)
+// it can speed up the cohort processing
 
-    public DataInvariantFieldWS(FieldType fieldType){
+public class DataInvariantRangeFieldWS implements DataFieldWS {
+
+    private final FieldType fieldType;
+
+    // private Integer min,max;
+
+    public DataInvariantRangeFieldWS(FieldType fieldType){
         this.fieldType = fieldType;
+        
     }
 
     @Override
     public int writeTo(DataOutput out) throws IOException {
+        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -25,7 +33,7 @@ public class DataInvariantFieldWS implements DataFieldWS{
 
     @Override
     public void put(String tuple) throws IOException {
-        // for invariant data field, no need to write data
+        // TODO Auto-generated method stub
     }
     
 }
