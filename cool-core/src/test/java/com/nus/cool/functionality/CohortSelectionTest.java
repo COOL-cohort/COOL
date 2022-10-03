@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 /**
  * Testing cohort selection.
  */
-public class CohortSelectionTest extends CsvLoaderTest {
+public class CohortSelectionTest {
   static final Logger logger = LoggerFactory.getLogger(CohortSelectionTest.class);
 
   @BeforeTest
@@ -34,7 +34,7 @@ public class CohortSelectionTest extends CsvLoaderTest {
         CohortSelectionTest.class.getSimpleName()));
   }
 
-  @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods = "csvLoaderUnitTest")
+  @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void cohortSelectionUnitTest(String datasetPath, String queryPath,
       List<Integer> selectionGlobalIDs, List<String> selectionActualIDs) throws IOException {
 
@@ -76,7 +76,7 @@ public class CohortSelectionTest extends CsvLoaderTest {
   public Object[][] cohortSelectionTestDPArgObjects() {
     return new Object[][] {
       {
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString(),
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
         Paths.get(
           System.getProperty("user.dir"), "..", "datasets/health", "query1-0.json").toString(),
           // output global IDs

@@ -3,6 +3,7 @@ package com.nus.cool.functionality;
 import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.model.CoolLoader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -12,6 +13,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Testing csv loader.
@@ -27,6 +29,12 @@ public class CsvLoaderTest {
   @AfterTest
   public void tearDown() {
     logger.info(String.format("Tear down UnitTest %s\n", CsvLoaderTest.class.getSimpleName()));
+    try {
+      FileUtils.deleteDirectory(new File(Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()));
+      logger.info("Deleted the TestCube for UnitTest");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Test(priority = 1, dataProvider = "CsvLoaderTestDP")
@@ -55,13 +63,13 @@ public class CsvLoaderTest {
         "health",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "data.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString()
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
       },
       {
         "sogamo",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "data.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString()
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
       },
       {
         "tpc-h-10g",
@@ -69,7 +77,7 @@ public class CsvLoaderTest {
           .toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch", "scripts",
           "data.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString()
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
       },
       {
         "ecommerce_query",
@@ -77,7 +85,7 @@ public class CsvLoaderTest {
           .toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/ecommerce_query", "data.csv")
           .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString()
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
       },
       {
         "health_raw",
@@ -85,7 +93,7 @@ public class CsvLoaderTest {
           .toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health_raw", "data.csv")
           .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString()
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
       },
       {
         "fraud_case",
@@ -93,7 +101,7 @@ public class CsvLoaderTest {
           .toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/fraud_case", "data.csv")
           .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString()
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
       }
     };
   }
@@ -108,7 +116,7 @@ public class CsvLoaderTest {
         "health",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "raw.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString()
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
       },
     };
   }

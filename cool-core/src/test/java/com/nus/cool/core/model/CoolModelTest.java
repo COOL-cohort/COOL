@@ -13,9 +13,9 @@ import org.testng.annotations.Test;
 /**
  * Testing cool model.
  */
-public class CoolModelTest extends CsvLoaderTest {
+public class CoolModelTest {
 
-  @Test(dataProvider = "CubeListTestDP", dependsOnMethods = "csvLoaderUnitTest")
+  @Test(dataProvider = "CubeListTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void cubeListUnitTest(String datasetPath, String[] out) {
     String[] cubes = CoolModel.listCubes(datasetPath);
     for (String cube : out) {
@@ -23,7 +23,7 @@ public class CoolModelTest extends CsvLoaderTest {
     }
   }
 
-  @Test(dataProvider = "CubeReloadTestDP", dependsOnMethods = "csvLoaderUnitTest")
+  @Test(dataProvider = "CubeReloadTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public static void cubeReloadUnitTest(String datasetPath, String cubeName) throws IOException {
     CoolModel coolModel = new CoolModel(datasetPath);
     coolModel.reload(cubeName);
@@ -35,7 +35,7 @@ public class CoolModelTest extends CsvLoaderTest {
    */
   @DataProvider(name = "CubeReloadTestDP")
   public Object[][] cubeReloadTestDPArgObjects() {
-    String sourcePath = Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString();
+    String sourcePath = Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString();
     return new Object[][] {
         { sourcePath, "health" },
         { sourcePath, "sogamo" },
@@ -48,7 +48,7 @@ public class CoolModelTest extends CsvLoaderTest {
    */
   @DataProvider(name = "CubeListTestDP")
   public Object[][] cubeListArgObjects() {
-    String sourcePath = Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString();
+    String sourcePath = Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString();
     return new Object[][] {
         { sourcePath, new String[] { "sogamo", "tpc-h-10g", "health" } },
     };

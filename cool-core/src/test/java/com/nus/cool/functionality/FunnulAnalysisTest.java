@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 /**
  * Testing funnel analysis.
  */
-public class FunnulAnalysisTest extends CsvLoaderTest {
+public class FunnulAnalysisTest {
   static final Logger logger = LoggerFactory.getLogger(FunnulAnalysisTest.class);
 
   @BeforeTest
@@ -32,7 +32,7 @@ public class FunnulAnalysisTest extends CsvLoaderTest {
     logger.info(String.format("Tear down UnitTest %s\n", FunnulAnalysisTest.class.getSimpleName()));
   }
 
-  @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = "csvLoaderUnitTest")
+  @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void funnelAnalysisUnitTest(String datasetPath, String queryPath, int[] out)
       throws IOException {
     ObjectMapper mapper = new ObjectMapper();
@@ -64,7 +64,7 @@ public class FunnulAnalysisTest extends CsvLoaderTest {
     int[] out = { 5, 5, 4, 4 };
     return new Object[][] {
       {
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString(),
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "query1.json")
           .toString(),
         out
