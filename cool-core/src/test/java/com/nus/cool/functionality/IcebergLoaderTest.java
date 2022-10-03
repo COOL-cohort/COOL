@@ -20,7 +20,7 @@ import org.testng.annotations.Test;
 /**
  * Testing iceberg loader.
  */
-public class IcebergLoaderTest extends CsvLoaderTest {
+public class IcebergLoaderTest {
   static final Logger logger = LoggerFactory.getLogger(IcebergLoaderTest.class);
 
   @BeforeTest
@@ -33,7 +33,7 @@ public class IcebergLoaderTest extends CsvLoaderTest {
     logger.info(String.format("Tear down UnitTest %s\n", IcebergLoaderTest.class.getSimpleName()));
   }
 
-  @Test(dataProvider = "IceBergUnitTestDP", dependsOnMethods = "csvLoaderUnitTest")
+  @Test(dataProvider = "IceBergUnitTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void iceBergTest(String datasetPath, String queryPath, List<BaseResult> out)
       throws Exception {
     // load query
@@ -70,7 +70,7 @@ public class IcebergLoaderTest extends CsvLoaderTest {
 
     return new Object[][] {
       {
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString(),
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch", "query.json")
           .toString(),
         out

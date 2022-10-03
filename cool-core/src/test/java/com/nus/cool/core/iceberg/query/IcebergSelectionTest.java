@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
  */
 public class IcebergSelectionTest {
 
-  @Test(dataProvider = "IcebergQuerySelectionTestDP")
+  @Test(dataProvider = "IcebergQuerySelectionTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void dataChunkProceesTest(String dzPath, String queryPath)
       throws IOException, ParseException {
     System.out.println("===================== Process Data ChunkRS Test =====================");
@@ -52,7 +52,7 @@ public class IcebergSelectionTest {
   @DataProvider(name = "IcebergQuerySelectionTestDP")
   public Object[][] dpArgs() {
     return new Object[][] {
-        { "../CubeRepo", "../datasets/olap-tpch/query.json" }
+        { "../CubeRepo/TestCube", "../datasets/olap-tpch/query.json" }
     };
   }
 }

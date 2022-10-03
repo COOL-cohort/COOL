@@ -6,7 +6,6 @@ import com.nus.cool.core.cohort.refactor.CohortProcessor;
 import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.functionality.CsvLoaderTest;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
@@ -24,9 +23,9 @@ import org.testng.annotations.Test;
 /**
  * Testing cohort processor.
  */
-public class ProcessorTest extends CsvLoaderTest {
+public class ProcessorTest {
   static final Logger logger = LoggerFactory.getLogger(ProcessorTest.class);
-  private final String cubeRepo = "../CubeRepo";
+  private final String cubeRepo = "../CubeRepo/TestCube";
   private CoolModel coolModel;
 
   private final String queryName = "query.json";
@@ -44,7 +43,7 @@ public class ProcessorTest extends CsvLoaderTest {
   /**
    * Testing cohort query. 
    */
-  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = "csvLoaderUnitTest")
+  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void processQueryAndValidResult(String queryDir) throws IOException {
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
