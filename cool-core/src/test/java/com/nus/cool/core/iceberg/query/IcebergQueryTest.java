@@ -17,7 +17,7 @@ import org.testng.annotations.Test;
 /**
  * Testing iceberg query.
  */
-public class IcebergQueryTest{
+public class IcebergQueryTest {
 
   IcebergQuery query;
 
@@ -56,7 +56,8 @@ public class IcebergQueryTest{
     System.out.println("Iceberg query print to string" + output);
   }
 
-  @Test(dataProvider = "IcebergQueryTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+  @Test(dataProvider = "IcebergQueryTestDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void readTest(String queryPath) throws IOException {
     String queryFilePath = queryPath; // "../olap-tpch/query.json";
     FileInputStream fin = new FileInputStream(queryFilePath);
@@ -70,7 +71,7 @@ public class IcebergQueryTest{
   @DataProvider(name = "IcebergQueryTestDP")
   public Object[][] dpArgs() {
     return new Object[][] {
-        { "../datasets/olap-tpch/query.json" }
+        {"../datasets/olap-tpch/query.json"}
     };
   }
 

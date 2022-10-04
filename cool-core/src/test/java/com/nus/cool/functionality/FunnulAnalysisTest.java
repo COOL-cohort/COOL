@@ -32,7 +32,8 @@ public class FunnulAnalysisTest {
     logger.info(String.format("Tear down UnitTest %s\n", FunnulAnalysisTest.class.getSimpleName()));
   }
 
-  @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+  @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void funnelAnalysisUnitTest(String datasetPath, String queryPath, int[] out)
       throws IOException {
     ObjectMapper mapper = new ObjectMapper();
@@ -61,14 +62,14 @@ public class FunnulAnalysisTest {
    */
   @DataProvider(name = "FunnelAnalysisTestDP")
   public Object[][] funnelAnalysisTestDPArgObjects() {
-    int[] out = { 5, 5, 4, 4 };
+    int[] out = {5, 5, 4, 4};
     return new Object[][] {
-      {
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "query1.json")
-          .toString(),
-        out
-      }
+        {
+            Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "query1.json")
+                .toString(),
+            out
+        }
     };
   }
 }
