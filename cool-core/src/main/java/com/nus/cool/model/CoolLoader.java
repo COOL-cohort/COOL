@@ -61,6 +61,9 @@ public class CoolLoader {
       String cubeRepo) throws IOException {
     // check the existence of the data repository
     File root = new File(cubeRepo);
+    if (!root.getParentFile().exists()) {
+      root.getParentFile().mkdir();
+    }
     if (!root.exists()) {
       if (root.mkdir()) {
         logger.info("[*] Cube repository " + root.getCanonicalPath() + " is created!");
