@@ -41,9 +41,10 @@ public class ProcessorTest {
   }
 
   /**
-   * Testing cohort query. 
+   * Testing cohort query.
    */
-  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void processQueryAndValidResult(String queryDir) throws IOException {
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
@@ -83,13 +84,13 @@ public class ProcessorTest {
    */
   @DataProvider(name = "ProcessQueryDP")
   public Object[][] queryDirDataProvider() {
-    return new Object[][] { { "../datasets/health_raw/sample_query_distinctcount" },
-        { "../datasets/ecommerce_query/sample_query" },
-        { "../datasets/health_raw/sample_query_count" },
-        { "../datasets/health_raw/sample_query_average" },
-        { "../datasets/health_raw/sample_query_max" },
-        { "../datasets/health_raw/sample_query_min" },
-        { "../datasets/health_raw/sample_query_sum" },
-        { "../datasets/fraud_case/sample_query_login_count" } };
+    return new Object[][] {{"../datasets/health_raw/sample_query_distinctcount"},
+        {"../datasets/ecommerce_query/sample_query"},
+        {"../datasets/health_raw/sample_query_count"},
+        {"../datasets/health_raw/sample_query_average"},
+        {"../datasets/health_raw/sample_query_max"},
+        {"../datasets/health_raw/sample_query_min"},
+        {"../datasets/health_raw/sample_query_sum"},
+        {"../datasets/fraud_case/sample_query_login_count"}};
   }
 }

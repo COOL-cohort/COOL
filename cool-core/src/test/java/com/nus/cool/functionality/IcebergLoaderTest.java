@@ -33,7 +33,8 @@ public class IcebergLoaderTest {
     logger.info(String.format("Tear down UnitTest %s\n", IcebergLoaderTest.class.getSimpleName()));
   }
 
-  @Test(dataProvider = "IceBergUnitTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+  @Test(dataProvider = "IceBergUnitTestDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void iceBergTest(String datasetPath, String queryPath, List<BaseResult> out)
       throws Exception {
     // load query
@@ -69,12 +70,12 @@ public class IcebergLoaderTest {
         new AggregatorResult(1, (long) 33248, null, null, null, null, null)));
 
     return new Object[][] {
-      {
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch", "query.json")
-          .toString(),
-        out
-      }
+        {
+            Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch", "query.json")
+                .toString(),
+            out
+        }
     };
   }
 }

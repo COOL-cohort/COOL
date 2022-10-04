@@ -34,9 +34,11 @@ public class CohortSelectionTest {
         CohortSelectionTest.class.getSimpleName()));
   }
 
-  @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+  @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void cohortSelectionUnitTest(String datasetPath, String queryPath,
-      List<Integer> selectionGlobalIDs, List<String> selectionActualIDs) throws IOException {
+                                      List<Integer> selectionGlobalIDs,
+                                      List<String> selectionActualIDs) throws IOException {
 
     ObjectMapper mapper = new ObjectMapper();
     ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
@@ -75,15 +77,16 @@ public class CohortSelectionTest {
   @DataProvider(name = "CohortSelectionTestDP")
   public Object[][] cohortSelectionTestDPArgObjects() {
     return new Object[][] {
-      {
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
-        Paths.get(
-          System.getProperty("user.dir"), "..", "datasets/health", "query1-0.json").toString(),
-          // output global IDs
-          Arrays.asList(0, 2, 3, 4, 5, 7, 9, 11, 12),
-          // output actual IDs
-          Arrays.asList("P-0", "P-2", "P-3", "P-4", "P-5", "P-7", "P-9", "P-11", "P-12"),
-      }
+        {
+            Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
+            Paths.get(
+                System.getProperty("user.dir"), "..", "datasets/health",
+                "query1-0.json").toString(),
+            // output global IDs
+            Arrays.asList(0, 2, 3, 4, 5, 7, 9, 11, 12),
+            // output actual IDs
+            Arrays.asList("P-0", "P-2", "P-3", "P-4", "P-5", "P-7", "P-9", "P-11", "P-12"),
+        }
     };
   }
 }

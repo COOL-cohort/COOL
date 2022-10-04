@@ -7,12 +7,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
-import org.apache.commons.io.FileUtils;
 import org.testng.annotations.Test;
 
 /**
@@ -30,7 +30,8 @@ public class CsvLoaderTest {
   public void tearDown() {
     logger.info(String.format("Tear down UnitTest %s\n", CsvLoaderTest.class.getSimpleName()));
     try {
-      FileUtils.deleteDirectory(new File(Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()));
+      FileUtils.deleteDirectory(new File(
+          Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()));
       logger.info("Deleted the TestCube for UnitTest");
     } catch (IOException e) {
       e.printStackTrace();
@@ -39,7 +40,7 @@ public class CsvLoaderTest {
 
   @Test(priority = 1, dataProvider = "CsvLoaderTestDP")
   public void csvLoaderUnitTest(String cube, String schemaFileName, String dataFileName,
-      String cubeRepo) throws IOException {
+                                String cubeRepo) throws IOException {
     DataLoaderConfig config = new CsvDataLoaderConfig();
     CoolLoader loader = new CoolLoader(config);
     loader.load(cube, schemaFileName, dataFileName, cubeRepo);
@@ -47,7 +48,7 @@ public class CsvLoaderTest {
 
   @Test(dataProvider = "CsvLoaderFailTestDP", expectedExceptions = FileNotFoundException.class)
   public void csvLoaderFailUnitTest(String cube, String schemaFileName, String dataFileName,
-      String cubeRepo) throws IOException {
+                                    String cubeRepo) throws IOException {
     DataLoaderConfig config = new CsvDataLoaderConfig();
     CoolLoader loader = new CoolLoader(config);
     loader.load(cube, schemaFileName, dataFileName, cubeRepo);
@@ -58,52 +59,34 @@ public class CsvLoaderTest {
    */
   @DataProvider(name = "CsvLoaderTestDP")
   public Object[][] csvLoaderTestDPArgObjects() {
-    return new Object[][] {
-      {
-        "health",
+    return new Object[][] {{"health",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "data.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
-      },
-      {
-        "sogamo",
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()}, {"sogamo",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "data.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
-      },
-      {
-        "tpc-h-10g",
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch", "table.yaml")
-          .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch", "scripts",
-          "data.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
-      },
-      {
-        "ecommerce_query",
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/ecommerce_query", "table.yaml")
-          .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/ecommerce_query", "data.csv")
-          .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
-      },
-      {
-        "health_raw",
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/health_raw", "table.yaml")
-          .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/health_raw", "data.csv")
-          .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
-      },
-      {
-        "fraud_case",
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/fraud_case", "table.yaml")
-          .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/fraud_case", "data.csv")
-          .toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
-      }
-    };
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},
+        {"tpc-h-10g", Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch",
+            "table.yaml").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch", "scripts",
+                "data.csv").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},
+        {"ecommerce_query",
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/ecommerce_query",
+                "table.yaml").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/ecommerce_query",
+                "data.csv").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},
+        {"health_raw", Paths.get(System.getProperty("user.dir"), "..", "datasets/health_raw",
+            "table.yaml").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/health_raw",
+                "data.csv").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},
+        {"fraud_case", Paths.get(System.getProperty("user.dir"), "..", "datasets/fraud_case",
+            "table.yaml").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/fraud_case",
+                "data.csv").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()}};
   }
 
   /**
@@ -111,13 +94,9 @@ public class CsvLoaderTest {
    */
   @DataProvider(name = "CsvLoaderFailTestDP")
   public Object[][] csvLoaderTestDPFailArgObjects() {
-    return new Object[][] {
-      {
-        "health",
+    return new Object[][] {{"health",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "raw.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()
-      },
-    };
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},};
   }
 }
