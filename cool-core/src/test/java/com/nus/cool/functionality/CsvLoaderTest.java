@@ -26,6 +26,9 @@ public class CsvLoaderTest {
     logger.info("Start UnitTest " + CsvLoaderTest.class.getSimpleName());
   }
 
+  /**
+   * Delete the TestCube after the test.
+   */
   @AfterTest
   public void tearDown() {
     logger.info(String.format("Tear down UnitTest %s\n", CsvLoaderTest.class.getSimpleName()));
