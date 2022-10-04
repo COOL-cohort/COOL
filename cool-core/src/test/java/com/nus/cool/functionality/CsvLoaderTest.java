@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 import org.apache.commons.io.FileUtils;
+import org.testng.annotations.Test;
 
 /**
  * Testing csv loader.
