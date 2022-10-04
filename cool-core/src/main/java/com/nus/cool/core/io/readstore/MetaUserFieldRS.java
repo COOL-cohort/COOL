@@ -33,7 +33,7 @@ public class MetaUserFieldRS implements MetaFieldRS {
     
     public MetaUserFieldRS(MetaChunkRS metaChunkRS, Charset charset){
         this.charset = checkNotNull(charset);
-        int invariant_size = this.metaChunkRS.getSchema().getInvariantFieldIdxToOrder().size();
+        int invariant_size = this.metaChunkRS.getSchema().getInvariantFieldNumber();
         this.invarantMaps = new InputVector[invariant_size];
     }
 
@@ -83,6 +83,17 @@ public class MetaUserFieldRS implements MetaFieldRS {
             this.invarantMaps[i] = InputVectorFactory.readFrom(buffer);
         }
         this.valueVec = InputVectorFactory.readFrom(buffer);
+    }
+
+    // --------------- specific method for MetaUserField ---------------
+    /**
+     * 
+     * @param invariant_idx, the index of invariant field in all invariant fields
+     * @param gid, the according gloablId of UserKey
+     * @return
+     */
+    public int getInvaraintValue(int invariant_idx, int gid){
+        return this.invarantMaps[invariant_idx].get(gid);
     }
     
 }
