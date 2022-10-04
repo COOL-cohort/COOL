@@ -5,23 +5,36 @@ import java.nio.ByteBuffer;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 
-public class DataInvariantFieldRS implements FieldRS {
+public class DataInvariantRangeFieldRS implements FieldRS{
 
     private final MetaUserFieldRS userMetaField;
 
-    private final ChunkRS dataChunkRS;
+    private final DataHashFieldRS userDataField;
 
-    DataInvariantFieldRS(MetaUserFieldRS userMetaField, ChunkRS dataChunkRS){
+    private final FieldType fieldType;
+
+    private final int invariant_idx;
+
+    public DataInvariantRangeFieldRS(FieldType fieldType, int invariant_idx,MetaUserFieldRS userMetaField, DataHashFieldRS  userDataField){
         this.userMetaField = userMetaField;
-        this.dataChunkRS = dataChunkRS;
+        this.userDataField = userDataField;
+        this.fieldType = fieldType;
+        this.invariant_idx = invariant_idx;
     }
+    
 
     @Override
     public FieldType getFieldType() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.fieldType;
     }
 
+    @Override
+    public int getValueByIndex(int idx) {
+        int gidOfUserKey = this.userDataField.getValueByIndex(idx);
+        return this.userMetaField.getInvaraintValue(this.invariant_idx, gidOfUserKey);
+    }
+
+    // -------------- above method is no used in new Version -----------------
     @Override
     public InputVector getKeyVector() {
         // TODO Auto-generated method stub
@@ -46,13 +59,13 @@ public class DataInvariantFieldRS implements FieldRS {
         return 0;
     }
 
-    @Override
-    public int getValueByIndex(int idx) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
 
     @Override
-    public void readFrom(ByteBuffer buffer) { }
+    public void readFrom(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
     
 }
