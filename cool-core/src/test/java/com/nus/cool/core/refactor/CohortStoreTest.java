@@ -40,7 +40,7 @@ public class CohortStoreTest {
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
     crs.readFrom(Files.map(cubemeta).order(ByteOrder.nativeOrder()));
     System.out.println(crs.getUsers());
-
+    cubemeta.delete();
   }
 
 }
