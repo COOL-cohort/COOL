@@ -53,18 +53,11 @@ public class ProcessorTest extends CsvLoaderTest {
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
 
-
-<<<<<<< HEAD
-    // start a new cool model and reload the cube
-    this.coolModel = new CoolModel(this.cubeRepo);
-    coolModel.reload(cohortProcessor.getDataSource());
-    CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
-=======
-        // get current dir path
-        File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
-        CohortRet ret = cohortProcessor.process(cube);
-        cohortProcessor.persistCohort(currentVersion.toString());
->>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
+    // get current dir path
+    File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
+    // cohortProcessor.readExistingCohort("../CubeRepo/health_raw/v00000001");
+    CohortRet ret = cohortProcessor.process(cube);
+    cohortProcessor.persistCohort(currentVersion.toString());
 
     // get current dir path
     File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
@@ -104,5 +97,4 @@ public class ProcessorTest extends CsvLoaderTest {
         {"../datasets/fraud_case/sample_query_login_count"},
         {"../datasets/health/sample_query_distinctcount"}};
   }
-
 }
