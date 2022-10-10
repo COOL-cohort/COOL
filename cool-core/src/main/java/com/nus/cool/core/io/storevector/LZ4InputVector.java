@@ -43,7 +43,7 @@ public class LZ4InputVector implements InputVector {
 
   private byte[] data;
 
-  private LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+  private final LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
 
   private void decode() {
     byte[] compressed = new byte[this.zLen];
