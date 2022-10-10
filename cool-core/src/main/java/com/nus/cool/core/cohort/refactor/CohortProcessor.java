@@ -1,5 +1,7 @@
 package com.nus.cool.core.cohort.refactor;
 
+import com.google.common.io.Files;
+import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
 import com.nus.cool.core.cohort.refactor.storage.CohortWS;
 import com.nus.cool.core.cohort.refactor.storage.CohortWSStr;
 import java.io.DataOutputStream;
@@ -7,6 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,6 +78,8 @@ public class CohortProcessor {
 =======
     // initialize cohort result write store
     private final HashMap<String, CohortWSStr> CohortUserMapper = new HashMap<>();
+
+    private HashSet<String> PreviousCohortUsers = null;
 
     public CohortProcessor(CohortQueryLayout layout){
 >>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
@@ -172,7 +178,7 @@ public class CohortProcessor {
      */
     public void persistCohort(String outputDir) throws IOException {
         for (Map.Entry<String, CohortWSStr > ele: this.CohortUserMapper.entrySet()){
-            String fileName = ele.getKey();
+            String fileName = ele.getKey() + ".cohort";
             File cubemeta = new File(outputDir, fileName);
             DataOutputStream out = new DataOutputStream(
                 new FileOutputStream(cubemeta));
@@ -181,8 +187,65 @@ public class CohortProcessor {
 >>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
     }
 
+<<<<<<< HEAD
     // iterate all the write-store in CohortUserMapper, and sync it to disk
     for (Map.Entry<String, CohortWS > ele: CohortUserMapper.entrySet()){
+=======
+    /**
+     * Persist cohort to output disk
+     * @param cohortPath the path to store the previous stored cohort.
+     */
+    public void readExistingCohort(String cohortPath) throws IOException {
+        this.PreviousCohortUsers = new HashSet<>();
+        CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
+
+        File file = new File(cohortPath);
+        File[] fs = file.listFiles();
+        if (fs == null){
+            return;
+        }
+        for (File f: fs){
+            int pointIndex = f.getName().lastIndexOf(".");
+            if (pointIndex == -1 ){
+                continue;
+            }
+            String extension = f.getName().substring(pointIndex);
+            if (!f.isDirectory() && extension.equals(".cohort")){
+                crs.readFrom(Files.map(f).order(ByteOrder.nativeOrder()));
+                this.PreviousCohortUsers.addAll(crs.getUsers());
+            }
+        }
+    }
+
+    /**
+     * Process one Cublet
+     *
+     * @param cublet
+     */
+    private void processCublet(CubletRS cublet) {
+        MetaChunkRS metaChunk = cublet.getMetaChunk();
+        // if it is necessary, add logic in method checkMetaChunk
+        // Personally, this step is not universal
+        // all right, can check whether this cublet pass rangeFilter
+        // for Hash Value, Maintain HashMap<Schema, String[]>, the String[] is gid ->
+        // True Value
+        HashMap<String, String[]> gidMapBySchema = new HashMap<>();
+        HashMap<String, int[]> invariantGidMap = new HashMap<>();
+
+        // we only get used schema;
+        UserMetaFieldRS userMetaField;
+        for (String schema : this.projectedSchemaSet) {
+            MetaFieldRS metaField = metaChunk.getMetaField(schema);
+            if(metaField.getFieldType()==FieldType.UserKey){
+                userMetaField=(UserMetaFieldRS) metaField;
+                gidMapBySchema.put(schema,userMetaField.getGidMap());
+                invariantGidMap=loadInvariantGidMaps(userMetaField);
+            }
+            else if (FieldType.IsHashType(metaField.getFieldType())) {
+                gidMapBySchema.put(schema, ((HashMetaFieldRS) metaField).getGidMap());
+            }
+        }
+>>>>>>> ddbb360 (Reading from previous cohort; Update cohort file format.)
 
       String fileName = ele.getKey();
       File cubemeta = new File(outputDir, fileName);
@@ -290,6 +353,10 @@ public class CohortProcessor {
     private void processTuple() {
         // For One Tuple, we firstly get the userId, and ActionTime
         String userId = (String) tuple.getValueBySchema(this.UserIdSchema);
+        // only process the user in previous cohort.
+        if (PreviousCohortUsers != null && !PreviousCohortUsers.contains(userId)){
+            return;
+        }
         LocalDateTime actionTime = DateUtils.daysSinceEpoch((int)tuple.getValueBySchema(this.ActionTimeSchema));
         // check whether its birthEvent is selected
         if (!this.birthSelector.isUserSelected(userId)) {
@@ -410,6 +477,7 @@ public class CohortProcessor {
         return true;
       }
     }
+<<<<<<< HEAD
     return false;
   }
 
@@ -436,6 +504,19 @@ public class CohortProcessor {
     // init birthSelector
     for (Filter filter : this.birthSelector.getFilterList()) {
       filter.loadMetaInfo(metaChunkRS);
+=======
+
+
+     /**
+     * Read from json file and create a instance of CohortProcessor
+     * @param in File
+     * @return instance of file
+     * @throws IOException IOException
+     */
+    public static CohortProcessor readFromJson(File in) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(in, CohortProcessor.class);
+>>>>>>> ddbb360 (Reading from previous cohort; Update cohort file format.)
     }
 
     // init cohort
