@@ -54,10 +54,17 @@ public class ProcessorTest extends CsvLoaderTest {
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
 
 
+<<<<<<< HEAD
     // start a new cool model and reload the cube
     this.coolModel = new CoolModel(this.cubeRepo);
     coolModel.reload(cohortProcessor.getDataSource());
     CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
+=======
+        // get current dir path
+        File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
+        CohortRet ret = cohortProcessor.process(cube);
+        cohortProcessor.persistCohort(currentVersion.toString());
+>>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
 
     // get current dir path
     File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());

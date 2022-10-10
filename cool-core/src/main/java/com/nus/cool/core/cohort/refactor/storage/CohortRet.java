@@ -18,6 +18,7 @@ import lombok.Getter;
  */
 public class CohortRet {
 
+<<<<<<< HEAD
   private HashMap<String, Xaxis> cohortToValueList;
 
   private int min;
@@ -60,6 +61,23 @@ public class CohortRet {
   public RetUnit getByAge(String cohort, int age) {
     if (!this.cohortToValueList.containsKey(cohort)) {
       this.cohortToValueList.put(cohort, new Xaxis(this.size));
+=======
+    private final HashMap<String, Xaxis> cohortToValueList;
+
+    private int min, max, interval;
+
+    private final int size;
+
+    @Getter
+    private final HashMap<String, List<String>> cohortToUserIdList = new HashMap<>();
+
+    public CohortRet(AgeSelectionLayout ageSelection) {
+        this.cohortToValueList = new HashMap<>();
+        this.interval = ageSelection.getInterval();
+        this.min = ageSelection.getMin();
+        this.max = ageSelection.getMax();
+        this.size = (this.max - this.min) / this.interval + 1;
+>>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
     }
     int offset = getCohortAge(age);
     return this.cohortToValueList.get(cohort).get(offset);
@@ -94,6 +112,7 @@ public class CohortRet {
       return this.retUnits[i];
     }
 
+<<<<<<< HEAD
     // TODO(lingze), only support int type value
     public List<Integer> getValues() {
       ArrayList<Integer> ret = new ArrayList<>();
@@ -101,6 +120,12 @@ public class CohortRet {
         if (retUnits[i] == null) {
           ret.add(0);
           continue;
+=======
+    public void addUserid(String cohortName, String userId){
+        if (!this.cohortToUserIdList.containsKey(cohortName)){
+            List<String> userIdList = new ArrayList<>();
+            this.cohortToUserIdList.put(cohortName ,userIdList);
+>>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
         }
         ret.add((int) retUnits[i].getValue());
       }
