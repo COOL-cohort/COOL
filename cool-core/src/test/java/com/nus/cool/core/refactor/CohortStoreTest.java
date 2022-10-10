@@ -35,27 +35,12 @@ public class CohortStoreTest {
     DataOutputStream out = new DataOutputStream(
         new FileOutputStream(cubemeta));
     cws.writeTo(out);
-  }
 
-  @Test()
-  public void ReadCohort() throws IOException {
-    // input file
-    String fileName = "TestCohort";
+    // read the above
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
-    File cubemeta = new File(System.getProperty("user.dir"), fileName);
-
-//    Path filePath = Paths.get(System.getProperty("user.dir"), fileName);
-//    FileChannel fc = FileChannel.open(filePath);
-//    MappedByteBuffer mappedByteBuffer = fc.map(MapMode.READ_ONLY, 0, 123);
-//
-//    crs.readFrom(mappedByteBuffer);
-//    crs.getUsers();
-
     crs.readFrom(Files.map(cubemeta).order(ByteOrder.nativeOrder()));
-    crs.getUsers();
+    System.out.println(crs.getUsers());
 
   }
-
-
 
 }
