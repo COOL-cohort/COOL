@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.io.compression.Histogram;
+import java.util.List;
 
 
 /**
@@ -61,6 +62,10 @@ public class CohortWSStr implements Output {
    */
   public void addCubletResults(String userId) {
     usersStrSet.add(userId);
+  }
+
+  public void addCubletResults(List<String> userIds) {
+    usersStrSet.addAll(userIds);
   }
 
   @Override
