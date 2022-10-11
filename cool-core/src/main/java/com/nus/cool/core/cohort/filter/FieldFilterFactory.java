@@ -45,7 +45,7 @@ public class FieldFilterFactory {
       case Action:
         return new SetFieldFilter(fieldSet, values, schema.getFieldType());
       case ActionTime:
-        return new RangeFieldFilter(fieldSet, values, new DayIntConverter(), schema.getFieldType());
+        return new RangeFieldFilter(fieldSet, values, DayIntConverter.getInstance(),schema.getFieldType());
       case Metric:
         return new RangeFieldFilter(fieldSet, values, new StringIntConverter(),
           schema.getFieldType());

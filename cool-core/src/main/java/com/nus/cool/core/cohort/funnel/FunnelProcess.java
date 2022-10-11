@@ -20,7 +20,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 /**
  * Funnel query operator.
  */
@@ -79,7 +78,7 @@ public class FunnelProcess implements CohortOperator {
 
   /**
    * Initialize funnel processing.
-
+   * 
    * @param cohortUsers existing cohort
    */
   public void init(TableSchema tableSchema, InputVector cohortUsers, FunnelQuery query) {
@@ -157,7 +156,7 @@ public class FunnelProcess implements CohortOperator {
       return;
     }
 
-    FieldRS userField = chunk.getField(tableSchema.getUserKeyField());
+    FieldRS userField = chunk.getField(tableSchema.getUserKeyFieldIdx());
     if (userField.getValueVector() instanceof RLEInputVector == false) {
       return;
     }
