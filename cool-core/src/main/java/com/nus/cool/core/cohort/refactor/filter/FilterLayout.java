@@ -2,74 +2,72 @@ package com.nus.cool.core.cohort.refactor.filter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Preconditions;
+
 import lombok.Getter;
 
 /**
- * Read from json file into FilterLayout Parse to construct different filter instance.
- */
+ * Read from json file into FilterLayout
+ * Parse to construct different filter instance
+ **/
 public class FilterLayout {
-  @Getter
-  private String fieldSchema;
+    @Getter
+    private String fieldSchema;
 
-  @Getter
-  private FilterType type;
+    @Getter
+    private FilterType type;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @Getter
-  private String[] acceptValue;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Getter
+    private String[] acceptValue;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  @Getter
-  private String[] rejectValue;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Getter
+    private String[] rejectValue;
 
-  @Override
-  public String toString() {
-    String acStr = "";
-    String rejStr = "";
-    if (this.acceptValue != null) {
-      acStr = acceptValue.toString();
+    @Override
+    public String toString() {
+        String acStr = "", rejStr = "";
+        if (this.acceptValue != null)
+            acStr = acceptValue.toString();
+        if (this.rejectValue != null)
+            rejStr = rejectValue.toString();
+        return String.format("FilterLayout fieldSchema %s filter type %s, acceptValue %s, rejectValue %s",
+                fieldSchema, type, acStr, rejStr);
     }
-    if (this.rejectValue != null) {
-      rejStr = rejectValue.toString();
-    }
-    return String.format(
-        "FilterLayout fieldSchema %s filter type %s, acceptValue %s, rejectValue %s", fieldSchema,
-        type, acStr, rejStr);
-  }
 
-  /**
-   * Generate different filter instances.
-   */
-  public Filter generateFilter() {
-    switch (type) {
-      case Range:
-        Preconditions.checkArgument(rejectValue == null,
-            "For RangeFilter, rejectValue property is null");
-        return new RangeFilter(fieldSchema, acceptValue);
-      case Set:
-        return new SetFilter(fieldSchema, acceptValue, rejectValue);
-      default:
-        throw new IllegalArgumentException(String.format("No filter of this type named %s", type));
+    /**
+     * Generate different filter instances
+     */
+    public Filter generateFilter() {
+        switch (type) {
+            case Range:
+                Preconditions.checkArgument(rejectValue == null,
+                        "For RangeFilter, rejectValue property is null");
+                return new RangeFilter(fieldSchema, acceptValue);
+            case Set:
+                if (this.acceptValue != null)
+                    return new SetAcceptFilter(fieldSchema, acceptValue);
+                if (this.rejectValue != null)
+                    return new SetRejectFilter(fieldSchema, rejectValue);
+            default:
+                throw new IllegalArgumentException(
+                        String.format("No filter of this type named %s", type));
+        }
     }
-  }
 
-  /**
-   * Default Constructor, JsonMapper use it.
-   */
-  public FilterLayout() {
-  }
-
-  // ----------------- For Test ----------------------- //
-  /**
-   * for testing.
-   */
-  public FilterLayout(Boolean isSet, String[] acList, String[] rejList) {
-    if (isSet) {
-      this.type = FilterType.Set;
-    } else {
-      this.type = FilterType.Range;
+    /**
+     * Default Constructor, JsonMapper use it
+     */
+    public FilterLayout() {
     }
-    this.acceptValue = acList;
-    this.rejectValue = rejList;
-  }
+
+    // ----------------- For Test ----------------------- //
+    public FilterLayout(Boolean IsSet, String[] acList, String[] rejList) {
+        if (IsSet)
+            this.type = FilterType.Set;
+        else
+            this.type = FilterType.Range;
+        this.acceptValue = acList;
+        this.rejectValue = rejList;
+    }
 }
