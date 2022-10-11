@@ -132,8 +132,8 @@ public class ExtendedCohortAggregation implements CohortOperator {
     }
 
     // Load necessary fields, we need at least four fields
-    FieldRS userField = chunk.getField(tableSchema.getUserKeyField());
-    FieldRS actionTimeField = chunk.getField(tableSchema.getActionTimeField());
+    FieldRS userField = chunk.getField(tableSchema.getUserKeyFieldIdx());
+    FieldRS actionTimeField = chunk.getField(tableSchema.getActionTimeFieldIdx());
 
     // Measure measure = cubeSchema.getMeasure(query.getMeasure());
     // checkArgument(measure != null);
@@ -146,7 +146,7 @@ public class ExtendedCohortAggregation implements CohortOperator {
 
     AgeField ageField = query.getAgeField();
     BitSet ageDelimiter = null;
-    if (tableSchema.getFieldID(ageField.getField()) != tableSchema.getActionTimeField()) {
+    if (tableSchema.getFieldID(ageField.getField()) != tableSchema.getActionTimeFieldIdx()) {
       ageDelimiter = new BitSet(chunk.records() + 1);
     }
 
@@ -203,7 +203,7 @@ public class ExtendedCohortAggregation implements CohortOperator {
       int ageOff = cohort.getBirthOffset();
 
       if (ageOff < end && sigma.isAgeActiveChunk()) {
-        if (tableSchema.getFieldID(ageField.getField()) != tableSchema.getActionTimeField()) {
+        if (tableSchema.getFieldID(ageField.getField()) != tableSchema.getActionTimeFieldIdx()) {
           ageDelimiter.set(ageOff, end);
           sigma.selectAgeByActivities(ageOff, end, ageDelimiter);
         }
@@ -217,7 +217,7 @@ public class ExtendedCohortAggregation implements CohortOperator {
             .getAggregator(query.getMeasure().toUpperCase());
         aggr.init(metricField.getValueVector());
         if (tableSchema.getFieldID(query.getAgeField().getField()) != tableSchema
-            .getActionTimeField()) {
+            .getActionTimeFieldIdx()) {
           aggr.ageAggregate(bv, ageDelimiter, ageOff, end,
               this.query.getAgeField().getAgeInterval(), sigma.getAgeFieldFilter(), cohortCells);
           ageDelimiter.clear(ageOff, end + 1);
