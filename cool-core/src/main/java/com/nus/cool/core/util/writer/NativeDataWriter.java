@@ -6,6 +6,9 @@ import com.nus.cool.core.io.writestore.DataChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.IntegerUtil;
+import lombok.RequiredArgsConstructor;
+
+import javax.validation.constraints.NotNull;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,219 +16,212 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
 
-/**
- * Native data writer writes a set of records in cool storage format.
- */
 @RequiredArgsConstructor
 public class NativeDataWriter implements DataWriter {
 
-  @NotNull
-  private final TableSchema tableSchema;
+    @NotNull
+    private final TableSchema tableSchema;
 
-  @NotNull
-  private final File outputDir;
+    @NotNull
+    private final File outputDir;
 
-  @NotNull
-  private final long chunkSize;
+    @NotNull
+    private final long chunkSize;
 
-  @NotNull
-  private final long cubletSize;
+    @NotNull
+    private final long cubletSize;
 
-  // states.
+    /**
+     * states
+     */
+    private boolean initalized = false;
 
-  private boolean initalized = false;
+    private boolean finished = false;
+    /**
+     * below are variables describing the dataset building context
+     */
 
-  private boolean finished = false;
+    /**
+     * initialzied once
+     */
+    private int userKeyIndex;
 
-  // below are variables describing the dataset building context
+    private MetaChunkWS metaChunk;
 
-  // initialzied once.
-  private int userKeyIndex;
+    /**
+     * updated as building progress
+     */
+    private int offset = 0;
 
-  private List<Integer> invariantFieldIndex = new ArrayList<>();
+    private int tupleCount = Integer.MAX_VALUE;
 
-  private MetaChunkWS metaChunk;
+    private String lastUser = null;
 
-  // updated as building progress
-  private int offset = 0;
+    // record the Header offset of each chunk
+    private final List<Integer> chunkHeaderOffsets = Lists.newArrayList();
 
-  private int tupleCount = Integer.MAX_VALUE;
+    private DataChunkWS dataChunk;
 
-  private String lastUser = null;
+    private DataOutputStream out = null;
 
-  // record the Header offset of each chunk
-  private final List<Integer> chunkHeaderOffsets = Lists.newArrayList();
+    @Override
+    public boolean initialize() throws IOException {
+        if (initalized)
+            return true;
+        this.userKeyIndex = tableSchema.getUserKeyFieldIdx();
 
-  private DataChunkWS dataChunk;
-
-  private DataOutputStream out = null;
-
-  @Override
-  public boolean initialize() throws IOException {
-    if (initalized) {
-      return true;
+        // when there is no user key, using any field for the additional condition on
+        // chunk switch is ok.
+        if (this.userKeyIndex == -1)
+            this.userKeyIndex = 0;
+        // cublet
+        // create metaChunk instance, default offset to be 0, update offset when write
+        // later.
+        this.metaChunk = MetaChunkWS.newMetaChunkWS(this.tableSchema, 0);
+        this.out = newCublet();
+        // chunk
+        this.tupleCount = 0;
+        this.offset = 0;
+        // create dataChunk instance
+        this.dataChunk = DataChunkWS.newDataChunk(this.tableSchema, this.metaChunk.getMetaFields(), this.offset);
+        this.initalized = true;
+        return true;
     }
-    this.userKeyIndex = tableSchema.getUserKeyField();
-    this.invariantFieldIndex = tableSchema.getInvariantFields();
-    // when there is no user key, using any field for the additional condition on
-    // chunk switch is ok.
-    if (this.userKeyIndex == -1) {
-      this.userKeyIndex = 0;
-    }
-    // cublet
-    // create metaChunk instance, default offset to be 0, update offset when write
-    // later.
-    this.metaChunk = MetaChunkWS.newMetaChunkWS(this.tableSchema, 0,
-        userKeyIndex, invariantFieldIndex);
-    this.out = newCublet();
-    // chunk
-    this.tupleCount = 0;
-    this.offset = 0;
-    // create dataChunk instance
-    this.dataChunk = DataChunkWS.newDataChunk(this.tableSchema, this.metaChunk.getMetaFields(),
-        this.offset);
-    this.initalized = true;
-    return true;
-  }
 
-  /**
-   * Update current offset, begin write to a new dataChunk.
-   */
-  private void finishChunk() throws IOException {
-    offset += dataChunk.writeTo(out);
-    // record the header offset in chunkHeaderOffsets.
-    chunkHeaderOffsets.add(offset - Ints.BYTES);
-  }
+    /**
+     * Update current offset, begin write to a new dataChunk
+     *
+     * @throws IOException
+     */
+    private void finishChunk() throws IOException {
+        offset += dataChunk.writeTo(out);
+        // record the header offset in chunkHeaderOffsets.
+        chunkHeaderOffsets.add(offset - Ints.BYTES);
+    }
 
-  /**
-   * If chunkSize is greater 65536 or meet last user.
-   *
-   * @param curUser current user id
-   * @return is chunk full or is last user
-   */
-  private boolean maybeSwitchChunk(String curUser) throws IOException {
-    if ((tupleCount < chunkSize) || (curUser.equals(lastUser))) {
-      return false;
+    /**
+     * If chunkSize is greater 65536 or meet last user
+     *
+     * @param curUser current user id
+     * @return is chunk full or is last user
+     * @throws IOException
+     */
+    private boolean maybeSwitchChunk(String curUser) throws IOException {
+        if ((tupleCount < chunkSize) || (curUser.equals(lastUser)))
+            return false;
+        finishChunk();
+        // create a new data chunk, init tuple Count
+        dataChunk = DataChunkWS.newDataChunk(tableSchema, metaChunk.getMetaFields(), offset);
+        tupleCount = 0;
+        return true;
     }
-    finishChunk();
-    // create a new data chunk, init tuple Count
-    dataChunk = DataChunkWS.newDataChunk(tableSchema, metaChunk.getMetaFields(), offset);
-    tupleCount = 0;
-    return true;
-  }
 
-  /**
-   * Write metaChunk lastly.
-   */
-  private void finishCublet() throws IOException {
-    // write metaChunk begin from current offset.
-    this.metaChunk.updateBeginOffset(this.offset);
-    this.metaChunk.complete();
-    offset += this.metaChunk.writeTo(out);
-    this.metaChunk.cleanForNextCublet();
-    // record header offset
-    chunkHeaderOffsets.add(offset - Ints.BYTES);
-    // 1. write number of chunks
-    out.writeInt(IntegerUtil.toNativeByteOrder(chunkHeaderOffsets.size()));
-    // 2. write header of each chunk
-    for (int chunkOff : chunkHeaderOffsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
+    /**
+     * Write metaChunk lastly
+     *
+     * @throws IOException
+     */
+    private void finishCublet() throws IOException {
+        // write metaChunk begin from current offset.
+        this.metaChunk.updateBeginOffset(this.offset);
+        this.metaChunk.complete();
+        offset += this.metaChunk.writeTo(out);
+        this.metaChunk.cleanForNextCublet();
+        // record header offset
+        chunkHeaderOffsets.add(offset - Ints.BYTES);
+        // 1. write number of chunks
+        out.writeInt(IntegerUtil.toNativeByteOrder(chunkHeaderOffsets.size()));
+        // 2. write header of each chunk
+        for (int chunkOff : chunkHeaderOffsets) {
+            out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
+        }
+        // 3. write the header offset.
+        out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+        // 4. flush after writing whole Cublet.
+        out.flush();
+        out.close();
     }
-    // 3. write the header offset.
-    out.writeInt(IntegerUtil.toNativeByteOrder(offset));
-    // 4. flush after writing whole Cublet.
-    out.flush();
-    out.close();
-  }
 
-  /**
-   * Create I/O stream to write data.
-   *
-   * @return DataOutputStream
-   */
-  private DataOutputStream newCublet() throws IOException {
-    String fileName = Long.toHexString(System.currentTimeMillis()) + ".dz";
-    System.out.println("[*] A new cublet " + fileName + " is created!");
-    File cublet = new File(outputDir, fileName);
-    DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));
-    offset = 0;
-    chunkHeaderOffsets.clear();
-    return out;
-  }
+    /**
+     * Create I/O stream to write data.
+     *
+     * @return DataOutputStream
+     * @throws IOException
+     */
+    private DataOutputStream newCublet() throws IOException {
+        String fileName = Long.toHexString(System.currentTimeMillis()) + ".dz";
+        System.out.println("[*] A new cublet " + fileName + " is created!");
+        File cublet = new File(outputDir, fileName);
+        DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));
+        offset = 0;
+        chunkHeaderOffsets.clear();
+        return out;
+    }
 
-  /**
-   * Switch a new cublet File once meet 1GB.
-   */
-  private void maybeSwitchCublet() throws IOException {
-    if (offset < cubletSize) {
-      return;
+    /**
+     * Switch a new cublet File once meet 1GB
+     *
+     * @throws IOException
+     */
+    private void maybeSwitchCublet() throws IOException {
+        if (offset < cubletSize)
+            return;
+        finishCublet();
+        out = newCublet();
     }
-    finishCublet();
-    out = newCublet();
-  }
 
-  @Override
-  public boolean add(Object tuple) throws IOException {
-    if (!(tuple instanceof String[])) {
-      System.out.println(
-          "Unexpected tuple type: tuple not in valid type for DataWriter");
-      return false;
+    @Override
+    public boolean add(Object tuple) throws IOException {
+        if (!(tuple instanceof String[])) {
+            System.out.println(
+                    "Unexpected tuple type: tuple not in valid type for DataWriter");
+            return false;
+        }
+        String[] insertTuple = (String[]) tuple;
+        String curUser = insertTuple[userKeyIndex];
+        if (lastUser == null)
+            lastUser = curUser;
+        // start a new chunk
+        if (maybeSwitchChunk(curUser))
+            maybeSwitchCublet();
+        lastUser = curUser;
+        // update metachunk / metafield
+        metaChunk.put(insertTuple);
+        List<String> dataArray = new ArrayList<String>(Arrays.asList(insertTuple));
+        dataChunk.put((String[]) dataArray.toArray(new String[0]));
+        // update data chunk
+        tupleCount++;
+        return true;
     }
-    String[] insertTuple = (String[]) tuple;
-    String curUser = insertTuple[userKeyIndex];
-    if (lastUser == null) {
-      lastUser = curUser;
-    }
-    // start a new chunk
-    if (maybeSwitchChunk(curUser)) {
-      maybeSwitchCublet();
-    }
-    lastUser = curUser;
-    // update metachunk / metafield
-    metaChunk.put(insertTuple, tableSchema.getInvariantType());
-    List<String> dataArray = new ArrayList<String>(Arrays.asList(insertTuple));
-    for (int i = invariantFieldIndex.size() - 1; i >= 0; i--) {
-      dataArray.remove((int) invariantFieldIndex.get(i));
-    }
-    dataChunk.put((String[]) dataArray.toArray(new String[0]));
-    // update data chunk
-    tupleCount++;
-    return true;
-  }
 
-  private void generateCubeMeta() throws IOException {
-    if (!finished) {
-      return;
+    private void GenerateCubeMeta() throws IOException {
+        if (!finished)
+            return;
+        String fileName = "cubemeta";
+        File cubemeta = new File(outputDir, fileName);
+        DataOutputStream out = new DataOutputStream(
+                new FileOutputStream(cubemeta));
+        offset = 0;
+        metaChunk.writeCubeMeta(out);
+        out.flush();
+        out.close();
     }
-    String fileName = "cubemeta";
-    File cubemeta = new File(outputDir, fileName);
-    DataOutputStream out = new DataOutputStream(
-        new FileOutputStream(cubemeta));
-    offset = 0;
-    metaChunk.writeCubeMeta(out);
-    out.flush();
-    out.close();
-  }
 
-  @Override
-  public void finish() throws IOException {
-    if (finished) {
-      return;
+    @Override
+    public void finish() throws IOException {
+        if (finished)
+            return;
+        finishChunk();
+        finishCublet();
+        finished = true;
+        GenerateCubeMeta();
     }
-    finishChunk();
-    finishCublet();
-    finished = true;
-    generateCubeMeta();
-  }
 
-  @Override
-  public void close() throws IOException {
-    // force close the out stream
-    if (!finished) {
-      finish();
+    @Override
+    public void close() throws IOException {
+        // force close the out stream
+        if (!finished)
+            finish();
     }
-  }
 }
