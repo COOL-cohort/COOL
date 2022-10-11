@@ -91,8 +91,8 @@ public class CohortSelection implements Operator {
 
     // Create AppKey, birthselectors and ageselectors
     String app = query.getAppKey();
-    this.appFilter = FieldFilterFactory.create(this.schema.getField(this.schema.getAppKeyField()),
-        null, Arrays.asList(app));
+    this.appFilter = FieldFilterFactory
+        .create(this.schema.getField(this.schema.getAppKeyFieldIdx()), null, Arrays.asList(app));
 
     List<FieldSet> birthSelectors = query.getBirthSelection();
     for (FieldSet fs : birthSelectors) {
@@ -120,7 +120,7 @@ public class CohortSelection implements Operator {
     // this.bAgeActiveCublet = true;
 
     boolean accept = this.appFilter
-        .accept(metaChunk.getMetaField(this.schema.getAppKeyField(), FieldType.AppKey));
+        .accept(metaChunk.getMetaField(this.schema.getAppKeyFieldIdx(), FieldType.AppKey));
     if (!accept) {
       this.userActiveCublet = false;
       return;
@@ -149,7 +149,7 @@ public class CohortSelection implements Operator {
     this.userActiveChunk = true;
     // this.bAgeActiveChunk = true;
 
-    boolean accept = this.appFilter.accept(chunk.getField(this.schema.getAppKeyField()));
+    boolean accept = this.appFilter.accept(chunk.getField(this.schema.getAppKeyFieldIdx()));
     if (!accept) {
       this.userActiveChunk = false;
       return;

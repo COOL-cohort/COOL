@@ -39,7 +39,8 @@ import java.util.Map;
 import lombok.Getter;
 
 /**
- * CohortAggregation, for each chunk, divide the users into cohorts. and then aggregate the results
+ * CohortAggregation, for each chunk, divide the users into cohorts. and then
+ * aggregate the results
  */
 public class CohortAggregation implements Operator {
 
@@ -78,14 +79,14 @@ public class CohortAggregation implements Operator {
 
   /**
    * metachunk dictionary for birth action.
-
+   * 
    * @param metaChunk the metachunk to process
    */
   @Override
   public void process(MetaChunkRS metaChunk) {
     this.sigma.process(metaChunk);
 
-    int actionField = this.schema.getActionField();
+    int actionField = this.schema.getActionFieldIdx();
     MetaFieldRS actionMetaField = metaChunk.getMetaField(actionField, FieldType.Action);
     this.birthActionGlobalIds = new int[this.birthActions.length];
     for (int i = 0; i < this.birthActions.length; i++) {
@@ -98,9 +99,11 @@ public class CohortAggregation implements Operator {
   }
 
   /**
-   * Check whether the chunk has the corresponding birth actions according to the metachunk
-   * dictionary, then divide the users into different cohorts and compute the results of cohorts.
-
+   * Check whether the chunk has the corresponding birth actions according to the
+   * metachunk
+   * dictionary, then divide the users into different cohorts and compute the
+   * results of cohorts.
+   * 
    * @param chunk the chunk to process
    */
   @Override
@@ -110,9 +113,9 @@ public class CohortAggregation implements Operator {
       return;
     }
 
-    FieldRS userField = loadField(chunk, this.schema.getUserKeyField());
-    FieldRS actionField = loadField(chunk, this.schema.getActionField());
-    FieldRS actionTimeField = loadField(chunk, this.schema.getActionTimeField());
+    FieldRS userField = loadField(chunk, this.schema.getUserKeyFieldIdx());
+    FieldRS actionField = loadField(chunk, this.schema.getActionFieldIdx());
+    FieldRS actionTimeField = loadField(chunk, this.schema.getActionTimeFieldIdx());
     FieldRS cohortField = loadField(chunk, this.query.getCohortFields()[0]);
     FieldRS metricField = loadField(chunk, this.query.getMetric());
     this.birthActionChunkIds = new int[this.birthActionGlobalIds.length];
@@ -123,12 +126,12 @@ public class CohortAggregation implements Operator {
       }
       this.birthActionChunkIds[i] = id;
     }
-    
+
     int min = cohortField.minKey();
     int cardinality = cohortField.maxKey() - min + 1;
     int cohortSize = actionTimeField.maxKey() - actionTimeField.minKey() + 1 + 1;
     long[][] chunkResults = new long[cardinality][cohortSize];
-    
+
     InputVector cohortInput = cohortField.getValueVector();
     InputVector actionTimeInput = actionTimeField.getValueVector();
     InputVector metricInput = metricField == null ? null : metricField.getValueVector();
@@ -137,8 +140,8 @@ public class CohortAggregation implements Operator {
     int maxAllowedAge = cohortSize - 1;
     aggregator.init(metricInput, actionTimeInput, cohortSize, minAllowedAge, maxAllowedAge,
         this.query.getAgeInterval());
-    
-    FieldRS appField = loadField(chunk, this.schema.getAppKeyField());
+
+    FieldRS appField = loadField(chunk, this.schema.getAppKeyFieldIdx());
     RLEInputVector appInput = (RLEInputVector) appField.getValueVector();
     appInput.skipTo(0);
     RLEInputVector.Block appBlock = new RLEInputVector.Block();
@@ -195,7 +198,7 @@ public class CohortAggregation implements Operator {
     }
 
     InputVector keyVector = null;
-    if (cohortField.isSetField()) {
+    if (FieldType.isHashType(cohortField.getFieldType())) {
       keyVector = cohortField.getKeyVector();
     }
     for (int i = 0; i < cardinality; i++) {
@@ -244,7 +247,7 @@ public class CohortAggregation implements Operator {
 
   /**
    * Find the birth tuple.
-
+   * 
    * @param begin       the start position to search
    * @param end         the end position to search
    * @param actionInput The birth action
