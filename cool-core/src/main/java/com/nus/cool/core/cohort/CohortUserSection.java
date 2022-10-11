@@ -114,7 +114,7 @@ public class CohortUserSection implements CohortOperator {
       return;
     }
 
-    FieldRS userField = dataChunk.getField(tableSchema.getUserKeyField());
+    FieldRS userField = dataChunk.getField(tableSchema.getUserKeyFieldIdx());
 
     // Skipping non RLE compressed blocks
 
