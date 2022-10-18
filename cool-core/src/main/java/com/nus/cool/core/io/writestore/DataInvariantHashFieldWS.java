@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import com.nus.cool.core.schema.FieldType;
 
-// TODO(lingze) : this is interface
+
 // whether to record the meta data of field in this chunk
 // Through filter to speed up the cohort processing
 public class DataInvariantHashFieldWS implements DataFieldWS{ 

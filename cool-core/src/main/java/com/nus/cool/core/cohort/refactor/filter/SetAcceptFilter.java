@@ -13,4 +13,8 @@ public class SetAcceptFilter extends SetFilter {
         return this.gidSet.contains(value);
     }
     
+    @Override
+    public Boolean accept(String value) throws RuntimeException {
+        return this.valueSet.contains(value);       
+    }
 }
