@@ -15,4 +15,9 @@ public class SetRejectFilter extends SetFilter {
         // return this.
     }
 
+    @Override
+    public Boolean accept(String value) throws RuntimeException {
+        return !this.valueSet.contains(value);       
+    }
+
 }
