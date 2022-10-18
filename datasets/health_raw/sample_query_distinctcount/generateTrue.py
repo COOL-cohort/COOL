@@ -18,7 +18,7 @@ Cohort:1950-1960, 1960-1970, 1970-1980, 1980-1990, 1990-2000
 cwd = os.getcwd()
 data_dir = os.path.join(cwd, "datasets", "health_raw")
 data_path = os.path.join(data_dir, "data.csv")
-ret_path = os.path.join(data_dir,"sample_query","query_result.json")
+ret_path = os.path.join(data_dir,"sample_query_distinctcount","query_result.json")
 
 
 

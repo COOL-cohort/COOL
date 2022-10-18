@@ -33,7 +33,8 @@ public class MetaUserFieldRS implements MetaFieldRS {
     
     public MetaUserFieldRS(MetaChunkRS metaChunkRS, Charset charset){
         this.charset = checkNotNull(charset);
-        int invariant_size = this.metaChunkRS.getSchema().getInvariantFieldNumber();
+        this.metaChunkRS = metaChunkRS;
+        int invariant_size = metaChunkRS.getSchema().getInvariantFieldNumber();
         this.invarantMaps = new InputVector[invariant_size];
     }
 
