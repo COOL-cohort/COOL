@@ -37,7 +37,7 @@ public class AgeSelection {
     public int generateAge(LocalDateTime birthDate, LocalDateTime actionTime) {
         TimeWindow tw = DateUtils.getDifference(birthDate, actionTime, this.unit);
         int age = (int) tw.getLength();
-        if (this.scope.IsInScope(age)) {
+        if (this.scope.isInScope(age)) {
             return age;
         }
         return -1;

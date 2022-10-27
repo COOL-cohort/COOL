@@ -17,7 +17,7 @@ public class RetUnit {
 
   private boolean used;
 
-  private HashSet<String> userIdSet;
+  private HashSet<Integer> userIdSet;
 
   /**
    * Create a RetUnit with initial value and count.

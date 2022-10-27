@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
 public class CoolModelTest {
 
   @Test(dataProvider = "CubeListTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"})
   public void cubeListUnitTest(String datasetPath, String[] out) {
     String[] cubes = CoolModel.listCubes(datasetPath);
     for (String cube : out) {
@@ -24,7 +24,7 @@ public class CoolModelTest {
   }
 
   @Test(dataProvider = "CubeReloadTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"})
   public static void cubeReloadUnitTest(String datasetPath, String cubeName) throws IOException {
     CoolModel coolModel = new CoolModel(datasetPath);
     coolModel.reload(cubeName);
