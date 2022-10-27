@@ -1,14 +1,12 @@
-package com.nus.cool.core.cohort.refactor.birthSelect;
+package com.nus.cool.core.cohort.refactor.birthselect;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.nus.cool.core.cohort.BirthSequence.BirthEvent;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
 
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor.cohortSelect;
+package com.nus.cool.core.cohort.refactor.cohortselect;
 
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonInclude;

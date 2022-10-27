@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor.cohortSelect;
+package com.nus.cool.core.cohort.refactor.cohortselect;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.filter.SetFilter;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
