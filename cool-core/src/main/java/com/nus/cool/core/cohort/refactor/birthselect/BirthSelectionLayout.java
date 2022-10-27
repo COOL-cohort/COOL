@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor.birthSelect;
+package com.nus.cool.core.cohort.refactor.birthselect;
 
 import java.util.ArrayList;
 import java.util.HashSet;
