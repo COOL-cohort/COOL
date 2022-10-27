@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor.valueSelect;
+package com.nus.cool.core.cohort.refactor.valueselect;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -1,12 +1,10 @@
-package com.nus.cool.core.cohort.refactor.birthSelect;
+package com.nus.cool.core.cohort.refactor.birthselect;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
-import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import lombok.Getter;
 
 
