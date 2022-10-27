@@ -29,6 +29,10 @@ public class Scope {
     return !(scope.getLeft() >= this.right || scope.getRight() <= this.left);
   }
 
+  public Boolean isSubset(Scope scope){
+    return scope.getLeft() >= this.left && scope.getRight() <= this.right;
+}
+
   @Override
   public String toString() {
     String l = this.left == Integer.MIN_VALUE ? "MIN" : this.left.toString();

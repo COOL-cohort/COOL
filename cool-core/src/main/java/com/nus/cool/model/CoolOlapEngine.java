@@ -73,7 +73,7 @@ public class CoolOlapEngine {
       // end = System.currentTimeMillis();
       // System.out.println("selection process meta chunk elapsed: " + (end - beg));
       // if this metaChunk need to be checked, read all data-chunks
-      if (selection.isactivateCublet()) {
+      if (selection.isbActivateCublet()) {
         List<ChunkRS> datachunks = cubletRS.getDataChunks();
         for (ChunkRS dataChunk : datachunks) {
           // beg = System.currentTimeMillis();

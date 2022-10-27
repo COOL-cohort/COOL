@@ -135,7 +135,7 @@ public class CohortLoader {
       CohortAggregation gamma = new CohortAggregation(sigma);
       gamma.init(schema, query);
       gamma.process(metaChunk);
-      if (sigma.isBUserActiveCublet()) {
+      if (sigma.isUserActiveCublet()) {
         List<ChunkRS> dataChunks = cublet.getDataChunks();
         for (ChunkRS dataChunk : dataChunks) {
           gamma.process(dataChunk);
