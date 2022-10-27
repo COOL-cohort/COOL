@@ -40,6 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class IcebergSelection {
 
+
     private boolean bActivateCublet;
 
     private TableSchema tableSchema;

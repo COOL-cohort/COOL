@@ -24,7 +24,7 @@ public class CohortRangeSelector implements CohortSelector  {
     private String selectCohort(Object input) {
         Integer i = (Integer)input;
         for(Scope u : this.filter.getAcceptRangeList()){
-            if(u.IsInScope(i)) return u.toString();
+            if(u.isInScope(i)) return u.toString();
         }
         return null;
     }

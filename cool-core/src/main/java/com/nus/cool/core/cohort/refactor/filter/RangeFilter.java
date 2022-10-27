@@ -50,7 +50,7 @@ public class RangeFilter implements Filter {
     @Override
     public Boolean accept(Integer value) throws RuntimeException {
         for (Scope u : acceptRangeList) {
-            if (u.IsInScope(value)) {
+            if (u.isInScope(value)) {
                 return true;
             }
         }
@@ -71,7 +71,7 @@ public class RangeFilter implements Filter {
     @Override
     public boolean accept(Scope scope) throws RuntimeException {
         for (Scope u : acceptRangeList) {
-            if (u.IsSubset(scope)) {
+            if (u.isSubset(scope)) {
                 return true;
             }
         }

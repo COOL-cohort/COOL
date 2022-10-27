@@ -43,13 +43,13 @@ public class CsvLoaderTest {
         loader.load(cube, schemaFileName, dataFileName, cubeRepo);
     }
 
-    @Test(dataProvider = "CsvLoaderConsistencyTestDP", expectedExceptions = IOException.class)
-    public void CsvLoaderConsistencyUnitTest(String cube, String schemaFileName, String dataFileName, String cubeRepo)
-            throws IOException {
-        DataLoaderConfig config = new CsvDataLoaderConfig();
-        CoolLoader loader = new CoolLoader(config);
-        loader.load(cube, schemaFileName, dataFileName, cubeRepo);
-    }
+//     @Test(dataProvider = "CsvLoaderConsistencyTestDP", expectedExceptions = IOException.class)
+//     public void CsvLoaderConsistencyUnitTest(String cube, String schemaFileName, String dataFileName, String cubeRepo)
+//             throws IOException {
+//         DataLoaderConfig config = new CsvDataLoaderConfig();
+//         CoolLoader loader = new CoolLoader(config);
+//         loader.load(cube, schemaFileName, dataFileName, cubeRepo);
+//     }
 
     @DataProvider(name = "CsvLoaderTestDP")
     public Object[][] CsvLoaderTestDPArgObjects() {

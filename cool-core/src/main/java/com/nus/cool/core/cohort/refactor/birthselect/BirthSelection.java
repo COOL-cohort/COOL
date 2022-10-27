@@ -78,7 +78,7 @@ public class BirthSelection {
         // if birthEvents is not null
         for (EventSelection event : birthEvents) {
             if (event.Accept(tuple)) {
-                context.Add(userId, eventIdx, date);
+                context.add(userId, eventIdx, date);
                 return true;
             }
             eventIdx++;
