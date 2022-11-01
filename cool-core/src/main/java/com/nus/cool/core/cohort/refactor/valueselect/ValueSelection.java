@@ -8,7 +8,7 @@ import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateFunc;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
-import com.nus.cool.core.cohort.refactor.storage.RetUnit;
+
 import lombok.Getter;
 
 public class ValueSelection {

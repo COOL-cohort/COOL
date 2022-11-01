@@ -19,10 +19,11 @@
 
 package com.nus.cool.functionality;
 
+import java.io.IOException;
+
 import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.model.CoolLoader;
-import java.io.IOException;
 
 /**
  * Load csv data into cool system.

@@ -19,12 +19,13 @@
 
 package com.nus.cool.functionality;
 
+import java.io.File;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.model.CoolModel;
-import java.io.File;
-import java.util.List;
 
 /**
  * IcebergLoader is a higher level abstraction for iceberg query.

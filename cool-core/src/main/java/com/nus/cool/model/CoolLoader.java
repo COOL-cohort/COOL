@@ -19,16 +19,18 @@
 
 package com.nus.cool.model;
 
-import com.google.common.io.Files;
-import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.config.DataLoaderConfig;
-import com.nus.cool.loader.DataLoader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.io.Files;
+import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.core.util.config.DataLoaderConfig;
+import com.nus.cool.loader.DataLoader;
 
 /**
  * Loader.

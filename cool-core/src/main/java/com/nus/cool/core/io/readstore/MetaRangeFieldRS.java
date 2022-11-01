@@ -18,8 +18,9 @@
  */
 package com.nus.cool.core.io.readstore;
 
-import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
+
+import com.nus.cool.core.schema.FieldType;
 
 public class MetaRangeFieldRS implements MetaFieldRS {
 
