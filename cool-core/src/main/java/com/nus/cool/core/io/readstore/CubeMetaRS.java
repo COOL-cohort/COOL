@@ -159,7 +159,7 @@ public class CubeMetaRS implements Input {
     if (id < 0 || id >= this.fieldOffsets.length) {
       return "";
     }
-    
+
     if (this.fields.containsKey(id)) {
       return this.fields.get(id).generateJson();
     }

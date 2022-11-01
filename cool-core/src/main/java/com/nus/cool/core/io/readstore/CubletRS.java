@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,7 +37,7 @@ import lombok.Setter;
  * <p>
  * cublet layout
  * ---------------------------------------------------------------------------
- * |data chunk 1 | ... | data chunk n |  meta chunk ｜ header | header offset |
+ * |data chunk 1 | ... | data chunk n | meta chunk ｜ header | header offset |
  * ---------------------------------------------------------------------------
  * <p>
  * header layout
@@ -50,13 +51,13 @@ import lombok.Setter;
 public class CubletRS implements Input {
 
   /**
-   * MetaChunk for this cublet
+   * MetaChunk for this cublet.
    */
   @Getter
   private MetaChunkRS metaChunk;
 
   /**
-   * BitSet list for query result
+   * BitSet list for query result.
    */
   private List<BitSet> bitSets = Lists.newArrayList();
 
@@ -77,7 +78,7 @@ public class CubletRS implements Input {
   }
 
   /**
-   * deserialize a cublet from a byte buffer
+   * deserialize a cublet from a byte buffer.
    */
   @Override
   public void readFrom(ByteBuffer buffer) {
@@ -85,14 +86,13 @@ public class CubletRS implements Input {
     int end = buffer.limit();
     this.limit = end;
     int headOffset;
-    buffer.position(end - Ints.BYTES); //  one byte to store header offset
+    buffer.position(end - Ints.BYTES); // one byte to store header offset
     int tag = buffer.getInt();
     // if offset is got from last one byte
     if (tag != 0) {
       headOffset = tag;
-    }
-    // if offset is not got from last one byte, read two bytes
-    else {
+    } else {
+      // if offset is not got from last one byte, read two bytes
       buffer.position(end - Ints.BYTES - Ints.BYTES);
       int size = buffer.getInt();
       buffer.position(end - Ints.BYTES - Ints.BYTES - Ints.BYTES);
@@ -100,9 +100,9 @@ public class CubletRS implements Input {
       buffer.position(end - Ints.BYTES);
       headOffset = buffer.getInt();
       buffer.position(end);
-        for (; size > 0; size--) {
-            this.bitSets.add(SimpleBitSetCompressor.read(buffer));
-        }
+      for (; size > 0; size--) {
+        this.bitSets.add(SimpleBitSetCompressor.read(buffer));
+      }
     }
 
     // Get #chunk and chunk offsets
@@ -115,13 +115,13 @@ public class CubletRS implements Input {
 
     // read the metaChunk, which is the last one in #chunks
     this.metaChunk = new MetaChunkRS(this.schema);
-    buffer.position(chunkOffsets[chunks-1]);
+    buffer.position(chunkOffsets[chunks - 1]);
     int chunkHeadOffset = buffer.getInt();
     buffer.position(chunkHeadOffset);
     this.metaChunk.readFrom(buffer);
 
     // read the dataChunk
-    for (int i = 0; i < chunks-1; i++) {
+    for (int i = 0; i < chunks - 1; i++) {
       ChunkRS chunk = new ChunkRS(this.schema, this.metaChunk);
       buffer.position(chunkOffsets[i]);
       chunkHeadOffset = buffer.getInt();

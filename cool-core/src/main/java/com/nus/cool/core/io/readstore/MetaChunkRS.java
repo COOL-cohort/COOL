@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -25,12 +26,10 @@ import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-
-import lombok.Getter;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
+import lombok.Getter;
 
 /**
  * MetaChunk read store
@@ -56,23 +55,23 @@ import java.util.Map;
 public class MetaChunkRS implements Input {
 
   /**
-   * TableSchema for this meta chunk
+   * TableSchema for this meta chunk.
    */
   @Getter
   private TableSchema schema;
 
   /**
-   * charset defined in table schema
+   * charset defined in table schema.
    */
   private Charset charset;
 
   /**
-   * stored data byte buffer
+   * stored data byte buffer.
    */
   private ByteBuffer buffer;
 
   /**
-   * offsets for fields in this meta chunk
+   * offsets for fields in this meta chunk.
    */
   private int[] fieldOffsets;
 
@@ -89,30 +88,37 @@ public class MetaChunkRS implements Input {
     // Get chunk type
     this.buffer = checkNotNull(buffer);
     ChunkType chunkType = ChunkType.fromInteger(this.buffer.get());
-      if (chunkType != ChunkType.META) {
-          throw new IllegalStateException("Expect MetaChunk, but reads: " + chunkType);
-      }
+    if (chunkType != ChunkType.META) {
+      throw new IllegalStateException("Expect MetaChunk, but reads: " + chunkType);
+    }
 
     // Get #fields
     int fields = this.buffer.getInt();
     // Get field offsets
     this.fieldOffsets = new int[fields];
     for (int i = 0; i < fields; i++) {
-        fieldOffsets[i] = this.buffer.getInt();
+      fieldOffsets[i] = this.buffer.getInt();
     }
     // Fields are loaded only if they are called
   }
 
+  /**
+   * Get i-th MetaField and load it.
+   *
+   * @param i index of this metafield
+   * @param type type of this metafield
+   * @return MetaFieldRS
+   */
   public synchronized MetaFieldRS getMetaField(int i, FieldType type) {
     // Return the meta field if it had been read before
     if (this.fields.containsKey(i)) {
-        return this.fields.get(i);
+      return this.fields.get(i);
     }
     // Read the meta field from the buffer if it is called at the first time
     int fieldOffset = this.fieldOffsets[i];
     this.buffer.position(fieldOffset);
     MetaFieldRS metaField = null;
-    
+
     switch (type) {
       case UserKey:
         metaField = new MetaUserFieldRS(this, this.charset);
@@ -134,13 +140,19 @@ public class MetaChunkRS implements Input {
     return metaField;
   }
 
+  /**
+   * Get the MetaField according to the fieldName in tableSchema.
+   *
+   * @param fieldName fieldName
+   * @return MetaFieldRS
+   */
   public MetaFieldRS getMetaField(String fieldName) {
     int id = this.schema.getFieldID(fieldName);
     FieldType type = this.schema.getFieldType(fieldName);
     return (id < 0 || id >= this.fieldOffsets.length) ? null : this.getMetaField(id, type);
   }
 
-  public MetaFieldRS getMetaField(int idx){
+  public MetaFieldRS getMetaField(int idx) {
     FieldType type = this.schema.getFieldType(idx);
     return (idx < 0 || idx >= this.fieldOffsets.length) ? null : this.getMetaField(idx, type);
   }
