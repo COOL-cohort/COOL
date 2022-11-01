@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -54,10 +55,13 @@ public class DataRangeFieldWS implements DataFieldWS {
 
   private final OutputCompressor compressor;
 
+  /**
+   * Constructor for DataRangeFieldWS.
+   *
+   * @param fieldType  fieldtype
+   * @param compressor compressor
+   */
   public DataRangeFieldWS(FieldType fieldType, OutputCompressor compressor) {
-    /**
-     * Field index to get data from tuple
-     */
     this.fieldType = fieldType;
     this.compressor = checkNotNull(compressor);
   }
@@ -68,19 +72,19 @@ public class DataRangeFieldWS implements DataFieldWS {
   }
 
   /**
-   * UnitTest insert data
+   * insert value.
    *
-   * @param TupleValue
-   * @throws IOException
+   * @param tupleValue value
+   * @throws IOException when string convert fail
    */
   @Override
-  public void put(String TupleValue) throws IOException {
-      if (this.fieldType == FieldType.ActionTime) {
-          DayIntConverter converter = DayIntConverter.getInstance();
-          this.buffer.writeInt(converter.toInt(TupleValue));
-      } else {
-          this.buffer.writeInt(Integer.parseInt(TupleValue));
-      }
+  public void put(String tupleValue) throws IOException {
+    if (this.fieldType == FieldType.ActionTime) {
+      DayIntConverter converter = DayIntConverter.getInstance();
+      this.buffer.writeInt(converter.toInt(tupleValue));
+    } else {
+      this.buffer.writeInt(Integer.parseInt(tupleValue));
+    }
   }
 
   @Override

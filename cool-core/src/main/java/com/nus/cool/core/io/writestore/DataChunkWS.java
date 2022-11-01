@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -56,22 +57,22 @@ import java.io.IOException;
 public class DataChunkWS implements Output {
 
   /**
-   * Chunk beginning offset, don't update
+   * Chunk beginning offset, don't update.
    */
   private final int chunkBeginOffset;
 
   /**
-   * Number of records
+   * Number of records.
    */
   private int recordCount;
 
   /**
-   * Fields in data chunk
+   * Fields in data chunk.
    */
   private final DataFieldWS[] dataFields;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param offset Offset in out stream
    * @param fields fields for this data chunk
@@ -84,8 +85,8 @@ public class DataChunkWS implements Output {
   }
 
   /**
-   * Data Chunk Builder
-   * 
+   * Data Chunk Builder.
+   *
    * @param schema     tableSchema
    * @param metaFields MetaFields
    * @param offset     Offset in out stream
@@ -97,7 +98,7 @@ public class DataChunkWS implements Output {
     // data chunk fields.
     // don't have to maintain dataField for invairant Field
     DataFieldWS[] fields = new DataFieldWS[numOfFields];
-    
+
     for (int i = 0; i < numOfFields; i++) {
 
       FieldType fieldType = schema.getField(i).getFieldType();
@@ -106,17 +107,20 @@ public class DataChunkWS implements Output {
         case AppKey:
         case Action:
         case Segment:
-          if (schema.isInvariantField(i))
+          if (schema.isInvariantField(i)) {
             fields[i] = new DataInvariantHashFieldWS(fieldType, metaFields[i]);
-          else
-            fields[i] = new DataHashFieldWS(fieldType, metaFields[i], compressor, schema.getField(i).isPreCal());
+          } else {
+            fields[i] = new DataHashFieldWS(fieldType, metaFields[i],
+                compressor, schema.getField(i).isPreCal());
+          }
           break;
         case ActionTime:
         case Metric:
-          if (schema.isInvariantField(i))
+          if (schema.isInvariantField(i)) {
             fields[i] = new DataInvariantRangeFieldWS(fieldType);
-          else
+          } else {
             fields[i] = new DataRangeFieldWS(fieldType, compressor);
+          }
           break;
         default:
           throw new IllegalArgumentException("Unsupported FieldType: " + fieldType);
@@ -126,7 +130,7 @@ public class DataChunkWS implements Output {
   }
 
   /**
-   * Put a tuple into the chunk
+   * Put a tuple into the chunk.
    *
    * @param tuple plain data
    * @throws IOException If an I/O error occurs

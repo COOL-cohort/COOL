@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,6 +30,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
 
+/**
+ * Meta HashField ReadStore.
+ */
 public class MetaHashFieldRS implements MetaFieldRS {
 
   protected static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
@@ -44,7 +48,7 @@ public class MetaHashFieldRS implements MetaFieldRS {
   protected InputVector valueVec;
 
   // inverse map from global id to the offset in values.
-  //  only populated once when getString is called to retrieve from valueVec
+  // only populated once when getString is called to retrieve from valueVec
   protected Map<Integer, Integer> id2offset;
 
   public MetaHashFieldRS(Charset charset) {
@@ -59,25 +63,25 @@ public class MetaHashFieldRS implements MetaFieldRS {
   @Override
   public int find(String key) {
     int globalIDIdx = this.fingerVec.find(rhash.hash(key));
-    return globalIDIdx == -1 ? -1 :this.globalIDVec.get(globalIDIdx);
+    return globalIDIdx == -1 ? -1 : this.globalIDVec.get(globalIDIdx);
   }
 
   @Override
   public int count() {
     return this.fingerVec.size();
   }
-  
+
   @Override
   public String getString(int i) {
     // if (this.id2offset == null) {
-    //   this.id2offset = Maps.newHashMap();
-    //   // lazily populate the inverse index only once
-    //   for (int j = 0; j < this.globalIDVec.size(); j++) {
-    //     this.id2offset.put(this.globalIDVec.get(j), j);
-    //   }
+    // this.id2offset = Maps.newHashMap();
+    // // lazily populate the inverse index only once
+    // for (int j = 0; j < this.globalIDVec.size(); j++) {
+    // this.id2offset.put(this.globalIDVec.get(j), j);
+    // }
     // }
     // return ((LZ4InputVector) this.valueVec)
-    //   .getString(this.id2offset.get(i), this.charset);
+    // .getString(this.id2offset.get(i), this.charset);
     return ((LZ4InputVector) this.valueVec).getString(i, this.charset);
   }
 
@@ -98,7 +102,7 @@ public class MetaHashFieldRS implements MetaFieldRS {
     this.globalIDVec = InputVectorFactory.readFrom(buffer);
     if (this.fieldType == FieldType.Action || this.fieldType == FieldType.Segment
         || this.fieldType == FieldType.AppKey) {
-        this.valueVec = InputVectorFactory.readFrom(buffer);
+      this.valueVec = InputVectorFactory.readFrom(buffer);
     }
   }
 
