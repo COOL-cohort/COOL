@@ -8,7 +8,6 @@ import com.nus.cool.core.cohort.refactor.utils.DateUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeUtils;
 import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
-
 /**
  * Store Age condition and filter valid age for cohort Analysis.
  */

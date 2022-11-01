@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 
 /**
- * Partial of a tuple in project, when generated, the layout of schemas is fixed. Instance of
+ * Partial of a tuple in project, when generated, the layout of schemas is
+ * fixed. Instance of
  * ProjectTuple can load Object[] to reuse this memory
  */
 public class ProjectedTuple {
@@ -23,7 +24,7 @@ public class ProjectedTuple {
     }
     return tuple[schema2Index.get(schema)];
   }
-  
+
   /**
    * Create a partial tuple with selected fields.
    */

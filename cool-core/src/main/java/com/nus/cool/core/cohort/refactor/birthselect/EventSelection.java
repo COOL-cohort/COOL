@@ -7,7 +7,6 @@ import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
 import lombok.Getter;
 
-
 /**
  * EventSelection is a collection of filters
  * if one data item pass all filters in this Event X's eventSelection
@@ -20,7 +19,7 @@ public class EventSelection {
     @Getter
     private final List<Filter> filterList;
 
-    public EventSelection(List<Filter> filterList){
+    public EventSelection(List<Filter> filterList) {
         this.filterList = filterList;
     }
 
@@ -32,13 +31,12 @@ public class EventSelection {
     public boolean Accept(ProjectedTuple projectTuple) {
         for (int i = 0; i < filterList.size(); i++) {
             Filter filter = filterList.get(i);
-            Integer gid = (Integer)projectTuple.getValueBySchema(filter.getFilterSchema());
-            if(!filter.accept(gid)){
+            Integer gid = (Integer) projectTuple.getValueBySchema(filter.getFilterSchema());
+            if (!filter.accept(gid)) {
                 return false;
             }
         }
         return true;
     }
-
 
 }

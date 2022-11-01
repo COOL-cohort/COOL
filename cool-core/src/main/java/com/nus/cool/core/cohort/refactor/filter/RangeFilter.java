@@ -111,11 +111,10 @@ public class RangeFilter implements Filter {
 
     @Override
     public void loadMetaInfo(MetaChunkRS metaChunkRS) {
-        // for range Filter, no need to load info 
+        // for range Filter, no need to load info
     }
 
-
-    // ---------------  compatable with old version -----------------
+    // --------------- compatable with old version -----------------
 
     public Boolean accept(String value) throws RuntimeException {
         // TODO Auto-generated method stub
@@ -127,5 +126,4 @@ public class RangeFilter implements Filter {
         return null;
     }
 
-   
 }

@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Map.Entry;
 
 /**
- * Class for Cohort Analysis Result We consider the Cohort Analysis Result as a x-y Axis x-Axis is
- * age, y-Axis is value, legend is cohort group CohortResult class is generated according to the
+ * Class for Cohort Analysis Result We consider the Cohort Analysis Result as a
+ * x-y Axis x-Axis is
+ * age, y-Axis is value, legend is cohort group CohortResult class is generated
+ * according to the
  * ageselection.
  */
 public class CohortRet {
@@ -48,7 +50,8 @@ public class CohortRet {
   }
 
   /**
-   * Initialize the missing intance Get the certain RetUnit, user can modify RetUnit in place.
+   * Initialize the missing intance Get the certain RetUnit, user can modify
+   * RetUnit in place.
    */
   public RetUnit getByAge(String cohort, int age) {
     if (!this.cohortToValueList.containsKey(cohort)) {
@@ -59,7 +62,8 @@ public class CohortRet {
   }
 
   /**
-   * when invoked this func, the tuple should pass the ageSelection, index is in range.
+   * when invoked this func, the tuple should pass the ageSelection, index is in
+   * range.
    */
   private int getCohortAge(int index) {
     Preconditions.checkArgument(index <= max && index >= min,

@@ -24,21 +24,21 @@ public class BirthSelectionLayout {
     @JsonIgnore
     private HashSet<String> relatedSchemas;
 
-    public BirthSelection generate(){
+    public BirthSelection generate() {
         ArrayList<EventSelection> birthEvents = new ArrayList<>();
         this.relatedSchemas = new HashSet<>();
-        if(this.eventLayoutList == null){
+        if (this.eventLayoutList == null) {
             // no birthEvent filter, means that all event can be selected as birthEvent
             return new BirthSelection(null, new BirthSelectionContext(timeWindow, null));
         }
         // init event
-        int[] eventMinFrequency = new int [this.eventLayoutList.size()];
+        int[] eventMinFrequency = new int[this.eventLayoutList.size()];
         int i = 0;
-        for(EventSelectionLayout layout: this.eventLayoutList){
+        for (EventSelectionLayout layout : this.eventLayoutList) {
             birthEvents.add(layout.generate());
             this.relatedSchemas.addAll(layout.getSchemaList());
             eventMinFrequency[i++] = layout.getFrequency();
         }
         return new BirthSelection(birthEvents, new BirthSelectionContext(timeWindow, eventMinFrequency));
-    } 
+    }
 }
