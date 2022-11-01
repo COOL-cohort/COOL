@@ -19,16 +19,18 @@
 
 package com.nus.cool.core.iceberg.query;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import lombok.Data;
-import lombok.Getter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.Data;
+import lombok.Getter;
 
 /**
  * Iceberg query class.

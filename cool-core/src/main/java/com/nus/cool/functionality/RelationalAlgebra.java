@@ -19,10 +19,11 @@
 
 package com.nus.cool.functionality;
 
+import java.util.List;
+
 import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.model.CoolModel;
-import java.util.List;
 
 /**
  * Relational algebra operation.
