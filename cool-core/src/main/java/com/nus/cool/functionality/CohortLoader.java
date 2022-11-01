@@ -37,8 +37,8 @@ import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.converter.NumericConverter;
-import com.nus.cool.result.ResultTuple;
 import com.nus.cool.model.CoolModel;
+import com.nus.cool.result.ResultTuple;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -49,19 +49,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CohortLoader is a higher level abstraction for cohort query
+ * CohortLoader is a higher level abstraction for cohort query.
  * With CohortLoader, you can easily get the query result
  */
 public class CohortLoader {
 
   /**
-   * Local model for cool
+   * Local model for cool.
    *
    * @param args [0] the output data dir (eg, dir of .dz file)
    *             args [1] application name, also the folder name under above
    *             folder
    *             args [2] query's path, eg sogamo/query0.json
-   * @throws IOException
+   * @throws IOException when CoolModel throw IOException
    */
   public static void main(String[] args) throws IOException {
 
@@ -113,7 +113,7 @@ public class CohortLoader {
   }
 
   /**
-   * execute query
+   * execute query.
    * 
    * @param cube  the cube that stores the data we need
    * @param query the cohort query needed to process
