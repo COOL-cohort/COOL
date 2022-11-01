@@ -19,8 +19,9 @@
 
 package com.nus.cool.core.iceberg.query;
 
-import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
 import java.util.List;
+
+import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
 
 /**
  * Aggregator query structure defines a set of aggregators on a field.

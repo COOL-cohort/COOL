@@ -19,9 +19,10 @@
 
 package com.nus.cool.core.cohort;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Birth sequence.

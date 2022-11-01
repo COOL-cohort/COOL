@@ -19,9 +19,10 @@
 
 package com.nus.cool.core.iceberg.query;
 
-import com.nus.cool.core.cohort.filter.FieldFilter;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.nus.cool.core.cohort.filter.FieldFilter;
 
 /**
  * Selection filter class.

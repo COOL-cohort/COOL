@@ -19,22 +19,6 @@
 
 package com.nus.cool.model;
 
-import com.nus.cool.core.cohort.*;
-import com.nus.cool.core.cohort.funnel.FunnelProcess;
-import com.nus.cool.core.cohort.funnel.FunnelQuery;
-import com.nus.cool.core.io.compression.Compressor;
-import com.nus.cool.core.io.compression.Histogram;
-import com.nus.cool.core.io.compression.ZIntBitCompressor;
-import com.nus.cool.core.io.readstore.*;
-import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.schema.DataType;
-import com.nus.cool.core.schema.FieldSchema;
-import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.reader.CoolTupleReader;
-import com.nus.cool.core.util.writer.DataWriter;
-import com.nus.cool.result.ExtendedResultTuple;
-
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,6 +27,31 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.nus.cool.core.cohort.BirthSequence;
+import com.nus.cool.core.cohort.CohortUserSection;
+import com.nus.cool.core.cohort.ExtendedCohort;
+import com.nus.cool.core.cohort.ExtendedCohortAggregation;
+import com.nus.cool.core.cohort.ExtendedCohortQuery;
+import com.nus.cool.core.cohort.ExtendedCohortSelection;
+import com.nus.cool.core.cohort.funnel.FunnelProcess;
+import com.nus.cool.core.cohort.funnel.FunnelQuery;
+import com.nus.cool.core.io.compression.Compressor;
+import com.nus.cool.core.io.compression.Histogram;
+import com.nus.cool.core.io.compression.ZIntBitCompressor;
+import com.nus.cool.core.io.readstore.ChunkRS;
+import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.core.io.readstore.CubletRS;
+import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.DataType;
+import com.nus.cool.core.schema.FieldSchema;
+import com.nus.cool.core.schema.FieldType;
+import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.core.util.reader.CoolTupleReader;
+import com.nus.cool.core.util.writer.DataWriter;
+import com.nus.cool.result.ExtendedResultTuple;
 
 /**
  * Execute different Query
