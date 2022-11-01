@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.Histogram;
@@ -27,19 +27,15 @@ import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
-
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
- * Hash MetaField write store
+ * Hash MetaField write store.
  * <p>
  * Hash MetaField layout
  * ---------------------------------------
@@ -59,12 +55,12 @@ public class MetaHashFieldWS implements MetaFieldWS {
   protected final FieldType fieldType;
   protected final OutputCompressor compressor;
   protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
-  
+
   protected Map<Integer, Integer> fingerToGid = Maps.newTreeMap();
   protected final List<String> valueList = new ArrayList<>();
-  
+
   /**
-   * Global hashToTerm, keys are hashed by the indexed string
+   * Global hashToTerm, keys are hashed by the indexed string.
    */
 
   // hash of one tuple field : Term {origin value of tuple filed, global ID. }
@@ -76,6 +72,13 @@ public class MetaHashFieldWS implements MetaFieldWS {
   // global id
   protected int nextGid = 0;
 
+  /**
+   * Constructor of MetaHashFieldWS.
+   *
+   * @param type       type
+   * @param charset    charset
+   * @param compressor compressor
+   */
   public MetaHashFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
     this.fieldType = type;
     this.charset = charset;
@@ -85,19 +88,20 @@ public class MetaHashFieldWS implements MetaFieldWS {
   @Override
   public void put(String[] tuple, int idx) {
     int hashKey = rhash.hash(tuple[idx]);
-    if (!this.fingerToGid.containsKey(hashKey)){
+    if (!this.fingerToGid.containsKey(hashKey)) {
       this.fingerToGid.put(hashKey, nextGid++);
       this.valueList.add(tuple[idx]);
     }
     // if (!this.hashToTerm.containsKey(hashKey)) {
-    //   this.hashToTerm.put(hashKey, new Term(tuple[idx], nextGid++));
+    // this.hashToTerm.put(hashKey, new Term(tuple[idx], nextGid++));
     // }
   }
 
   @Override
   public int find(String v) {
     int fp = this.rhash.hash(v);
-    // return this.hashToTerm.containsKey(fp) ? this.hashToTerm.get(fp).globalId : -1;
+    // return this.hashToTerm.containsKey(fp) ? this.hashToTerm.get(fp).globalId :
+    // -1;
     return this.fingerToGid.containsKey(fp) ? this.fingerToGid.get(fp) : -1;
   }
 
@@ -114,7 +118,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
   @Override
   public void complete() {
     // for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-    //   fieldValues.add(en.getValue().term);
+    // fieldValues.add(en.getValue().term);
     // }
   }
 
@@ -168,7 +172,6 @@ public class MetaHashFieldWS implements MetaFieldWS {
     bytesWritten += this.compressor.writeTo(out);
 
     // Write values
-
 
     try (DataOutputBuffer buffer = new DataOutputBuffer()) {
       // Store offsets into the buffer first
@@ -244,7 +247,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
   }
 
   /**
-   * Convert string to globalIDs
+   * Convert string to globalIDs.
    */
   public static class Term implements Comparable<Term> {
 
@@ -265,12 +268,13 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
     @Override
     public int compareTo(Term t) {
-      if (this.globalId < t.globalId)
+      if (this.globalId < t.globalId) {
         return -1;
-      else if (this.globalId > t.globalId)
+      } else if (this.globalId > t.globalId) {
         return 1;
-      else
+      } else {
         return 0;
+      }
     }
   }
 }

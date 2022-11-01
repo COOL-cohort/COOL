@@ -16,12 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
+import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
 
-import com.nus.cool.core.schema.FieldType;
 
+/**
+ * Meta RangeField ReadStore.
+ */
 public class MetaRangeFieldRS implements MetaFieldRS {
 
   private FieldType fieldType;

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.io.Input;
@@ -23,7 +24,6 @@ import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import java.nio.ByteBuffer;
-
 import lombok.Getter;
 
 /**
@@ -51,13 +51,13 @@ import lombok.Getter;
 public class ChunkRS implements Input {
 
   /**
-   * number of record in this chunk
+   * number of record in this chunk.
    */
   @Getter
   private int records;
 
   /**
-   * field array in this chunk
+   * field array in this chunk.
    */
   private FieldRS[] fields;
 
@@ -97,7 +97,8 @@ public class ChunkRS implements Input {
 
     this.fields = new FieldRS[fields];
 
-    MetaUserFieldRS userMetaField = (MetaUserFieldRS) this.metaChunkRS.getMetaField(tableSchema.getUserKeyFieldName());
+    MetaUserFieldRS userMetaField = (MetaUserFieldRS) this.metaChunkRS.getMetaField(
+        tableSchema.getUserKeyFieldName());
 
     // initialized UserDataField first, it will become args for invariant field
     DataHashFieldRS userDataField = new DataHashFieldRS();
@@ -115,26 +116,29 @@ public class ChunkRS implements Input {
 
       if (FieldType.isHashType(fieldType)) {
         if (tableSchema.isInvariantField(i)) {
-          int invariant_idx = tableSchema.getInvariantFieldFlagMap()[i];
+          int invariantIdx = tableSchema.getInvariantFieldFlagMap()[i];
           // invariant_idx != -1;
-          this.fields[i] = new DataInvariantHashFieldRS(fieldType, invariant_idx, userMetaField, userDataField);
-        } else
+          this.fields[i] = new DataInvariantHashFieldRS(
+              fieldType, invariantIdx, userMetaField, userDataField);
+        } else {
           this.fields[i] = DataHashFieldRS.readFrom(buffer, fieldType);
+        }
       } else {
         if (tableSchema.isInvariantField(i)) {
-          int invariant_idx = tableSchema.getInvariantFieldFlagMap()[i];
-          this.fields[i] = new DataInvariantRangeFieldRS(fieldType, invariant_idx, userMetaField, userDataField);
-        } else
+          int invariantIdx = tableSchema.getInvariantFieldFlagMap()[i];
+          this.fields[i] = new DataInvariantRangeFieldRS(
+              fieldType, invariantIdx, userMetaField, userDataField);
+        } else {
           this.fields[i] = DataRangeFieldRS.readFrom(buffer, fieldType);
+        }
       }
     }
   }
 
   /**
-   * Get the filed information according to index
-   * 
+   * Get the filed information according to index.
+   *
    * @param i index of filed
-   * @return
    */
   public FieldRS getField(int i) {
     return this.fields[i];

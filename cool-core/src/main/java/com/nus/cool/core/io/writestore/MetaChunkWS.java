@@ -16,7 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.writestore;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Output;
@@ -26,15 +30,11 @@ import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.IntegerUtil;
-import lombok.Getter;
-
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import lombok.Getter;
 
 /**
  * MetaChunk write store
@@ -73,7 +73,7 @@ public class MetaChunkWS implements Output {
   private TableSchema tableSchema;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param offset     Offset in out stream
    * @param metaFields fields type for each file of the meta chunk
@@ -86,7 +86,7 @@ public class MetaChunkWS implements Output {
   }
 
   /**
-   * MetaChunkWS Build
+   * MetaChunkWS Build.
    *
    * @param schema table schema created with table.yaml
    * @param offset Offset begin to write metaChunk.
@@ -125,7 +125,7 @@ public class MetaChunkWS implements Output {
   }
 
   /**
-   * Put a tuple into the meta chunk
+   * Put a tuple into the meta chunk.
    *
    * @param tuple Plain data line
    */
@@ -135,7 +135,9 @@ public class MetaChunkWS implements Output {
         "input tuple's size is not equal to table schema's size");
     int userKeyIdx = this.tableSchema.getUserKeyFieldIdx();
     for (int i = 0; i < tuple.length; i++) {
-      if(i == userKeyIdx) continue;
+      if (i == userKeyIdx) {
+        continue;
+      }
       this.metaFields[i].put(tuple, i);
     }
     // the UserKey value should be uploaded until all value's loading is done
@@ -144,7 +146,7 @@ public class MetaChunkWS implements Output {
   }
 
   /**
-   * Complete MetaFields
+   * Complete MetaFields.
    */
   public void complete() {
     for (MetaFieldWS metaField : this.metaFields) {
@@ -153,7 +155,7 @@ public class MetaChunkWS implements Output {
   }
 
   /**
-   * Write MetaChunkWS to out stream and return bytes written
+   * Write MetaChunkWS to out stream and return bytes written.
    *
    * @param out stream can write data to output stream
    * @return How many bytes has been written
@@ -193,12 +195,23 @@ public class MetaChunkWS implements Output {
     return bytesWritten;
   }
 
+  /**
+   * reuse metaField for nextCublet.
+   */
   public void cleanForNextCublet() {
     for (MetaFieldWS metaField : this.metaFields) {
       metaField.cleanForNextCublet();
     }
   }
 
+  /**
+   * writeCubeMeta.
+   *
+   * @param out dataoutput
+   * @return success or fail
+   *
+   * @throws IOException write error
+   */
   public int writeCubeMeta(DataOutput out) throws IOException {
     this.offset = 0;
     int bytesWritten = 0;
@@ -240,9 +253,9 @@ public class MetaChunkWS implements Output {
   }
 
   /**
-   * Update beginning offset to write the
-   * 
-   * @param newOffset: new offset to write metaChunk
+   * Update beginning offset to write.
+   *
+   * @param newOffset new offset to write metaChunk
    */
   public void updateBeginOffset(int newOffset) {
     this.offset = newOffset;
