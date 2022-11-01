@@ -77,7 +77,7 @@ public class DataLoader {
     }
     writer.finish();
   }
-  
+
   /**
    * Builder of DataLoader.
    */

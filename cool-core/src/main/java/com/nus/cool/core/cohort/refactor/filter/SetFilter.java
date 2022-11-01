@@ -25,13 +25,14 @@ public class SetFilter implements Filter {
         this.valueSet = new HashSet<>(Arrays.asList(Values));
     }
 
-    public static Filter GenerateSetFilter(String fieldSchema, String[] acceptValues, String[] rejectValues){
-        if(acceptValues != null) 
+    public static Filter GenerateSetFilter(String fieldSchema, String[] acceptValues, String[] rejectValues) {
+        if (acceptValues != null)
             return new SetAcceptFilter(fieldSchema, acceptValues);
-        else if(rejectValues != null)
+        else if (rejectValues != null)
             return new SetRejectFilter(fieldSchema, rejectValues);
         else
-            throw new IllegalArgumentException("For SetFilter, acceptValue and rejectValue aren't equal to null at the same time");
+            throw new IllegalArgumentException(
+                    "For SetFilter, acceptValue and rejectValue aren't equal to null at the same time");
     }
 
     @Override
@@ -52,8 +53,8 @@ public class SetFilter implements Filter {
 
     @Override
     public boolean accept(Scope scope) throws RuntimeException {
-        for(int i = scope.getLeft(); i < scope.getRight(); i++){
-            if(!this.accept(i)){
+        for (int i = scope.getLeft(); i < scope.getRight(); i++) {
+            if (!this.accept(i)) {
                 return false;
             }
         }
@@ -74,9 +75,9 @@ public class SetFilter implements Filter {
     public void loadMetaInfo(MetaChunkRS metaChunkRS) {
         this.gidSet = new HashSet<>();
         MetaFieldRS metaFieldRS = metaChunkRS.getMetaField(this.fieldSchema);
-        for(String value:this.valueSet){
+        for (String value : this.valueSet) {
             int gid = metaFieldRS.find(value);
-            if(gid == -1){
+            if (gid == -1) {
                 // means this value is not existed in this Cublet
                 continue;
             }
@@ -97,5 +98,6 @@ public class SetFilter implements Filter {
                 res.set(i);
             }
         }
-        return res;  }
+        return res;
+    }
 }

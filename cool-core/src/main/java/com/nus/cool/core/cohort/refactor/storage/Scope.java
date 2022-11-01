@@ -9,7 +9,7 @@ public class Scope {
 
   @Getter
   private Integer left;
-  
+
   @Getter
   private Integer right;
 
@@ -21,7 +21,7 @@ public class Scope {
   public Boolean isInScope(Integer i) {
     return i < this.right && i >= this.left;
   }
-  
+
   /**
    * Check if two scopes intersect.
    */
@@ -29,9 +29,9 @@ public class Scope {
     return !(scope.getLeft() >= this.right || scope.getRight() <= this.left);
   }
 
-  public Boolean isSubset(Scope scope){
+  public Boolean isSubset(Scope scope) {
     return scope.getLeft() >= this.left && scope.getRight() <= this.right;
-}
+  }
 
   @Override
   public String toString() {

@@ -9,7 +9,8 @@ import java.util.Set;
 /**
  * Class BirthSelectionContext is a control and manage layer for birthSelector
  * 
- * <p>for every user, we maintain a queue (BirthContextWindow) to record chosen
+ * <p>
+ * for every user, we maintain a queue (BirthContextWindow) to record chosen
  * event's frequency in a time sliding window. If the events frequency of one
  * user's BirthContextWindow satisfied the requirement (eventMinFrequency), this
  * user is selected. and no longer needed to maintain BirthContextWindow for
@@ -44,7 +45,8 @@ public class BirthSelectionContext {
   /**
    * Add a event into event queue
    * 
-   * <p>get the corresponding BirthContextWindow, and push new eventId into it. the
+   * <p>
+   * get the corresponding BirthContextWindow, and push new eventId into it. the
    * BirthContextWindow will automatically adjust the inner event queue when new
    * event is pushed check whether the state of birthContextWindow satisfied the
    * requirement. if satisfied, mark the corresponding user's birthAction
@@ -92,7 +94,7 @@ public class BirthSelectionContext {
 
   /**
    * Get the birthEvent's datetime of certain user.
-
+   * 
    * @return null if user is not selected
    */
   public LocalDateTime getUserBirthEventDate(String userId) {

@@ -49,7 +49,7 @@ import java.util.Map;
  */
 public class CoolCohortEngine {
 
-    public List<String> listCohortUsers(CubeRS cube, List<Integer> inCohort){
+    public List<String> listCohortUsers(CubeRS cube, List<Integer> inCohort) {
         List<String> outCohort = new ArrayList<>();
 
         CubletRS cubletRS = cube.getCublets().get(0);
@@ -57,7 +57,7 @@ public class CoolCohortEngine {
 
         TableSchema tableSchema = cube.getSchema();
         MetaFieldRS metaField = metaChunk.getMetaField(tableSchema.getUserKeyFieldIdx(), FieldType.UserKey);
-        for(Integer userID : inCohort){
+        for (Integer userID : inCohort) {
             outCohort.add(metaField.getString(userID));
         }
         return outCohort;
@@ -65,15 +65,16 @@ public class CoolCohortEngine {
 
     /**
      * Cohort Users
-     * @param cube in-memory cube,
+     * 
+     * @param cube  in-memory cube,
      * @param users users, null for default
      * @param query query query instance, parsed from JSON
      * @return result selected users
      * @throws IOException
      */
     public List<Integer> selectCohortUsers(CubeRS cube,
-                                          InputVector users,
-                                          ExtendedCohortQuery query) throws IOException {
+            InputVector users,
+            ExtendedCohortQuery query) throws IOException {
         if (cube == null)
             throw new IOException("data source is null");
 
@@ -87,24 +88,24 @@ public class CoolCohortEngine {
             CohortUserSection gamma = new CohortUserSection(sigma);
             gamma.init(tableSchema, users, query);
             gamma.process(metaChunk);
-            if(sigma.isUserActiveCublet()) {
+            if (sigma.isUserActiveCublet()) {
                 List<ChunkRS> dataChunks = cubletRS.getDataChunks();
-                for(ChunkRS dataChunk : dataChunks) {
+                for (ChunkRS dataChunk : dataChunks) {
                     gamma.process(dataChunk);
                 }
             }
 
-            userList.addAll((List<Integer>)gamma.getCubletResults());
+            userList.addAll((List<Integer>) gamma.getCubletResults());
         }
 
         return userList;
     }
 
-
     /**
      * createCohort
-     * @param users users
-     * @param query query instance
+     * 
+     * @param users      users
+     * @param query      query instance
      * @param cohortRoot file
      * @return result
      */
@@ -122,8 +123,9 @@ public class CoolCohortEngine {
         }
 
         int maxValue = Integer.MIN_VALUE;
-        for(int v : userArray)
-            if(v > maxValue) maxValue = v;
+        for (int v : userArray)
+            if (v > maxValue)
+                maxValue = v;
 
         Compressor compressor = new ZIntBitCompressor(
                 Histogram.builder()
@@ -140,12 +142,12 @@ public class CoolCohortEngine {
     }
 
     public List<ExtendedResultTuple> processCohortResult(ExtendedCohortQuery query,
-                                                         TableSchema tableSchema,
-                                                         MetaChunkRS metaChunk,
-                                                         ExtendedCohortSelection sigma,
-                                                         Map<ExtendedCohort, Map<Integer, List<Double>>> resultMap){
+            TableSchema tableSchema,
+            MetaChunkRS metaChunk,
+            ExtendedCohortSelection sigma,
+            Map<ExtendedCohort, Map<Integer, List<Double>>> resultMap) {
         List<ExtendedResultTuple> resultSet = new ArrayList<>();
-        for (Map.Entry<ExtendedCohort, Map<Integer, List<Double>>> entry:resultMap.entrySet()) {
+        for (Map.Entry<ExtendedCohort, Map<Integer, List<Double>>> entry : resultMap.entrySet()) {
             ExtendedCohort key = entry.getKey();
 
             // update dimension names
@@ -165,7 +167,7 @@ public class CoolCohortEngine {
                         builder.append("(");
                         int level = key.getDimensions().get(cnt);
                         if (cf.getMinLevel() == level) {
-                            builder.append(Integer.toString(filed.getMinValue())+", ");
+                            builder.append(Integer.toString(filed.getMinValue()) + ", ");
                         } else {
                             if (cf.isLogScale()) {
                                 builder.append((new Double(Math.pow(cf.getScale(), level - 1))).longValue());
@@ -176,7 +178,7 @@ public class CoolCohortEngine {
                         }
 
                         if (cf.getMinLevel() + cf.getNumLevel() == level) {
-                            builder.append(Integer.toString(filed.getMaxValue())+")");
+                            builder.append(Integer.toString(filed.getMaxValue()) + ")");
                         } else {
                             if (cf.isLogScale()) {
                                 builder.append((new Double(Math.pow(cf.getScale(), level))).longValue());
@@ -206,7 +208,7 @@ public class CoolCohortEngine {
                     sum = ageMetric.getValue().get(3);
                     num = ageMetric.getValue().get(4);
                 }
-                if (num==0) {
+                if (num == 0) {
                     min = 0.0;
                     max = 0.0;
                 }
@@ -218,7 +220,8 @@ public class CoolCohortEngine {
 
     /**
      * performCohortQuery
-     * @param cube cube name
+     * 
+     * @param cube  cube name
      * @param users users
      * @param query query instance
      * @return result
@@ -235,7 +238,8 @@ public class CoolCohortEngine {
 
             // Initialize the birth events and trigger times
             gamma.init(tableSchema, users, query);
-            // Check the validity of fields (e.g., the existences of field names and their values)
+            // Check the validity of fields (e.g., the existences of field names and their
+            // values)
             gamma.process(metaChunk);
             if (sigma.isUserActiveCublet()) {
                 List<ChunkRS> dataChunks = cubletRS.getDataChunks();
@@ -246,7 +250,8 @@ public class CoolCohortEngine {
 
             Object results = gamma.getCubletResults();
 
-            resultSet.addAll(processCohortResult(query,tableSchema,metaChunk,sigma,(Map<ExtendedCohort, Map<Integer, List<Double>>>) results));
+            resultSet.addAll(processCohortResult(query, tableSchema, metaChunk, sigma,
+                    (Map<ExtendedCohort, Map<Integer, List<Double>>>) results));
         }
 
         return resultSet;
@@ -254,12 +259,13 @@ public class CoolCohortEngine {
 
     /**
      * performFunnelQuery
-     * @param cube cube name
+     * 
+     * @param cube  cube name
      * @param users users
      * @param query query instance
      * @return result
      */
-    public int[] performFunnelQuery(CubeRS cube, InputVector users, FunnelQuery query){
+    public int[] performFunnelQuery(CubeRS cube, InputVector users, FunnelQuery query) {
         List<CubletRS> cublets = cube.getCublets();
         TableSchema tableSchema = cube.getTableSchema();
         int[] result = new int[query.getStages().size()];

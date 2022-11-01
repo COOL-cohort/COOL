@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor.birthselect; 
+package com.nus.cool.core.cohort.refactor.birthselect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,6 @@ import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.filter.FilterLayout;
 
 import lombok.Getter;
-
 
 public class EventSelectionLayout {
     @Getter
@@ -23,18 +22,19 @@ public class EventSelectionLayout {
     @JsonProperty("frequency")
     private int frequency;
 
-    public EventSelection generate(){
+    public EventSelection generate() {
         ArrayList<Filter> filterList = new ArrayList<>();
-        for(FilterLayout layout : filters){
+        for (FilterLayout layout : filters) {
             filterList.add(layout.generateFilter());
         }
         return new EventSelection(filterList);
     };
 
-    public List<String> getSchemaList(){
-        if(this.schemaList != null) return this.schemaList; 
-        this.schemaList =  new ArrayList<>();
-        for(FilterLayout layout: filters){
+    public List<String> getSchemaList() {
+        if (this.schemaList != null)
+            return this.schemaList;
+        this.schemaList = new ArrayList<>();
+        for (FilterLayout layout : filters) {
             this.schemaList.add(layout.getFieldSchema());
         }
         return this.schemaList;

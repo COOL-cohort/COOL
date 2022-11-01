@@ -2,7 +2,6 @@ package com.nus.cool.core.cohort.refactor.filter;
 
 public class SetRejectFilter extends SetFilter {
 
-
     public SetRejectFilter(String fieldSchema, String[] rejectValues) {
         super(fieldSchema, rejectValues);
     }
@@ -17,7 +16,7 @@ public class SetRejectFilter extends SetFilter {
 
     @Override
     public Boolean accept(String value) throws RuntimeException {
-        return !this.valueSet.contains(value);       
+        return !this.valueSet.contains(value);
     }
 
 }
