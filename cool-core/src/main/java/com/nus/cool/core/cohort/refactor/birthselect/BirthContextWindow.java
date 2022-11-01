@@ -9,14 +9,17 @@ import com.nus.cool.core.cohort.refactor.utils.TimeWindow;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 /**
  * BirthContextWindow is a sliding window based on adaptive queue.
  * It keep a maxTimeWindow and a time-based queue (LinkedList)
- * When new <eventId, datetime> input, this queue will automatically pop elements 
- * to keep the time duration between the first and the last element is less than the maxTimeWindow
+ * When new <eventId, datetime> input, this queue will automatically pop
+ * elements
+ * to keep the time duration between the first and the last element is less than
+ * the maxTimeWindow
  */
 public class BirthContextWindow {
-    
+
     // store EventTime in a queue, in time order
     private LinkedList<EventTime> window;
 
@@ -25,10 +28,9 @@ public class BirthContextWindow {
     private int[] eventState;
 
     private final int eventNum;
-    
+
     // the max timeWindow
     private final TimeWindow maxTimeWindow;
-
 
     public BirthContextWindow(TimeWindow tWindow, int eventNum) {
         this.maxTimeWindow = tWindow;
@@ -39,13 +41,14 @@ public class BirthContextWindow {
 
     /**
      * Put new Chosen EventId and corresponding time into queue.
+     * 
      * @param eventId
      * @param date
      */
     public void put(Integer eventId, LocalDateTime date) {
         Preconditions.checkState(eventId < this.eventNum,
                 "Input eventId is out of range");
-        if(this.maxTimeWindow == null){
+        if (this.maxTimeWindow == null) {
             // no need to maintain window, all action tuple should be considered
             // consider the window is infinete max
             this.eventState[eventId] += 1;

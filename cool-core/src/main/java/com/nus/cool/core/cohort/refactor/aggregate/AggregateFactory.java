@@ -3,7 +3,8 @@ package com.nus.cool.core.cohort.refactor.aggregate;
 /**
  * Generate different aggregators according to cohort query.
  * 
- * <p>AverageAggregate: calculate average value of selected schema for all
+ * <p>
+ * AverageAggregate: calculate average value of selected schema for all
  * traversed eligitable tuple COUNT: calculate the number for all traversed
  * eligiable tuple MAX: keep the max value of selected schema in all traversed
  * eligiable tuple MIN: keep the min value of selected schema in all traversed
@@ -32,7 +33,7 @@ public class AggregateFactory {
         return new DistinctCountAggregate(schema);
       default:
         throw new IllegalArgumentException(
-          String.format("%s this type is not existed ", type.toString()));
+            String.format("%s this type is not existed ", type.toString()));
     }
   }
 }

@@ -145,7 +145,7 @@ public class CoolModel implements Closeable {
 
     // Read schema information
     TableSchema schema = TableSchema.read(
-      new FileInputStream(new File(currentVersion, "table.yaml")));
+        new FileInputStream(new File(currentVersion, "table.yaml")));
     CubeRS cubeRS = new CubeRS(schema);
 
     File[] cubletFiles = currentVersion.listFiles((file, s) -> s.endsWith(".dz"));
@@ -196,7 +196,7 @@ public class CoolModel implements Closeable {
     CubeRS out = this.cubeStore.get(cube);
     if (out == null) {
       throw new IOException("[*] Cube " + cube
-        + " is not loaded in the COOL system. Please reload it.");
+          + " is not loaded in the COOL system. Please reload it.");
     } else {
       currentCube = cube;
     }
@@ -217,7 +217,7 @@ public class CoolModel implements Closeable {
 
     // Read schema information
     TableSchema schema = TableSchema.read(
-      new FileInputStream(new File(currentVersion, "table.yaml")));
+        new FileInputStream(new File(currentVersion, "table.yaml")));
 
     // load the cube meta.
     cubeMeta = new CubeMetaRS(schema);
@@ -251,7 +251,7 @@ public class CoolModel implements Closeable {
       this.cohortStore.put(cohortFile.getName(), store);
     } else {
       throw new IOException("[x] Cohort File " + cohortFile
-        + " does not exist in the cube " + cube + ".");
+          + " does not exist in the cube " + cube + ".");
     }
   }
 
@@ -276,14 +276,14 @@ public class CoolModel implements Closeable {
     File out = this.storePath.get(cube);
     if (out == null) {
       throw new IOException("[x] Cube " + cube
-        + " is not loaded in the COOL system. Please reload it.");
+          + " is not loaded in the COOL system. Please reload it.");
     } else {
       return out;
     }
   }
 
   /**
-   * Reset a cube. 
+   * Reset a cube.
    */
   public void resetCube(String cubeName) throws IOException {
     CubeRS cube = this.cubeStore.get(cubeName);

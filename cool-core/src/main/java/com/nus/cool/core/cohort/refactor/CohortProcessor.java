@@ -88,7 +88,6 @@ public class CohortProcessor {
         return this.result;
     }
 
-
     /**
      * Process one Cublet
      *
@@ -139,10 +138,10 @@ public class CohortProcessor {
      */
     private void processTuple(MetaChunkRS metaChunk) {
         // For One Tuple, we firstly get the userId, and ActionTime
-        int userGlobalID = (int)tuple.getValueBySchema(this.UserIdSchema);
+        int userGlobalID = (int) tuple.getValueBySchema(this.UserIdSchema);
         MetaFieldRS userMetaField = metaChunk.getMetaField(this.UserIdSchema);
         String userId = userMetaField.getString(userGlobalID);
-        
+
         LocalDateTime actionTime = DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.ActionTimeSchema));
         // check whether its birthEvent is selected
         if (!this.birthSelector.isUserSelected(userId)) {
@@ -170,13 +169,10 @@ public class CohortProcessor {
             // Pass all above filter, we can store value into CohortRet
             // get the temporay result for this CohortGroup and this age
             RetUnit ret = this.result.getByAge(cohortName, age);
-            
+
             this.valueSelector.getAggregateFunc().calculate(ret, tuple);
         }
     }
-
-
-
 
     /**
      * Check if this cublet contains the required field.
@@ -193,10 +189,11 @@ public class CohortProcessor {
             return true;
         }
 
-        for(Filter filter: this.birthSelector.getFilterList()){
+        for (Filter filter : this.birthSelector.getFilterList()) {
             String checkedSchema = filter.getFilterSchema();
             MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
-            if(this.checkMetaField(metaField, filter)) return true;
+            if (this.checkMetaField(metaField, filter))
+                return true;
         }
 
         // 2. check birth selection
@@ -218,13 +215,12 @@ public class CohortProcessor {
         return false;
     }
 
-    
     public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
-            // if(ft == FilterType.Range){
-            //     Scope scope = new Scope(metaField.getMinValue(), metaField.getMaxValue());
-            //     return ft.accept(scope);
-            // }
-            return true;
+        // if(ft == FilterType.Range){
+        // Scope scope = new Scope(metaField.getMinValue(), metaField.getMaxValue());
+        // return ft.accept(scope);
+        // }
+        return true;
     }
 
     /***
@@ -238,19 +234,20 @@ public class CohortProcessor {
 
     /**
      * When new Cublet is coming, transfer the set value in Filter to GlobalID
+     * 
      * @param metaChunkRS
      */
-    private void FilterInit(MetaChunkRS metaChunkRS){
+    private void FilterInit(MetaChunkRS metaChunkRS) {
         // init birthSelector
-        for(Filter filter:this.birthSelector.getFilterList()){
+        for (Filter filter : this.birthSelector.getFilterList()) {
             filter.loadMetaInfo(metaChunkRS);
         }
 
         // init cohort
         this.cohortSelector.getFilter().loadMetaInfo(metaChunkRS);
-        
+
         // value age
-        for(Filter filter:this.valueSelector.getFilterList()){
+        for (Filter filter : this.valueSelector.getFilterList()) {
             filter.loadMetaInfo(metaChunkRS);
         }
     }
@@ -272,5 +269,4 @@ public class CohortProcessor {
         return readFromJson(new File(path));
     }
 
-    
 }

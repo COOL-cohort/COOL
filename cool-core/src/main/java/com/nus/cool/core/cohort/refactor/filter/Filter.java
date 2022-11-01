@@ -13,13 +13,15 @@ public interface Filter {
 
     /**
      * Range Filter implements this function
+     * 
      * @param value the Input Value to check
      * @return true if the condition is met, otherwise false
-     */ 
+     */
     public Boolean accept(Integer value) throws RuntimeException;
-    
+
     /**
-     * Range Filter implements this function 
+     * Range Filter implements this function
+     * 
      * @param values the batch of input value to check
      * @return List of bool stored in BitSet
      */
@@ -27,8 +29,9 @@ public interface Filter {
 
     /**
      * Range Filter implements this function
+     * 
      * @param values Scope of time_min-time_max
-     * @return whether all value in this scope can be accepted 
+     * @return whether all value in this scope can be accepted
      */
     public boolean accept(Scope values) throws RuntimeException;
 
@@ -48,13 +51,9 @@ public interface Filter {
      */
     public void loadMetaInfo(MetaChunkRS metaChunkRS);
 
-
-    
     // ---------------- For compatiable ---------------
     public Boolean accept(String value) throws RuntimeException;
-    
 
     public BitSet accept(String[] values) throws RuntimeException;
 
 }
-
