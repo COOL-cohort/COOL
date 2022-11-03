@@ -226,28 +226,34 @@ public class CohortProcessor {
   }
 
   /**
-   * Check if this dataChunk is required
+   * Check if this dataChunk is required.
    *
    * @param chunk data chunk
    * @return if this data chunk need to check
    */
   public Boolean checkDataChunk(ChunkRS chunk) {
-    // 1. check birth selector
-    if (this.birthSelector.getBirthEvents() != null) {
-      for (EventSelection es : this.birthSelector.getBirthEvents()) {
-        for (Filter ft : es.getFilterList()) {
-          String checkedSchema = ft.getFilterSchema();
-          FieldRS dataField = chunk.getField(checkedSchema);
-          if (ft.getType().equals(FilterType.Range)) {
-            if (this.checkDataRangeFiled(dataField, ft)) {
-              return false;
-            }
+
+    // 1. check birth selection
+    // if the metaChunk contains all birth filter's accept value, then the metaChunk
+    // is valid.
+    if (this.birthSelector.getBirthEvents() == null) {
+      return true;
+    }
+
+    // 1. check birth selection
+    for (EventSelection es : this.birthSelector.getBirthEvents()) {
+      for (Filter ft : es.getFilterList()) {
+        String checkedSchema = ft.getFilterSchema();
+        FieldRS dataField = chunk.getField(checkedSchema);
+        if (ft.getType().equals(FilterType.Range)) {
+          if (this.checkDataRangeFiled(dataField, ft)) {
+            return false;
           }
         }
       }
     }
 
-    // 2. check birth selection
+    // 2. check cohort selection
     Filter cohortFilter = this.cohortSelector.getFilter();
     String checkedSchema = cohortFilter.getFilterSchema();
     FieldRS dataField = chunk.getField(checkedSchema);
@@ -255,14 +261,6 @@ public class CohortProcessor {
       return this.checkDataRangeFiled(dataField, cohortFilter);
     }
 
-    //        // 3. check value Selector,
-    //        for (Filter ft: this.valueSelector.getFilterList()){
-    //            String ValueSchema = ft.getFilterSchema();
-    //            FieldRS ValueDataField = chunk.getField(ValueSchema);
-    //           if (ft.getType().equals(FilterType.Range)){
-    //               if (this.checkDataRangeFiled(ValueDataField, ft)){return false;}
-    //           }
-    //       }
     return true;
   }
 
@@ -294,7 +292,7 @@ public class CohortProcessor {
   }
 
   /**
-   * Check if the range Filter meet the requirement
+   * Check if the range Filter meet the requirement.
    *
    * @param dataChunk dataChunk to be filtred
    * @param ft        filter

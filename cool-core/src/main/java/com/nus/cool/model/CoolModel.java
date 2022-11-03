@@ -287,7 +287,7 @@ public class CoolModel implements Closeable {
   /**
    * Reset a cube.
    */
-  public void resetCube(String cubeName) throws IOException {
+  public void resetCube(String cubeName) {
     CubeRS cube = this.cubeStore.get(cubeName);
     int userKeyId = cube.getTableSchema().getUserKeyFieldIdx();
     for (CubletRS cubletRS : cube.getCublets()) {

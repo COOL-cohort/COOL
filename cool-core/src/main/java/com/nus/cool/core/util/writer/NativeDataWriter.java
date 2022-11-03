@@ -190,8 +190,8 @@ public class NativeDataWriter implements DataWriter {
         lastUser = curUser;
         // update metachunk / metafield
         metaChunk.put(insertTuple);
-        List<String> dataArray = new ArrayList<String>(Arrays.asList(insertTuple));
-        dataChunk.put((String[]) dataArray.toArray(new String[0]));
+        List<String> dataArray = new ArrayList<>(Arrays.asList(insertTuple));
+        dataChunk.put(dataArray.toArray(new String[0]));
         // update data chunk
         tupleCount++;
         return true;
