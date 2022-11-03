@@ -34,9 +34,11 @@ public class CohortSelectionTest {
         CohortSelectionTest.class.getSimpleName()));
   }
 
-    @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods={"CsvLoaderUnitTest"}, enabled = false)
-    public void CohortSelectionUnitTest(String datasetPath, String queryPath, List<Integer> selectionGlobalIDs,
-                                        List<String> selectionActualIDs) throws IOException {
+  @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods = {
+      "CsvLoaderUnitTest"}, enabled = false)
+  public void CohortSelectionUnitTest(String datasetPath, String queryPath,
+                                      List<Integer> selectionGlobalIDs,
+                                      List<String> selectionActualIDs) throws IOException {
 
     ObjectMapper mapper = new ObjectMapper();
     ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);

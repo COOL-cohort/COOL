@@ -1,4 +1,3 @@
-
 package com.nus.cool.core.model;
 
 import com.nus.cool.model.CoolModel;

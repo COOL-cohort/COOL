@@ -37,7 +37,7 @@ public class ResultTupleTest {
     ResultTuple res2 = new ResultTuple("bc", 8, 26L);
     ResultTuple res4 = new ResultTuple("bc", 8, 6L);
     return new Object[][] {
-        { new ResultTuple[] { res1, res2, res4 } }
+        {new ResultTuple[] {res1, res2, res4}}
     };
   }
 }
