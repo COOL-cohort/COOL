@@ -1,13 +1,13 @@
-package com.nus.cool.core.cohort.valueselect;
+package com.nus.cool.core.cohort.refactor.valueselect;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.nus.cool.core.cohort.aggregate.AggregateFactory;
-import com.nus.cool.core.cohort.aggregate.AggregateFunc;
-import com.nus.cool.core.cohort.aggregate.AggregateType;
-import com.nus.cool.core.cohort.filter.Filter;
-import com.nus.cool.core.cohort.filter.FilterLayout;
+import com.nus.cool.core.cohort.refactor.aggregate.AggregateFactory;
+import com.nus.cool.core.cohort.refactor.aggregate.AggregateFunc;
+import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
+import com.nus.cool.core.cohort.refactor.filter.Filter;
+import com.nus.cool.core.cohort.refactor.filter.FilterLayout;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
