@@ -225,8 +225,9 @@ public class CohortProcessor {
     return false;
   }
 
-  /***
+  /**
    * Check if this dataChunk is required
+   *
    * @param chunk data chunk
    * @return if this data chunk need to check
    */
