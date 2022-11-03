@@ -94,7 +94,7 @@ public class BirthSelectionContext {
 
   /**
    * Get the birthEvent's datetime of certain user.
-   * 
+   *
    * @return null if user is not selected
    */
   public LocalDateTime getUserBirthEventDate(String userId) {
