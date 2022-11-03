@@ -85,9 +85,9 @@ public class LZ4InputVectorTest {
   @DataProvider(name = "LZ4InputVectorDP", parallel = false)
   public Object[][] lz4InputVectorDP() {
     return new Object[][] {
-        { generateValueList(10) },
-        { generateValueList(100) },
-        { new String[] { "111", "222", "333", "555", "KKK", "111" } },
+        {generateValueList(10)},
+        {generateValueList(100)},
+        {new String[] {"111", "222", "333", "555", "KKK", "111"}},
     };
   }
 

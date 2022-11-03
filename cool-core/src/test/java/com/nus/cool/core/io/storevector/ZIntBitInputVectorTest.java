@@ -12,7 +12,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Testing ZIntBit input vector. 
+ * Testing ZIntBit input vector.
  */
 public class ZIntBitInputVectorTest {
   @Test(dataProvider = "ZIntBitDP")
@@ -47,8 +47,8 @@ public class ZIntBitInputVectorTest {
   @DataProvider(name = "ZIntBitDP")
   public Object[][] dpArgs() {
     return new Object[][] {
-        { new int[] { 0, 0, 8, 3, 4, 5, 6, 1000, 2354, 9499 } },
-        { new int[] { 1, 5, 233, 777, 333, 999, 3434 } }
+        {new int[] {0, 0, 8, 3, 4, 5, 6, 1000, 2354, 9499}},
+        {new int[] {1, 5, 233, 777, 333, 999, 3434}}
     };
   }
 

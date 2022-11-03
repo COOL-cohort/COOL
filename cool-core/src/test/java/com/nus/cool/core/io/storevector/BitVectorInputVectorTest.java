@@ -14,7 +14,7 @@ public class BitVectorInputVectorTest {
 
   @Test
   public void test() {
-    int[] numbers = { 0, 1, 2, 3 };
+    int[] numbers = {0, 1, 2, 3};
     Compressor compressor = new BitVectorCompressor(3);
     // compress the bytes
     int maxLen = compressor.maxCompressedLength();
