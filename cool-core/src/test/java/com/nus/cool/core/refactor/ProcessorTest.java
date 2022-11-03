@@ -1,6 +1,5 @@
 package com.nus.cool.core.refactor;
 
-<<<<<<< HEAD
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.CohortProcessor;
@@ -9,11 +8,6 @@ import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.functionality.CsvLoaderTest;
 import com.nus.cool.model.CoolModel;
-=======
-import com.nus.cool.core.cohort.refactor.OlapProcessor;
-import com.nus.cool.core.cohort.refactor.OlapQueryLayout;
-import com.nus.cool.core.cohort.refactor.storage.OlapRet;
->>>>>>> 1af8e2d (Add olap layout)
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -43,7 +37,6 @@ public class ProcessorTest extends CsvLoaderTest {
     logger.info(String.format("Tear down UnitTest %s\n", ProcessorTest.class.getSimpleName()));
   }
 
-<<<<<<< HEAD
   /**
    *
    */
@@ -53,13 +46,6 @@ public class ProcessorTest extends CsvLoaderTest {
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
-=======
-    /**
-     * test Cohort Query processing
-     */
-    @Test(dataProvider = "ProcessQueryDP")
-    public void ProcessQueryAndValidResult(String queryDir) throws Exception {
->>>>>>> 1af8e2d (Add olap layout)
 
     // start a new cool model and reload the cube
     this.coolModel = new CoolModel(this.cubeRepo);
@@ -104,35 +90,4 @@ public class ProcessorTest extends CsvLoaderTest {
     };
   }
 
-<<<<<<< HEAD
 }
-=======
-    /**
-     * Process Olap query
-     * @param queryDir query file dir
-     * @throws Exception Exception
-     */
-    @Test(dataProvider = "OLAPProcessQueryDP")
-    public void ProcessOlapAndValidResult(String queryDir) throws Exception{
-        String queryPath = Paths.get(queryDir, this.queryName).toString();
-        OlapQueryLayout layout = OlapQueryLayout.readFromJson(queryPath);
-        OlapProcessor olapProcessor = new OlapProcessor(layout);
-
-        // start a new cool model and reload the cube
-        this.coolModel = new CoolModel(this.cubeRepo);
-        coolModel.reload(olapProcessor.getDataSource());
-        CubeRS cube = coolModel.getCube(olapProcessor.getDataSource());
-
-        OlapRet ret = olapProcessor.process(cube);
-        System.out.println(ret);
-    }
-
-    @DataProvider(name = "OLAPProcessQueryDP")
-    public Object[][] queryOlapDataProvider(){
-        return new Object[][] {
-            { "../datasets/ecommerce/queries"},
-        };
-    }
-
-}
->>>>>>> 1af8e2d (Add olap layout)
