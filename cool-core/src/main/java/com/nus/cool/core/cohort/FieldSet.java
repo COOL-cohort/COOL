@@ -20,7 +20,6 @@
 package com.nus.cool.core.cohort;
 
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

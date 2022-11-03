@@ -19,11 +19,10 @@
 
 package com.nus.cool.core.io.compression;
 
+import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.BitSet;
-
-import com.nus.cool.core.util.IntegerUtil;
 
 /**
  * Compress a list of integers with BitVector encoding. The final BitSet is

@@ -19,14 +19,6 @@
 
 package com.nus.cool.functionality;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -47,6 +39,13 @@ import com.nus.cool.core.util.converter.DayIntConverter;
 import com.nus.cool.core.util.converter.NumericConverter;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ResultTuple;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * CohortLoader is a higher level abstraction for cohort query.

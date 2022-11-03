@@ -15,7 +15,6 @@
 package com.nus.cool.core.io.compression;
 
 import com.nus.cool.core.schema.CompressType;
-
 import lombok.Builder;
 import lombok.Getter;
 

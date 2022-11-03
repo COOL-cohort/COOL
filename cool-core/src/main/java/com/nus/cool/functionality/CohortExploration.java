@@ -19,13 +19,12 @@
 
 package com.nus.cool.functionality;
 
-import java.io.IOException;
-
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.writer.CliDataWriter;
 import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.model.CoolModel;
+import java.io.IOException;
 
 /**
  * Cohort exploration operation.

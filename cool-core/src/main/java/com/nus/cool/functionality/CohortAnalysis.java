@@ -20,16 +20,15 @@
 
 package com.nus.cool.functionality;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.result.ExtendedResultTuple;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Cohort analysis operation.

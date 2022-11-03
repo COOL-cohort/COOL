@@ -21,11 +21,10 @@ package com.nus.cool.core.cohort;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.converter.DateBase;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 
 /**
  * Utility class to manage time representation in cool.

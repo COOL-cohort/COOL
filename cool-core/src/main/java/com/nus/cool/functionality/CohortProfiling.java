@@ -19,15 +19,14 @@
 
 package com.nus.cool.functionality;
 
-import java.io.File;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.model.CoolOlapEngine;
+import java.io.File;
+import java.util.List;
 
 /**
  * Cohort profiling operation.

@@ -1,5 +1,11 @@
 package com.nus.cool.core.util.writer;
 
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
+import com.nus.cool.core.io.writestore.DataChunkWS;
+import com.nus.cool.core.io.writestore.MetaChunkWS;
+import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -7,16 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.validation.constraints.NotNull;
-
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
-import com.nus.cool.core.io.writestore.DataChunkWS;
-import com.nus.cool.core.io.writestore.MetaChunkWS;
-import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.IntegerUtil;
-
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

@@ -1,12 +1,10 @@
 package com.nus.cool.core.util.config;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.TupleReader;
-
+import java.io.File;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
