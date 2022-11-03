@@ -18,6 +18,9 @@
  */
 package com.nus.cool.core.cohort;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.nus.cool.core.cohort.aggregator.EventAggregator;
 import com.nus.cool.core.cohort.filter.AgeFieldFilter;
 import com.nus.cool.core.cohort.filter.FieldFilter;
@@ -32,12 +35,14 @@ import com.nus.cool.core.schema.DataType;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-
 import java.io.IOException;
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class ExtendedCohortSelection implements Operator {
 

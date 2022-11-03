@@ -19,15 +19,6 @@
 
 package com.nus.cool.model;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.nus.cool.core.cohort.BirthSequence;
 import com.nus.cool.core.cohort.CohortUserSection;
 import com.nus.cool.core.cohort.ExtendedCohort;
@@ -52,6 +43,14 @@ import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.reader.CoolTupleReader;
 import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.result.ExtendedResultTuple;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Execute different Query

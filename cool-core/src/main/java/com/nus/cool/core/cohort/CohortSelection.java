@@ -21,11 +21,6 @@ package com.nus.cool.core.cohort;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.collect.Maps;
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.cohort.filter.FieldFilterFactory;
@@ -36,7 +31,10 @@ import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 
 /**

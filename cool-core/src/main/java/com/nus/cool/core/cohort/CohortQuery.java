@@ -19,10 +19,8 @@
 
 package com.nus.cool.core.cohort;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
+import java.util.List;
 import lombok.Data;
 
 /**

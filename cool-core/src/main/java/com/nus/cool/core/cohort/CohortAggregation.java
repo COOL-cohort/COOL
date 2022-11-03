@@ -21,9 +21,6 @@ package com.nus.cool.core.cohort;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.BitSet;
-import java.util.Map;
-
 import com.google.common.collect.Maps;
 import com.nus.cool.core.cohort.aggregator.Aggregator;
 import com.nus.cool.core.cohort.aggregator.SumAggregator;
@@ -37,7 +34,8 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-
+import java.util.BitSet;
+import java.util.Map;
 import lombok.Getter;
 
 /**

@@ -22,9 +22,8 @@ package com.nus.cool.core.cohort.aggregator;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.BitSet;
-
 import com.nus.cool.core.io.storevector.InputVector;
+import java.util.BitSet;
 
 /**
  * SumAggregator is used to aggregate the results of users at different time

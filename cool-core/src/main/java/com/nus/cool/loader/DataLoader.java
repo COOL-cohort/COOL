@@ -19,16 +19,14 @@
 
 package com.nus.cool.loader;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.TupleReader;
 import com.nus.cool.core.util.writer.DataWriter;
 import com.nus.cool.core.util.writer.NativeDataWriter;
-
+import java.io.File;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

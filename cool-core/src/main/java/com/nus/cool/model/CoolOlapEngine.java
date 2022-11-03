@@ -19,13 +19,6 @@
 
 package com.nus.cool.model;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
 import com.nus.cool.core.iceberg.query.Aggregation;
@@ -39,6 +32,12 @@ import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.schema.TableSchema;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Cool OLAP encgine.

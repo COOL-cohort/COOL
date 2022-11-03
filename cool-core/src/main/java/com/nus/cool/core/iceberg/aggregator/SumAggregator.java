@@ -19,13 +19,12 @@
 
 package com.nus.cool.core.iceberg.aggregator;
 
-import java.util.BitSet;
-import java.util.Map;
-
 import com.nus.cool.core.iceberg.result.AggregatorResult;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import java.util.BitSet;
+import java.util.Map;
 
 /**
  * Sum aggregator.

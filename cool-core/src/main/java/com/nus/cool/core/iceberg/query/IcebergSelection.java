@@ -21,14 +21,6 @@ package com.nus.cool.core.iceberg.query;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import com.nus.cool.core.cohort.filter.FieldFilter;
 import com.nus.cool.core.cohort.filter.FieldFilterFactory;
 import com.nus.cool.core.io.readstore.ChunkRS;
@@ -39,7 +31,13 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.converter.DayIntConverter;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

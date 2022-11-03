@@ -19,9 +19,8 @@
 
 package com.nus.cool.core.schema;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
 
 /**
  * structure representing a dimension (column).

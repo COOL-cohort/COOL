@@ -19,14 +19,6 @@
 
 package com.nus.cool.core.iceberg.query;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.map.HashedMap;
-
 import com.nus.cool.core.iceberg.aggregator.Aggregator;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory;
 import com.nus.cool.core.iceberg.aggregator.AggregatorFactory.AggregatorType;
@@ -39,6 +31,12 @@ import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.converter.DayIntConverter;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections.map.HashedMap;
 
 public class IcebergAggregation {
 
