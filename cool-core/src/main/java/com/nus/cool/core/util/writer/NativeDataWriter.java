@@ -124,7 +124,7 @@ public class NativeDataWriter implements DataWriter {
   /**
    * Write metaChunk lastly.
    *
-   * @throws IOException.
+   * @throws IOException
    */
   private void finishCublet() throws IOException {
     // write metaChunk begin from current offset.
