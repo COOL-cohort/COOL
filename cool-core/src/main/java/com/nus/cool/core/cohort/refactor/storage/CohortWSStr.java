@@ -17,7 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.cohort.refactor.storage;
+
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
@@ -52,12 +54,13 @@ public class CohortWSStr implements Output {
     this.charset = charset;
   }
 
-  public CohortWSStr(){
+  public CohortWSStr() {
     this.charset = StandardCharsets.UTF_8;
   }
 
   /**
    * Add user id to local list
+   *
    * @param userId as string
    */
   public void addCubletResults(String userId) {
@@ -78,21 +81,19 @@ public class CohortWSStr implements Output {
 
     // Value offsets begin with 0
     int offset = 0;
-    for (String userIdStr: usersStrSet){
+    for (String userIdStr : usersStrSet) {
       buffer.writeInt(offset);
       offset += userIdStr.getBytes(this.charset).length;
     }
 
     // Store String values into the buffer
-    for (String userIdStr: usersStrSet){
+    for (String userIdStr : usersStrSet) {
       buffer.write(userIdStr.getBytes(this.charset));
     }
 
     // The codec is written internal
-    Histogram hist = Histogram.builder()
-        .type(CompressType.KeyString)
-        .rawSize(buffer.size())
-        .build();
+    Histogram hist =
+        Histogram.builder().type(CompressType.KeyString).rawSize(buffer.size()).build();
 
     OutputCompressor compressor = new OutputCompressor();
     compressor.reset(hist, buffer.getData(), 0, buffer.size());

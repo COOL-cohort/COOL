@@ -2,11 +2,9 @@ package com.nus.cool.core.cohort.refactor;
 
 import com.google.common.io.Files;
 import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
-import com.nus.cool.core.cohort.refactor.storage.CohortWS;
 import com.nus.cool.core.cohort.refactor.storage.CohortWSStr;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -63,6 +61,11 @@ public class CohortProcessor {
 
   private final HashSet<String> projectedSchemaSet;
 
+  // initialize cohort result write store
+  private final HashMap<String, CohortWSStr> CohortUserMapper = new HashMap<>();
+
+  private HashSet<String> PreviousCohortUsers = null;
+
   /**
    * Constructor.
    *
@@ -70,19 +73,10 @@ public class CohortProcessor {
    */
   public CohortProcessor(CohortQueryLayout layout) {
 
-<<<<<<< HEAD
     this.ageSelector = layout.getAgetSelectionLayout().generate();
     this.birthSelector = layout.getBirthSelectionLayout().generate();
     this.cohortSelector = layout.getCohortSelectionLayout().generate();
     this.valueSelector = layout.getValueSelectionLayout().generate();
-=======
-    // initialize cohort result write store
-    private final HashMap<String, CohortWSStr> CohortUserMapper = new HashMap<>();
-
-    private HashSet<String> PreviousCohortUsers = null;
-
-    public CohortProcessor(CohortQueryLayout layout){
->>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
 
     this.projectedSchemaSet = layout.getSchemaSet();
     this.dataSource = layout.getDataSource();
@@ -95,7 +89,7 @@ public class CohortProcessor {
    * @param cube Cube
    * @return CohortRet
    */
-  public CohortRet process(CubeRS cube, String outputDir) throws IOException {
+  public CohortRet process(CubeRS cube) throws IOException {
     // initialize the UserId and KeyId
     TableSchema tableschema = cube.getSchema();
     for (FieldSchema fieldSchema : tableschema.getFields()) {
@@ -109,152 +103,62 @@ public class CohortProcessor {
     this.projectedSchemaSet.add(this.userIdSchema);
     this.projectedSchemaSet.add(this.actionTimeSchema);
     this.tuple = new ProjectedTuple(this.projectedSchemaSet);
-
-    // initialize cohort result write store
-    HashMap<String, CohortWS > CohortUserMapper = new HashMap<>();
-
-<<<<<<< HEAD
     for (CubletRS cublet : cube.getCublets()) {
       processCublet(cublet);
 
       // record result user id list
-      for (Map.Entry<String, List<String>> ele: this.result.getCohortToUserIdList().entrySet()){
-
+      for (Map.Entry<String, List<String>> ele : this.result.getCohortToUserIdList().entrySet()) {
         String cohortName = ele.getKey();
         List<String> users = ele.getValue();
-        if (!CohortUserMapper.containsKey(cohortName)){
-          CohortUserMapper.put(cohortName, new CohortWS(cube.getCublets().size()));
+        if (!this.CohortUserMapper.containsKey(cohortName)) {
+          this.CohortUserMapper.put(cohortName, new CohortWSStr());
         }
-
-        CohortUserMapper.get(cohortName).addCubletResults(users);
+        this.CohortUserMapper.get(cohortName).addCubletResults(users);
       }
       this.result.ClearUserIds();
-=======
-    /**
-     * Public interface, Scan whole table and return CohortResult
-     *
-     * @param cube the cube to process
-     * @return CohortRet
-     */
-    public CohortRet process(CubeRS cube) throws IOException {
-        // initialize the UserId and KeyId
-        TableSchema tableschema = cube.getSchema();
-        for(FieldSchema fieldSchema : tableschema.getFields()){
-            if(fieldSchema.getFieldType() == FieldType.UserKey){
-                this.UserIdSchema = fieldSchema.getName();
-            } else if (fieldSchema.getFieldType() == FieldType.ActionTime){
-                this.ActionTimeSchema = fieldSchema.getName();
-            }
-        }
-        // add this two schema into List
-        this.projectedSchemaSet.add(this.UserIdSchema);
-        this.projectedSchemaSet.add(this.ActionTimeSchema);
-        this.tuple = new ProjectedTuple(this.projectedSchemaSet);
-
-        for (CubletRS cublet : cube.getCublets()) {
-            processCublet(cublet);
-
-            // record result user id list
-            for (Map.Entry<String, List<String> > ele:
-                this.result.getCohortToUserIdList().entrySet()){
-
-                String cohortName = ele.getKey();
-                List<String> users = ele.getValue();
-                if (!this.CohortUserMapper.containsKey(cohortName)){
-                    this.CohortUserMapper.put(cohortName, new CohortWSStr());
-                }
-
-                this.CohortUserMapper.get(cohortName).addCubletResults(users);
-            }
-            this.result.ClearUserIds();
-        }
-
-        return this.result;
     }
+    return this.result;
+  }
 
-    /**
-     * Persist cohort to output disk
-     * @param outputDir the output file path
-     */
-    public void persistCohort(String outputDir) throws IOException {
-        for (Map.Entry<String, CohortWSStr > ele: this.CohortUserMapper.entrySet()){
-            String fileName = ele.getKey() + ".cohort";
-            File cubemeta = new File(outputDir, fileName);
-            DataOutputStream out = new DataOutputStream(
-                new FileOutputStream(cubemeta));
-            ele.getValue().writeTo(out);
-        }
->>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
-    }
-
-<<<<<<< HEAD
-    // iterate all the write-store in CohortUserMapper, and sync it to disk
-    for (Map.Entry<String, CohortWS > ele: CohortUserMapper.entrySet()){
-=======
-    /**
-     * Persist cohort to output disk
-     * @param cohortPath the path to store the previous stored cohort.
-     */
-    public void readExistingCohort(String cohortPath) throws IOException {
-        this.PreviousCohortUsers = new HashSet<>();
-        CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
-
-        File file = new File(cohortPath);
-        File[] fs = file.listFiles();
-        if (fs == null){
-            return;
-        }
-        for (File f: fs){
-            int pointIndex = f.getName().lastIndexOf(".");
-            if (pointIndex == -1 ){
-                continue;
-            }
-            String extension = f.getName().substring(pointIndex);
-            if (!f.isDirectory() && extension.equals(".cohort")){
-                crs.readFrom(Files.map(f).order(ByteOrder.nativeOrder()));
-                this.PreviousCohortUsers.addAll(crs.getUsers());
-            }
-        }
-    }
-
-    /**
-     * Process one Cublet
-     *
-     * @param cublet
-     */
-    private void processCublet(CubletRS cublet) {
-        MetaChunkRS metaChunk = cublet.getMetaChunk();
-        // if it is necessary, add logic in method checkMetaChunk
-        // Personally, this step is not universal
-        // all right, can check whether this cublet pass rangeFilter
-        // for Hash Value, Maintain HashMap<Schema, String[]>, the String[] is gid ->
-        // True Value
-        HashMap<String, String[]> gidMapBySchema = new HashMap<>();
-        HashMap<String, int[]> invariantGidMap = new HashMap<>();
-
-        // we only get used schema;
-        UserMetaFieldRS userMetaField;
-        for (String schema : this.projectedSchemaSet) {
-            MetaFieldRS metaField = metaChunk.getMetaField(schema);
-            if(metaField.getFieldType()==FieldType.UserKey){
-                userMetaField=(UserMetaFieldRS) metaField;
-                gidMapBySchema.put(schema,userMetaField.getGidMap());
-                invariantGidMap=loadInvariantGidMaps(userMetaField);
-            }
-            else if (FieldType.IsHashType(metaField.getFieldType())) {
-                gidMapBySchema.put(schema, ((HashMetaFieldRS) metaField).getGidMap());
-            }
-        }
->>>>>>> ddbb360 (Reading from previous cohort; Update cohort file format.)
-
-      String fileName = ele.getKey();
+  /**
+   * Persist cohort to output disk
+   *
+   * @param outputDir the output file path
+   */
+  public void persistCohort(String outputDir) throws IOException {
+    for (Map.Entry<String, CohortWSStr> ele : this.CohortUserMapper.entrySet()) {
+      String fileName = ele.getKey() + ".cohort";
       File cubemeta = new File(outputDir, fileName);
-      DataOutputStream out = new DataOutputStream(
-          new FileOutputStream(cubemeta));
+      DataOutputStream out = new DataOutputStream(new FileOutputStream(cubemeta));
       ele.getValue().writeTo(out);
     }
+  }
 
-    return this.result;
+  /**
+   * Persist cohort to output disk
+   *
+   * @param cohortPath the path to store the previous stored cohort.
+   */
+  public void readExistingCohort(String cohortPath) throws IOException {
+    this.PreviousCohortUsers = new HashSet<>();
+    CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
+
+    File file = new File(cohortPath);
+    File[] fs = file.listFiles();
+    if (fs == null) {
+      return;
+    }
+    for (File f : fs) {
+      int pointIndex = f.getName().lastIndexOf(".");
+      if (pointIndex == -1) {
+        continue;
+      }
+      String extension = f.getName().substring(pointIndex);
+      if (!f.isDirectory() && extension.equals(".cohort")) {
+        crs.readFrom(Files.map(f).order(ByteOrder.nativeOrder()));
+        this.PreviousCohortUsers.addAll(crs.getUsers());
+      }
+    }
   }
 
   /**
@@ -272,7 +176,6 @@ public class CohortProcessor {
       return;
     }
 
-<<<<<<< HEAD
     // Now start to pass the DataChunk
     for (ChunkRS chunk : cublet.getDataChunks()) {
       if (this.checkDataChunk(chunk)) {
@@ -286,115 +189,30 @@ public class CohortProcessor {
    * We left the process logic in processTuple function.
    *
 <<<<<<< HEAD
+<<<<<<< HEAD
    * @param chunk     dataChunk
    * @param metaChunk metaChunk
 =======
    * @param chunk              dataChunk
    * @param metaChunk          metaChunk
 >>>>>>> c906bf6 (Store cohort result after cohort-processing)
-   */
-    private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk) {
-      for (int i = 0; i < chunk.getRecords(); i++) {
-        // load data into tuple
-        for (String schema : this.projectedSchemaSet) {
-          int value = chunk.getField(schema).getValueByIndex(i);
-          this.tuple.loadAttr(value, schema);
 =======
-
-
-    /**
-     * In this section, we load the tuple which is an inner property.
-     * We left the process logic in processTuple function.
-     *
-     * @param chunk dataChunk
-     * @param metaChunk metaChunk
-     * @param hashMapperBySchema map of filedName: []value
-     * @param invariantGidMap map of invariant filedName: []value
-     */
-    private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk, HashMap<String, String[]> hashMapperBySchema,
-                                  HashMap<String, int[]>invariantGidMap) {
-        for (int i = 0; i < chunk.getRecords(); i++) {
-            // load data into tuple
-            for (String schema : this.projectedSchemaSet) {
-                // if the value is segment type, we should convert it to String from globalId
-                if(chunk.isInvariantFieldByName(schema)){
-                    // get the invariant schema from UserMetaField
-                    String idName=chunk.getUserFieldName();
-                    UserMetaFieldRS userMetaField = (UserMetaFieldRS) metaChunk.getMetaField(idName);
-                    int userGlobalId = chunk.getField(idName).getValueByIndex(i);
-                    if (FieldType.IsHashType(chunk.getFieldTypeByName(schema))){
-                        int hash=invariantGidMap.get(schema)[userGlobalId];
-                        int valueGlobalIDLocation= userMetaField.find(hash);
-                        String v =metaChunk.getMetaField(schema).getString(valueGlobalIDLocation);
-                        tuple.loadAttr(v,schema);
-                    }
-                    else{
-                        int v = invariantGidMap.get(schema)[userGlobalId];
-                        tuple.loadAttr(v, schema);
-                    }
-                }
-                else if(hashMapperBySchema.containsKey(schema)){
-                    int globalId = chunk.getField(schema).getValueByIndex(i);
-                    String v = hashMapperBySchema.get(schema)[globalId];
-                    tuple.loadAttr(v, schema);
-                } else {
-                    tuple.loadAttr(chunk.getField(schema).getValueByIndex(i), schema);
-                }
-            }
-//            int userGlobalId = chunk.getField(chunk.getUserFieldName()).getValueByIndex(i);
-            // now this tuple is loaded
-            this.processTuple();
-        }
-    }
-
-    /**
-     * process the inner tuple
-     */
-    private void processTuple() {
-        // For One Tuple, we firstly get the userId, and ActionTime
-        String userId = (String) tuple.getValueBySchema(this.UserIdSchema);
-        // only process the user in previous cohort.
-        if (PreviousCohortUsers != null && !PreviousCohortUsers.contains(userId)){
-            return;
-        }
-        LocalDateTime actionTime = DateUtils.daysSinceEpoch((int)tuple.getValueBySchema(this.ActionTimeSchema));
-        // check whether its birthEvent is selected
-        if (!this.birthSelector.isUserSelected(userId)) {
-            // if birthEvent is not selected
-            this.birthSelector.selectEvent(userId, actionTime, this.tuple);
-        } else {
-            // the birthEvent is selected
-            // do time_diff to generate age / get the BirthEvent Date
-            LocalDateTime birthTime = this.birthSelector.getUserBirthEventDate(userId);
-            int age = this.ageSelector.generateAge(birthTime, actionTime);
-            if (age == AgeSelection.DefaultNullAge) {
-                // age is outofrange
-                return;
-            }
-            // extract the cohort this tuple belong to
-            String cohortName = this.cohortSelector.selectCohort(this.tuple);
-            if (cohortName == null) {
-                // cohort is outofrange
-                return;
-            }
-            if (!this.valueSelector.IsSelected(this.tuple)) {
-                // value outofrange
-                return;
-            }
-            // Pass all above filter, we can store value into CohortRet
-            // get the temporay result for this CohortGroup and this age
-//            System.out.println("[Update Cohort Result]: cohortName:" + cohortName + "\tage:"+ age);
-            RetUnit ret = this.result.getByAge(cohortName, age);
-            this.result.addUserid(cohortName, userId );
-            // update
-            this.valueSelector.updateRetUnit(ret, tuple);
->>>>>>> d88b8cc (Update cohort processor logic to support cohort support)
-        }
-
-        this.processTuple(metaChunk);
+   * @param chunk     dataChunk
+   * @param metaChunk metaChunk
+>>>>>>> f71baa4 (Solve conflicts)
+   */
+  private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk) {
+    for (int i = 0; i < chunk.getRecords(); i++) {
+      // load data into tuple
+      for (String schema : this.projectedSchemaSet) {
+        int value = chunk.getField(schema).getValueByIndex(i);
+        this.tuple.loadAttr(value, schema);
       }
+
+      this.processTuple(metaChunk);
     }
 
+  }
 
   /**
    * process the inner tuple.
@@ -405,6 +223,14 @@ public class CohortProcessor {
     MetaFieldRS userMetaField = metaChunk.getMetaField(this.userIdSchema);
     String userId = userMetaField.getString(userGlobalID);
 
+<<<<<<< HEAD
+=======
+    // only process the user in previous cohort.
+    if (PreviousCohortUsers != null && !PreviousCohortUsers.contains(userId)) {
+      return;
+    }
+
+>>>>>>> f71baa4 (Solve conflicts)
     LocalDateTime actionTime =
         DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
     // check whether its birthEvent is selected
@@ -477,7 +303,6 @@ public class CohortProcessor {
         return true;
       }
     }
-<<<<<<< HEAD
     return false;
   }
 
@@ -504,19 +329,6 @@ public class CohortProcessor {
     // init birthSelector
     for (Filter filter : this.birthSelector.getFilterList()) {
       filter.loadMetaInfo(metaChunkRS);
-=======
-
-
-     /**
-     * Read from json file and create a instance of CohortProcessor
-     * @param in File
-     * @return instance of file
-     * @throws IOException IOException
-     */
-    public static CohortProcessor readFromJson(File in) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(in, CohortProcessor.class);
->>>>>>> ddbb360 (Reading from previous cohort; Update cohort file format.)
     }
 
     // init cohort

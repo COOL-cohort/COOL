@@ -97,7 +97,7 @@ public class CoolModel implements Closeable {
    * Load the latest version directory of a cube.
    * caller: reload(String) and getCubeMeta(String)
    */
-  private File loadLatestVersion(String cube) throws IOException {
+  public File loadLatestVersion(String cube) throws IOException {
     // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
     if (!cubeRoot.exists()) {

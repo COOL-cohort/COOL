@@ -10,7 +10,6 @@ import com.nus.cool.functionality.CsvLoaderTest;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -45,23 +44,38 @@ public class ProcessorTest extends CsvLoaderTest {
   /**
    * Testing cohort query.
    */
+<<<<<<< HEAD
 
   @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void processQueryAndValidResult(String queryDir) throws IOException {
+=======
+  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {"CsvLoaderUnitTest"})
+  public void ProcessQueryAndValidResult(String queryDir) throws IOException {
+>>>>>>> 02ba6f0 (Solve conflicts)
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
 
+<<<<<<< HEAD
     // get current dir path
     File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
     // cohortProcessor.readExistingCohort("../CubeRepo/health_raw/v00000001");
     CohortRet ret = cohortProcessor.process(cube);
     cohortProcessor.persistCohort(currentVersion.toString());
+=======
+    // start a new cool model and reload the cube
+    this.coolModel = new CoolModel(this.cubeRepo);
+    coolModel.reload(cohortProcessor.getDataSource());
+    CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
+>>>>>>> 02ba6f0 (Solve conflicts)
 
     // get current dir path
     File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
-    CohortRet ret = cohortProcessor.process(cube, currentVersion.toString());
+//    cohortProcessor.readExistingCohort("../CubeRepo/health_raw/v00000012");
+    CohortRet ret = cohortProcessor.process(cube);
+    cohortProcessor.persistCohort(currentVersion.toString());
+
     String queryResultPath = Paths.get(queryDir, this.resultName).toString();
     ObjectMapper mapper = new ObjectMapper();
     // HashMap<String, List<Integer>> cohortData = mapper.readValue(new
@@ -80,13 +94,16 @@ public class ProcessorTest extends CsvLoaderTest {
       // System.out.printf("True Result %s\n", cohortData.get(cohortName).toString());
       // System.out.printf("Get Result %s\n", ret.getValuesByCohort(cohortName));
       Assert.assertEquals(cohortData.get(cohortName), ret.getValuesByCohort(cohortName));
-    System.out.println(ret.getCohortList());
+      System.out.println(ret.getCohortList());
     }
   }
 
+<<<<<<< HEAD
   /**
    * Data provider.
    */
+=======
+>>>>>>> 02ba6f0 (Solve conflicts)
   @DataProvider(name = "ProcessQueryDP")
   public Object[][] queryDirDataProvider() {
     return new Object[][] {{"../datasets/health_raw/sample_query_distinctcount"},
@@ -95,6 +112,13 @@ public class ProcessorTest extends CsvLoaderTest {
         {"../datasets/health_raw/sample_query_max"}, {"../datasets/health_raw/sample_query_min"},
         {"../datasets/health_raw/sample_query_sum"},
         {"../datasets/fraud_case/sample_query_login_count"},
+<<<<<<< HEAD
         {"../datasets/health/sample_query_distinctcount"}};
   }
 }
+=======
+        {"../datasets/health/sample_query_distinctcount"},};
+  }
+
+}
+>>>>>>> 02ba6f0 (Solve conflicts)

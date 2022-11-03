@@ -18,6 +18,7 @@
  */
 
 package com.nus.cool.core.cohort.refactor.storage;
+
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
@@ -43,22 +44,22 @@ public class CohortRSStr implements Input {
    */
   private final Charset charset;
 
-  public CohortRSStr(Charset charset){
+  public CohortRSStr(Charset charset) {
     this.charset = charset;
   }
 
-  public CohortRSStr(){
+  public CohortRSStr() {
     this.charset = StandardCharsets.UTF_8;
   }
 
   /**
    * Get the userid list
+   *
    * @return user id list
-   * @throws IllegalStateException IllegalStateException
+   * @throws IllegalStateException    IllegalStateException
    * @throws IllegalArgumentException IllegalArgumentException
    */
-  public List<String> getUsers()
-      throws IllegalStateException, IllegalArgumentException {
+  public List<String> getUsers() throws IllegalStateException, IllegalArgumentException {
     return values;
   }
 
