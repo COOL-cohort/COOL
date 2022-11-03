@@ -1,47 +1,55 @@
 package com.nus.cool.core.cohort.refactor.valueselect;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateFunc;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
-
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 
+/**
+ * Value Selection.
+ */
 public class ValueSelection {
 
-    @Getter
-    private List<Filter> filterList;
+  @Getter
+  private List<Filter> filterList;
 
-    @JsonIgnore
-    private List<String> schemaList;
-    // private
+  @JsonIgnore
+  private List<String> schemaList;
+  // private
 
-    @JsonIgnore
-    @Getter
-    private AggregateFunc aggregateFunc;
+  @JsonIgnore
+  @Getter
+  private AggregateFunc aggregateFunc;
 
-    public ValueSelection(List<Filter> filterList, AggregateFunc aggregateFunc) throws IllegalArgumentException {
-        Preconditions.checkArgument(aggregateFunc != null, "AggregateFunc shouldn't be null");
-        if (filterList == null)
-            this.filterList = new ArrayList<>();
-        else
-            this.filterList = filterList;
-        this.aggregateFunc = aggregateFunc;
+  /**
+   * Constructor.
+   */
+  public ValueSelection(List<Filter> filterList,
+      AggregateFunc aggregateFunc) throws IllegalArgumentException {
+    Preconditions.checkArgument(aggregateFunc != null, "AggregateFunc shouldn't be null");
+    if (filterList == null) {
+      this.filterList = new ArrayList<>();
+    } else {
+      this.filterList = filterList;
     }
+    this.aggregateFunc = aggregateFunc;
+  }
 
-    /**
-     * The filter will outline abnormal tuples
-     * @param tuple
-     * @return
-     */
-    public boolean IsSelected(ProjectedTuple tuple) {
-        for (Filter filter : filterList) {
-            if (!filter.accept((Integer) tuple.getValueBySchema(filter.getFilterSchema())))
-                return false;
-        }return true;
+  /**
+   * The filter will outline abnormal tuples.
+   *
+   * @param tuple tuple
+   */
+  public boolean isSelected(ProjectedTuple tuple) {
+    for (Filter filter : filterList) {
+      if (!filter.accept((Integer) tuple.getValueBySchema(filter.getFilterSchema()))) {
+        return false;
+      }
     }
+    return true;
+  }
 }
