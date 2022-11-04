@@ -13,7 +13,6 @@ import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
 import com.nus.cool.core.io.readstore.FieldRS;
-import com.nus.cool.core.io.readstore.HashMetaFieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import java.util.ArrayList;
@@ -120,8 +119,7 @@ public class OlapProcessor {
 
       if (currentFilter.getType().equals(FilterType.Range)){
         Scope scope = new Scope(field.minKey(), field.maxKey());
-        BitSet res = currentFilter.accept(scope);
-        return res.nextSetBit(0) != -1;
+        return currentFilter.accept(scope);
       }
       // todo: how to check using Set Filter in dataChunk
       return true;
