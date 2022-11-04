@@ -3,6 +3,7 @@ package com.nus.cool.core.cohort.filter;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.util.converter.DayIntConverter;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -18,7 +19,7 @@ public class RangeFilter implements Filter {
   private static final String MinLimit = "MIN";
   private static final String MaxLimit = "MAX";
   @Getter
-  private static final String splitChar = "-";
+  private static final String splitChar = " to ";
 
   // accepted range
   @Getter
@@ -87,7 +88,7 @@ public class RangeFilter implements Filter {
   @Override
   public boolean accept(Scope scope) throws RuntimeException {
     for (Scope u : acceptRangeList) {
-      if (u.isSubset(scope)) {
+      if (u.isSubset(scope) || u.isIntersection(scope)) {
         return true;
       }
     }
@@ -113,10 +114,10 @@ public class RangeFilter implements Filter {
     Integer l = null;
     Integer r = null;
     if (!part[0].equals(MinLimit)) {
-      l = Integer.parseInt(part[0]);
+      l = convertPartToInt(part[0]);
     }
     if (!part[1].equals(MaxLimit)) {
-      r = Integer.parseInt(part[1]);
+      r = convertPartToInt(part[1]);
     }
     return new Scope(l, r);
   }
@@ -130,5 +131,15 @@ public class RangeFilter implements Filter {
   public void loadMetaInfo(MetaChunkRS metaChunkRS) {
     // for range Filter, no need to load info
   }
+
+  private static int convertPartToInt(String dataStr){
+    if (dataStr.contains("-")){
+      DayIntConverter dins = DayIntConverter.getInstance();
+      return dins.toInt(dataStr);
+    }else{
+      return Integer.parseInt(dataStr);
+    }
+  }
+
 
 }
