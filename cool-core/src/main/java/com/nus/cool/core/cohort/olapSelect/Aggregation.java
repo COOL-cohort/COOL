@@ -19,6 +19,7 @@
 
 package com.nus.cool.core.cohort.refactor.olapSelect;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
 import java.util.List;
 import lombok.Data;
@@ -27,13 +28,10 @@ import lombok.Data;
 public class Aggregation {
 
     // filed name used to do the aggregation
+    @JsonProperty("fieldName")
     private String fieldName;
 
     // get aggregator
+    @JsonProperty("operators")
     private List<AggregateType> operators;
-
-    public Aggregation(String fieldName, List<AggregateType> operators) {
-        this.fieldName = fieldName;
-        this.operators = operators;
-    }
 }
