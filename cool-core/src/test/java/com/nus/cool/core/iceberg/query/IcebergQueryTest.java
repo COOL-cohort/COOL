@@ -61,15 +61,13 @@ public class IcebergQueryTest {
 
   @DataProvider(name = "IcebergQueryTestDP")
   public Object[][] dpArgs() {
-    return new Object[][] {
-        {"../datasets/olap-tpch/query.json"}
-    };
+    return new Object[][] {{"../datasets/olap-tpch/query.json"}};
   }
 
   @Test(dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"})
   public void EcommerceDataTestSQL1() throws Exception {
 
-    String dzFilePath = "../CubeRepo";
+    String dzFilePath = "../CubeRepo/TestCube";
     String queryFilePath = "../datasets/ecommerce/queries/1.query_retention.json";
 
     // load query

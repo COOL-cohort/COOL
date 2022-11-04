@@ -16,7 +16,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class FunnulAnalysisTest extends CsvLoaderTest {
+public class FunnulAnalysisTest {
   static final Logger logger = LoggerFactory.getLogger(FunnulAnalysisTest.class);
 
   @BeforeTest
@@ -29,7 +29,8 @@ public class FunnulAnalysisTest extends CsvLoaderTest {
     logger.info(String.format("Tear down UnitTest %s\n", FunnulAnalysisTest.class.getSimpleName()));
   }
 
-  @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = "CsvLoaderUnitTest", enabled = false)
+  @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"}, enabled = false)
   public void FunnelAnalysisUnitTest(String datasetPath, String queryPath, int[] out)
       throws IOException {
     ObjectMapper mapper = new ObjectMapper();
@@ -55,11 +56,9 @@ public class FunnulAnalysisTest extends CsvLoaderTest {
   @DataProvider(name = "FunnelAnalysisTestDP")
   public Object[][] FunnelAnalysisTestDPArgObjects() {
     int[] out = {5, 5, 4, 4};
-    return new Object[][] {{
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo",
-            "query1.json").toString(),
-        out
-    }};
+    return new Object[][] {
+        {Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo",
+                "query1.json").toString(), out}};
   }
 }
