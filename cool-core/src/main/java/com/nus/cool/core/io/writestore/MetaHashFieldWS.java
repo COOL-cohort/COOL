@@ -58,6 +58,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
   protected final OutputCompressor compressor;
   protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
+  // hash(value): global id
   protected Map<Integer, Integer> fingerToGid = Maps.newTreeMap();
   protected final List<String> valueList = new ArrayList<>();
 
