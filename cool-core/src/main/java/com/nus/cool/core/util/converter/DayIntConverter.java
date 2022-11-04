@@ -35,7 +35,11 @@ public class DayIntConverter implements NumericConverter {
   private DayIntConverter() {
   }
 
+<<<<<<< HEAD
   public static final DayIntConverter getInstance() {
+=======
+  public static DayIntConverter getInstance(){
+>>>>>>> b54dbd5 (Remove final in dayIntConverter, since there is static)
     return DayIntConverterHolder.INSTANCE;
   }
 
