@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.CohortProcessor;
 import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
+import com.nus.cool.core.cohort.refactor.OlapProcessor;
+import com.nus.cool.core.cohort.refactor.OlapQueryLayout;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.functionality.CsvLoaderTest;
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -38,7 +41,7 @@ public class ProcessorTest extends CsvLoaderTest {
   }
 
   /**
-   *
+   * Test OLAP query.
    */
   @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {
       "CsvLoaderUnitTest"})
@@ -87,6 +90,35 @@ public class ProcessorTest extends CsvLoaderTest {
         {"../datasets/health_raw/sample_query_sum"},
         {"../datasets/fraud_case/sample_query_login_count"},
         {"../datasets/health/sample_query_distinctcount"},
+    };
+  }
+
+
+  /**
+   * Test OLAP query.
+   */
+  @Test(dataProvider = "ProcessQueryAP", dependsOnMethods = {
+      "CsvLoaderUnitTest"})
+  public void ProcessQueryAndValidResultAP(String queryDir) throws Exception {
+    String queryPath = Paths.get(queryDir, this.queryName).toString();
+    OlapQueryLayout layout = OlapQueryLayout.readFromJson(queryPath);
+    String dataSource = layout.getDataSource();
+    OlapProcessor olapProcessor = new OlapProcessor(layout);
+
+    // start a new cool model and reload the cube
+    this.coolModel = new CoolModel(this.cubeRepo);
+    coolModel.reload(dataSource);
+    CubeRS cube = coolModel.getCube(dataSource);
+    Map<String, Float> ret = olapProcessor.process(cube);
+    System.out.println(ret);
+
+  }
+
+  @DataProvider(name = "ProcessQueryAP")
+  public Object[][] queryDirDataProviderAP() {
+    return new Object[][] {
+        {"../datasets/olap-tpch"},
+        {"../datasets/ecommerce/queries"},
     };
   }
 
