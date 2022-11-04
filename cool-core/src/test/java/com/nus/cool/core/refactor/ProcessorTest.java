@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
  */
 public class ProcessorTest extends CsvLoaderTest {
   static final Logger logger = LoggerFactory.getLogger(ProcessorTest.class);
-  private final String cubeRepo = "../CubeRepo";
+  private final String cubeRepo = "../CubeRepo/TestCube";
   private CoolModel coolModel;
 
   private final String queryName = "query.json";
@@ -44,8 +44,10 @@ public class ProcessorTest extends CsvLoaderTest {
   /**
    * Testing cohort query.
    */
-  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = { "CsvLoaderUnitTest" })
-  public void processQueryAndValidResult(String queryDir) throws IOException {
+
+  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"})
+  public void ProcessQueryAndValidResult(String queryDir) throws IOException {
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
@@ -83,17 +85,13 @@ public class ProcessorTest extends CsvLoaderTest {
    */
   @DataProvider(name = "ProcessQueryDP")
   public Object[][] queryDirDataProvider() {
-    return new Object[][] {
-        { "../datasets/health_raw/sample_query_distinctcount" },
-        { "../datasets/ecommerce_query/sample_query" },
-        { "../datasets/health_raw/sample_query_count" },
-        { "../datasets/health_raw/sample_query_average" },
-        { "../datasets/health_raw/sample_query_max" },
-        { "../datasets/health_raw/sample_query_min" },
-        { "../datasets/health_raw/sample_query_sum" },
-        { "../datasets/fraud_case/sample_query_login_count" },
-        { "../datasets/health/sample_query_distinctcount" }
-    };
+    return new Object[][] {{"../datasets/health_raw/sample_query_distinctcount"},
+        {"../datasets/ecommerce_query/sample_query"}, {"../datasets/health_raw/sample_query_count"},
+        {"../datasets/health_raw/sample_query_average"},
+        {"../datasets/health_raw/sample_query_max"}, {"../datasets/health_raw/sample_query_min"},
+        {"../datasets/health_raw/sample_query_sum"},
+        {"../datasets/fraud_case/sample_query_login_count"},
+        {"../datasets/health/sample_query_distinctcount"}};
   }
 
 }

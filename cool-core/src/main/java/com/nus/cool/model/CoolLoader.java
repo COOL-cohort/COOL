@@ -21,6 +21,7 @@ package com.nus.cool.model;
 
 import com.google.common.io.Files;
 import com.nus.cool.core.schema.TableSchema;
+import com.nus.cool.core.util.config.CsvDataLoaderConfig;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.loader.DataLoader;
 import java.io.File;
@@ -58,7 +59,7 @@ public class CoolLoader {
    * @param cubeRepo       the name of the output cube repository
    */
   public synchronized void load(String dataSourceName, String schemaFileName, String dataFileName,
-      String cubeRepo) throws IOException {
+                                String cubeRepo) throws IOException {
     // check the existence of the data repository
     File root = new File(cubeRepo);
     if (!root.getParentFile().exists()) {
@@ -92,8 +93,8 @@ public class CoolLoader {
     }
 
     // create a new folder to this new version
-    File outputCubeVersionDir = new File(cubeRoot,
-        String.format("v%0" + 8 + "d", (currentVersion + 1)));
+    File outputCubeVersionDir =
+        new File(cubeRoot, String.format("v%0" + 8 + "d", (currentVersion + 1)));
     if (outputCubeVersionDir.mkdir()) {
       logger.info("[*] New version " + outputCubeVersionDir.getName() + " is created!");
     }
@@ -102,6 +103,16 @@ public class CoolLoader {
     TableSchema schema = TableSchema.read(new FileInputStream(schemaFile));
     DataLoader loader = DataLoader.builder(dataSourceName, schema, dataFile, outputCubeVersionDir,
         this.loaderConfig).build();
+    // check for the consistency between table.yaml and data.csv
+    if (dataFileName.endsWith(".csv")) {
+      boolean bconsistency = DataLoader.checkConsistency(schema.getFields(),
+          ((CsvDataLoaderConfig) this.loaderConfig).getDataFieldName());
+      if (!bconsistency) {
+        logger.error(
+            "The field sequence of the data file must be the same as that of the table.YAML!");
+        throw new IOException("Field Sequence");
+      }
+    }
     loader.load();
     // copy the table.yaml to new version folder
     Files.copy(schemaFile, new File(outputCubeVersionDir, "table.yaml"));

@@ -34,7 +34,7 @@ public class IcebergLoaderTest {
   }
 
   @Test(dataProvider = "IceBergUnitTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"}, enabled = false)
+      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"})
   public void iceBergTest(String datasetPath, String queryPath, List<BaseResult> out)
       throws Exception {
     // load query
@@ -47,8 +47,8 @@ public class IcebergLoaderTest {
     coolModel.reload(dataSourceName);
 
     // execute query
-    List<BaseResult> results = coolModel.olapEngine.performOlapQuery(
-        coolModel.getCube(dataSourceName), query);
+    List<BaseResult> results =
+        coolModel.olapEngine.performOlapQuery(coolModel.getCube(dataSourceName), query);
 
     Assert.assertEquals(results, out);
     coolModel.close();
@@ -70,12 +70,8 @@ public class IcebergLoaderTest {
         new AggregatorResult(1, (long) 33248, null, null, null, null, null)));
 
     return new Object[][] {
-        {
-            Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
-            Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch", "query.json")
-                .toString(),
-            out
-        }
-    };
+        {Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
+            Paths.get(System.getProperty("user.dir"), "..", "datasets/olap-tpch",
+                "query.json").toString(), out}};
   }
 }
