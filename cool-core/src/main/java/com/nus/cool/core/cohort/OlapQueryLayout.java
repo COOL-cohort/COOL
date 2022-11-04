@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.olapSelect.Aggregation;
 import com.nus.cool.core.cohort.refactor.olapSelect.olapSelectionLayout;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import lombok.Getter;
 import java.io.File;
@@ -56,6 +57,19 @@ public class OlapQueryLayout {
 
   public static OlapQueryLayout readFromJson(String path) throws IOException{
     return readFromJson(new File(path));
+  }
+
+  /**
+   * Return the schema set.
+   */
+  public HashSet<String> getSchemaSet() {
+
+    HashSet<String> ret = new HashSet<>(this.groupFields);
+    for (Aggregation agg: this.aggregations){
+      ret.add(agg.getFieldName());
+    }
+    ret.addAll(this.selection.getSchemaSet());
+    return ret;
   }
 
 }

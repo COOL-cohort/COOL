@@ -23,11 +23,7 @@ public class olapSelector {
     private BitSet matchedRecords;
   }
 
-
   private olapSelectionLayout selection;
-
-  private Filter filter;
-
 
   private String timeRange;
 
@@ -45,8 +41,6 @@ public class olapSelector {
 
   public void init(OlapQueryLayout query) throws ParseException {
     this.selection = query.getSelection();
-    this.selection.initSelectionFilter();
-
   }
 
   /**
@@ -71,7 +65,7 @@ public class olapSelector {
    * @param selectionFilter selectionFilter
    * @param chunk data-chunk
    * @param bv
-   * @return
+   * @return BitSet
    */
   private BitSet select(olapSelectionLayout selectionFilter, ChunkRS chunk, BitSet bv) {
     BitSet bs = (BitSet) bv.clone();
@@ -80,7 +74,6 @@ public class olapSelector {
     if (selectionFilter.getType().equals(SelectionType.filter)) {
       FieldRS field = chunk.getField(selectionFilter.getDimension());
       selectFields(bs, field, selectionFilter.getFilter());
-
     }
     // for and operator
     else if (selectionFilter.getType().equals(SelectionType.and)) {
@@ -120,7 +113,4 @@ public class olapSelector {
       off = bs.nextSetBit(off + 1);
     }
   }
-
-
-
 }

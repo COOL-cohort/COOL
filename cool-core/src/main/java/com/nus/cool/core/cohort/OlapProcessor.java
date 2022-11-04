@@ -15,9 +15,15 @@ import com.nus.cool.core.io.readstore.CubletRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
+import com.nus.cool.core.schema.FieldSchema;
+import com.nus.cool.core.schema.FieldType;
+import com.nus.cool.core.schema.TableSchema;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.Getter;
 
@@ -25,15 +31,15 @@ import lombok.Getter;
 public class OlapProcessor {
 
   private OlapQueryLayout query;
-  private final String dataSource;
   private olapSelector selection = new olapSelector();
+  private Map<String, Float> result = new HashMap<>();
 
   @Getter
-  private final List<OlapRet> result = new ArrayList<>();
+  private final HashSet<String> projectedSchemaSet = new HashSet<>();
 
   public OlapProcessor(OlapQueryLayout layout){
     this.query = layout;
-    this.dataSource = "123";
+    this.projectedSchemaSet.addAll(this.query.getSchemaSet());
   }
 
   /**
@@ -42,7 +48,18 @@ public class OlapProcessor {
    * @param cube the cube that stores the data we need
    * @return the result of the query
    */
-  public List<OlapRet> process(CubeRS cube) throws  Exception{
+  public Map<String, Float> process(CubeRS cube) throws  Exception{
+
+    TableSchema tableschema = cube.getSchema();
+    // add this two schema into List
+
+    for (FieldSchema fieldSchema : tableschema.getFields()) {
+      if (fieldSchema.getFieldType() == FieldType.UserKey) {
+        this.projectedSchemaSet.add(fieldSchema.getName());
+      } else if (fieldSchema.getFieldType() == FieldType.ActionTime) {
+        this.projectedSchemaSet.add(fieldSchema.getName());
+      }
+    }
 
     this.selection.init(this.query);
     for (CubletRS cublet : cube.getCublets()) {
@@ -57,8 +74,8 @@ public class OlapProcessor {
    */
   private void processCublet(CubletRS cubletRS){
     MetaChunkRS metaChunk = cubletRS.getMetaChunk();
-
-    // if this cublet don't meet fild requirements
+    this.selection.getSelection().initSelectionFilter(metaChunk);
+    // if this cublet don't meet field requirements
     if (!this.checkMetaChunk(metaChunk, selection.getSelection())) {
       return;
     }
@@ -83,8 +100,8 @@ public class OlapProcessor {
     if (selectionFilter.getType().equals(SelectionType.filter)){
 
       // get current filter and metaField
-      Filter currentFilter = selectionFilter.getFilter();
       MetaFieldRS metaField = metaChunk.getMetaField(selectionFilter.getDimension());
+      Filter currentFilter = selectionFilter.getFilter();
 
       return this.checkMetaField(metaField, currentFilter);
 
@@ -101,6 +118,25 @@ public class OlapProcessor {
         }
       }
       return flag;
+    }
+  }
+
+  /**
+   * check if this metaFiled meet the requirement
+   * @param metaField metaField
+   * @param ft filter
+   * @return yes, no
+   */
+  public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
+    FilterType checkedType = ft.getType();
+    if (checkedType.equals(FilterType.Set)) {
+      return true;
+    } else if (checkedType.equals(FilterType.Range)) {
+      Scope scope = new Scope(metaField.getMinValue(), metaField.getMaxValue());
+      // if there is no true in res, then no record meet the requirement
+      return ft.accept(scope);
+    } else {
+      throw new IllegalArgumentException("Only support set or range");
     }
   }
 
@@ -138,28 +174,6 @@ public class OlapProcessor {
   }
 
   /**
-   * check if this metaFiled meet the requirement
-   * @param metaField metaField
-   * @param ft filter
-   * @return yes, no
-   */
-  public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
-    FilterType checkedType = ft.getType();
-    if (checkedType.equals(FilterType.Set)) {
-      BitSet res = ft.accept(( (HashMetaFieldRS) metaField).getGidMap());
-      // if there is no true in res, then no record meet the requirement
-      return res.nextSetBit(0) != -1;
-    } else if (checkedType.equals(FilterType.Range)) {
-      Scope scope = new Scope(metaField.getMinValue(), metaField.getMaxValue());
-      BitSet res = ft.accept(scope);
-      // if there is no true in res, then no record meet the requirement
-      return res.nextSetBit(0) != -1;
-    } else {
-      throw new IllegalArgumentException("Only support set or range");
-    }
-  }
-
-  /**
    * Process data chunk
    * @param metaChunk meta chunk
    * @param dataChunk data chunk
@@ -168,7 +182,7 @@ public class OlapProcessor {
     // 1. find all records in dataChunk meet the timeRange and selection requirements.
     BitSet bs = this.selection.selectRecordsOnDataChunk(dataChunk);
     if (bs.nextSetBit(0) == -1){
-      return ;
+      return;
     }
 
     // 2. run groupBy
@@ -177,10 +191,15 @@ public class OlapProcessor {
         bs, this.query.getGroupFields(), metaChunk, dataChunk, query.getGroupFields_granularity());
 
     for (Aggregation aggregation : this.query.getAggregations()) {
-      List<OlapRet> res = olapAggregator.process(aggregation);
-      this.result.addAll(res);
+      Map<String, Float> res = olapAggregator.process(aggregation, this.projectedSchemaSet);
+      for (Map.Entry<String, Float> ele: res.entrySet()){
+        String groupName = ele.getKey();
+        if (this.result.containsKey(groupName)){
+          this.result.put(groupName, this.result.get(ele.getKey())+ele.getValue());
+        }else{
+          this.result.put(groupName, ele.getValue());
+        }
+      }
     }
   }
-
-
 }
