@@ -258,69 +258,72 @@ public class olapAggregation {
     mergeGroups();
   }
 
-  public Map<String, Float> process(Aggregation aggregation,
-                               HashSet<String> projectedSchemaSet) {
+  public ArrayList<OlapRet> process(Aggregation aggregation, HashSet<String> projectedSchemaSet) {
 
-    String fieldName = aggregation.getFieldName();
-    FieldType fieldType = this.metaChunk.getMetaField(fieldName).getFieldType();
-
-    // store the result
-    // Map<String, AggregatorResult> resultMap = new HashMap<>();
-    Map<String, RetUnit> resultMap = new HashMap<>();
-
-    // init the result.
-    for (Map.Entry<String, BitSet> entry: this.group.entrySet()){
-      String groupName = entry.getKey();
-      if (resultMap.get(groupName) == null) {
-      // AggregatorResult aggregatorResult = new AggregatorResult();
-        resultMap.put(groupName, new RetUnit(0, 1));
-      }
-    }
     // init projectedTuple.
     ProjectedTuple tuple = new ProjectedTuple(projectedSchemaSet);
 
-    for (AggregateType aggregatorType : aggregation.getOperators()) {
-      if (!checkOperatorIllegal(fieldType, aggregatorType)) {
-        throw new IllegalArgumentException(fieldName + " can not process " + aggregatorType);
-      }
-      // do the aggregation
-      AggregateFunc aggregator = AggregateFactory.generateAggregate(aggregatorType, fieldName);
-      FieldRS field = this.dataChunk.getField(fieldName);
-      InputVector valueVec = field.getValueVector();
-      // aggregator.calculate(this.group, field, resultMap, this.metaChunk.getMetaField(fieldName));
+    // 1. get the field type and data
+    String fieldName = aggregation.getFieldName();
+    FieldType fieldType = this.metaChunk.getMetaField(fieldName).getFieldType();
 
-      for (Map.Entry<String, BitSet> entry: this.group.entrySet()){
-        String groupName = entry.getKey();
-        BitSet groupBs = entry.getValue();
-        for (int i =0; i< groupBs.size(); i++){
-          int nextpos = groupBs.nextSetBit(i);
-          if (nextpos < 0){
-            break;
-          }
-          int value = valueVec.get(nextpos);
-          tuple.loadAttr(value, fieldName);
-          aggregator.calculate(resultMap.get(groupName), tuple);
-          i = nextpos;
+    FieldRS field = this.dataChunk.getField(fieldName);
+    InputVector valueVec = field.getValueVector();
+
+    // 2. init the Aggregate function
+    Map<AggregateType, AggregateFunc > aggMap = new HashMap<>();
+    for (AggregateType operator: aggregation.getOperators()) {
+      if (!checkOperatorIllegal(fieldType, operator)) {
+        throw new IllegalArgumentException(fieldName + " can not process " + operator);
+      }
+      AggregateFunc aggregator = AggregateFactory.generateAggregate(operator, fieldName);
+      aggMap.put(operator, aggregator);
+    }
+
+    // 3. init the result
+    Map<String, Map<AggregateType, RetUnit> > resultMap = new HashMap<>();
+
+    // 4. traverse once and conduct all operations
+    for (Map.Entry<String, BitSet> entry: this.group.entrySet()){
+      String groupName = entry.getKey();
+      BitSet groupBs = entry.getValue();
+
+      Map<AggregateType, RetUnit> res = new HashMap<>();
+      resultMap.put(groupName, res);
+
+      for (int i = 0; i < groupBs.size(); i++){
+        int nextpos = groupBs.nextSetBit(i);
+        if (nextpos < 0){
+          break;
         }
+        int value = valueVec.get(nextpos);
+        tuple.loadAttr(value, fieldName);
+        // for each operator.
+        for (AggregateType operator: aggregation.getOperators()) {
+          // init result into dict
+          resultMap.get(groupName).putIfAbsent(operator, new RetUnit(0, 0));
+          // do aggregation
+          AggregateFunc aggregator = aggMap.get(operator);
+          aggregator.calculate(resultMap.get(groupName).get(operator), tuple);
+        }
+        i = nextpos;
       }
     }
 
-    Map<String, Float> results = new HashMap<>();
-    for (Map.Entry<String, RetUnit> entry : resultMap.entrySet()) {
+    ArrayList<OlapRet> results = new ArrayList<>();
+
+    for (Map.Entry<String, Map<AggregateType, RetUnit> > entry : resultMap.entrySet()) {
       String groupName = entry.getKey();
-      float value = entry.getValue().getValue();
-      results.put(groupName, value);
+      Map<AggregateType, RetUnit> groupValue = entry.getValue();
+
+      // assign new result
+      OlapRet newEle = new OlapRet();
+      newEle.setTimeRange(this.timeRange);
+      newEle.setKey(groupName);
+      newEle.setFieldName(fieldName);
+      newEle.initAggregator(groupValue);
+      results.add(newEle);
     }
     return results;
-    //    List<String> results = new ArrayList<>();
-    //    for (Map.Entry<String, AggregatorResult> entry : resultMap.entrySet()) {
-    //      BaseResult result = new BaseResult();
-    //      result.setTimeRange(this.timeRange);
-    //      result.setFieldName(fieldName);
-    //      result.setKey(entry.getKey());
-    //      result.setAggregatorResult(entry.getValue());
-    //      results.add(result);
-    //    }
-    //    return results;
   }
 }

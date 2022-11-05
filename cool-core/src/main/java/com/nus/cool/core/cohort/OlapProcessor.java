@@ -32,7 +32,7 @@ public class OlapProcessor {
 
   private OlapQueryLayout query;
   private olapSelector selection = new olapSelector();
-  private Map<String, Float> result = new HashMap<>();
+  private List<OlapRet> result = new ArrayList<>();
 
   @Getter
   private final HashSet<String> projectedSchemaSet = new HashSet<>();
@@ -48,7 +48,7 @@ public class OlapProcessor {
    * @param cube the cube that stores the data we need
    * @return the result of the query
    */
-  public Map<String, Float> process(CubeRS cube) throws  Exception{
+  public List<OlapRet> process(CubeRS cube) throws  Exception{
 
     TableSchema tableschema = cube.getSchema();
     // add this two schema into List
@@ -191,15 +191,8 @@ public class OlapProcessor {
         bs, this.query.getGroupFields(), metaChunk, dataChunk, query.getGroupFields_granularity());
 
     for (Aggregation aggregation : this.query.getAggregations()) {
-      Map<String, Float> res = olapAggregator.process(aggregation, this.projectedSchemaSet);
-      for (Map.Entry<String, Float> ele: res.entrySet()){
-        String groupName = ele.getKey();
-        if (this.result.containsKey(groupName)){
-          this.result.put(groupName, this.result.get(ele.getKey())+ele.getValue());
-        }else{
-          this.result.put(groupName, ele.getValue());
-        }
-      }
+      ArrayList<OlapRet> res = olapAggregator.process(aggregation, this.projectedSchemaSet);
+      result.addAll(res);
     }
   }
 }
