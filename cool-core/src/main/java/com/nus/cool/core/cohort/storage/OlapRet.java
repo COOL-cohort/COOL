@@ -131,20 +131,28 @@ public class OlapRet {
     if (this == o) {
       return true;
     }
+
     if ((o instanceof OlapRet)) {
-      OlapRet
-          another = (OlapRet) o;
+      OlapRet another = (OlapRet) o;
       if (this.equalsKey(another)) {
-        if (this.getTimeRange().equals(another.getTimeRange())
-            && this.getFieldName().equals(another.getFieldName())) {
-          return true;
-        } else {
+
+        if (!this.getFieldName().equals((another.getFieldName()))){
           return false;
         }
-      } else {
+
+        if (!this.getAggregatorResult().equals((another.getAggregatorResult()))){
+          return false;
+        }
+
+        return true;
+      }
+      // not same key
+      else {
         return false;
       }
-    } else {
+    }
+    // not OlapRet instance
+    else {
       return false;
     }
   }
