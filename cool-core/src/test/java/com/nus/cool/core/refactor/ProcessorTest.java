@@ -114,11 +114,18 @@ public class ProcessorTest extends CsvLoaderTest {
     coolModel.reload(dataSource);
     CubeRS cube = coolModel.getCube(dataSource);
     List<OlapRet> ret = olapProcessor.process(cube);
-//    System.out.println(ret);
+    // System.out.println(ret);
 
     // verification:
     if (queryDir.equals("../datasets/olap-tpch")){
       ArrayList<OlapRet> result = generateResultForTPCH();
+      for (int i = 0; i< ret.size(); i++){
+        Assert.assertEquals(result.get(i), ret.get(i));
+      }
+    }
+
+    if (queryDir.equals("../datasets/ecommerce/queries")){
+      ArrayList<OlapRet> result = generateResultForEcommerce();
       for (int i = 0; i< ret.size(); i++){
         Assert.assertEquals(result.get(i), ret.get(i));
       }
@@ -129,7 +136,7 @@ public class ProcessorTest extends CsvLoaderTest {
   public Object[][] queryDirDataProviderAP() {
     return new Object[][] {
         {"../datasets/olap-tpch"},
-//        {"../datasets/ecommerce/queries"},
+        {"../datasets/ecommerce/queries"},
     };
   }
 
@@ -171,6 +178,29 @@ public class ProcessorTest extends CsvLoaderTest {
       newEle.setTimeRange(null);
       newEle.setKey(groupName);
       newEle.setFieldName("O_TOTALPRICE");
+      newEle.initAggregator(groupValue);
+      results.add(newEle);
+    }
+    return results;
+  }
+
+  private ArrayList<OlapRet> generateResultForEcommerce(){
+    Map<String, Map<AggregateType, RetUnit> > resultMap = new HashMap<>();
+    resultMap.put("2021-01",
+        new HashMap<AggregateType, RetUnit>(){{
+          put(AggregateType.DISTINCT,new RetUnit(235, 0));}}
+    );
+    ArrayList<OlapRet> results = new ArrayList<>();
+
+    for (Map.Entry<String, Map<AggregateType, RetUnit> > entry : resultMap.entrySet()) {
+      String groupName = entry.getKey();
+      Map<AggregateType, RetUnit> groupValue = entry.getValue();
+
+      // assign new result
+      OlapRet newEle = new OlapRet();
+      newEle.setTimeRange(null);
+      newEle.setKey(groupName);
+      newEle.setFieldName("Product_ID");
       newEle.initAggregator(groupValue);
       results.add(newEle);
     }

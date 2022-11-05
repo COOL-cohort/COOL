@@ -58,6 +58,23 @@ public class OlapRet {
     @JsonIgnore
     private Set<String> distinctSet = new HashSet<>();
 
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if ((o instanceof AggregatorResult)) {
+        AggregatorResult another = (AggregatorResult) o;
+
+        if (! another.toString().equals(this.toString()) ){
+          return false;
+        }
+        return true;
+      }else{
+        return false;
+      }
+    }
+
     public String toString() {
 
       String json = "\n{";
