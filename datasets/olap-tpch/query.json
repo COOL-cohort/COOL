@@ -17,7 +17,7 @@
         "fields":[]},
       { "filter_type": "filter",
         "fieldSchema": "O_ORDERDATE",
-        "acceptValue": ["1993-01-01 to 1993-12-31"],
+        "acceptValue": ["1993-01-01 to 1994-01-02"],
         "type":"RANGE",
         "fields":[]}
     ]
