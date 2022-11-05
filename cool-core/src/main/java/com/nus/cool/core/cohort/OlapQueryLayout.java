@@ -34,21 +34,17 @@ public class OlapQueryLayout {
   @JsonProperty("groupFields")
   private List<String> groupFields;
 
+  // granularity for groupBy, if the groupBy field is dataType,
+  @JsonProperty("groupFields_granularity")
+  private granularityType groupFields_granularity;
+
   // a list of aggregation functions, sum, count etc
   @JsonProperty("aggregations")
   private List<Aggregation> aggregations;
 
-  // selected time range
-  @JsonProperty("timeRange")
-  private String timeRange;
-
   // granularity for time range
   @JsonProperty("granularity")
   private granularityType granularity;
-
-  // granularity for groupBy, if the groupBy field is dataType,
-  @JsonProperty("groupFields_granularity")
-  private granularityType groupFields_granularity;
 
   public static OlapQueryLayout readFromJson(File inputFile) throws IOException{
     ObjectMapper mapper = new ObjectMapper();

@@ -8,23 +8,19 @@
       { "filter_type": "filter",
         "fieldSchema": "O_ORDERPRIORITY",
         "acceptValue": [ "2-HIGH" ],
-        "type":"SET",
-        "fields":[]},
+        "type":"SET"},
       { "filter_type": "filter",
         "fieldSchema": "R_NAME",
         "acceptValue": ["EUROPE"],
-        "type":"SET",
-        "fields":[]},
+        "type":"SET"},
       { "filter_type": "filter",
         "fieldSchema": "O_ORDERDATE",
         "acceptValue": ["1993-01-01 to 1994-01-02"],
-        "type":"RANGE",
-        "fields":[]}
+        "type":"RANGE"}
     ]
   },
   "groupFields":["N_NAME","R_NAME"],
   "aggregations":[
     {"fieldName":"O_TOTALPRICE","operators":["COUNT","SUM"]}
-  ],
-  "granularity":"NULL"
+  ]
 }
