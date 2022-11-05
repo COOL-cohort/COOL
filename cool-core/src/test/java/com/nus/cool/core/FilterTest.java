@@ -83,9 +83,16 @@ public class FilterTest {
   public Object[][] generateRangeFilterAcceptInput() {
     return new Object[][] {
         {
+<<<<<<< HEAD:cool-core/src/test/java/com/nus/cool/core/FilterTest.java
             new FilterLayout(false, new String[] { "MIN-15", "16-2000", "2555-MAX" }, null),
             new int[] { 12, 55, 555555, 1999, 14, 16, 1999, 2555 } }
         };
+=======
+            new FilterLayout(false, new String[] {"MIN to 15", "16 to 2000", "2555 to MAX"}, null),
+            new int[] {12, 55, 555555, 1999, 14, 16, 1999, 2555}
+        }
+    };
+>>>>>>> 3939e00 (Update splitChar from "-" to " to ", and pass filter test):cool-core/src/test/java/com/nus/cool/core/refactor/FilterTest.java
   }
 
   /**
@@ -95,9 +102,16 @@ public class FilterTest {
   public Object[][] generateRangeFilterRejectInput() {
     return new Object[][] {
         {
+<<<<<<< HEAD:cool-core/src/test/java/com/nus/cool/core/FilterTest.java
             new FilterLayout(false, new String[] { "MIN-15", "16-2000", "2555-MAX" }, null),
             new int[] { 2001, 2222, 2244 } }
         };
+=======
+            new FilterLayout(false, new String[] {"MIN to 15", "16 to 2000", "2555 to MAX"}, null),
+            new int[] {2001, 2222, 2244}
+        }
+    };
+>>>>>>> 3939e00 (Update splitChar from "-" to " to ", and pass filter test):cool-core/src/test/java/com/nus/cool/core/refactor/FilterTest.java
   }
 
 }
