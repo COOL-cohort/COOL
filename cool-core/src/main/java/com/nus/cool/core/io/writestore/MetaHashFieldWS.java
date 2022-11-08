@@ -20,6 +20,7 @@
 package com.nus.cool.core.io.writestore;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.Histogram;
@@ -33,6 +34,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Hash MetaField write store.
@@ -59,15 +61,8 @@ public class MetaHashFieldWS implements MetaFieldWS {
   protected Map<Integer, Integer> fingerToGid = Maps.newTreeMap();
   protected final List<String> valueList = new ArrayList<>();
 
-  /**
-   * Global hashToTerm, keys are hashed by the indexed string.
-   */
-
-  // hash of one tuple field : Term {origin value of tuple field, global ID. }
-  // protected final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
-
   // all possible values of the field.
-  // protected final Set<String> fieldValues = Sets.newTreeSet();
+  protected final Set<String> fieldValues = Sets.newTreeSet();
 
   // global id
   protected int nextGid = 0;
@@ -92,16 +87,11 @@ public class MetaHashFieldWS implements MetaFieldWS {
       this.fingerToGid.put(hashKey, nextGid++);
       this.valueList.add(tuple[idx]);
     }
-    // if (!this.hashToTerm.containsKey(hashKey)) {
-    // this.hashToTerm.put(hashKey, new Term(tuple[idx], nextGid++));
-    // }
   }
 
   @Override
   public int find(String v) {
     int fp = this.rhash.hash(v);
-    // return this.hashToTerm.containsKey(fp) ? this.hashToTerm.get(fp).globalId :
-    // -1;
     return this.fingerToGid.containsKey(fp) ? this.fingerToGid.get(fp) : -1;
   }
 
@@ -117,9 +107,9 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
   @Override
   public void complete() {
-    // for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-    // fieldValues.add(en.getValue().term);
-    // }
+    for (String v : this.valueList) {
+      fieldValues.add(v);
+    }
   }
 
   @Override
@@ -187,15 +177,6 @@ public class MetaHashFieldWS implements MetaFieldWS {
       for (String t : this.valueList) {
         buffer.write(t.getBytes(this.charset));
       }
-      // for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-      // buffer.writeInt(off);
-      // off += en.getValue().term.getBytes(this.charset).length;
-      // }
-
-      // // Store String values into the buffer
-      // for (Map.Entry<Integer, Term> en : this.hashToTerm.entrySet()) {
-      // buffer.write(en.getValue().term.getBytes(this.charset));
-      // }
 
       // Compress and write the buffer
       // The codec is written internal
@@ -214,17 +195,18 @@ public class MetaHashFieldWS implements MetaFieldWS {
   public int writeCubeMeta(DataOutput out) throws IOException {
     int bytesWritten = 0;
     if (this.fieldType == FieldType.Segment
-        || this.fieldType == FieldType.Action) {
+        || this.fieldType == FieldType.Action
+        || this.fieldType == FieldType.UserKey) {
       try (DataOutputBuffer buffer = new DataOutputBuffer()) {
-        buffer.writeInt(this.valueList.size());
+        buffer.writeInt(this.fieldValues.size());
         int off = 0;
 
-        for (String s : this.valueList) {
+        for (String s : this.fieldValues) {
           buffer.writeInt(off);
           off += s.getBytes(this.charset).length;
         }
 
-        for (String s : this.valueList) {
+        for (String s : this.fieldValues) {
           buffer.write(s.getBytes(this.charset));
         }
 
@@ -244,35 +226,4 @@ public class MetaHashFieldWS implements MetaFieldWS {
     return "HashMetaField: " + valueList.toString();
   }
 
-  // /**
-  //  * Convert string to globalIDs.
-  //  */
-  // public static class Term implements Comparable<Term> {
-
-  //   // the real value in each row of the csv file
-  //   String term;
-  //   // assigned global ID.
-  //   int globalId;
-
-  //   public Term(String term, int globalId) {
-  //     this.term = term;
-  //     this.globalId = globalId;
-  //   }
-
-  //   @Override
-  //   public String toString() {
-  //     return "{term: " + term + ", globalId: " + globalId + "}";
-  //   }
-
-  //   @Override
-  //   public int compareTo(Term t) {
-  //     if (this.globalId < t.globalId) {
-  //       return -1;
-  //     } else if (this.globalId > t.globalId) {
-  //       return 1;
-  //     } else {
-  //       return 0;
-  //     }
-  //   }
-  // }
 }
