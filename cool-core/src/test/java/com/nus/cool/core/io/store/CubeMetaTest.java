@@ -37,7 +37,7 @@ public class CubeMetaTest {
       + "\"Medicine-C\",\"None\"]}",
     "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Labtest-A\",\"Labtest-B\","
       + "\"Labtest-C\",\"None\"]}",
-    "{\"type\":\"Metric\",\"min\":0,\"max\":76}",
+    "{\"type\":\"Metric\",\"min\":0,\"max\":70}",
     "{\"type\":\"ActionTime\",\"min\":15340,\"max\":15696}"
   };
 
@@ -62,8 +62,7 @@ public class CubeMetaTest {
     logger.info(String.format("Tear down UnitTest %s\n", CubeMetaTest.class.getSimpleName()));
   }
 
-  // guoyu1108: to be fixed
-  @Test(enabled = false)
+  @Test
   public void cubeMetaUnitTest() throws IOException {
     for (int i = 0; i < this.table.getRowCounts(); i++) {
       metaws.put(this.table.getTuple(i));

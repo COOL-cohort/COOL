@@ -205,7 +205,7 @@ public class MetaChunkWS implements Output {
   }
 
   /**
-   * writeCubeMeta.
+   * write CubeMeta (complete should be called first).
    *
    * @param out dataoutput
    * @return success or fail
