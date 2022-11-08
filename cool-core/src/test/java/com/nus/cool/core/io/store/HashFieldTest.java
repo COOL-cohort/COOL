@@ -25,7 +25,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * HashField UnitTest
+ * HashField UnitTest.
  */
 public class HashFieldTest {
   static final Logger logger = LoggerFactory.getLogger(HashFieldTest.class);
@@ -34,20 +34,16 @@ public class HashFieldTest {
   private Charset charset;
   private OutputCompressor compressor;
 
+  /**
+   * setup.
+   */
   @BeforeTest
   public void setUp() {
     logger.info("Start UnitTest " + HashFieldTest.class.getSimpleName());
     this.charset = Charset.defaultCharset();
     this.compressor = new OutputCompressor();
-    sourcePath = Paths.get(System.getProperty("user.dir"),
-        "src",
-        "test",
-        "java",
-        "com",
-        "nus",
-        "cool",
-        "core",
-        "resources").toString();
+    sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com", "nus",
+        "cool", "core", "resources").toString();
     String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
     table = TestTable.readFromCSV(filepath);
   }
@@ -58,16 +54,12 @@ public class HashFieldTest {
   }
 
   /**
-   * HashFiledTest : Conversion between WriteStore and ReadStore
-   *
-   * @param fieldName
-   * @param fType
-   * @throws IOException
+   * HashFieldTest : Conversion between WriteStore and ReadStore.
    */
   @Test(dataProvider = "HashFieldTestDP")
-  public void HashFieldUnitTest(String fieldName, FieldType fType) throws IOException {
-    logger.info("Input HashField UnitTest Data: FieldName " + fieldName + " FiledType : " +
-        fType.toString());
+  public void hashFieldUnitTest(String fieldName, FieldType fType) throws IOException {
+    logger.info("Input HashField UnitTest Data: FieldName " + fieldName + " FieldType : "
+        + fType.toString());
 
     int fieldidx = table.getField2Ids().get(fieldName);
     ArrayList<String> data = table.getCols().get(fieldidx);
@@ -85,7 +77,7 @@ public class HashFieldTest {
 
     // write this file into a Buffer
     DataOutputBuffer dob = new DataOutputBuffer();
-    int wsPos = hmws.writeTo(dob);
+    final int wsPos = hmws.writeTo(dob);
     ws.writeTo(dob);
 
     // Convert DataOutputBuffer to ByteBuffer
@@ -99,19 +91,17 @@ public class HashFieldTest {
     // validate the MetaField
     Set<String> valueSet = new HashSet<String>(data);
 
-    for (String expect_value : valueSet) {
-      int gid = hmrs.find(expect_value);
-      String get_value = hmrs.getString(gid);
-      Assert.assertEquals(get_value, expect_value);
+    for (String expected : valueSet) {
+      int gid = hmrs.find(expected);
+      String actual = hmrs.getString(gid);
+      Assert.assertEquals(actual, expected);
     }
-
 
     bf.position(wsPos);
     FieldRS rs = DataHashFieldRS.readFrom(bf, fType);
 
     // Check the Key Point of HashMetaField and HashField
     Assert.assertEquals(hmws.count(), hmrs.count());
-
 
     for (int i = 0; i < data.size(); i++) {
       String expected = data.get(i);
@@ -122,14 +112,14 @@ public class HashFieldTest {
     }
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "HashFieldTestDP")
   public Object[][] dpArgs() {
     return new Object[][] {
         // { "id", FieldType.UserKey },
-        {"event", FieldType.Action},
-        {"attr1", FieldType.Segment},
-        {"attr2", FieldType.Segment},
-        {"attr3", FieldType.Segment},
-    };
+        { "event", FieldType.Action }, { "attr1", FieldType.Segment },
+        { "attr2", FieldType.Segment }, { "attr3", FieldType.Segment }, };
   }
 }

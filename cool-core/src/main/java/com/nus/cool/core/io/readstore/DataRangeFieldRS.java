@@ -67,7 +67,7 @@ public class DataRangeFieldRS implements FieldRS {
   }
 
 
-  // no used, only to keep compatiable with old version code
+  // not used, only to keep compatiablity with old version code
   @Override
   public InputVector getKeyVector() {
     // TODO Auto-generated method stub

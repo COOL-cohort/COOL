@@ -44,7 +44,7 @@ public class LoadQuery {
       f = isExist(configPath);
     }
     return f && isExist(schemaPath) && isExist(dataPath) && cubeName.isEmpty()
-        && outputPath.isEmpty();
+      && outputPath.isEmpty();
   }
 
   private boolean isExist(String path) throws IOException {

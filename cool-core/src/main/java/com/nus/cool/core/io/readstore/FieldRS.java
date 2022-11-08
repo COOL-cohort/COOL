@@ -24,7 +24,7 @@ import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 
 /**
- * Interface for Data Field ReadStore.
+ * Interface of read stores of fields in data chunks.
  */
 public interface FieldRS extends Input {
 

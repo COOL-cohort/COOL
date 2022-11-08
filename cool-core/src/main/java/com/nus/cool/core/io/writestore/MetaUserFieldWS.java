@@ -48,7 +48,7 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
   public void put(String[] tuple, int idx) {
     int hashKey = rhash.hash(tuple[idx]);
     if (this.fingerToGid.containsKey(hashKey)) {
-      // this key is existed, skip
+      // skip existing key
       return;
     }
 
@@ -90,6 +90,7 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
     this.fingerToGid.clear();
     this.invariantIdxToValueList.clear();
     this.valueList.clear();
+    this.nextGid = 0; // a field can have different id across cublet.
   }
 
   @Override

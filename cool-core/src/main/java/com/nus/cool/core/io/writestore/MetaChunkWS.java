@@ -140,8 +140,8 @@ public class MetaChunkWS implements Output {
       }
       this.metaFields[i].put(tuple, i);
     }
-    // the UserKey value should be uploaded until all value's loading is done
-    // it needs the value's globalId of other field
+    // the user key meta field should be updated at last 
+    // as it needs the globalId of values from other meta field
     this.metaFields[userKeyIdx].put(tuple, userKeyIdx);
   }
 
@@ -173,7 +173,7 @@ public class MetaChunkWS implements Output {
     }
 
     // Store header offset for MetaChunk layout
-    int headOffset = this.offset + bytesWritten;
+    final int headOffset = this.offset + bytesWritten;
 
     // 1. Write ChunkType for header layout
     out.writeByte(ChunkType.META.ordinal());
@@ -196,7 +196,7 @@ public class MetaChunkWS implements Output {
   }
 
   /**
-   * reuse metaField for nextCublet.
+   * Clear the stats tracking for a cublet, to process the next one afresh.
    */
   public void cleanForNextCublet() {
     for (MetaFieldWS metaField : this.metaFields) {
@@ -224,7 +224,7 @@ public class MetaChunkWS implements Output {
     }
 
     // Store header offset for MetaChunk layout
-    int headOffset = this.offset + bytesWritten;
+    final int headOffset = this.offset + bytesWritten;
 
     // 1. Write ChunkType for header layout
     out.writeByte(ChunkType.META.ordinal());

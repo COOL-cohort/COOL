@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 
 
 /**
- * Meta RangeField ReadStore.
+ * Read store of meta of a int field in meta chunks.
  */
 public class MetaRangeFieldRS implements MetaFieldRS {
 

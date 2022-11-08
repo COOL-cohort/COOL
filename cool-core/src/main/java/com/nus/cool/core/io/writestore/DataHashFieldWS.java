@@ -75,11 +75,8 @@ public class DataHashFieldWS implements DataFieldWS {
   private final Boolean preCal;
 
   /**
-   * Constructor.
+   * Construct a write store of string fields for data chunk.
    *
-   * @param fieldType fieldType
-   * @param metaField metaField
-   * @param compressor compressor
    * @param preCal is preCalculated
    */
   public DataHashFieldWS(FieldType fieldType, MetaFieldWS metaField, OutputCompressor compressor,
@@ -97,7 +94,7 @@ public class DataHashFieldWS implements DataFieldWS {
 
   @Override
   public void put(String tupleValue) throws IOException {
-    int gId = this.metaField.find(tupleValue);
+    final int gId = this.metaField.find(tupleValue);
     if (gId == -1) {
       throw new IllegalArgumentException("Value not exist in dimension: " + tupleValue);
     }
@@ -110,7 +107,6 @@ public class DataHashFieldWS implements DataFieldWS {
 
   @Override
   public int writeTo(DataOutput out) throws IOException {
-    int bytesWritten = 0;
     // number of global id
     int size = this.buffer.size() / Ints.BYTES;
 
@@ -160,6 +156,7 @@ public class DataHashFieldWS implements DataFieldWS {
         .type(CompressType.KeyHash)
         .build();
     this.compressor.reset(hist, key, 0, key.length);
+    int bytesWritten = 0;
     bytesWritten += this.compressor.writeTo(out);
 
     // Write compressed bitSetList if pre-calculate

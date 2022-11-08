@@ -2,7 +2,10 @@ package com.nus.cool.core.schema;
 
 import org.testng.annotations.Test;
 
-public class tableSchemaTest {
+/**
+ * TableSchema Unit test.
+ */
+public class TableSchemaTest {
 
   @Test
   public void checkTableSchemaTest() {

@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.storevector;
 
 import com.google.common.primitives.Ints;
@@ -23,6 +24,14 @@ import com.nus.cool.core.util.IntBuffers;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+/**
+ * Decompress data which stores integers in four bytes.
+ * <p>
+ * The data layout is as follows
+ * ------------------------------------
+ * | count | ZInt compressed integers |
+ * ------------------------------------
+ */
 public class ZInt32Store implements ZIntStore, InputVector {
 
   private final int count;
@@ -36,6 +45,9 @@ public class ZInt32Store implements ZIntStore, InputVector {
     this.sorted = sorted;
   }
 
+  /**
+   * Create input vector on a buffer that is ZInt32 encoded.
+   */
   public static ZIntStore load(ByteBuffer buffer) {
     int n = buffer.getInt();
     int flag = buffer.get(); // get byte into int
@@ -52,10 +64,11 @@ public class ZInt32Store implements ZIntStore, InputVector {
 
   @Override
   public int find(int key) {
-    if(this.sorted)
+    if (this.sorted) {
       return IntBuffers.binarySearch(this.buffer, 0, this.buffer.limit(), key);
-    else
+    } else {
       return IntBuffers.traverseSearch(this.buffer, 0, this.buffer.limit(), key);
+    }
   }
 
   @Override

@@ -23,25 +23,24 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+/**
+ * RangeField Unit test.
+ */
 public class RangeFieldTest {
   static final Logger logger = LoggerFactory.getLogger(RangeFieldTest.class);
   private String sourcePath;
   private TestTable table;
   private OutputCompressor compressor;
 
+  /**
+   * setup.
+   */
   @BeforeTest
   public void setUp() {
     logger.info("Start UnitTest " + RangeFieldTest.class.getSimpleName());
     this.compressor = new OutputCompressor();
-    sourcePath = Paths.get(System.getProperty("user.dir"),
-        "src",
-        "test",
-        "java",
-        "com",
-        "nus",
-        "cool",
-        "core",
-        "resources").toString();
+    sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com", "nus",
+        "cool", "core", "resources").toString();
     String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
     table = TestTable.readFromCSV(filepath);
   }
@@ -52,9 +51,9 @@ public class RangeFieldTest {
   }
 
   @Test(dataProvider = "RangeFieldTestDP")
-  public void RangeFieldUnitTest(String fieldName, FieldType fType) throws IOException {
-    logger.info("Input HashField UnitTest Data: FieldName " + fieldName + " FiledType : " +
-        fType.toString());
+  public void rangeFieldUnitTest(String fieldName, FieldType fType) throws IOException {
+    logger.info("Input HashField UnitTest Data: FieldName " + fieldName + " FieldType : "
+        + fType.toString());
 
     int fieldidx = table.getField2Ids().get(fieldName);
     ArrayList<String> data = table.getCols().get(fieldidx);
@@ -106,11 +105,8 @@ public class RangeFieldTest {
 
   @DataProvider(name = "RangeFieldTestDP")
   public Object[][] rangeFieldTestDPArgObjects() {
-    return new Object[][] {
-        {"birthYear", FieldType.Metric},
-        {"attr4", FieldType.Metric},
-        {"time", FieldType.ActionTime}
-    };
+    return new Object[][] { { "birthYear", FieldType.Metric }, { "attr4", FieldType.Metric },
+        { "time", FieldType.ActionTime } };
   }
 
 }

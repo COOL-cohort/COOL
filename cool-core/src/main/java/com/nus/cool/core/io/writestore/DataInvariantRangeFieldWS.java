@@ -7,8 +7,7 @@ import java.io.IOException;
 
 
 /**
- * whether to record the field's meta data in this chunk (min,max).
- * it can speed up the cohort processing
+ * we should keep meta here for data chunk filter.
  */
 public class DataInvariantRangeFieldWS implements DataFieldWS {
 

@@ -36,8 +36,8 @@ public class LZ4InputVectorTest {
 
   @Test(dataProvider = "LZ4InputVectorDP", enabled = true)
   public void lz4InputVectorUnitTest(String[] valueList) throws IOException {
-    logger.info(String.format("Input LZ4InputVector UnitTest Data: ValueList Size %d",
-        valueList.length));
+    logger.info(
+        String.format("Input LZ4InputVector UnitTest Data: ValueList Size %d", valueList.length));
 
     DataOutputBuffer buf = new DataOutputBuffer();
     // Write Size
@@ -84,11 +84,8 @@ public class LZ4InputVectorTest {
    */
   @DataProvider(name = "LZ4InputVectorDP", parallel = false)
   public Object[][] lz4InputVectorDP() {
-    return new Object[][] {
-        {generateValueList(10)},
-        {generateValueList(100)},
-        {new String[] {"111", "222", "333", "555", "KKK", "111"}},
-    };
+    return new Object[][] { { generateValueList(10) }, { generateValueList(100) },
+        { new String[] { "111", "222", "333", "555", "KKK", "111" } }, };
   }
 
   private String[] generateValueList(int n) {

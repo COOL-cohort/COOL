@@ -114,31 +114,24 @@ public class ChunkRS implements Input {
         continue;
       }
 
-      if (FieldType.isHashType(fieldType)) {
-        if (tableSchema.isInvariantField(i)) {
-          int invariantIdx = tableSchema.getInvariantFieldFlagMap()[i];
-          // invariant_idx != -1;
-          this.fields[i] = new DataInvariantHashFieldRS(
-              fieldType, invariantIdx, userMetaField, userDataField);
-        } else {
-          this.fields[i] = DataHashFieldRS.readFrom(buffer, fieldType);
-        }
+      if (tableSchema.isInvariantField(i)) {
+        int invariantIdx = tableSchema.getInvariantFieldFlagMap()[i];
+        // invariant_idx != -1;
+        this.fields[i] = new DataInvariantFieldRS(
+            fieldType, invariantIdx, userMetaField, userDataField);
+      } else if (FieldType.isHashType(fieldType)) {
+        this.fields[i] = DataHashFieldRS.readFrom(buffer, fieldType);
       } else {
-        if (tableSchema.isInvariantField(i)) {
-          int invariantIdx = tableSchema.getInvariantFieldFlagMap()[i];
-          this.fields[i] = new DataInvariantRangeFieldRS(
-              fieldType, invariantIdx, userMetaField, userDataField);
-        } else {
-          this.fields[i] = DataRangeFieldRS.readFrom(buffer, fieldType);
-        }
+        // range field
+        this.fields[i] = DataRangeFieldRS.readFrom(buffer, fieldType);
       }
     }
   }
 
   /**
-   * Get the filed information according to index.
+   * Get the field information according to index.
    *
-   * @param i index of filed
+   * @param i index of field
    */
   public FieldRS getField(int i) {
     return this.fields[i];

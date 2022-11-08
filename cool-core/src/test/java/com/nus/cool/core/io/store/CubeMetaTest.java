@@ -1,6 +1,5 @@
 package com.nus.cool.core.io.store;
 
-
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.readstore.CubeMetaRS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
@@ -17,7 +16,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-
+/**
+ * Testing cube meta.
+ */
 public class CubeMetaTest {
   static final Logger logger = LoggerFactory.getLogger(CubeMetaTest.class);
   private TableSchema schema;
@@ -25,32 +26,33 @@ public class CubeMetaTest {
   private MetaChunkWS metaws;
 
   private String[] expected = {
-      "{\"charset\":\"UTF-8\",\"type\":\"UserKey\",\"values\":[\"P-0\",\"P-1\",\"P-10\",\"P-11\",\"P-12\",\"P-2\",\"P-3\",\"P-4\",\"P-5\",\"P-6\",\"P-7\",\"P-8\",\"P-9\"]}",
-      "{\"type\":\"Metric\",\"min\":1954,\"max\":2000}",
-      "{\"charset\":\"UTF-8\",\"type\":\"Action\",\"values\":[\"diagnose\",\"labtest\",\"prescribe\"]}",
-      "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Disease-A\",\"Disease-B\",\"Disease-C\",\"None\"]}",
-      "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Medicine-A\",\"Medicine-B\",\"Medicine-C\",\"None\"]}",
-      "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Labtest-A\",\"Labtest-B\",\"Labtest-C\",\"None\"]}",
-      "{\"type\":\"Metric\",\"min\":0,\"max\":76}",
-      "{\"type\":\"ActionTime\",\"min\":15340,\"max\":15696}"
+    "{\"charset\":\"UTF-8\",\"type\":\"UserKey\",\"values\":[\"P-0\",\"P-1\",\"P-10\",\"P-11\","
+      + "\"P-12\",\"P-2\",\"P-3\",\"P-4\",\"P-5\",\"P-6\",\"P-7\",\"P-8\",\"P-9\"]}",
+    "{\"type\":\"Metric\",\"min\":1954,\"max\":2000}",
+    "{\"charset\":\"UTF-8\",\"type\":\"Action\",\"values\":[\"diagnose\",\"labtest\","
+      + "\"prescribe\"]}",
+    "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Disease-A\",\"Disease-B\","
+      + "\"Disease-C\",\"None\"]}",
+    "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Medicine-A\",\"Medicine-B\","
+      + "\"Medicine-C\",\"None\"]}",
+    "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Labtest-A\",\"Labtest-B\","
+      + "\"Labtest-C\",\"None\"]}",
+    "{\"type\":\"Metric\",\"min\":0,\"max\":76}",
+    "{\"type\":\"ActionTime\",\"min\":15340,\"max\":15696}"
   };
 
+  /**
+   * setup.
+   */
   @BeforeTest
   public void setup() throws IOException {
     logger.info("Start UnitTest " + CubeMetaTest.class.getSimpleName());
-    String sourcePath = Paths.get(System.getProperty("user.dir"),
-        "src",
-        "test",
-        "java",
-        "com",
-        "nus",
-        "cool",
-        "core",
-        "resources").toString();
+    String sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com",
+        "nus", "cool", "core", "resources").toString();
 
     String dirPath = Paths.get(sourcePath, "health").toString();
-    this.schema = utils.loadSchema(dirPath);
-    this.table = utils.loadTable(dirPath);
+    this.schema = Utils.loadSchema(dirPath);
+    this.table = Utils.loadTable(dirPath);
 
     this.metaws = MetaChunkWS.newMetaChunkWS(this.schema, 0);
   }
@@ -60,8 +62,9 @@ public class CubeMetaTest {
     logger.info(String.format("Tear down UnitTest %s\n", CubeMetaTest.class.getSimpleName()));
   }
 
+  // guoyu1108: to be fixed
   @Test(enabled = false)
-  public void CubeMetaUnitTest() throws IOException {
+  public void cubeMetaUnitTest() throws IOException {
     for (int i = 0; i < this.table.getRowCounts(); i++) {
       metaws.put(this.table.getTuple(i));
     }
@@ -71,8 +74,7 @@ public class CubeMetaTest {
     int written = metaws.writeCubeMeta(out);
     out.close();
 
-    ByteBuffer buffer = ByteBuffer.wrap(out.getData())
-        .order(ByteOrder.nativeOrder());
+    ByteBuffer buffer = ByteBuffer.wrap(out.getData()).order(ByteOrder.nativeOrder());
     buffer.limit(written);
 
     CubeMetaRS cubemeta = new CubeMetaRS(this.schema);

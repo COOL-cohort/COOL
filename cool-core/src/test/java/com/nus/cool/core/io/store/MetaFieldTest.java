@@ -28,8 +28,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * In this unit, we test MetaHashField and MetaRangeField
- * independently
+ * In this unit, we test MetaHashField and MetaRangeField independently.
  */
 public class MetaFieldTest {
 
@@ -39,6 +38,9 @@ public class MetaFieldTest {
   private OutputCompressor compressor;
   // private TestTable table;
 
+  /**
+   * setup.
+   */
   @BeforeTest
   public void setUp() {
     logger.info("Start UnitTest " + MetaFieldTest.class.getSimpleName());
@@ -64,112 +66,87 @@ public class MetaFieldTest {
   }
 
   @Test(dataProvider = "MetaFieldDP", enabled = false)
-  public void MetaFieldUnitTest(String dataDirPath) throws IOException {
-    TestTable table = utils.loadTable(dataDirPath);
-    TableSchema schema = utils.loadSchema(dataDirPath);
+  public void metaFieldUnitTest(String dataDirPath) throws IOException {
+    TestTable table = Utils.loadTable(dataDirPath);
+    TableSchema schema = Utils.loadSchema(dataDirPath);
     for (FieldSchema fieldSchema : schema.getFields()) {
-        if (fieldSchema.getFieldType() == FieldType.UserKey) {
-            continue;
-        }
+      if (fieldSchema.getFieldType() == FieldType.UserKey) {
+        continue;
+      }
 
       if (FieldType.isHashType(fieldSchema.getFieldType())) {
-        MetaHashFieldTest(table, fieldSchema.getName(), fieldSchema.getFieldType());
+        metaHashFieldTest(table, fieldSchema.getName(), fieldSchema.getFieldType());
       } else {
-        MetaRangeFieldTest(table, fieldSchema.getName(), fieldSchema.getFieldType());
+        metaRangeFieldTest(table, fieldSchema.getName(), fieldSchema.getFieldType());
       }
     }
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "MetaFieldDP")
-  public Object[][] MetaFieldDataProvider() {
-    String sourcePath = Paths.get(System.getProperty("user.dir"),
-        "src",
-        "test",
-        "java",
-        "com",
-        "nus",
-        "cool",
-        "core",
-        "resources").toString();
-    String HealthPath = Paths.get(sourcePath, "health").toString();
-    String TPCHPath = Paths.get(sourcePath, "olap-tpch").toString();
-    String SogamoPath = Paths.get(sourcePath, "sogamo").toString();
-    return new Object[][] {
-        {HealthPath},
-        {TPCHPath},
-        {SogamoPath},
-    };
+  public Object[][] metaFieldDataProvider() {
+    String sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com",
+        "nus", "cool", "core", "resources").toString();
+    String healthPath = Paths.get(sourcePath, "health").toString();
+    String tpchPath = Paths.get(sourcePath, "olap-tpch").toString();
+    String sogamoPath = Paths.get(sourcePath, "sogamo").toString();
+    return new Object[][] { { healthPath }, { tpchPath }, { sogamoPath }, };
   }
 
   /**
-   * For test the logic of Test unit
-   * In product env, enanble = false
-   *
-   * @param table
-   * @param fieldName
-   * @param type
-   * @throws IOException
+   * For test the logic of Test unit In product env, enanble = false.
    */
   @Test(dataProvider = "MetaHashFieldDP", enabled = false)
-  public void MetaHashFieldUnitTest(TestTable table, String fieldName, FieldType type)
+  public void metaHashFieldUnitTest(TestTable table, String fieldName, FieldType type)
       throws IOException {
-    MetaHashFieldTest(table, fieldName, type);
+    metaHashFieldTest(table, fieldName, type);
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "MetaHashFieldDP")
-  public Object[][] MetaHashFieldDataProvider() {
-    String sourcePath = Paths.get(System.getProperty("user.dir"),
-        "src",
-        "test",
-        "java",
-        "com",
-        "nus",
-        "cool",
-        "core",
-        "resources").toString();
-    String HealthPath = Paths.get(sourcePath, "health").toString();
-    System.out.println(HealthPath);
-    TestTable table = utils.loadTable(HealthPath);
+  public Object[][] metaHashFieldDataProvider() {
+    String sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com",
+        "nus", "cool", "core", "resources").toString();
+    String healthPath = Paths.get(sourcePath, "health").toString();
+    System.out.println(healthPath);
+    TestTable table = Utils.loadTable(healthPath);
     System.out.println(table.toString());
-    table.ShowTable();
-    return new Object[][] {
-        {table, "event", FieldType.Action},
-        {table, "attr1", FieldType.Segment},
-        {table, "attr2", FieldType.Segment},
-        {table, "attr3", FieldType.Segment},
-    };
+    table.showTable();
+    return new Object[][] { { table, "event", FieldType.Action },
+        { table, "attr1", FieldType.Segment }, { table, "attr2", FieldType.Segment },
+        { table, "attr3", FieldType.Segment }, };
   }
 
   @Test(dataProvider = "MetaRangeFieldDP", enabled = false)
-  public void MetaRangeFieldUnitTest(TestTable table, String fieldName, FieldType type)
+  public void metaRangeFieldUnitTest(TestTable table, String fieldName, FieldType type)
       throws IOException {
-    MetaRangeFieldTest(table, fieldName, type);
+    metaRangeFieldTest(table, fieldName, type);
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "MetaRangeFieldDP")
-  public Object[][] MetaRangeFieldDataProvider() {
-    String sourcePath = Paths.get(System.getProperty("user.dir"),
-        "src",
-        "test",
-        "java",
-        "com",
-        "nus",
-        "cool",
-        "core",
-        "resources").toString();
-    String HealthPath = Paths.get(sourcePath, "health").toString();
-    System.out.println(HealthPath);
-    TestTable table = utils.loadTable(HealthPath);
+  public Object[][] metaRangeFieldDataProvider() {
+    String sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com",
+        "nus", "cool", "core", "resources").toString();
+    String healthPath = Paths.get(sourcePath, "health").toString();
+    System.out.println(healthPath);
+    TestTable table = Utils.loadTable(healthPath);
     System.out.println(table.toString());
-    table.ShowTable();
-    return new Object[][] {
-        {"birthYear", FieldType.Metric},
-        {"attr4", FieldType.Metric},
-        {"time", FieldType.ActionTime}
-    };
+    table.showTable();
+    return new Object[][] { { "birthYear", FieldType.Metric }, { "attr4", FieldType.Metric },
+        { "time", FieldType.ActionTime } };
   }
 
-  public void MetaHashFieldTest(TestTable table, String fieldName, FieldType type)
+  /**
+   * MetaHashField Unit test.
+   */
+  public void metaHashFieldTest(TestTable table, String fieldName, FieldType type)
       throws IOException {
     System.out.println(fieldName + type.toString());
     int fieldIdx = table.getField2Ids().get(fieldName);
@@ -209,7 +186,10 @@ public class MetaFieldTest {
     }
   }
 
-  public void MetaRangeFieldTest(TestTable table, String fieldName, FieldType type)
+  /**
+   * MetaRangeField Unit test.
+   */
+  public void metaRangeFieldTest(TestTable table, String fieldName, FieldType type)
       throws IOException {
     int fieldIdx = table.getField2Ids().get(fieldName);
     MetaFieldWS mws = new MetaRangeFieldWS(type);

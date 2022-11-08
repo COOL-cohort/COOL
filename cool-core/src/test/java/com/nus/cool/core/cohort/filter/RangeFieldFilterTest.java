@@ -9,7 +9,9 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-
+/**
+ * Testing range field filters.
+ */
 public class RangeFieldFilterTest {
   @Test
   public void rangeFilterUnitTest() {
@@ -36,9 +38,8 @@ public class RangeFieldFilterTest {
       List<String> values = new ArrayList<>();
       values.add("50|90");
       values.add("10|20");
-      FieldFilterFactory filterFactory = new FieldFilterFactory();
-      FieldFilter fieldFilter = filterFactory.create(
-          tschema.getFieldSchema("money"), null, values);
+      FieldFilter fieldFilter = FieldFilterFactory.create(tschema.getFieldSchema("money"),
+          null, values);
       Assert.assertEquals(fieldFilter.getClass(), RangeFieldFilter.class);
       Assert.assertEquals(fieldFilter.getMaxKey(), 90);
       Assert.assertEquals(fieldFilter.getMinKey(), 10);

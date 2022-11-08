@@ -63,7 +63,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
    * Global hashToTerm, keys are hashed by the indexed string.
    */
 
-  // hash of one tuple field : Term {origin value of tuple filed, global ID. }
+  // hash of one tuple field : Term {origin value of tuple field, global ID. }
   // protected final Map<Integer, Term> hashToTerm = Maps.newTreeMap();
 
   // all possible values of the field.
@@ -214,8 +214,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
   public int writeCubeMeta(DataOutput out) throws IOException {
     int bytesWritten = 0;
     if (this.fieldType == FieldType.Segment
-        || this.fieldType == FieldType.Action
-        || this.fieldType == FieldType.AppKey) {
+        || this.fieldType == FieldType.Action) {
       try (DataOutputBuffer buffer = new DataOutputBuffer()) {
         buffer.writeInt(this.valueList.size());
         int off = 0;
@@ -242,39 +241,38 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
   @Override
   public String toString() {
-    return "HashMetaField: "
-        + valueList.toString();
+    return "HashMetaField: " + valueList.toString();
   }
 
-  /**
-   * Convert string to globalIDs.
-   */
-  public static class Term implements Comparable<Term> {
+  // /**
+  //  * Convert string to globalIDs.
+  //  */
+  // public static class Term implements Comparable<Term> {
 
-    // the real value in each row of the csv file
-    String term;
-    // assigned global ID.
-    int globalId;
+  //   // the real value in each row of the csv file
+  //   String term;
+  //   // assigned global ID.
+  //   int globalId;
 
-    public Term(String term, int globalId) {
-      this.term = term;
-      this.globalId = globalId;
-    }
+  //   public Term(String term, int globalId) {
+  //     this.term = term;
+  //     this.globalId = globalId;
+  //   }
 
-    @Override
-    public String toString() {
-      return "{term: " + term + ", globalId: " + globalId + "}";
-    }
+  //   @Override
+  //   public String toString() {
+  //     return "{term: " + term + ", globalId: " + globalId + "}";
+  //   }
 
-    @Override
-    public int compareTo(Term t) {
-      if (this.globalId < t.globalId) {
-        return -1;
-      } else if (this.globalId > t.globalId) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }
+  //   @Override
+  //   public int compareTo(Term t) {
+  //     if (this.globalId < t.globalId) {
+  //       return -1;
+  //     } else if (this.globalId > t.globalId) {
+  //       return 1;
+  //     } else {
+  //       return 0;
+  //     }
+  //   }
+  // }
 }
