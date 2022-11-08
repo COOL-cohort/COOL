@@ -73,7 +73,7 @@ public class DataHashFieldRS implements FieldRS {
 
 
 
-  // under Method is to keep compatiable with old version code
+  // Methods to keep compatiablity with old version code
 
   @Override
   public InputVector getKeyVector() {

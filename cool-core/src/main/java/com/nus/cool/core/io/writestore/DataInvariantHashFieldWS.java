@@ -5,8 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
- * whether to record the meta data of field in this chunk.
- * Through filter to speed up the cohort processing
+ * we should keep meta here for data chunk filter.
  */
 public class DataInvariantHashFieldWS implements DataFieldWS {
 

@@ -56,10 +56,7 @@ public class DataRangeFieldWS implements DataFieldWS {
   private final OutputCompressor compressor;
 
   /**
-   * Constructor for DataRangeFieldWS.
-   *
-   * @param fieldType  fieldtype
-   * @param compressor compressor
+   * Create a write store of int field for data chunk.
    */
   public DataRangeFieldWS(FieldType fieldType, OutputCompressor compressor) {
     this.fieldType = fieldType;

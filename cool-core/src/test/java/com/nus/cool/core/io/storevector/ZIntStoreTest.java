@@ -43,13 +43,8 @@ public class ZIntStoreTest {
     int count = numbers.length;
     int rawSize = count * codecByte(codeType);
 
-    Histogram hist = Histogram.builder()
-        .min(min)
-        .max(max)
-        .numOfValues(count)
-        .rawSize(rawSize)
-        .type(CompressType.KeyHash)
-        .build();
+    Histogram hist = Histogram.builder().min(min).max(max).numOfValues(count).rawSize(rawSize)
+        .type(CompressType.KeyHash).build();
     Compressor compressor = new ZIntCompressor(codeType, hist);
     int maxLen = compressor.maxCompressedLength();
     byte[] compressed = new byte[maxLen];
@@ -88,9 +83,9 @@ public class ZIntStoreTest {
   @DataProvider(name = "ZIntStoreDP")
   public Object[][] dpArgs() {
     return new Object[][] {
-        {new int[] {0, 1, 2, 3, 4, 5, 6, 1000, 2222, 9499}, Codec.INT32},
-        {new int[] {1, 5, 666, 777, 888, 999, 222}, Codec.INT16},
-        {new int[] {1, 7, 12, 11, 12, 44}, Codec.INT8},
+        { new int[] { 0, 1, 2, 3, 4, 5, 6, 1000, 2222, 9499 }, Codec.INT32 },
+        { new int[] { 1, 5, 666, 777, 888, 999, 222 }, Codec.INT16 },
+        { new int[] { 1, 7, 12, 11, 12, 44 }, Codec.INT8 },
     };
   }
 

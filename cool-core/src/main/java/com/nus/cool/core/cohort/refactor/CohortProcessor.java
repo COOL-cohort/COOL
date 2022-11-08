@@ -123,8 +123,8 @@ public class CohortProcessor {
    *
    * @param chunk              dataChunk
    * @param metaChunk          metaChunk
-   * @param hashMapperBySchema map of filedName: []value
-   * @param invariantGidMap    map of invariant filedName: []value
+   * @param hashMapperBySchema map of fieldName: []value
+   * @param invariantGidMap    map of invariant fieldName: []value
    */
   private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk) {
     for (int i = 0; i < chunk.getRecords(); i++) {

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import lombok.Getter;
 
 /**
- * Generate TestTable from csv File simply and Generate Data for UnitTest
+ * Generate TestTable from csv File simply and Generate Data for UnitTest.
  */
 public class TestTable {
   @Getter
@@ -38,8 +38,7 @@ public class TestTable {
   }
 
   /**
-   * @param filepath
-   * @return new TestTable object which structured file data
+   * return new TestTable object which structured file data.
    */
   public static TestTable readFromCSV(String filepath) {
     TestTable table = new TestTable();
@@ -75,6 +74,9 @@ public class TestTable {
     return table;
   }
 
+  /**
+   * return the tuple at index idx.
+   */
   public String[] getTuple(int idx) {
     String[] ret = new String[this.colCounts];
     for (int i = 0; i < this.colCounts; i++) {
@@ -84,16 +86,16 @@ public class TestTable {
   }
 
   /**
-   * Print all dataItem
+   * Print all dataItem.
    */
-  public void ShowTable() {
+  public void showTable() {
     this.tablePrint(this.rowCounts);
   }
 
   /**
-   * Print first 10 line dataitem
+   * Print first 10 line dataitem.
    */
-  public void ShowTableHead() {
+  public void showTableHead() {
     this.tablePrint(10);
   }
 
@@ -135,8 +137,8 @@ public class TestTable {
 
   @Override
   public String toString() {
-    return "TestTable [field2Ids=" + field2Ids + ", rowCounts=" + rowCounts + ", colCounts=" +
-        colCounts + "]";
+    return "TestTable [field2Ids=" + field2Ids + ", rowCounts=" + rowCounts + ", colCounts="
+        + colCounts + "]";
   }
 
 }

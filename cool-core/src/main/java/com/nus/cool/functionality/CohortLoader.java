@@ -112,8 +112,8 @@ public class CohortLoader {
   }
 
   /**
-   * execute query.
-   * 
+   * Execute query.
+   *
    * @param cube  the cube that stores the data we need
    * @param query the cohort query needed to process
    * @param map   the cublet and it's data
@@ -155,7 +155,8 @@ public class CohortLoader {
 
       String cohortField = query.getCohortFields()[0];
       String actionTimeField = schema.getActionTimeFieldName();
-      NumericConverter converter = cohortField.equals(actionTimeField) ? DayIntConverter.getInstance() : null;
+      NumericConverter converter = cohortField.equals(actionTimeField)
+          ? DayIntConverter.getInstance() : null;
       MetaFieldRS cohortMetaField = metaChunk.getMetaField(cohortField);
       Map<CohortKey, Long> results = gamma.getCubletResults();
       for (Map.Entry<CohortKey, Long> entry : results.entrySet()) {

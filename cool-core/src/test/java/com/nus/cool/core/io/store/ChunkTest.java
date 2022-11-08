@@ -25,6 +25,9 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+/**
+ * Testing data chunk read store and write store.
+ */
 public class ChunkTest {
 
   static final Logger logger = LoggerFactory.getLogger(ChunkTest.class);
@@ -40,11 +43,11 @@ public class ChunkTest {
   }
 
   @Test(dataProvider = "ChunkUnitTestDP")
-  public void ChunkUnitTest(String dirPath) throws IOException {
+  public void chunkUnitTest(String dirPath) throws IOException {
     logger.info("Input Chunk UnitTest Data: DataPath " + dirPath);
 
-    TestTable table = utils.loadTable(dirPath);
-    TableSchema schemas = utils.loadSchema(dirPath);
+    TestTable table = Utils.loadTable(dirPath);
+    TableSchema schemas = Utils.loadSchema(dirPath);
 
     // Generate MetaChunkWS
     MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0);
@@ -61,8 +64,8 @@ public class ChunkTest {
     // We create two Buffer, one for chunkWS, another for metaChunkWS
     DataOutputBuffer chunkDOB = new DataOutputBuffer();
     DataOutputBuffer metaDOB = new DataOutputBuffer();
-    int chunkPOS = chunkWS.writeTo(chunkDOB);
-    int metaPOS = metaChunkWS.writeTo(metaDOB);
+    final int chunkPOS = chunkWS.writeTo(chunkDOB);
+    final int metaPOS = metaChunkWS.writeTo(metaDOB);
 
     // ReadFrom
     ByteBuffer metaBF = ByteBuffer.wrap(metaDOB.getData());
@@ -96,40 +99,29 @@ public class ChunkTest {
     }
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "ChunkUnitTestDP")
   public Object[][] chunkUnitTestDP() {
-    String sourcePath = Paths.get(System.getProperty("user.dir"),
-        "src",
-        "test",
-        "java",
-        "com",
-        "nus",
-        "cool",
-        "core",
-        "resources").toString();
-    String HealthPath = Paths.get(sourcePath, "health").toString();
-    String TPCHPath = Paths.get(sourcePath, "olap-tpch").toString();
-    String SogamoPath = Paths.get(sourcePath, "sogamo").toString();
+    String sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com",
+        "nus", "cool", "core", "resources").toString();
+    String healthPath = Paths.get(sourcePath, "health").toString();
+    String tpchPath = Paths.get(sourcePath, "olap-tpch").toString();
+    String sogamoPath = Paths.get(sourcePath, "sogamo").toString();
 
-    return new Object[][] {
-        {HealthPath},
-        {TPCHPath},
-        {SogamoPath},
-    };
+    return new Object[][] { { healthPath }, { tpchPath }, { sogamoPath }, };
   }
 
   // ------------------------------ Helper Function -----------------------------
 
   /**
-   * Check Weather the decoded Field is correct
+   * Check Weather the decoded Field is correct.
    *
-   * @param metaFieldRS
-   * @param fieldRS
-   * @param fieldValue
    * @return True, correct Field or False something wrong
    */
   private Boolean isFieldCorrect(MetaFieldRS metaFieldRS, FieldRS fieldRS,
-                                 ArrayList<String> valueList) {
+      ArrayList<String> valueList) {
     if (FieldType.isHashType(fieldRS.getFieldType())) {
       // HashField
       for (int i = 0; i < valueList.size(); i++) {
@@ -141,7 +133,6 @@ public class ChunkTest {
       }
     } else {
       // RangeField
-
       DayIntConverter convertor = DayIntConverter.getInstance();
       for (int i = 0; i < valueList.size(); i++) {
         String expect = valueList.get(i);

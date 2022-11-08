@@ -63,7 +63,7 @@ public class IcebergAggregation {
         switch (type) {
             case STRING: {
                 InputVector key = field.getKeyVector();
-                return metaField.getString(key.get(value)); // localID => globalId => the filed => string
+                return metaField.getString(key.get(value)); // localID => globalId => the field => string
             }
             case NUMERIC: {
                 return String.valueOf(value);
@@ -75,9 +75,9 @@ public class IcebergAggregation {
 
     /**
      * Group by one column
-     * @param field: grouped filed read form one dataChunk
+     * @param field: grouped field read form one dataChunk
      * @param bs bitSet, filtered by timeRange and previous
-     * @param metaField grouped filed read form one metaChunk
+     * @param metaField grouped field read form one metaChunk
      * @param type group by type
      */
     private void group(FieldRS field, BitSet bs, MetaFieldRS metaField, GroupType type) {
@@ -117,7 +117,7 @@ public class IcebergAggregation {
 
     /**
      * Group by one column
-     * @param field: grouped filed read form one dataChunk
+     * @param field: grouped field read form one dataChunk
      * @param bs bitSet, filtered by timeRange and previous
      * @param granularity when groupField is actionTime, group by granularity.
      */
@@ -209,7 +209,7 @@ public class IcebergAggregation {
     /**
      * groupBy aggregation instance
      * @param bs bitMap, true means the record in time range
-     * @param groupbyFields filed ot be group by
+     * @param groupbyFields field ot be group by
      * @param metaChunk current metaChunk
      * @param dataChunk current metaChunk
      * @param timeRange time Range

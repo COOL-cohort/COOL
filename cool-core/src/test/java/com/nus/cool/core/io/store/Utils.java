@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-
-public class utils {
+/**
+ * Utilities to load data and schema.
+ */
+public class Utils {
 
   public static TestTable loadTable(String dirPath) {
     String path = Paths.get(dirPath, "table.csv").toString();

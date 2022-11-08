@@ -81,7 +81,6 @@ public class DataChunkWS implements Output {
     this.dataFields = checkNotNull(fields);
     checkArgument(offset >= 0 && fields.length > 0);
     this.chunkBeginOffset = offset;
-
   }
 
   /**
@@ -166,7 +165,7 @@ public class DataChunkWS implements Output {
 
     // 2. Write header of the Data Chunk.
     // Calculate offset of header
-    int chunkHeadOff = this.chunkBeginOffset + bytesWritten;
+    final int chunkHeadOff = this.chunkBeginOffset + bytesWritten;
     // 2.1 Write chunkType (D ATA)'s position 1 Byte to store the ChunkType
     out.write(ChunkType.DATA.ordinal());
     bytesWritten++;

@@ -23,20 +23,22 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 
 /**
- * DayIntConverter converts the input day represented in format yyyy-MM-dd
- * to integer which is the number of days past the reference day.
+ * DayIntConverter converts the input day represented in format yyyy-MM-dd to integer which is the
+ * number of days past the reference day.
  */
 public class DayIntConverter implements NumericConverter {
 
-  private static class DayIntConverterHolder{
+  private static class DayIntConverterHolder {
     private static final DayIntConverter INSTANCE = new DayIntConverter();
   }
 
-  private DayIntConverter(){}
+  private DayIntConverter() {
+  }
 
-  public static final DayIntConverter getInstance(){
+  public static final DayIntConverter getInstance() {
     return DayIntConverterHolder.INSTANCE;
   }
+
   /**
    * Convert date string value to the number of days past the reference day.
    *

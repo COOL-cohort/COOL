@@ -24,7 +24,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class Histogram {
-
   /**
    * Compress data size.
    */
