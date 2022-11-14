@@ -17,7 +17,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Testing funnul analysis.
+ * Testing funnel analysis.
  */
 public class FunnulAnalysisTest {
   static final Logger logger = LoggerFactory.getLogger(FunnulAnalysisTest.class);
