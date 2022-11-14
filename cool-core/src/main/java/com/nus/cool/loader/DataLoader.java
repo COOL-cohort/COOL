@@ -80,9 +80,12 @@ public class DataLoader {
   }
 
   /**
+   * check the consistency for table.yaml and data.csv
+   *
    * @param schemaFields the fields read from table.yaml
    * @param fieldNames   the field names read from data.csv
-   * @return true indicates the names of the fields between the two files are consistent, and otherwise, they are different.
+   * @return true indicates the names of the fields between the two files are consistent,\
+   *      and otherwise, they are different.
    */
   public static boolean checkConsistency(List<FieldSchema> schemaFields, String[] fieldNames) {
     if (schemaFields.size() != fieldNames.length) {

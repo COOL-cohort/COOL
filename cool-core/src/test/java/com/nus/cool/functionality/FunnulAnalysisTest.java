@@ -30,7 +30,7 @@ public class FunnulAnalysisTest {
   }
 
   @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"}, enabled = false)
+      "com.nus.cool.functionality.csvLoaderTest.CsvLoaderUnitTest"}, enabled = false)
   public void FunnelAnalysisUnitTest(String datasetPath, String queryPath, int[] out)
       throws IOException {
     ObjectMapper mapper = new ObjectMapper();

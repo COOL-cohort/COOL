@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
 public class IcebergSelectionTest {
 
   @Test(dataProvider = "IcebergQuerySelectionTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"})
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void dataChunkProceesTest(String dzPath, String queryPath)
       throws IOException, ParseException {
     System.out.println("===================== Process Data ChunkRS Test =====================");

@@ -34,7 +34,7 @@ public class IcebergLoaderTest {
   }
 
   @Test(dataProvider = "IceBergUnitTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"})
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void iceBergTest(String datasetPath, String queryPath, List<BaseResult> out)
       throws Exception {
     // load query
