@@ -100,21 +100,27 @@ public class CsvLoaderTest {
             Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()}};
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "CsvLoaderConsistencyTestDP")
-  public Object[][] CsvLoaderTestDPAssertArgObjects() {
+  public Object[][] csvLoaderTestDPAssertArgObjects() {
     return new Object[][] {{"health_raw",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health_raw",
             "error_table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health_raw",
             "data.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},};
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()}};
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "CsvLoaderFailTestDP")
-  public Object[][] CsvLoaderTestDPFailArgObjects() {
+  public Object[][] csvLoaderTestDPFailArgObjects() {
     return new Object[][] {{"health",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "raw.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},};
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()}};
   }
 }
