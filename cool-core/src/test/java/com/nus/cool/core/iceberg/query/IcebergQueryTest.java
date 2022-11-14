@@ -64,7 +64,7 @@ public class IcebergQueryTest {
     return new Object[][] {{"../datasets/olap-tpch/query.json"}};
   }
 
-  @Test(dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"})
+  @Test(dependsOnMethods = {"com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void EcommerceDataTestSQL1() throws Exception {
 
     String dzFilePath = "../CubeRepo/TestCube";

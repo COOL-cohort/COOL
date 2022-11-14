@@ -35,8 +35,8 @@ public class CohortSelectionTest {
   }
 
   @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.CsvLoaderUnitTest"}, enabled = false)
-  public void CohortSelectionUnitTest(String datasetPath, String queryPath,
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"}, enabled = false)
+  public void cohortSelectionUnitTest(String datasetPath, String queryPath,
                                       List<Integer> selectionGlobalIDs) throws IOException {
 
     ObjectMapper mapper = new ObjectMapper();
@@ -51,7 +51,7 @@ public class CohortSelectionTest {
     List<Integer> cohortResults = coolModel.cohortEngine.selectCohortUsers(cube, null, query);
     Assert.assertEquals(selectionGlobalIDs, cohortResults);
     List<String> userIDs = coolModel.cohortEngine.listCohortUsers(cube, cohortResults);
-//    Assert.assertEquals(userIDs, selectionActualIDs);
+    //    Assert.assertEquals(userIDs, selectionActualIDs);
 
     String outputCohort = query.getOutputCohort();
     File cohortRoot = new File(coolModel.getCubeStorePath(inputSource), "cohort");

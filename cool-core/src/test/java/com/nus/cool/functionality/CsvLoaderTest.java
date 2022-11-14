@@ -15,6 +15,9 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+/**
+ * Testing csv file loading.
+ */
 public class CsvLoaderTest {
   static final Logger logger = LoggerFactory.getLogger(CsvLoaderTest.class);
 
@@ -39,7 +42,7 @@ public class CsvLoaderTest {
   }
 
   @Test(priority = 1, dataProvider = "CsvLoaderTestDP")
-  public void CsvLoaderUnitTest(String cube, String schemaFileName, String dataFileName,
+  public void csvLoaderUnitTest(String cube, String schemaFileName, String dataFileName,
                                 String cubeRepo) throws IOException {
     DataLoaderConfig config = new CsvDataLoaderConfig();
     CoolLoader loader = new CoolLoader(config);
@@ -47,7 +50,7 @@ public class CsvLoaderTest {
   }
 
   @Test(dataProvider = "CsvLoaderFailTestDP", expectedExceptions = FileNotFoundException.class)
-  public void CsvLoaderFailUnitTest(String cube, String schemaFileName, String dataFileName,
+  public void csvLoaderFailUnitTest(String cube, String schemaFileName, String dataFileName,
                                     String cubeRepo) throws IOException {
     DataLoaderConfig config = new CsvDataLoaderConfig();
     CoolLoader loader = new CoolLoader(config);
@@ -55,15 +58,18 @@ public class CsvLoaderTest {
   }
 
   @Test(dataProvider = "CsvLoaderConsistencyTestDP", expectedExceptions = IOException.class)
-  public void CsvLoaderConsistencyUnitTest(String cube, String schemaFileName, String dataFileName,
+  public void csvLoaderConsistencyUnitTest(String cube, String schemaFileName, String dataFileName,
                                            String cubeRepo) throws IOException {
     DataLoaderConfig config = new CsvDataLoaderConfig();
     CoolLoader loader = new CoolLoader(config);
     loader.load(cube, schemaFileName, dataFileName, cubeRepo);
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "CsvLoaderTestDP")
-  public Object[][] CsvLoaderTestDPArgObjects() {
+  public Object[][] csvLoaderTestDPArgObjects() {
     return new Object[][] {{"health",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "data.csv").toString(),
