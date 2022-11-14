@@ -23,6 +23,9 @@ public class IcebergQueryTest {
 
   IcebergQuery query;
 
+  /**
+   * setup.
+   */
   @BeforeMethod
   public void setUp() {
     query = new IcebergQuery();
