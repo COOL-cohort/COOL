@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * Class BirthSelectionContext is a control and manage layer for birthSelector
- * 
+ *
  * <p>
  * for every user, we maintain a queue (BirthContextWindow) to record chosen
  * event's frequency in a time sliding window. If the events frequency of one
@@ -44,7 +44,7 @@ public class BirthSelectionContext {
 
   /**
    * Add a event into event queue
-   * 
+   *
    * <p>
    * get the corresponding BirthContextWindow, and push new eventId into it. the
    * BirthContextWindow will automatically adjust the inner event queue when new
@@ -80,6 +80,13 @@ public class BirthSelectionContext {
    */
   public boolean isUserSelected(String userId) {
     return userSelected.containsKey(userId);
+  }
+
+  /**
+   * reset user's birthEvent
+   */
+  public void resetUserSelected(String userId) {
+    userSelected.remove(userId);
   }
 
   /**

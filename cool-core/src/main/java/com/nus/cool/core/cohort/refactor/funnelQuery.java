@@ -1,33 +1,36 @@
 package com.nus.cool.core.cohort.refactor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nus.cool.core.cohort.BirthSequence;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nus.cool.core.cohort.refactor.birthselect.BirthSelectionLayout;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import lombok.Getter;
 
 /**
  * Funnel query.
  */
 
-
-public class funnelQuery {
+@Getter
+public class FunnelQuery {
 
   private String dataSource;
 
   private String inputCohort;
 
-  private List<BirthSelectionLayout> stages = new ArrayList<>();
+  @JsonProperty("birthSelector")
+  private List<BirthSelectionLayout> birthSelectionLayout = new ArrayList<>();
 
   boolean isOrdered = true;
 
   public List<BirthSelectionLayout> getStages() {
-    return stages;
+    return birthSelectionLayout;
   }
 
   public void setStages(List<BirthSelectionLayout> stages) {
-    this.stages = stages;
+    this.birthSelectionLayout = stages;
   }
 
   public boolean isOrdered() {
@@ -59,11 +62,19 @@ public class funnelQuery {
    */
   @JsonIgnore
   public boolean isValid() throws IOException {
-    if ((stages != null) && (dataSource != null)) {
+    if ((birthSelectionLayout != null) && (dataSource != null)) {
       return true;
     } else {
       throw new IOException("[x] Invalid funnel query.");
     }
+  }
+
+  public HashSet<String> getFunnelSchemaSet() {
+    HashSet<String> ret = new HashSet<>();
+    for (int i = 0; i < this.birthSelectionLayout.size(); i++) {
+      ret.addAll(this.birthSelectionLayout.get(i).getRelatedSchemas());
+    }
+    return ret;
   }
 
 
