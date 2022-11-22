@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Processor for Funnel Analysis
+ * Processor for Funnel Analysis.
  */
 public class FunnelProcessor {
   @Getter
