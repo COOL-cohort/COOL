@@ -69,6 +69,11 @@ public class FunnelQuery {
     }
   }
 
+  /**
+   * Get the schema related to the funnel analysis.
+   *
+   * @return the schema related to the funnel analysis
+   */
   public HashSet<String> getFunnelSchemaSet() {
     HashSet<String> ret = new HashSet<>();
     for (int i = 0; i < this.birthSelectionLayout.size(); i++) {

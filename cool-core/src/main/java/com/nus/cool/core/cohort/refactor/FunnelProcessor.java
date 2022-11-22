@@ -21,6 +21,9 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Processor for Funnel Analysis
+ */
 public class FunnelProcessor {
   @Getter
   private final String dataSource;
@@ -37,6 +40,11 @@ public class FunnelProcessor {
   private final HashSet<String> projectedSchemaSet;
   private final List<BirthSelection> birthSelector;
 
+  /**
+   * Constructor.
+   *
+   * @param layout query for funnel analysis
+   */
   public FunnelProcessor(FunnelQuery layout) {
     this.birthSelector = new ArrayList<>();
     for (int i = 0; i < layout.getBirthSelectionLayout().size(); i++) {
@@ -139,8 +147,8 @@ public class FunnelProcessor {
               return;
             }
           }
-          String temp="";
-          temp=temp.concat(Integer.toString(i)).concat("     ").concat(userId);
+          String temp = "";
+          temp = temp.concat(Integer.toString(i)).concat("     ").concat(userId);
           Logger logger = LoggerFactory.getLogger(FunnelProcessor.class);
           logger.info(temp);
           this.result[i] += 1;

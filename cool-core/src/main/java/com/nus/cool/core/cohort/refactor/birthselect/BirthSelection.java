@@ -44,7 +44,7 @@ public class BirthSelection {
   }
 
   /**
-   * Reset the selected attribute
+   * Reset the selected attribute.
    *
    */
   public void resetUserSelected(String userId) {
