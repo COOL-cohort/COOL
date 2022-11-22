@@ -83,7 +83,7 @@ public class BirthSelectionContext {
   }
 
   /**
-   * reset user's birthEvent
+   * reset user's birthEvent.
    */
   public void resetUserSelected(String userId) {
     userSelected.remove(userId);
