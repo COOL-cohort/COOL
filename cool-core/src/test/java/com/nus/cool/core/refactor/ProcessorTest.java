@@ -38,9 +38,10 @@ public class ProcessorTest extends CsvLoaderTest {
   }
 
   /**
-   *
+   * Testing cohort query.
    */
-  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {"CsvLoaderUnitTest"})
+  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void ProcessQueryAndValidResult(String queryDir) throws IOException {
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
