@@ -47,7 +47,7 @@
               "fieldSchema": "money",
               "type": "RANGE",
               "acceptValue": [
-                "MIN-4000, 30000-MAX"
+                "4000-30000"
               ]
             }
           ],

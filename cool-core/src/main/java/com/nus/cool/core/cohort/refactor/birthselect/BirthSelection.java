@@ -44,6 +44,14 @@ public class BirthSelection {
   }
 
   /**
+   * Reset the selected attribute
+   *
+   */
+  public void resetUserSelected(String userId) {
+    context.resetUserSelected(userId);
+  }
+
+  /**
    * If user's birthEvent is selected, Get the birthEvent's Date.
    * If cohort query requires a collection of event
    * we take the first event in whole collection as user's birthEvent

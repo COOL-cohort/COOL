@@ -1,10 +1,8 @@
 package com.nus.cool.functionality;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.refactor.CohortProcessor;
-import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
-import com.nus.cool.core.cohort.refactor.funnelQuery;
-import com.nus.cool.core.cohort.refactor.storage.CohortRet;
+import com.nus.cool.core.cohort.refactor.FunnelProcessor;
+import com.nus.cool.core.cohort.refactor.FunnelQuery;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
@@ -43,14 +41,15 @@ public class FunnulAnalysisTest {
       throws IOException {
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     ObjectMapper mapper = new ObjectMapper();
-    funnelQuery query = mapper.readValue(new File(queryPath), funnelQuery.class);
+    FunnelQuery query = mapper.readValue(new File(queryPath), FunnelQuery.class);
+    Assert.assertTrue(query.isValid());
     this.coolModel = new CoolModel(this.cubeRepo);
-    String dataSource=query.getDataSource();
+    String dataSource = query.getDataSource();
     coolModel.reload(dataSource);
+    FunnelProcessor funnelProcessor = new FunnelProcessor(query);
     CubeRS cube = coolModel.getCube(dataSource);
-    int[] ret = coolModel.cohortEngine.funnelAnalysis(cube, query);
+    int[] ret = funnelProcessor.process(cube);
     Assert.assertEquals(ret, out);
-    System.out.println(1);
   }
 
   /**
