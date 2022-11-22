@@ -73,7 +73,7 @@ public class CoolCohortEngine {
 
     /**
      * Cohort Users
-     *
+     * 
      * @param cube  in-memory cube,
      * @param users users, null for default
      * @param query query query instance, parsed from JSON
@@ -111,7 +111,7 @@ public class CoolCohortEngine {
 
     /**
      * createCohort
-     *
+     * 
      * @param users      users
      * @param query      query instance
      * @param cohortRoot file
@@ -228,7 +228,7 @@ public class CoolCohortEngine {
 
     /**
      * performCohortQuery
-     *
+     * 
      * @param cube  cube name
      * @param users users
      * @param query query instance
@@ -267,7 +267,7 @@ public class CoolCohortEngine {
 
     /**
      * performFunnelQuery
-     *
+     * 
      * @param cube  cube name
      * @param users users
      * @param query query instance
