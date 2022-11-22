@@ -1,25 +1,15 @@
 package com.nus.cool.core.cohort.refactor;
 
-import com.google.common.io.Files;
-import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
-import com.nus.cool.core.cohort.refactor.storage.CohortWSStr;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Files;
 import com.nus.cool.core.cohort.refactor.ageselect.AgeSelection;
 import com.nus.cool.core.cohort.refactor.birthselect.BirthSelection;
 import com.nus.cool.core.cohort.refactor.cohortselect.CohortSelector;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
+import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
+import com.nus.cool.core.cohort.refactor.storage.CohortWSStr;
 import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.refactor.storage.RetUnit;
 import com.nus.cool.core.cohort.refactor.utils.DateUtils;
@@ -32,6 +22,17 @@ import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 
 /**
@@ -49,22 +50,15 @@ public class CohortProcessor {
 
   @Getter
   private final String dataSource;
-
-  private ProjectedTuple tuple;
-
   @Getter
   private final CohortRet result;
-
-  private String userIdSchema;
-
-  private String actionTimeSchema;
-
   private final HashSet<String> projectedSchemaSet;
-
   // initialize cohort result write store
-  private final HashMap<String, CohortWSStr> CohortUserMapper = new HashMap<>();
-
-  private HashSet<String> PreviousCohortUsers = null;
+  private final HashMap<String, CohortWSStr> cohortUserMapper = new HashMap<>();
+  private ProjectedTuple tuple;
+  private String userIdSchema;
+  private String actionTimeSchema;
+  private HashSet<String> previousCohortUsers = null;
 
   /**
    * Constructor.
@@ -81,6 +75,23 @@ public class CohortProcessor {
     this.projectedSchemaSet = layout.getSchemaSet();
     this.dataSource = layout.getDataSource();
     this.result = new CohortRet(layout.getAgetSelectionLayout());
+  }
+
+  /**
+   * Read from json file and create a instance of CohortProcessor.
+   *
+   * @param in File
+   * @return instance of file
+   * @throws IOException IOException
+   */
+  public static CohortProcessor readFromJson(File in) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    CohortProcessor instance = mapper.readValue(in, CohortProcessor.class);
+    return instance;
+  }
+
+  public static CohortProcessor readFromJson(String path) throws IOException {
+    return readFromJson(new File(path));
   }
 
   /**
@@ -110,23 +121,23 @@ public class CohortProcessor {
       for (Map.Entry<String, List<String>> ele : this.result.getCohortToUserIdList().entrySet()) {
         String cohortName = ele.getKey();
         List<String> users = ele.getValue();
-        if (!this.CohortUserMapper.containsKey(cohortName)) {
-          this.CohortUserMapper.put(cohortName, new CohortWSStr());
+        if (!this.cohortUserMapper.containsKey(cohortName)) {
+          this.cohortUserMapper.put(cohortName, new CohortWSStr());
         }
-        this.CohortUserMapper.get(cohortName).addCubletResults(users);
+        this.cohortUserMapper.get(cohortName).addCubletResults(users);
       }
-      this.result.ClearUserIds();
+      this.result.clearUserIds();
     }
     return this.result;
   }
 
   /**
-   * Persist cohort to output disk
+   * Persist cohort to output disk.
    *
    * @param outputDir the output file path
    */
   public void persistCohort(String outputDir) throws IOException {
-    for (Map.Entry<String, CohortWSStr> ele : this.CohortUserMapper.entrySet()) {
+    for (Map.Entry<String, CohortWSStr> ele : this.cohortUserMapper.entrySet()) {
       String fileName = ele.getKey() + ".cohort";
       File cubemeta = new File(outputDir, fileName);
       DataOutputStream out = new DataOutputStream(new FileOutputStream(cubemeta));
@@ -135,12 +146,12 @@ public class CohortProcessor {
   }
 
   /**
-   * Persist cohort to output disk
+   * Persist cohort to output disk.
    *
    * @param cohortPath the path to store the previous stored cohort.
    */
   public void readExistingCohort(String cohortPath) throws IOException {
-    this.PreviousCohortUsers = new HashSet<>();
+    this.previousCohortUsers = new HashSet<>();
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
 
     File file = new File(cohortPath);
@@ -156,7 +167,7 @@ public class CohortProcessor {
       String extension = f.getName().substring(pointIndex);
       if (!f.isDirectory() && extension.equals(".cohort")) {
         crs.readFrom(Files.map(f).order(ByteOrder.nativeOrder()));
-        this.PreviousCohortUsers.addAll(crs.getUsers());
+        this.previousCohortUsers.addAll(crs.getUsers());
       }
     }
   }
@@ -226,7 +237,7 @@ public class CohortProcessor {
 <<<<<<< HEAD
 =======
     // only process the user in previous cohort.
-    if (PreviousCohortUsers != null && !PreviousCohortUsers.contains(userId)) {
+    if (previousCohortUsers != null && !previousCohortUsers.contains(userId)) {
       return;
     }
 
@@ -338,23 +349,6 @@ public class CohortProcessor {
     for (Filter filter : this.valueSelector.getFilterList()) {
       filter.loadMetaInfo(metaChunkRS);
     }
-  }
-
-  /**
-   * Read from json file and create a instance of CohortProcessor.
-   *
-   * @param in File
-   * @return instance of file
-   * @throws IOException IOException
-   */
-  public static CohortProcessor readFromJson(File in) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    CohortProcessor instance = mapper.readValue(in, CohortProcessor.class);
-    return instance;
-  }
-
-  public static CohortProcessor readFromJson(String path) throws IOException {
-    return readFromJson(new File(path));
   }
 
 }

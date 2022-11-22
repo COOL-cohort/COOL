@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * rewrite of CohortRS for the updated persistent cohort format
+ * rewrite of CohortRS for the updated persistent cohort format.
  */
 public class CohortRSStr implements Input {
 
@@ -53,7 +53,7 @@ public class CohortRSStr implements Input {
   }
 
   /**
-   * Get the userid list
+   * Get the userid list.
    *
    * @return user id list
    * @throws IllegalStateException    IllegalStateException
@@ -66,11 +66,11 @@ public class CohortRSStr implements Input {
   @Override
   public void readFrom(ByteBuffer buffer) {
     InputVector vec = InputVectorFactory.readFrom(buffer);
-    LZ4InputVector value_vec = (LZ4InputVector) vec;
-    int value_count = value_vec.size();
-    values = new ArrayList<>(value_count);
-    for (int i = 0; i < value_count; i++) {
-      String value = value_vec.getString(i, this.charset);
+    LZ4InputVector valueVec = (LZ4InputVector) vec;
+    int valueCount = valueVec.size();
+    values = new ArrayList<>(valueCount);
+    for (int i = 0; i < valueCount; i++) {
+      String value = valueVec.getString(i, this.charset);
       values.add(value);
     }
   }

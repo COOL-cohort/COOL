@@ -13,27 +13,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import org.testng.annotations.Test;
 
+/**
+ * Testing CohortStoreTest.
+ */
 public class CohortStoreTest {
 
+  /**
+   *
+   * Testing cohort query.
+   */
   @Test()
-  public void StoreCohort() throws IOException {
+  public void storeCohort() throws IOException {
 
     System.out.println(System.getProperty("user.dir"));
 
-    ArrayList<String> testData = new ArrayList<>(
-        Arrays.asList("Userid1", "Userid2", "Userid3", "Userid4", "Userid5"));
+    ArrayList<String> testData =
+        new ArrayList<>(Arrays.asList("Userid1", "Userid2", "Userid3", "Userid4", "Userid5"));
 
     CohortWSStr cws = new CohortWSStr(StandardCharsets.UTF_8);
 
-    for (String userID: testData){
+    for (String userID : testData) {
       cws.addCubletResults(userID);
     }
 
     // output file
     String fileName = "TestCohort";
     File cubemeta = new File(System.getProperty("user.dir"), fileName);
-    DataOutputStream out = new DataOutputStream(
-        new FileOutputStream(cubemeta));
+    DataOutputStream out = new DataOutputStream(new FileOutputStream(cubemeta));
     cws.writeTo(out);
 
     // read the above

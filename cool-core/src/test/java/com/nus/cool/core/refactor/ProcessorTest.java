@@ -20,9 +20,13 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+
+/**
+ * Testing cohort processor.
+ */
 public class ProcessorTest extends CsvLoaderTest {
   static final Logger logger = LoggerFactory.getLogger(ProcessorTest.class);
-  private final String cubeRepo = "../CubeRepo";
+  private final String cubeRepo = "../CubeRepo/TestCube";
   private CoolModel coolModel;
 
   private final String queryName = "query.json";
@@ -38,11 +42,12 @@ public class ProcessorTest extends CsvLoaderTest {
   }
 
   /**
-   * Testing cohort query.
+   * Testing processQueryAndValidResult.
    */
+
   @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
-  public void ProcessQueryAndValidResult(String queryDir) throws IOException {
+  public void processQueryAndValidResult(String queryDir) throws IOException {
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
@@ -54,7 +59,7 @@ public class ProcessorTest extends CsvLoaderTest {
 
     // get current dir path
     File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
-//    cohortProcessor.readExistingCohort("../CubeRepo/health_raw/v00000012");
+    // cohortProcessor.readExistingCohort("../CubeRepo/health_raw/v00000012");
     CohortRet ret = cohortProcessor.process(cube);
     cohortProcessor.persistCohort(currentVersion.toString());
 
@@ -80,17 +85,18 @@ public class ProcessorTest extends CsvLoaderTest {
     }
   }
 
+  /**
+   * Data provider.
+   */
   @DataProvider(name = "ProcessQueryDP")
   public Object[][] queryDirDataProvider() {
     return new Object[][] {{"../datasets/health_raw/sample_query_distinctcount"},
-        {"../datasets/ecommerce_query/sample_query"},
-        {"../datasets/health_raw/sample_query_count"},
+        {"../datasets/ecommerce_query/sample_query"}, {"../datasets/health_raw/sample_query_count"},
         {"../datasets/health_raw/sample_query_average"},
-        {"../datasets/health_raw/sample_query_max"},
-        {"../datasets/health_raw/sample_query_min"},
+        {"../datasets/health_raw/sample_query_max"}, {"../datasets/health_raw/sample_query_min"},
         {"../datasets/health_raw/sample_query_sum"},
         {"../datasets/fraud_case/sample_query_login_count"},
-        {"../datasets/health/sample_query_distinctcount"},};
+        {"../datasets/health/sample_query_distinctcount"}};
   }
 
 }

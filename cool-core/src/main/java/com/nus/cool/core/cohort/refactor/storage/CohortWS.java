@@ -16,13 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.nus.cool.core.cohort.refactor.storage;
 
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+package com.nus.cool.core.cohort.refactor.storage;
 
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Output;
@@ -30,6 +25,11 @@ import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.ZIntBitCompressor;
 import com.nus.cool.core.util.IntegerUtil;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -39,10 +39,10 @@ import com.nus.cool.core.util.IntegerUtil;
 public class CohortWS implements Output {
 
   /**
-   * a list userid for each cublet (a user can have different id across cublet)
+   * a list userid for each cublet (a user can have different id across cublet).
    */
   private final List<List<Integer>> usersByCublet;
-  
+
   public CohortWS(int numCublets) {
     this.usersByCublet = new ArrayList<>(Math.max(numCublets, 0));
   }
@@ -50,29 +50,30 @@ public class CohortWS implements Output {
   /**
    * add cohort user results of the next cublet.
    * (assuming results are added in sequence)
+   *
    * @param users : users' id in this cublet
    */
   public void addCubletResults(List<Integer> users) {
     usersByCublet.add(users);
   }
-  
+
   /**
-   * write the users' id of one cublet
-   * 
+   * write the users' id of one cublet.
+   *
    * @param out int
-   * @return
+   * @return number of bytes
    */
   private int writeTo(List<Integer> users, DataOutput out) throws IOException {
     Compressor compressor = new ZIntBitCompressor(
-      Histogram.builder()
-               .max(Collections.max(users))
-               .numOfValues(users.size())
-               .uniqueValues(users.size())
-               .build() 
+        Histogram.builder()
+            .max(Collections.max(users))
+            .numOfValues(users.size())
+            .uniqueValues(users.size())
+            .build()
     );
     byte[] compressed = new byte[compressor.maxCompressedLength()];
-    int nbytes = compressor.compress(users.stream().mapToInt(i->i).toArray(),
-      0, users.size(), compressed, 0, compressed.length);
+    int nbytes = compressor.compress(users.stream().mapToInt(i -> i).toArray(),
+        0, users.size(), compressed, 0, compressed.length);
 
     out.write(compressed);
     return nbytes;
@@ -83,11 +84,11 @@ public class CohortWS implements Output {
     int[] offsets = new int[usersByCublet.size()];
     // initial offset is 0
     offsets[0] = 0;
-    for (int i = 0; i < usersByCublet.size()-1; i++) {
-      offsets[i+1] = offsets[i] + writeTo(usersByCublet.get(i), out);
+    for (int i = 0; i < usersByCublet.size() - 1; i++) {
+      offsets[i + 1] = offsets[i] + writeTo(usersByCublet.get(i), out);
     }
-    int headerOffset = offsets[offsets.length-1]
-      + writeTo(usersByCublet.get(usersByCublet.size()-1), out);
+    int headerOffset = offsets[offsets.length - 1]
+        + writeTo(usersByCublet.get(usersByCublet.size() - 1), out);
     for (int offset : offsets) {
       out.writeInt(IntegerUtil.toNativeByteOrder(offset));
     }
