@@ -20,13 +20,9 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-
-/**
- * Testing cohort processor.
- */
 public class ProcessorTest extends CsvLoaderTest {
   static final Logger logger = LoggerFactory.getLogger(ProcessorTest.class);
-  private final String cubeRepo = "../CubeRepo/TestCube";
+  private final String cubeRepo = "../CubeRepo";
   private CoolModel coolModel;
 
   private final String queryName = "query.json";
@@ -42,33 +38,18 @@ public class ProcessorTest extends CsvLoaderTest {
   }
 
   /**
-   * Testing cohort query.
+   *
    */
-<<<<<<< HEAD
-
-  @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
-  public void processQueryAndValidResult(String queryDir) throws IOException {
-=======
   @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {"CsvLoaderUnitTest"})
   public void ProcessQueryAndValidResult(String queryDir) throws IOException {
->>>>>>> 02ba6f0 (Solve conflicts)
     String queryPath = Paths.get(queryDir, this.queryName).toString();
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
 
-<<<<<<< HEAD
-    // get current dir path
-    File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
-    // cohortProcessor.readExistingCohort("../CubeRepo/health_raw/v00000001");
-    CohortRet ret = cohortProcessor.process(cube);
-    cohortProcessor.persistCohort(currentVersion.toString());
-=======
     // start a new cool model and reload the cube
     this.coolModel = new CoolModel(this.cubeRepo);
     coolModel.reload(cohortProcessor.getDataSource());
     CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
->>>>>>> 02ba6f0 (Solve conflicts)
 
     // get current dir path
     File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
@@ -98,12 +79,6 @@ public class ProcessorTest extends CsvLoaderTest {
     }
   }
 
-<<<<<<< HEAD
-  /**
-   * Data provider.
-   */
-=======
->>>>>>> 02ba6f0 (Solve conflicts)
   @DataProvider(name = "ProcessQueryDP")
   public Object[][] queryDirDataProvider() {
     return new Object[][] {{"../datasets/health_raw/sample_query_distinctcount"},
@@ -114,13 +89,7 @@ public class ProcessorTest extends CsvLoaderTest {
         {"../datasets/health_raw/sample_query_min"},
         {"../datasets/health_raw/sample_query_sum"},
         {"../datasets/fraud_case/sample_query_login_count"},
-<<<<<<< HEAD
-        {"../datasets/health/sample_query_distinctcount"}};
-  }
-}
-=======
         {"../datasets/health/sample_query_distinctcount"},};
   }
 
 }
->>>>>>> 02ba6f0 (Solve conflicts)
