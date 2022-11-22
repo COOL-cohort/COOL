@@ -114,19 +114,25 @@ public class CohortRet {
 
   }
 
-  public void addUserid(String cohortName, String userId){
-    if (!this.cohortToUserIdList.containsKey(cohortName)){
+  /**
+   * addUserid.
+   *
+   * @param cohortName cohortName
+   * @param userId     userId
+   */
+  public void addUserid(String cohortName, String userId) {
+    if (!this.cohortToUserIdList.containsKey(cohortName)) {
       List<String> userIdList = new ArrayList<>();
-      this.cohortToUserIdList.put(cohortName ,userIdList);
+      this.cohortToUserIdList.put(cohortName, userIdList);
     }
     this.cohortToUserIdList.get(cohortName).add(userId);
   }
 
   /**
-   * After processing each cublet, clear the cohortToUserIdList mapper,
+   * After processing each cublet, clear the cohortToUserIdList mapper.
    */
-  public void ClearUserIds(){
-      this.cohortToUserIdList.clear();
+  public void clearUserIds() {
+    this.cohortToUserIdList.clear();
   }
 
   public List<String> getCohortList() {
@@ -146,8 +152,16 @@ public class CohortRet {
 
   @Override
   public String toString() {
-    String ret = "CohortRet [interval=" + interval + ", max=" + max + ", min=" + min + ", size="
-        + size + "]\n";
+    String ret =
+        "CohortRet [interval="
+            + interval
+            + ", max="
+            + max
+            + ", min="
+            + min
+            + ", size="
+            + size
+            + "]\n";
     for (Entry<String, Xaxis> entry : this.cohortToValueList.entrySet()) {
       ret += entry.getKey() + ":" + entry.getValue().toString() + "\n";
     }

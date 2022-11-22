@@ -1,15 +1,14 @@
 package com.nus.cool.core.cohort.refactor.storage;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.ZIntBitInputVector;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
- * rewrite of CohortRS for the updated persistent cohort format
+ * rewrite of CohortRS for the updated persistent cohort format.
  */
 public class CohortRS implements Input {
 
@@ -33,10 +32,22 @@ public class CohortRS implements Input {
     loaded[cubletIdx] = true;
   }
 
+  /**
+   * GetUsers.
+   *
+   * @param cubletIdx index
+   * @return null
+   * @throws IllegalStateException    IllegalStateException
+   * @throws IllegalArgumentException IllegalArgumentException
+   */
   public InputVector getUsers(int cubletIdx)
-    throws IllegalStateException, IllegalArgumentException {
-    if (!initialized) throw new IllegalStateException();
-    if (cubletIdx < offsets.length - 1) throw new IllegalArgumentException();
+      throws IllegalStateException, IllegalArgumentException {
+    if (!initialized) {
+      throw new IllegalStateException();
+    }
+    if (cubletIdx < offsets.length - 1) {
+      throw new IllegalArgumentException();
+    }
     // already loaded
     if (loaded[cubletIdx]) {
       return usersByCublet[cubletIdx];
@@ -45,13 +56,13 @@ public class CohortRS implements Input {
     loadCubletUsers(cubletIdx);
     return usersByCublet[cubletIdx];
   }
-  
+
   @Override
   public void readFrom(ByteBuffer buffer) {
     this.buffer = buffer;
     this.buffer.position(this.buffer.limit() - Ints.BYTES);
     int headerOffset = buffer.getInt();
-    int numCublets = (buffer.limit()-Ints.BYTES - headerOffset) / Ints.BYTES;
+    int numCublets = (buffer.limit() - Ints.BYTES - headerOffset) / Ints.BYTES;
     // initialize attributes
     offsets = new int[numCublets];
     usersByCublet = new InputVector[numCublets];

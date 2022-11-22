@@ -21,6 +21,8 @@
 package com.nus.cool.core.cohort.refactor.storage;
 
 import com.nus.cool.core.io.DataOutputBuffer;
+import com.nus.cool.core.io.Output;
+import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
 import java.io.DataOutput;
@@ -29,8 +31,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
-import com.nus.cool.core.io.Output;
-import com.nus.cool.core.io.compression.Histogram;
 import java.util.List;
 
 
@@ -41,7 +41,7 @@ import java.util.List;
 public class CohortWSStr implements Output {
 
   /**
-   * A list of user id as keys in string
+   * A list of user id as keys in string.
    */
   private final HashSet<String> usersStrSet = new HashSet<>();
 
@@ -59,7 +59,7 @@ public class CohortWSStr implements Output {
   }
 
   /**
-   * Add user id to local list
+   * Add user id to local list.
    *
    * @param userId as string
    */
