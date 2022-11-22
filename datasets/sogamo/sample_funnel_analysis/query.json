@@ -1,0 +1,76 @@
+{
+  "stages": [
+    {
+      "birthEvents": [
+        {
+          "filters": [
+            {
+              "fieldSchema": "event",
+              "type": "SET",
+              "acceptValue": [
+                "launch"
+              ]
+            }
+          ],
+          "frequency": 1
+        }
+      ]
+    },
+    {
+      "birthEvents": [
+        {
+          "filters": [
+            {
+              "fieldSchema": "event",
+              "type": "SET",
+              "acceptValue": [
+                "fight"
+              ]
+            }
+          ],
+          "frequency": 1
+        }
+      ]
+    },
+    {
+      "birthEvents": [
+        {
+          "filters": [
+            {
+              "fieldSchema": "event",
+              "type": "SET",
+              "acceptValue": [
+                "dungeon"
+              ]
+            },
+            {
+              "fieldSchema": "money",
+              "type": "RANGE",
+              "acceptValue": [
+                "MIN-4000, 30000-MAX"
+              ]
+            }
+          ],
+          "frequency": 1
+        }
+      ]
+    },
+    {
+      "birthEvents": [
+        {
+          "filters": [
+            {
+              "fieldSchema": "event",
+              "type": "SET",
+              "acceptValue": [
+                "selectdungeonspackage"
+              ]
+            }
+          ],
+          "frequency": 1
+        }
+      ]
+    }
+  ],
+  "dataSource": "sogamo"
+}

@@ -1,9 +1,11 @@
 package com.nus.cool.functionality;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.funnel.FunnelQuery;
+import com.nus.cool.core.cohort.refactor.CohortProcessor;
+import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
+import com.nus.cool.core.cohort.refactor.funnelQuery;
+import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +22,10 @@ import org.testng.annotations.Test;
  * Testing funnel analysis.
  */
 public class FunnulAnalysisTest {
+  private final String cubeRepo = "../CubeRepo/TestCube";
+  private final String queryName = "query.json";
   static final Logger logger = LoggerFactory.getLogger(FunnulAnalysisTest.class);
+  private CoolModel coolModel;
 
   @BeforeTest
   public void setUp() {
@@ -33,27 +38,19 @@ public class FunnulAnalysisTest {
   }
 
   @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.csvLoaderTest.CsvLoaderUnitTest"}, enabled = false)
-  public void funnelAnalysisUnitTest(String datasetPath, String queryPath, int[] out)
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+  public void funnelAnalysisUnitTest(String queryDir, int[] out)
       throws IOException {
+    String queryPath = Paths.get(queryDir, this.queryName).toString();
     ObjectMapper mapper = new ObjectMapper();
-    FunnelQuery query = mapper.readValue(new File(queryPath), FunnelQuery.class);
-
-    String inputSource = query.getDataSource();
-    CoolModel coolModel = new CoolModel(datasetPath);
-    coolModel.reload(inputSource);
-
-    Assert.assertTrue(query.isValid());
-
-    CubeRS inputCube = coolModel.getCube(query.getDataSource());
-    String inputCohort = query.getInputCohort();
-    if (inputCohort != null) {
-      coolModel.loadCohorts(inputCohort, inputSource);
-    }
-    InputVector userVector = coolModel.getCohortUsers(inputCohort);
-    int[] result = coolModel.cohortEngine.performFunnelQuery(inputCube, userVector, query);
-
-    Assert.assertEquals(result, out);
+    funnelQuery query = mapper.readValue(new File(queryPath), funnelQuery.class);
+    this.coolModel = new CoolModel(this.cubeRepo);
+    String dataSource=query.getDataSource();
+    coolModel.reload(dataSource);
+    CubeRS cube = coolModel.getCube(dataSource);
+    int[] ret = coolModel.cohortEngine.funnelAnalysis(cube, query);
+    Assert.assertEquals(ret, out);
+    System.out.println(1);
   }
 
   /**
@@ -62,9 +59,6 @@ public class FunnulAnalysisTest {
   @DataProvider(name = "FunnelAnalysisTestDP")
   public Object[][] funnelAnalysisTestDPArgObjects() {
     int[] out = {5, 5, 4, 4};
-    return new Object[][] {
-        {Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
-            Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo",
-                "query1.json").toString(), out}};
+    return new Object[][] {{"../datasets/sogamo/sample_funnel_analysis", out}};
   }
 }
