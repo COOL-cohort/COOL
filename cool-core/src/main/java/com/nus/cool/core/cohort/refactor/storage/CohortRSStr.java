@@ -53,7 +53,7 @@ public class CohortRSStr implements Input {
   }
 
   /**
-   * Get the userid list.
+   * Get the userid list, each user-id is the original defined in .yaml file.
    *
    * @return user id list
    * @throws IllegalStateException    IllegalStateException

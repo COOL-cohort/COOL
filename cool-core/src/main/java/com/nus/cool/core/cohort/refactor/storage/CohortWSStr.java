@@ -59,7 +59,7 @@ public class CohortWSStr implements Output {
   }
 
   /**
-   * Add user id to local list.
+   * Add user id (string) to local list.
    *
    * @param userId as string
    */
