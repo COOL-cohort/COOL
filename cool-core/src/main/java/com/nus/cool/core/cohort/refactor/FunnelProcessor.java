@@ -38,6 +38,7 @@ public class FunnelProcessor {
   private String actionTimeSchema;
 
   private final HashSet<String> projectedSchemaSet;
+
   private final List<BirthSelection> birthSelector;
 
   /**
@@ -132,8 +133,8 @@ public class FunnelProcessor {
     MetaFieldRS userMetaField = metaChunk.getMetaField(this.userIdSchema);
     String userId = userMetaField.getString(userGlobalID);
 
-    LocalDateTime actionTime = DateUtils.daysSinceEpoch(
-        (int) tuple.getValueBySchema(this.actionTimeSchema));
+    LocalDateTime actionTime =
+        DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
     // check whether its birthEvent is selected
 
     for (int i = 0; i < this.birthSelector.size(); i++) {
@@ -143,7 +144,7 @@ public class FunnelProcessor {
         if (this.birthSelector.get(i).isUserSelected(userId)) {
           for (int j = 0; j < i; j++) {
             if (!this.birthSelector.get(j).isUserSelected(userId)) {
-              this.birthSelector.get(i).resetUserSelected(userId);
+              this.birthSelector.get(i).removeUserSelected(userId);
               return;
             }
           }
