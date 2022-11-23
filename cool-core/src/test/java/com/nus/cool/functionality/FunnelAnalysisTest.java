@@ -18,18 +18,18 @@ import org.testng.annotations.Test;
 /**
  * Testing funnel analysis.
  */
-public class FunnulAnalysisTest {
-  static final Logger logger = LoggerFactory.getLogger(FunnulAnalysisTest.class);
+public class FunnelAnalysisTest {
+  static final Logger logger = LoggerFactory.getLogger(FunnelAnalysisTest.class);
   private CoolModel coolModel;
 
   @BeforeTest
   public void setUp() {
-    logger.info("Start UnitTest " + FunnulAnalysisTest.class.getSimpleName());
+    logger.info("Start UnitTest " + FunnelAnalysisTest.class.getSimpleName());
   }
 
   @AfterTest
   public void tearDown() {
-    logger.info(String.format("Tear down UnitTest %s\n", FunnulAnalysisTest.class.getSimpleName()));
+    logger.info(String.format("Tear down UnitTest %s\n", FunnelAnalysisTest.class.getSimpleName()));
   }
 
   @Test(dataProvider = "FunnelAnalysisTestDP", dependsOnMethods = {
