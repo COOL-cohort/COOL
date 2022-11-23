@@ -47,8 +47,8 @@ public class BirthSelection {
    * Reset the selected attribute.
    *
    */
-  public void resetUserSelected(String userId) {
-    context.resetUserSelected(userId);
+  public void removeUserSelected(String userId) {
+    context.removeUserSelected(userId);
   }
 
   /**
