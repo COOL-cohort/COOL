@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -21,17 +22,12 @@ import org.testng.annotations.Test;
 public class CohortStoreTest {
 
   /**
-   *
    * Testing cohort query.
    */
-  @Test()
-  public void storeCohort() throws IOException {
+  @Test(dataProvider = "storeCohortDP")
+  public void storeCohort(ArrayList<String> testData) throws IOException {
 
     System.out.println(System.getProperty("user.dir"));
-
-    ArrayList<String> testData =
-        new ArrayList<>(Arrays.asList("Userid1", "Userid2", "Userid3", "Userid4", "Userid5"));
-
     CohortWSStr cws = new CohortWSStr(StandardCharsets.UTF_8);
 
     for (String userID : testData) {
@@ -57,4 +53,14 @@ public class CohortStoreTest {
     cubemeta.delete();
   }
 
+  /**
+   * Data provider for storeCohortDP.
+   */
+  @DataProvider(name = "storeCohortDP")
+  private Object[] storeCohortDataProvider() {
+    ArrayList<String> testData =
+        new ArrayList<>(Arrays.asList("Userid1", "Userid2", "Userid3", "Userid4", "Userid5"));
+
+    return new Object[] {testData};
+  }
 }
