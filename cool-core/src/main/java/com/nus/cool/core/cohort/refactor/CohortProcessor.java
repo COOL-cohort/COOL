@@ -184,18 +184,8 @@ public class CohortProcessor {
    * In this section, we load the tuple which is an inner property.
    * We left the process logic in processTuple function.
    *
-<<<<<<< HEAD
-<<<<<<< HEAD
    * @param chunk     dataChunk
    * @param metaChunk metaChunk
-=======
-   * @param chunk              dataChunk
-   * @param metaChunk          metaChunk
->>>>>>> c906bf6 (Store cohort result after cohort-processing)
-=======
-   * @param chunk     dataChunk
-   * @param metaChunk metaChunk
->>>>>>> f71baa4 (Solve conflicts)
    */
   private void processDataChunk(ChunkRS chunk, MetaChunkRS metaChunk) {
     for (int i = 0; i < chunk.getRecords(); i++) {
@@ -219,14 +209,11 @@ public class CohortProcessor {
     MetaFieldRS userMetaField = metaChunk.getMetaField(this.userIdSchema);
     String userId = userMetaField.getString(userGlobalID);
 
-<<<<<<< HEAD
-=======
     // only process the user in previous cohort.
     if (previousCohortUsers != null && !previousCohortUsers.contains(userId)) {
       return;
     }
 
->>>>>>> f71baa4 (Solve conflicts)
     LocalDateTime actionTime =
         DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
     // check whether its birthEvent is selected
