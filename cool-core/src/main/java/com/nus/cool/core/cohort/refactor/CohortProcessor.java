@@ -1,6 +1,5 @@
 package com.nus.cool.core.cohort.refactor;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 import com.nus.cool.core.cohort.refactor.ageselect.AgeSelection;
@@ -28,7 +27,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +50,8 @@ public class CohortProcessor {
 
   private final BirthSelection birthSelector;
 
+  private final CohortQueryLayout layout;
+
   @Getter
   private final String dataSource;
   @Getter
@@ -66,7 +70,7 @@ public class CohortProcessor {
    * @param layout query layout
    */
   public CohortProcessor(CohortQueryLayout layout) {
-
+    this.layout = layout;
     this.ageSelector = layout.getAgetSelectionLayout().generate();
     this.birthSelector = layout.getBirthSelectionLayout().generate();
     this.cohortSelector = layout.getCohortSelectionLayout().generate();
@@ -121,12 +125,39 @@ public class CohortProcessor {
    * @param outputDir the output file path
    */
   public void persistCohort(String outputDir) throws IOException {
+
+    // 1. create folder named "cohort" under the current version
+    SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+    Date date = new Date();
+    String timeStr = formatter.format(date);
+
+    File cohortRes = new File(outputDir, "cohort/query_" + timeStr);
+    if (!cohortRes.getParentFile().exists()) {
+      cohortRes.getParentFile().mkdir();
+    }
+    if (!cohortRes.exists()) {
+      cohortRes.mkdir();
+    }
+
+    // 2.store cohort result
+    CohortResultLayout cohortJsonContent = new CohortResultLayout();
+    cohortJsonContent.setCohortQuery(this.layout);
+
     for (Map.Entry<String, CohortWSStr> ele : this.cohortUserMapper.entrySet()) {
-      String fileName = ele.getKey() + ".cohort";
-      File cubemeta = new File(outputDir, fileName);
+      String cohortName = ele.getKey();
+      String fileName = cohortName + ".cohort";
+      int cohortSize = ele.getValue().getNumUsers();
+      File cubemeta = new File(cohortRes.toString(), fileName);
       DataOutputStream out = new DataOutputStream(new FileOutputStream(cubemeta));
       ele.getValue().writeTo(out);
+      // update info
+      cohortJsonContent.addOneCohortRes(fileName, cohortName, cohortSize);
     }
+
+    // 3. store the json file with cohort result, and original query.json
+    ObjectMapper mapper = new ObjectMapper();
+    String cohortJson = Paths.get(cohortRes.toString(), "query_res.json").toString();
+    mapper.writeValue(new File(cohortJson), cohortJsonContent);
   }
 
   /**
