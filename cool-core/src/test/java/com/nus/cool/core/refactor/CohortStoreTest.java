@@ -11,6 +11,8 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -45,7 +47,13 @@ public class CohortStoreTest {
     // read the above
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
     crs.readFrom(Files.map(cubemeta).order(ByteOrder.nativeOrder()));
-    System.out.println(crs.getUsers());
+    List<String> redRes = crs.getUsers();
+
+    // assert the read the original data.
+    Boolean isEqual = testData.containsAll(redRes) && redRes.containsAll(testData);
+    Assert.assertEquals(isEqual, Boolean.TRUE);
+
+    // delete the file just write.
     cubemeta.delete();
   }
 
