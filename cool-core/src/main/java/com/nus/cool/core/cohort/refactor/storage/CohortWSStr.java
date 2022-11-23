@@ -71,6 +71,15 @@ public class CohortWSStr implements Output {
     usersStrSet.addAll(userIds);
   }
 
+  /**
+   * Get number of user in a cohort.
+   *
+   * @return number of users
+   */
+  public int getNumUsers() {
+    return usersStrSet.size();
+  }
+
   @Override
   public int writeTo(DataOutput out) throws IOException {
 

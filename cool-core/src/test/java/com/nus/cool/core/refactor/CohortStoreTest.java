@@ -27,7 +27,6 @@ public class CohortStoreTest {
   @Test(dataProvider = "storeCohortDP")
   public void storeCohort(ArrayList<String> testData) throws IOException {
 
-    System.out.println(System.getProperty("user.dir"));
     CohortWSStr cws = new CohortWSStr(StandardCharsets.UTF_8);
 
     for (String userID : testData) {
