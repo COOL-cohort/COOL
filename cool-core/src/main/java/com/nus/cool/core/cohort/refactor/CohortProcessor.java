@@ -130,7 +130,8 @@ public class CohortProcessor {
   }
 
   /**
-   * Persist cohort to output disk.
+   * Persist cohort to output disk, cohort is named cohortName.cohort, e,g. "1980-1990.cohort".
+   * Where 1980-1990 is the cohortName in our cohort query for health-raw dataset.
    *
    * @param cohortPath the path to store the previous stored cohort.
    */
