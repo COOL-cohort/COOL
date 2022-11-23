@@ -78,23 +78,6 @@ public class CohortProcessor {
   }
 
   /**
-   * Read from json file and create a instance of CohortProcessor.
-   *
-   * @param in File
-   * @return instance of file
-   * @throws IOException IOException
-   */
-  public static CohortProcessor readFromJson(File in) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    CohortProcessor instance = mapper.readValue(in, CohortProcessor.class);
-    return instance;
-  }
-
-  public static CohortProcessor readFromJson(String path) throws IOException {
-    return readFromJson(new File(path));
-  }
-
-  /**
    * Public interface, Scan whole table and return CohortResult.
    *
    * @param cube Cube
@@ -132,7 +115,8 @@ public class CohortProcessor {
   }
 
   /**
-   * Persist cohort to output disk.
+   * Persist cohort file .cohort to output disk to the same level with the .dz file.
+   * E,g. ../CubeRepo/health_raw/v00000012.
    *
    * @param outputDir the output file path
    */
