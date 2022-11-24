@@ -42,7 +42,7 @@ public class ProcessorTest extends CsvLoaderTest {
   }
 
   /**
-   * Testing processQueryAndValidResult.
+   * Testing cohort query.
    */
 
   @Test(dataProvider = "ProcessQueryDP", dependsOnMethods = {
@@ -59,9 +59,10 @@ public class ProcessorTest extends CsvLoaderTest {
 
     // get current dir path
     File currentVersion = this.coolModel.loadLatestVersion(cohortProcessor.getDataSource());
-    // cohortProcessor.readExistingCohort("../CubeRepo/health_raw/v00000012");
     CohortRet ret = cohortProcessor.process(cube);
-    cohortProcessor.persistCohort(currentVersion.toString());
+    String cohortStoragePath = cohortProcessor.persistCohort(currentVersion.toString());
+    cohortProcessor.readExistingCohort(cohortStoragePath);
+    Assert.assertTrue(cohortProcessor.getPreviousCohortUsers().size() > 0);
 
     String queryResultPath = Paths.get(queryDir, this.resultName).toString();
     ObjectMapper mapper = new ObjectMapper();
@@ -81,7 +82,6 @@ public class ProcessorTest extends CsvLoaderTest {
       // System.out.printf("True Result %s\n", cohortData.get(cohortName).toString());
       // System.out.printf("Get Result %s\n", ret.getValuesByCohort(cohortName));
       Assert.assertEquals(cohortData.get(cohortName), ret.getValuesByCohort(cohortName));
-      System.out.println(ret.getCohortList());
     }
   }
 

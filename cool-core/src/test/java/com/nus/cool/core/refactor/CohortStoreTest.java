@@ -35,13 +35,13 @@ public class CohortStoreTest {
 
     // output file
     String fileName = "TestCohort";
-    File cubemeta = new File(System.getProperty("user.dir"), fileName);
-    DataOutputStream out = new DataOutputStream(new FileOutputStream(cubemeta));
+    File cohortResFile = new File(System.getProperty("user.dir"), fileName);
+    DataOutputStream out = new DataOutputStream(new FileOutputStream(cohortResFile));
     cws.writeTo(out);
 
     // read the above
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
-    crs.readFrom(Files.map(cubemeta).order(ByteOrder.nativeOrder()));
+    crs.readFrom(Files.map(cohortResFile).order(ByteOrder.nativeOrder()));
     List<String> redRes = crs.getUsers();
 
     // assert the read the original data.
@@ -49,7 +49,7 @@ public class CohortStoreTest {
     Assert.assertEquals(isEqual, Boolean.TRUE);
 
     // delete the file just write.
-    cubemeta.delete();
+    cohortResFile.delete();
   }
 
   /**

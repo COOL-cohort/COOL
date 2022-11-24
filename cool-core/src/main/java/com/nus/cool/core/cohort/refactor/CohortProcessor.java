@@ -62,7 +62,8 @@ public class CohortProcessor {
   private ProjectedTuple tuple;
   private String userIdSchema;
   private String actionTimeSchema;
-  private HashSet<String> previousCohortUsers = null;
+  @Getter
+  private HashSet<String> previousCohortUsers = new HashSet<>();
 
   /**
    * Constructor.
@@ -123,8 +124,10 @@ public class CohortProcessor {
    * E,g. ../CubeRepo/health_raw/v00000012.
    *
    * @param outputDir the output file path
+   * @return The cohort result storage path
+   * @throws IOException IOException
    */
-  public void persistCohort(String outputDir) throws IOException {
+  public String persistCohort(String outputDir) throws IOException {
 
     // 1. create folder named "cohort" under the current version
     SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
@@ -147,8 +150,8 @@ public class CohortProcessor {
       String cohortName = ele.getKey();
       String fileName = cohortName + ".cohort";
       int cohortSize = ele.getValue().getNumUsers();
-      File cubemeta = new File(cohortRes.toString(), fileName);
-      DataOutputStream out = new DataOutputStream(new FileOutputStream(cubemeta));
+      File cohortResFile = new File(cohortRes.toString(), fileName);
+      DataOutputStream out = new DataOutputStream(new FileOutputStream(cohortResFile));
       ele.getValue().writeTo(out);
       // update info
       cohortJsonContent.addOneCohortRes(fileName, cohortName, cohortSize);
@@ -158,6 +161,8 @@ public class CohortProcessor {
     ObjectMapper mapper = new ObjectMapper();
     String cohortJson = Paths.get(cohortRes.toString(), "query_res.json").toString();
     mapper.writeValue(new File(cohortJson), cohortJsonContent);
+
+    return cohortRes.toString();
   }
 
   /**
@@ -167,7 +172,6 @@ public class CohortProcessor {
    * @param cohortPath the path to store the previous stored cohort.
    */
   public void readExistingCohort(String cohortPath) throws IOException {
-    this.previousCohortUsers = new HashSet<>();
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
 
     File file = new File(cohortPath);
@@ -241,7 +245,7 @@ public class CohortProcessor {
     String userId = userMetaField.getString(userGlobalID);
 
     // only process the user in previous cohort.
-    if (previousCohortUsers != null && !previousCohortUsers.contains(userId)) {
+    if (!this.previousCohortUsers.isEmpty() && !previousCohortUsers.contains(userId)) {
       return;
     }
 
