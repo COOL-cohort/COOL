@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.refactor.ageselect.AgeSelectionLayout;
 import com.nus.cool.core.cohort.refactor.birthselect.BirthSelectionLayout;
 import com.nus.cool.core.cohort.refactor.cohortselect.CohortSelectionLayout;
+import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.valueselect.ValueSelectionLayout;
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +39,9 @@ public class CohortQueryLayout {
   public static CohortQueryLayout readFromJson(File in) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     CohortQueryLayout instance = mapper.readValue(in, CohortQueryLayout.class);
+    if (instance.cohortSelectionLayout == null) {
+       instance.cohortSelectionLayout = new CohortSelectionLayout();
+    }
     return instance;
   }
 
@@ -50,10 +54,16 @@ public class CohortQueryLayout {
    */
   public HashSet<String> getSchemaSet() {
     HashSet<String> ret = new HashSet<>();
-    ret.addAll(this.birthSelectionLayout.getRelatedSchemas());
-    ret.add(this.cohortSelectionLayout.getFieldSchema());
-    ret.addAll(this.valueSelectionLayout.getSchemaList());
-    ret.add(this.valueSelectionLayout.getChosenSchema());
+    if (this.birthSelectionLayout != null) {
+      ret.addAll(this.birthSelectionLayout.getRelatedSchemas());
+    }
+    if (this.cohortSelectionLayout.getType() != FilterType.ALL) {
+      ret.add(this.cohortSelectionLayout.getFieldSchema());
+    }
+    if (this.valueSelectionLayout != null) {
+      ret.addAll(this.valueSelectionLayout.getSchemaList());
+      ret.add(this.valueSelectionLayout.getChosenSchema());
+    }
     return ret;
   }
 }

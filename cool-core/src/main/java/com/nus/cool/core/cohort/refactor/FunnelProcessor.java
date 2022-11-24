@@ -46,7 +46,7 @@ public class FunnelProcessor {
    *
    * @param layout query for funnel analysis
    */
-  public FunnelProcessor(FunnelQuery layout) {
+  public FunnelProcessor(FunnelQueryLayout layout) {
     this.birthSelector = new ArrayList<>();
     for (int i = 0; i < layout.getBirthSelectionLayout().size(); i++) {
       this.birthSelector.add(layout.getBirthSelectionLayout().get(i).generate());
@@ -137,6 +137,7 @@ public class FunnelProcessor {
         DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
     // check whether its birthEvent is selected
 
+    // i: the number of birth event
     for (int i = 0; i < this.birthSelector.size(); i++) {
       if (!this.birthSelector.get(i).isUserSelected(userId)) {
         // if birthEvent is not selected
@@ -148,10 +149,10 @@ public class FunnelProcessor {
               return;
             }
           }
-          String temp = "";
-          temp = temp.concat(Integer.toString(i)).concat("     ").concat(userId);
-          Logger logger = LoggerFactory.getLogger(FunnelProcessor.class);
-          logger.info(temp);
+//           String temp = "";
+//           temp = temp.concat(Integer.toString(i)).concat("     ").concat(userId);
+//           Logger logger = LoggerFactory.getLogger(FunnelProcessor.class);
+//           logger.info(temp);
           this.result[i] += 1;
         } else {
           break;

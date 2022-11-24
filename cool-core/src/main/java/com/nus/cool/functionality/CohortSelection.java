@@ -19,8 +19,9 @@
 
 package com.nus.cool.functionality;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.ExtendedCohortQuery;
+import com.nus.cool.core.cohort.refactor.CohortProcessor;
+import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
+import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
@@ -34,44 +35,37 @@ public class CohortSelection {
   /**
    * perform the cohort query to select users into a cohort.
    *
-   * @param args [0] dataset path: the path to all datasets, e.g., datasetSource
-   *             args [1] query path: the path to the cohort query, e.g.,
-   *             health/query2.json
+   * @param cubeRepo cubeRepo path: the path to all datasets, e.g., CubeRepo
+   * @param queryPath query path: the path to the cohort query, e.g.,
+   *                  datasets/health_raw/sample_query_selection/query.json
    */
+  public static String performCohortSelection(String cubeRepo, String queryPath) throws IOException {
+    CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
+    CohortProcessor cohortProcessor = new CohortProcessor(layout);
+
+    // start a new cool model and reload the cube
+    CoolModel coolModel = new CoolModel(cubeRepo);
+    coolModel.reload(cohortProcessor.getDataSource());
+    CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
+
+    // get current dir path
+    File currentVersion = coolModel.loadLatestVersion(cohortProcessor.getDataSource());
+    CohortRet ret = cohortProcessor.process(cube);
+    String cohortStoragePath = cohortProcessor.persistCohort(currentVersion.toString());
+    coolModel.close();
+
+    return cohortStoragePath;
+  }
+
+
   public static void main(String[] args) throws IOException {
-    String datasetPath = args[0];
+    String cubeRepo = args[0];
     String queryPath = args[1];
 
     try {
-      ObjectMapper mapper = new ObjectMapper();
-      ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
+      String cohortStoragePath = performCohortSelection(cubeRepo, queryPath);
 
-      String inputSource = query.getDataSource();
-      CoolModel coolModel = new CoolModel(datasetPath);
-      coolModel.reload(inputSource);
-
-      CubeRS cube = coolModel.getCube(query.getDataSource());
-
-      List<Integer> cohorResults = coolModel.cohortEngine.selectCohortUsers(cube, null, query);
-      System.out.println("Result for query is  " + cohorResults);
-      List<String> userIDs = coolModel.cohortEngine.listCohortUsers(cube, cohorResults);
-      System.out.println("Actual user IDs are  " + userIDs);
-
-      String outputCohort = query.getOutputCohort();
-      File cohortRoot = new File(coolModel.getCubeStorePath(inputSource), "cohort");
-      if (!cohortRoot.exists()) {
-        cohortRoot.mkdir();
-        System.out.println("[*] Cohort Fold " + cohortRoot.getName() + " is created.");
-      }
-      File cohortFile = new File(cohortRoot, outputCohort);
-      if (cohortFile.exists()) {
-        cohortFile.delete();
-        System.out.println("[*] Cohort " + outputCohort + " exists and is deleted!");
-      }
-
-      coolModel.cohortEngine.createCohort(query, cohorResults, cohortRoot);
-      System.out.println("[*] Cohort results are stored into " + cohortRoot.getAbsolutePath());
-      coolModel.close();
+      System.out.println("[*] Cohort results are stored into " + cohortStoragePath);
     } catch (IOException e) {
       System.out.println(e);
     }

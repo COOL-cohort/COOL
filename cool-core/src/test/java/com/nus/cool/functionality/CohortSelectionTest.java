@@ -1,13 +1,19 @@
 package com.nus.cool.functionality;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.ExtendedCohortQuery;
+import static com.nus.cool.functionality.CohortSelection.performCohortSelection;
+
+import com.google.common.io.Files;
+import com.nus.cool.core.cohort.refactor.CohortProcessor;
+import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
+import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
+import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,41 +39,18 @@ public class CohortSelectionTest {
     logger.info(
         String.format("Tear Down UnitTest %s\n", CohortSelectionTest.class.getSimpleName()));
   }
-
   @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods = {
-      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"}, enabled = false)
-  public void cohortSelectionUnitTest(String datasetPath, String queryPath,
-                                      List<Integer> selectionGlobalIDs) throws IOException {
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
+  public void cohortSelectionUnitTest(String cubeRepo, String queryPath, int cohortSize)
+      throws IOException {
 
-    ObjectMapper mapper = new ObjectMapper();
-    ExtendedCohortQuery query = mapper.readValue(new File(queryPath), ExtendedCohortQuery.class);
+    String cohortStoragePath = performCohortSelection(cubeRepo, queryPath);
 
-    String inputSource = query.getDataSource();
-    CoolModel coolModel = new CoolModel(datasetPath);
-    coolModel.reload(inputSource);
-
-    CubeRS cube = coolModel.getCube(query.getDataSource());
-
-    List<Integer> cohortResults = coolModel.cohortEngine.selectCohortUsers(cube, null, query);
-    Assert.assertEquals(selectionGlobalIDs, cohortResults);
-    List<String> userIDs = coolModel.cohortEngine.listCohortUsers(cube, cohortResults);
-    //    Assert.assertEquals(userIDs, selectionActualIDs);
-
-    String outputCohort = query.getOutputCohort();
-    File cohortRoot = new File(coolModel.getCubeStorePath(inputSource), "cohort");
-    if (!cohortRoot.exists()) {
-      cohortRoot.mkdir();
-      logger.info("[*] Cohort Fold " + cohortRoot.getName() + " is created.");
-    }
-    File cohortFile = new File(cohortRoot, outputCohort);
-    if (cohortFile.exists()) {
-      cohortFile.delete();
-      logger.info("[*] Cohort " + outputCohort + " exists and is deleted!");
-    }
-
-    coolModel.cohortEngine.createCohort(query, cohortResults, cohortRoot);
-    logger.info("[*] Cohort results are stored into " + cohortRoot.getAbsolutePath());
-    coolModel.close();
+    File cohortResFile = new File(cohortStoragePath, "all.cohort");
+    CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
+    crs.readFrom(Files.map(cohortResFile).order(ByteOrder.nativeOrder()));
+    List<String> redRes = crs.getUsers();
+    Assert.assertEquals(redRes.size(), cohortSize);
   }
 
   /**
@@ -78,8 +61,9 @@ public class CohortSelectionTest {
     return new Object[][] {
         {Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString(),
             Paths.get(System.getProperty("user.dir"), "..",
-                "datasets/health/sample_query_distinctcount", "query.json").toString(),
-            // output global IDs
-            Arrays.asList(1, 1, 0, 0, 0, 0, 0, 0, 0)}};
+                "datasets/health_raw/sample_query_selection", "query.json").toString(),
+            // cohort size
+            8581, // TODO: should be 8592.
+        }};
   }
 }

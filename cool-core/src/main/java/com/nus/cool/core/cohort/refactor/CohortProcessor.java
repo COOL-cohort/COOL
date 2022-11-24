@@ -6,6 +6,7 @@ import com.nus.cool.core.cohort.refactor.ageselect.AgeSelection;
 import com.nus.cool.core.cohort.refactor.birthselect.BirthSelection;
 import com.nus.cool.core.cohort.refactor.cohortselect.CohortSelector;
 import com.nus.cool.core.cohort.refactor.filter.Filter;
+import com.nus.cool.core.cohort.refactor.filter.FilterType;
 import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
 import com.nus.cool.core.cohort.refactor.storage.CohortRet;
 import com.nus.cool.core.cohort.refactor.storage.CohortWSStr;
@@ -42,20 +43,21 @@ import lombok.Getter;
  */
 public class CohortProcessor {
 
-  private final AgeSelection ageSelector;
+  private AgeSelection ageSelector;
 
-  private final ValueSelection valueSelector;
+  private ValueSelection valueSelector;
 
-  private final CohortSelector cohortSelector;
+  private CohortSelector cohortSelector;
 
-  private final BirthSelection birthSelector;
+  private BirthSelection birthSelector;
 
   private final CohortQueryLayout layout;
 
   @Getter
-  private final String dataSource;
+  private String dataSource;
+
   @Getter
-  private final CohortRet result;
+  private CohortRet result;
   private final HashSet<String> projectedSchemaSet;
   // initialize cohort result write store
   private final HashMap<String, CohortWSStr> cohortUserMapper = new HashMap<>();
@@ -72,14 +74,27 @@ public class CohortProcessor {
    */
   public CohortProcessor(CohortQueryLayout layout) {
     this.layout = layout;
-    this.ageSelector = layout.getAgetSelectionLayout().generate();
-    this.birthSelector = layout.getBirthSelectionLayout().generate();
+    // get age selector
+    if (layout.getAgetSelectionLayout() != null) {
+      this.ageSelector = layout.getAgetSelectionLayout().generate();
+      this.result = new CohortRet(layout.getAgetSelectionLayout());
+    }
+    // get birth selector
+    if (layout.getBirthSelectionLayout() != null) {
+      this.birthSelector = layout.getBirthSelectionLayout().generate();
+    }
+    // get cohort selector
     this.cohortSelector = layout.getCohortSelectionLayout().generate();
-    this.valueSelector = layout.getValueSelectionLayout().generate();
+    if (this.cohortSelector.getFilter().getType() == FilterType.ALL) {
+      this.result = new CohortRet();
+    }
+    // get value selector
+    if (layout.getValueSelectionLayout() != null) {
+      this.valueSelector = layout.getValueSelectionLayout().generate();
+    }
 
     this.projectedSchemaSet = layout.getSchemaSet();
     this.dataSource = layout.getDataSource();
-    this.result = new CohortRet(layout.getAgetSelectionLayout());
   }
 
   /**
@@ -249,6 +264,9 @@ public class CohortProcessor {
       return;
     }
 
+    // TODO: there is an error in the following code
+    // Error: A user with only one record will never be birthed.
+    // Please check the CohortSelectionTest.java file
     LocalDateTime actionTime =
         DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
     // check whether its birthEvent is selected
@@ -257,28 +275,32 @@ public class CohortProcessor {
       this.birthSelector.selectEvent(userId, actionTime, this.tuple);
     } else {
       // the birthEvent is selected
-      // do time_diff to generate age / get the BirthEvent Date
-      LocalDateTime birthTime = this.birthSelector.getUserBirthEventDate(userId);
-      int age = this.ageSelector.generateAge(birthTime, actionTime);
-      if (age == AgeSelection.DefaultNullAge) {
-        // age is outofrange
-        return;
-      }
       // extract the cohort this tuple belong to
       String cohortName = this.cohortSelector.selectCohort(this.tuple, metaChunk);
       if (cohortName == null) {
         // cohort is outofrange
         return;
       }
-      if (!this.valueSelector.isSelected(this.tuple)) {
-        // value outofrange
-        return;
-      }
-      // Pass all above filter, we can store value into CohortRet
-      // get the temporay result for this CohortGroup and this age
-      RetUnit ret = this.result.getByAge(cohortName, age);
       this.result.addUserid(cohortName, userId);
-      this.valueSelector.getAggregateFunc().calculate(ret, tuple);
+
+      if (this.ageSelector != null && this.valueSelector != null) {
+        // do time_diff to generate age / get the BirthEvent Date
+        LocalDateTime birthTime = this.birthSelector.getUserBirthEventDate(userId);
+        int age = this.ageSelector.generateAge(birthTime, actionTime);
+        if (age == AgeSelection.DefaultNullAge) {
+          // age is outofrange
+          return;
+        }
+        if (!this.valueSelector.isSelected(this.tuple)) {
+          // value outofrange
+          return;
+        }
+        // Pass all above filter, we can store value into CohortRet
+        // get the temporary result for this CohortGroup and this age
+        RetUnit ret = this.result.getByAge(cohortName, age);
+
+        this.valueSelector.getAggregateFunc().calculate(ret, tuple);
+      }
     }
   }
 
@@ -353,9 +375,11 @@ public class CohortProcessor {
     this.cohortSelector.getFilter().loadMetaInfo(metaChunkRS);
 
     // value age
-    for (Filter filter : this.valueSelector.getFilterList()) {
-      filter.loadMetaInfo(metaChunkRS);
+    if (this.valueSelector != null) {
+      for (Filter filter : this.valueSelector.getFilterList()) {
+        filter.loadMetaInfo(metaChunkRS);
+      }
     }
-  }
 
+  }
 }
