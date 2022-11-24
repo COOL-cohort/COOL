@@ -32,7 +32,7 @@ public class CohortRet {
   private final HashMap<String, List<String>> cohortToUserIdList = new HashMap<>();
 
   /**
-   * Create a cohort ret.
+   * Create a cohort ret with ageSelection.
    */
   public CohortRet(AgeSelectionLayout ageSelection) {
     this.cohortToValueList = new HashMap<>();
@@ -40,6 +40,17 @@ public class CohortRet {
     this.min = ageSelection.getMin();
     this.max = ageSelection.getMax();
     this.size = (this.max - this.min) / this.interval + 1;
+  }
+
+  /**
+   * Create a cohort ret without ageSelection.
+   */
+  public CohortRet() {
+    this.cohortToValueList = new HashMap<>();
+    this.interval = 1;
+    this.min = 0;
+    this.max = 0;
+    this.size = 1;
   }
 
   /**

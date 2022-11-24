@@ -20,8 +20,9 @@
 package com.nus.cool.functionality;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.funnel.FunnelQuery;
-import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.cohort.refactor.FunnelProcessor;
+import com.nus.cool.core.cohort.refactor.FunnelQueryLayout;
+import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
@@ -32,37 +33,34 @@ import java.util.Arrays;
  */
 public class FunnelAnalysis {
 
+  public static int[] performFunnelAnalysis(String cubeRepo, String queryPath) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    FunnelQueryLayout query = mapper.readValue(new File(queryPath), FunnelQueryLayout.class);
+    if (!query.isValid()) {
+      throw new IOException("[x] Invalid funnel query.");
+    }
+
+    CoolModel coolModel = new CoolModel(cubeRepo);
+    String dataSource = query.getDataSource();
+    coolModel.reload(dataSource);
+    FunnelProcessor funnelProcessor = new FunnelProcessor(query);
+    CubeRS cube = coolModel.getCube(dataSource);
+    int[] ret = funnelProcessor.process(cube);
+    coolModel.close();
+    return ret;
+  }
+
+
   /**
    * Execute funnel analysis query.
    */
   public static void main(String[] args) {
-    String datasetPath = args[0];
+    String cubeRepo = args[0];
     String queryPath = args[1];
 
     try {
-      ObjectMapper mapper = new ObjectMapper();
-      FunnelQuery query = mapper.readValue(new File(queryPath), FunnelQuery.class);
-
-      if (!query.isValid()) {
-        throw new IOException("[x] Invalid funnel query.");
-      }
-
-      String inputSource = query.getDataSource();
-      CoolModel coolModel = new CoolModel(datasetPath);
-      coolModel.reload(inputSource);
-
-      String inputCohort = query.getInputCohort();
-      if (inputCohort != null) {
-        coolModel.loadCohorts(inputCohort, inputSource);
-        System.out.println("Input cohort: " + inputCohort);
-      }
-
-      InputVector userVector = coolModel.getCohortUsers(query.getInputCohort());
-
-      int[] result = coolModel.cohortEngine.performFunnelQuery(
-        coolModel.getCube(inputSource), userVector, query);
+      int[] result = performFunnelAnalysis(cubeRepo, queryPath);
       System.out.println(Arrays.toString(result));
-      coolModel.close();
     } catch (IOException e) {
       System.out.println(e);
     }

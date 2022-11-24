@@ -16,7 +16,7 @@ public class CohortSelectionLayout {
 
   private String fieldSchema;
 
-  private FilterType type;
+  private FilterType type = FilterType.ALL;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer max;
@@ -45,10 +45,16 @@ public class CohortSelectionLayout {
         return generateSetSelector();
       case Range:
         return generateRangeSelector();
+      case ALL:
+        return generateAllSelector();
       default:
         throw new IllegalArgumentException(
             String.format("No filter of this type named %s", type.toString()));
     }
+  }
+
+  private CohortAllSelector generateAllSelector() {
+    return new CohortAllSelector();
   }
 
   private CohortRangeSelector generateRangeSelector() {

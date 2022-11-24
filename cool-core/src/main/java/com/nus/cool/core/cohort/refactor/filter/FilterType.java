@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Enum class for filtertype.
  */
 public enum FilterType {
-  Range("RANGE"), Set("SET");
+  Range("RANGE"), Set("SET"), ALL("ALL");
 
   private final String text;
 
@@ -31,6 +31,8 @@ public enum FilterType {
         return Range;
       case "SET":
         return Set;
+      case "ALL":
+        return ALL;
       default:
         throw new IllegalArgumentException();
     }
