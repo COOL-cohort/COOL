@@ -1,6 +1,7 @@
 package com.nus.cool.core.cohort.refactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nus.cool.core.cohort.FunnelQueryLayout;
 import java.io.File;
 import java.io.IOException;
 import org.slf4j.Logger;
