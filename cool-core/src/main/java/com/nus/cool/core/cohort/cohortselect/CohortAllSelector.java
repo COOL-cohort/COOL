@@ -16,9 +16,11 @@ public class CohortAllSelector implements CohortSelector {
   public CohortAllSelector() {
     this.filter = new AllFilter();
   }
+
   /**
    * select cohort.
-   * @param tuple tuple.
+   *
+   * @param tuple tuple ex.
    * @param metaChunkRS metaChunkRS.
    * @return name of cohort
    */
@@ -28,6 +30,8 @@ public class CohortAllSelector implements CohortSelector {
   }
 
   /**
+   * get the schema.
+   *
    * @return null
    */
   @Override
@@ -36,7 +40,9 @@ public class CohortAllSelector implements CohortSelector {
   }
 
   /**
-   * @return null
+   * get All filters.
+   *
+   * @return AllFilter
    */
   @Override
   public Filter getFilter() {

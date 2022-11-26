@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
  */
 public class FunnelAnalysisTest {
   static final Logger logger = LoggerFactory.getLogger(FunnelAnalysisTest.class);
+
   @BeforeTest
   public void setUp() {
     logger.info("Start UnitTest " + FunnelAnalysisTest.class.getSimpleName());

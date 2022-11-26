@@ -33,6 +33,14 @@ import java.util.Arrays;
  */
 public class FunnelAnalysis {
 
+  /**
+   * API to perform funnel analysis.
+   *
+   * @param cubeRepo path to the cube repository
+   * @param queryPath path to the query
+   * @return result of funnel analysis
+   * @throws IOException error
+   */
   public static int[] performFunnelAnalysis(String cubeRepo, String queryPath) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     FunnelQueryLayout query = mapper.readValue(new File(queryPath), FunnelQueryLayout.class);
@@ -53,6 +61,9 @@ public class FunnelAnalysis {
 
   /**
    * Execute funnel analysis query.
+   *
+   * @param args [0]: cubeRepo
+   *             [1]: queryPath
    */
   public static void main(String[] args) {
     String cubeRepo = args[0];

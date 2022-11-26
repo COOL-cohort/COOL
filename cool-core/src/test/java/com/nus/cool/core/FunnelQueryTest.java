@@ -1,4 +1,4 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.FunnelQueryLayout;
@@ -19,6 +19,7 @@ import org.testng.annotations.Test;
 
 public class FunnelQueryTest {
   static final Logger logger = LoggerFactory.getLogger(FunnelQueryTest.class);
+
   @BeforeTest
   public void setUp() {
     logger.info("Start UnitTest " + FunnelQueryTest.class.getSimpleName());

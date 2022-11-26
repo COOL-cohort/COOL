@@ -14,59 +14,65 @@ public class AllFilter implements Filter {
 
 
   /**
+   * Accept all values.
+   *
    * @param value the Input Value to check
    * @return true
-   * @throws RuntimeException
    */
   @Override
-  public Boolean accept(Integer value) throws RuntimeException {
+  public Boolean accept(Integer value) {
     return true;
   }
 
   /**
+   *  Accept all values.
+   *
    * @param values the batch of input value to check
-   * @return
-   * @throws RuntimeException
+   * @return null
    */
   @Override
-  public BitSet accept(List<Integer> values) throws RuntimeException {
+  public BitSet accept(List<Integer> values) {
     return null;
   }
 
   /**
+   *  Accept all values.
+   *
    * @param values Scope of time_min-time_max
-   * @return
-   * @throws RuntimeException
+   * @return true
    */
   @Override
-  public boolean accept(Scope values) throws RuntimeException {
+  public boolean accept(Scope values) {
     return true;
   }
 
   /**
+   *  Accept all values.
+   *
    * @param value value
-   * @return
-   * @throws RuntimeException
+   * @return true
    */
   @Override
-  public Boolean accept(String value) throws RuntimeException {
+  public Boolean accept(String value) {
     return true;
   }
 
   /**
+   *  Accept all values.
+   *
    * @param values values
-   * @return
-   * @throws RuntimeException
+   * @return null
    */
   @Override
-  public BitSet accept(String[] values) throws RuntimeException {
+  public BitSet accept(String[] values) {
     // TODO Auto-generated method stub
     return null;
   }
 
   /**
-   * return the type of filter.
-   * @return type
+   * return AllFilter.
+   *
+   * @return type the type of filter.
    */
   @Override
   public FilterType getType() {
@@ -74,7 +80,9 @@ public class AllFilter implements Filter {
   }
 
   /**
-   * @return
+   * No schema to return.
+   *
+   * @return null.
    */
   @Override
   public String getFilterSchema() {
