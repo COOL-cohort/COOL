@@ -70,10 +70,6 @@ public class CoolModel implements Closeable {
 
   private String currentCube = "";
 
-  public CoolCohortEngine cohortEngine = new CoolCohortEngine();
-
-  public CoolOlapEngine olapEngine = new CoolOlapEngine();
-
   /**
    * Create a CoolModel to manage a cube repository.
    * It supports to create a new cube repository if it does not exist.
