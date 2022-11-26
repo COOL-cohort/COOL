@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +40,7 @@ import lombok.Getter;
  * Cohort Query Processing Engine.
  */
 public class CohortProcessor {
+  private String queryName;
 
   private AgeSelection ageSelector;
 
@@ -57,13 +56,22 @@ public class CohortProcessor {
   private String dataSource;
 
   @Getter
+  private String inputCohort;
+
+  @Getter
   private CohortRet result;
+
   private final HashSet<String> projectedSchemaSet;
   // initialize cohort result write store
+
   private final HashMap<String, CohortWSStr> cohortUserMapper = new HashMap<>();
+
   private ProjectedTuple tuple;
+
   private String userIdSchema;
+
   private String actionTimeSchema;
+
   @Getter
   private HashSet<String> previousCohortUsers = new HashSet<>();
 
@@ -95,6 +103,8 @@ public class CohortProcessor {
 
     this.projectedSchemaSet = layout.getSchemaSet();
     this.dataSource = layout.getDataSource();
+    this.queryName = layout.getQueryName();
+    this.inputCohort = layout.getInputCohort();
   }
 
   /**
@@ -136,7 +146,7 @@ public class CohortProcessor {
 
   /**
    * Persist cohort file .cohort to output disk to the same level with the .dz file.
-   * E,g. ../CubeRepo/health_raw/v00000012.
+   * E,g. ../CubeRepo/health_raw/v00000012/cohort/queryName/all.cohort.
    *
    * @param outputDir the output file path
    * @return The cohort result storage path
@@ -145,11 +155,7 @@ public class CohortProcessor {
   public String persistCohort(String outputDir) throws IOException {
 
     // 1. create folder named "cohort" under the current version
-    SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
-    Date date = new Date();
-    String timeStr = formatter.format(date);
-
-    File cohortRes = new File(outputDir, "cohort/query_" + timeStr);
+    File cohortRes = new File(outputDir, "cohort/" + queryName);
     if (!cohortRes.getParentFile().exists()) {
       cohortRes.getParentFile().mkdir();
     }
@@ -181,15 +187,16 @@ public class CohortProcessor {
   }
 
   /**
-   * Persist cohort to output disk, cohort is named cohortName.cohort, e,g. "1980-1990.cohort".
+   * Read all cohorts from the results of a previous query,
+   * cohort is named cohortName.cohort, e,g. "1980-1990.cohort".
    * Where 1980-1990 is the cohortName in our cohort query for health-raw dataset.
    *
-   * @param cohortPath the path to store the previous stored cohort.
+   * @param cohortFolderPath the path to store the previous stored cohort.
    */
-  public void readExistingCohort(String cohortPath) throws IOException {
+  public void readQueryCohorts(String cohortFolderPath) throws IOException {
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
 
-    File file = new File(cohortPath);
+    File file = new File(cohortFolderPath);
     File[] fs = file.listFiles();
     if (fs == null) {
       return;
@@ -204,6 +211,34 @@ public class CohortProcessor {
         crs.readFrom(Files.map(f).order(ByteOrder.nativeOrder()));
         this.previousCohortUsers.addAll(crs.getUsers());
       }
+    }
+  }
+
+  /**
+   * Read a cohort from the results of a previous query.
+   * cohort is named cohortName.cohort, e,g. "all.cohort".
+   *
+   * @param cohortPath the path to store a stored cohort.
+   */
+  public void readOneCohort(String cohortPath) throws IOException {
+    File file = new File(cohortPath);
+    readOneCohort(file);
+  }
+
+  public void readOneCohort(File cohortFile) throws IOException {
+    CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
+
+    if (!cohortFile.exists()) {
+      throw new IOException("[*] cohort file is not found. Cohort path: " + cohortFile.getPath());
+    }
+    int pointIndex = cohortFile.getName().lastIndexOf(".");
+    if (pointIndex == -1) {
+      throw new IOException("[*] Not a valid cohort file which should end with '.cohort'. Cohort path: " + cohortFile.getPath());
+    }
+    String extension = cohortFile.getName().substring(pointIndex);
+    if (!cohortFile.isDirectory() && extension.equals(".cohort")) {
+      crs.readFrom(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
+      this.previousCohortUsers.addAll(crs.getUsers());
     }
   }
 
