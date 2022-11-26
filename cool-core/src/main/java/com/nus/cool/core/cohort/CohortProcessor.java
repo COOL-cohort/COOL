@@ -225,6 +225,12 @@ public class CohortProcessor {
     readOneCohort(file);
   }
 
+  /**
+   * Read a cohort from the results of a previous query.
+   * cohort is named cohortName.cohort, e,g. "all.cohort".
+   *
+   * @param cohortFile the File to store a stored cohort.
+   */
   public void readOneCohort(File cohortFile) throws IOException {
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
 
@@ -233,7 +239,8 @@ public class CohortProcessor {
     }
     int pointIndex = cohortFile.getName().lastIndexOf(".");
     if (pointIndex == -1) {
-      throw new IOException("[*] Not a valid cohort file which should end with '.cohort'. Cohort path: " + cohortFile.getPath());
+      throw new IOException("[*] Not a valid cohort file which should end with '.cohort'. "
+          + "Cohort path: " + cohortFile.getPath());
     }
     String extension = cohortFile.getName().substring(pointIndex);
     if (!cohortFile.isDirectory() && extension.equals(".cohort")) {

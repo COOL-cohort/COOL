@@ -38,7 +38,8 @@ public class CohortSelection {
    * @param queryPath query path: the path to the cohort query, e.g.,
    *                  datasets/health_raw/sample_query_selection/query.json
    */
-  public static String performCohortSelection(String cubeRepo, String queryPath) throws IOException {
+  public static String performCohortSelection(String cubeRepo, String queryPath)
+      throws IOException {
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
 
@@ -57,7 +58,13 @@ public class CohortSelection {
   }
 
 
-  public static void main(String[] args) throws IOException {
+  /**
+   * run the cohort selection function.
+   *
+   * @param args [0]: cubeRepo
+   *             [1]: queryPath
+   */
+  public static void main(String[] args) {
     String cubeRepo = args[0];
     String queryPath = args[1];
 

@@ -67,6 +67,12 @@ public class CohortAnalysis {
     return ret;
   }
 
+  /**
+   * API for cohort analysis.
+   *
+   * @param args [0]: cubeRepo
+   *             [1]: queryPath
+   */
   public static void main(String[] args) {
     String cubeRepo = args[0];
     String queryPath = args[1];

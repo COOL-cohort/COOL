@@ -49,7 +49,7 @@ public class CohortQueryLayout {
       throw new IOException("[x] please add a query Name for this query.");
     }
     if (instance.cohortSelectionLayout == null) {
-       instance.cohortSelectionLayout = new CohortSelectionLayout();
+      instance.cohortSelectionLayout = new CohortSelectionLayout();
     }
     return instance;
   }

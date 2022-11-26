@@ -228,6 +228,13 @@ public class CoolModel implements Closeable {
     return localRepoPara.list();
   }
 
+  /**
+   * check whether the cube ls loaded and is the latest.
+   *
+   * @param cube the name of the cube
+   * @return whether the cube ls loaded and is the latest
+   * @throws IOException error
+   */
   public synchronized boolean islatestCubeLoaded(String cube) throws IOException {
     // loaded and latest
     return this.cubeStore.containsKey(cube) && this.storePath.get(cube).getName().equals(

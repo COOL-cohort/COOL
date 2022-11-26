@@ -34,6 +34,7 @@ public class CohortAnalysisTest {
     logger.info(
         String.format("Tear Down UnitTest %s\n", CohortAnalysisTest.class.getSimpleName()));
   }
+
   @Test(dataProvider = "cohortAnalysisTestDP", dependsOnMethods = {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void cohortSelectionUnitTest(String cubeRepo, String queryPath, String queryResultPath)
@@ -111,6 +112,7 @@ public class CohortAnalysisTest {
             "../datasets/health/sample_query_distinctcount/query_result.json"}
     };
   }
+
   /**
    * Data provider for cohort analysis with input cohort.
    */
