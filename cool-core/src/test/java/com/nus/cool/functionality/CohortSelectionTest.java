@@ -3,12 +3,7 @@ package com.nus.cool.functionality;
 import static com.nus.cool.functionality.CohortSelection.performCohortSelection;
 
 import com.google.common.io.Files;
-import com.nus.cool.core.cohort.refactor.CohortProcessor;
-import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
 import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
-import com.nus.cool.core.cohort.refactor.storage.CohortRet;
-import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -39,6 +34,7 @@ public class CohortSelectionTest {
     logger.info(
         String.format("Tear Down UnitTest %s\n", CohortSelectionTest.class.getSimpleName()));
   }
+
   @Test(dataProvider = "CohortSelectionTestDP", dependsOnMethods = {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void cohortSelectionUnitTest(String cubeRepo, String queryPath, int cohortSize)
