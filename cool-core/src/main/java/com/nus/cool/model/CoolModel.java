@@ -62,7 +62,7 @@ public class CoolModel implements Closeable {
   // Container of loaded cohorts
   private final Map<String, CohortRS> cohortStore = Maps.newHashMap();
 
-  // Store path of loaded cubes
+  // Store path of loaded cubes (contains version information)
   private final Map<String, File> storePath = Maps.newHashMap();
 
   // Directory containing a set of cube files considered a repository
@@ -117,12 +117,12 @@ public class CoolModel implements Closeable {
    * @param cube the cube name
    */
   public synchronized void reload(String cube) throws IOException {
-    // Skip the reload process if the cube is the current one
-    if (currentCube.equals(cube)) {
+    // Skip the reload process if the cube is the current one and is the latest one
+    if (currentCube.equals(cube) && islatestCubeLoaded(cube)) {
       return;
     }
     // Skip the reload process if the cube is loaded
-    if (isCubeLoaded(cube)) {
+    if (islatestCubeLoaded(cube)) {
       if (!Objects.equals(currentCube, cube)) {
         this.cohortStore.clear();
       }
@@ -228,8 +228,10 @@ public class CoolModel implements Closeable {
     return localRepoPara.list();
   }
 
-  public synchronized boolean isCubeLoaded(String cube) {
-    return this.cubeStore.containsKey(cube);
+  public synchronized boolean islatestCubeLoaded(String cube) throws IOException {
+    // loaded and latest
+    return this.cubeStore.containsKey(cube) && this.storePath.get(cube).getName().equals(
+        loadLatestVersion(cube).getName());
   }
 
   public synchronized String[] listCohorts(String cube) throws IOException {
