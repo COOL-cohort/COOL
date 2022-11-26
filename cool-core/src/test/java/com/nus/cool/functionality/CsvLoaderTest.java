@@ -70,10 +70,12 @@ public class CsvLoaderTest {
    */
   @DataProvider(name = "CsvLoaderTestDP")
   public Object[][] csvLoaderTestDPArgObjects() {
-    return new Object[][] {{"health",
+    return new Object[][] {
+        {"health",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/health", "data.csv").toString(),
-        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()}, {"sogamo",
+        Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},
+        {"sogamo",
         Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "table.yaml").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "datasets/sogamo", "data.csv").toString(),
         Paths.get(System.getProperty("user.dir"), "..", "CubeRepo/TestCube").toString()},

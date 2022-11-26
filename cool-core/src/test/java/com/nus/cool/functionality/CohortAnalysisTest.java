@@ -4,13 +4,9 @@ import static com.nus.cool.functionality.CohortAnalysis.performCohortAnalysis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.Files;
-import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
-import com.nus.cool.core.cohort.refactor.storage.CohortRet;
+import com.nus.cool.core.cohort.storage.CohortRet;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;

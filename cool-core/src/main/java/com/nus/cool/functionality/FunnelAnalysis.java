@@ -20,8 +20,8 @@
 package com.nus.cool.functionality;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.refactor.FunnelProcessor;
-import com.nus.cool.core.cohort.refactor.FunnelQueryLayout;
+import com.nus.cool.core.cohort.FunnelProcessor;
+import com.nus.cool.core.cohort.FunnelQueryLayout;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import java.io.File;

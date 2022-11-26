@@ -3,7 +3,7 @@ package com.nus.cool.functionality;
 import static com.nus.cool.functionality.CohortSelection.performCohortSelection;
 
 import com.google.common.io.Files;
-import com.nus.cool.core.cohort.refactor.storage.CohortRSStr;
+import com.nus.cool.core.cohort.storage.CohortRSStr;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;

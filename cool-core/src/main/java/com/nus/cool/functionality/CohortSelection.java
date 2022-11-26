@@ -19,14 +19,13 @@
 
 package com.nus.cool.functionality;
 
-import com.nus.cool.core.cohort.refactor.CohortProcessor;
-import com.nus.cool.core.cohort.refactor.CohortQueryLayout;
-import com.nus.cool.core.cohort.refactor.storage.CohortRet;
+import com.nus.cool.core.cohort.CohortProcessor;
+import com.nus.cool.core.cohort.CohortQueryLayout;
+import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Cohort selection operation.
