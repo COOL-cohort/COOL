@@ -1,4 +1,5 @@
 {
+    "queryName": "sample_query_login_count",
     "birthSelector":{
         "birthEvents":[
             {

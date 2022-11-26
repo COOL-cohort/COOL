@@ -18,6 +18,9 @@ import lombok.Getter;
 @Getter
 public class CohortQueryLayout {
 
+  @JsonProperty("queryName")
+  private String queryName;
+
   @JsonProperty("birthSelector")
   private BirthSelectionLayout birthSelectionLayout;
 
@@ -33,12 +36,18 @@ public class CohortQueryLayout {
   @JsonProperty("dataSource")
   private String dataSource;
 
+  @JsonProperty("inputCohort")
+  private String inputCohort;
+
   /**
    * Read the cohort query in a json.
    */
   public static CohortQueryLayout readFromJson(File in) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     CohortQueryLayout instance = mapper.readValue(in, CohortQueryLayout.class);
+    if (instance.queryName == null) {
+      throw new IOException("[x] please add a query Name for this query.");
+    }
     if (instance.cohortSelectionLayout == null) {
        instance.cohortSelectionLayout = new CohortSelectionLayout();
     }
