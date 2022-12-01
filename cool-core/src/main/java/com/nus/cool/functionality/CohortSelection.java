@@ -49,7 +49,7 @@ public class CohortSelection {
     CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
 
     // get current dir path
-    File currentVersion = coolModel.loadLatestVersion(cohortProcessor.getDataSource());
+    File currentVersion = coolModel.getLatestVersion(cohortProcessor.getDataSource());
     CohortRet ret = cohortProcessor.process(cube);
     String cohortStoragePath = cohortProcessor.persistCohort(currentVersion.toString());
     coolModel.close();
