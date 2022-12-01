@@ -93,7 +93,7 @@ public class CoolModel implements Closeable {
    * Load the latest version directory of a cube.
    * caller: reload(String) and getCubeMeta(String)
    */
-  public File loadLatestVersion(String cube) throws IOException {
+  public File getLatestVersion(String cube) throws IOException {
     // Check the existence of cube under this repository
     File cubeRoot = new File(this.localRepo, cube);
     if (!cubeRoot.exists()) {
@@ -137,7 +137,7 @@ public class CoolModel implements Closeable {
     this.currentCube = cube;
 
     // Only load the latest version
-    File currentVersion = loadLatestVersion(cube);
+    File currentVersion = getLatestVersion(cube);
 
     // Read schema information
     TableSchema schema = TableSchema.read(
@@ -209,7 +209,7 @@ public class CoolModel implements Closeable {
     }
 
     // load from the latest version
-    File currentVersion = loadLatestVersion(cube);
+    File currentVersion = getLatestVersion(cube);
 
     // Read schema information
     TableSchema schema = TableSchema.read(
@@ -238,7 +238,7 @@ public class CoolModel implements Closeable {
   public synchronized boolean islatestCubeLoaded(String cube) throws IOException {
     // loaded and latest
     return this.cubeStore.containsKey(cube) && this.storePath.get(cube).getName().equals(
-        loadLatestVersion(cube).getName());
+        getLatestVersion(cube).getName());
   }
 
   public synchronized String[] listCohorts(String cube) throws IOException {

@@ -147,10 +147,6 @@ public class FunnelProcessor {
               return;
             }
           }
-          // String temp = "";
-          // temp = temp.concat(Integer.toString(i)).concat("     ").concat(userId);
-          // Logger logger = LoggerFactory.getLogger(FunnelProcessor.class);
-          // logger.info(temp);
           this.result[i] += 1;
         } else {
           break;
