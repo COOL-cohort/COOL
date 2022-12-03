@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 
 /**
@@ -120,7 +121,8 @@ public class CohortProcessor {
   }
 
   /**
-   * Persist cohort file .cohort to output disk to the same level with the .dz file.
+   * Persist cohort file .cohort to output disk to the same level with the .dz
+   * file.
    * E,g. ../CubeRepo/health_raw/v00000012.
    *
    * @param outputDir the output file path
@@ -166,7 +168,8 @@ public class CohortProcessor {
   }
 
   /**
-   * Persist cohort to output disk, cohort is named cohortName.cohort, e,g. "1980-1990.cohort".
+   * Persist cohort to output disk, cohort is named cohortName.cohort, e,g.
+   * "1980-1990.cohort".
    * Where 1980-1990 is the cohortName in our cohort query for health-raw dataset.
    *
    * @param cohortPath the path to store the previous stored cohort.
@@ -249,8 +252,8 @@ public class CohortProcessor {
       return;
     }
 
-    LocalDateTime actionTime =
-        DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
+    LocalDateTime actionTime = DateUtils.daysSinceEpoch(
+        (int) tuple.getValueBySchema(this.actionTimeSchema));
     // check whether its birthEvent is selected
     if (!this.birthSelector.isUserSelected(userId)) {
       // if birthEvent is not selected
@@ -356,6 +359,15 @@ public class CohortProcessor {
     for (Filter filter : this.valueSelector.getFilterList()) {
       filter.loadMetaInfo(metaChunkRS);
     }
+  }
+
+  /**
+   * the Interface to get selectedUser in CohortProcessing.
+   *
+   * @return a set of userId
+   */
+  Set<String> getSelectedUser() {
+    return this.birthSelector.getAcceptedUsers();
   }
 
 }
