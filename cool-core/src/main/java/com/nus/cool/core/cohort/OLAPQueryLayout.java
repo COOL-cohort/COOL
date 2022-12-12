@@ -2,7 +2,7 @@ package com.nus.cool.core.cohort;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.olapselect.Aggregation;
+import com.nus.cool.core.cohort.olapselect.AggregationLayout;
 import com.nus.cool.core.cohort.olapselect.OLAPSelectionLayout;
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class OLAPQueryLayout {
 
   // a list of aggregation functions, sum, count etc
   @JsonProperty("aggregations")
-  private List<Aggregation> aggregations;
+  private List<AggregationLayout> aggregations;
 
   // granularity for time range
   @JsonProperty("granularity")
@@ -63,7 +63,7 @@ public class OLAPQueryLayout {
   public HashSet<String> getSchemaSet() {
 
     HashSet<String> ret = new HashSet<>(this.groupFields);
-    for (Aggregation agg : this.aggregations) {
+    for (AggregationLayout agg : this.aggregations) {
       ret.add(agg.getFieldName());
     }
     ret.addAll(this.selection.getSchemaSet());

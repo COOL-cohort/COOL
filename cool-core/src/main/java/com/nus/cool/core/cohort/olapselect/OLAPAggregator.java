@@ -30,7 +30,7 @@ public class OLAPAggregator {
    * @return array of OlapRet.
    */
   public ArrayList<OlapRet> process(MetaChunkRS metaChunk, ChunkRS dataChunk,
-                                           Aggregation aggregation,
+                                    AggregationLayout aggregation,
                                            HashSet<String> projectedSchemaSet,
                                            Map<String, BitSet> group) {
 

@@ -28,7 +28,7 @@ import lombok.Data;
  * Aggregation.
  */
 @Data
-public class Aggregation {
+public class AggregationLayout {
 
   // filed name used to do the aggregation
   @JsonProperty("fieldName")

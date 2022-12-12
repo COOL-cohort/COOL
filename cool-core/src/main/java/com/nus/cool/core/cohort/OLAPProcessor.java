@@ -2,7 +2,7 @@ package com.nus.cool.core.cohort;
 
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.filter.FilterType;
-import com.nus.cool.core.cohort.olapselect.Aggregation;
+import com.nus.cool.core.cohort.olapselect.AggregationLayout;
 import com.nus.cool.core.cohort.olapselect.OLAPAggregator;
 import com.nus.cool.core.cohort.olapselect.OLAPGroupBy;
 import com.nus.cool.core.cohort.olapselect.OLAPSelectionLayout;
@@ -197,7 +197,7 @@ public class OLAPProcessor {
 
     // 3. run aggregator
     OLAPAggregator olapAgge = new OLAPAggregator();
-    for (Aggregation aggregation : this.query.getAggregations()) {
+    for (AggregationLayout aggregation : this.query.getAggregations()) {
       ArrayList<OlapRet> res =
           olapAgge.process(metaChunk, dataChunk, aggregation, this.projectedSchemaSet,
               olapGroupBy.getMergedGroup());
