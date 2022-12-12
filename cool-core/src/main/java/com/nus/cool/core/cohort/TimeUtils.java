@@ -20,9 +20,9 @@
 package com.nus.cool.core.cohort;
 
 import static com.google.common.base.Preconditions.checkArgument;
-
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.converter.DateBase;
+import com.nus.cool.core.cohort.utils.TimeUtils.TimeUnit;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 
@@ -76,7 +76,7 @@ public class TimeUtils {
   }
 
   public static int skipToNextTimeUnitN(InputVector vector, TimeUnit unit, int fromOffset,
-      int endOffset, int startDate, int nextN) {
+                                        int endOffset, int startDate, int nextN) {
     return skipToDate(vector, fromOffset, endOffset,
         getDateofNextTimeUnitN(startDate, unit, nextN));
   }

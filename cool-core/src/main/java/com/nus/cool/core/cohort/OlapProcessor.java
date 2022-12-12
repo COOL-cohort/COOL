@@ -1,14 +1,14 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort;
 
-import com.nus.cool.core.cohort.refactor.filter.Filter;
-import com.nus.cool.core.cohort.refactor.filter.FilterType;
-import com.nus.cool.core.cohort.refactor.olapSelect.Aggregation;
-import com.nus.cool.core.cohort.refactor.olapSelect.olapAggregation;
-import com.nus.cool.core.cohort.refactor.olapSelect.olapSelectionLayout;
-import com.nus.cool.core.cohort.refactor.olapSelect.olapSelectionLayout.SelectionType;
-import com.nus.cool.core.cohort.refactor.olapSelect.olapSelector;
-import com.nus.cool.core.cohort.refactor.storage.OlapRet;
-import com.nus.cool.core.cohort.refactor.storage.Scope;
+import com.nus.cool.core.cohort.filter.Filter;
+import com.nus.cool.core.cohort.filter.FilterType;
+import com.nus.cool.core.cohort.olapSelect.Aggregation;
+import com.nus.cool.core.cohort.olapSelect.olapAggregation;
+import com.nus.cool.core.cohort.olapSelect.olapSelectionLayout;
+import com.nus.cool.core.cohort.olapSelect.olapSelectionLayout.SelectionType;
+import com.nus.cool.core.cohort.olapSelect.olapSelector;
+import com.nus.cool.core.cohort.storage.OlapRet;
+import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;

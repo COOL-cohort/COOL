@@ -41,7 +41,7 @@
             {
                 "fieldSchema":"value",
                 "type":"RANGE",
-                "acceptValue":["MIN-45", "131-MAX"]
+                "acceptValue":["MIN to 45", "131 to MAX"]
             }
         ],
         "function":"DISTINCT",

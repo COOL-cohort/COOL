@@ -17,17 +17,15 @@
  * under the License.
  */
 
-package com.nus.cool.core.cohort.refactor.olapSelect;
+package com.nus.cool.core.cohort.olapSelect;
 
-import com.nus.cool.core.cohort.refactor.OlapQueryLayout.granularityType;
-import com.nus.cool.core.cohort.refactor.aggregate.AggregateFactory;
-import com.nus.cool.core.cohort.refactor.aggregate.AggregateFunc;
-import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
-import com.nus.cool.core.cohort.refactor.storage.OlapRet;
-import com.nus.cool.core.cohort.refactor.storage.ProjectedTuple;
-import com.nus.cool.core.cohort.refactor.storage.RetUnit;
-import com.nus.cool.core.iceberg.result.AggregatorResult;
-import com.nus.cool.core.iceberg.result.BaseResult;
+import com.nus.cool.core.cohort.OlapQueryLayout.granularityType;
+import com.nus.cool.core.cohort.aggregate.AggregateFactory;
+import com.nus.cool.core.cohort.aggregate.AggregateFunc;
+import com.nus.cool.core.cohort.aggregate.AggregateType;
+import com.nus.cool.core.cohort.storage.OlapRet;
+import com.nus.cool.core.cohort.storage.ProjectedTuple;
+import com.nus.cool.core.cohort.storage.RetUnit;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;

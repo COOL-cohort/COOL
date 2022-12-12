@@ -1,9 +1,9 @@
-package com.nus.cool.core.cohort.refactor;
+package com.nus.cool.core.cohort;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.refactor.olapSelect.Aggregation;
-import com.nus.cool.core.cohort.refactor.olapSelect.olapSelectionLayout;
+import com.nus.cool.core.cohort.olapSelect.Aggregation;
+import com.nus.cool.core.cohort.olapSelect.olapSelectionLayout;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;

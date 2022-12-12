@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.nus.cool.core.cohort.refactor.olapSelect;
+package com.nus.cool.core.cohort.olapSelect;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
+import com.nus.cool.core.cohort.aggregate.AggregateType;
 import java.util.List;
 import lombok.Data;
 

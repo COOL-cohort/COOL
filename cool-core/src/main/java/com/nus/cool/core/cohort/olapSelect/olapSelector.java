@@ -1,8 +1,8 @@
-package com.nus.cool.core.cohort.refactor.olapSelect;
+package com.nus.cool.core.cohort.olapSelect;
 
-import com.nus.cool.core.cohort.refactor.OlapQueryLayout;
-import com.nus.cool.core.cohort.refactor.filter.Filter;
-import com.nus.cool.core.cohort.refactor.olapSelect.olapSelectionLayout.SelectionType;
+import com.nus.cool.core.cohort.OlapQueryLayout;
+import com.nus.cool.core.cohort.filter.Filter;
+import com.nus.cool.core.cohort.olapSelect.olapSelectionLayout.SelectionType;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.storevector.InputVector;

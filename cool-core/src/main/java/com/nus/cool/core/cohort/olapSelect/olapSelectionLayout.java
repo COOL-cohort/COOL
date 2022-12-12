@@ -17,12 +17,12 @@
  * under the License.
  */
 
-package com.nus.cool.core.cohort.refactor.olapSelect;
+package com.nus.cool.core.cohort.olapSelect;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.nus.cool.core.cohort.refactor.filter.Filter;
-import com.nus.cool.core.cohort.refactor.filter.FilterLayout;
-import com.nus.cool.core.cohort.refactor.filter.FilterType;
+import com.nus.cool.core.cohort.filter.Filter;
+import com.nus.cool.core.cohort.filter.FilterLayout;
+import com.nus.cool.core.cohort.filter.FilterType;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import java.util.ArrayList;
 import java.util.HashSet;

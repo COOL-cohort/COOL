@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.nus.cool.core.cohort.refactor.storage;
+package com.nus.cool.core.cohort.storage;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nus.cool.core.cohort.refactor.aggregate.AggregateType;
+import com.nus.cool.core.cohort.aggregate.AggregateType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
