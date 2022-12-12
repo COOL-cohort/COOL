@@ -18,6 +18,7 @@ public class RangeFilter implements Filter {
   private static final FilterType type = FilterType.Range;
   private static final String MinLimit = "MIN";
   private static final String MaxLimit = "MAX";
+  private static final String TimeDelimiter = "-";
   @Getter
   private static final String splitChar = " to ";
 
@@ -132,7 +133,7 @@ public class RangeFilter implements Filter {
   }
 
   private static int convertPartToInt(String dataStr) {
-    if (dataStr.contains("-")) {
+    if (dataStr.contains(RangeFilter.TimeDelimiter)) {
       DayIntConverter dins = DayIntConverter.getInstance();
       return dins.toInt(dataStr);
     } else {
