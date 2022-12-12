@@ -1,19 +1,19 @@
 {
   "dataSource": "tpc-h-10g",
   "selection": {
-    "filter_type": "and",
+    "filterType": "and",
     "fieldSchema": null,
     "acceptValue": null,
     "fields": [
-      { "filter_type": "filter",
+      { "filterType": "filter",
         "fieldSchema": "O_ORDERPRIORITY",
         "acceptValue": [ "2-HIGH" ],
         "type":"SET"},
-      { "filter_type": "filter",
+      { "filterType": "filter",
         "fieldSchema": "R_NAME",
         "acceptValue": ["EUROPE"],
         "type":"SET"},
-      { "filter_type": "filter",
+      { "filterType": "filter",
         "fieldSchema": "O_ORDERDATE",
         "acceptValue": ["1993-01-01 to 1994-01-02"],
         "type":"RANGE"}

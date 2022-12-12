@@ -44,7 +44,7 @@ public interface FieldRS extends Input {
   InputVector getKeyVector();
 
   /**
-   * Return the local id of each tuple.
+   * Return the local id of each column.
    *
    * @return InputVector
    *
@@ -73,7 +73,7 @@ public interface FieldRS extends Input {
   int maxKey();
 
   /**
-   * Get the idx tuple's value in this field.
+   * Get the global id for set, or actual value for range.
    *
    * @param idx index of tuple
    * @return int globalId of value
@@ -81,5 +81,12 @@ public interface FieldRS extends Input {
   int getValueByIndex(int idx);
 
   // void readFromWithFieldType(ByteBuffer buf, FieldType fieldType);
+
+  /**
+   * Get the number of record in this field.
+   *
+   * @return i number of records
+   */
+  int getFieldSize();
 
 }

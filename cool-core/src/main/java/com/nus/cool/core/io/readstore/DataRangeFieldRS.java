@@ -79,4 +79,9 @@ public class DataRangeFieldRS implements FieldRS {
     return this.valueVector;
   }
 
+  @Override
+  public int getFieldSize() {
+    return this.valueVector.size();
+  }
+
 }

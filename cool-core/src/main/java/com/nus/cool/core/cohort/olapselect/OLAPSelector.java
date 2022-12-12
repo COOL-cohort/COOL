@@ -1,12 +1,9 @@
 package com.nus.cool.core.cohort.olapselect;
 
-import com.nus.cool.core.cohort.OlapQueryLayout;
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.olapselect.OLAPSelectionLayout.SelectionType;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
-import com.nus.cool.core.io.storevector.InputVector;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -29,26 +26,6 @@ public class OLAPSelector {
     private BitSet matchedRecords;
   }
 
-  private OLAPSelectionLayout selection;
-
-  private String timeRange;
-
-  // max and min query Time specified by user
-  private int maxQueryTime;
-  private int minQueryTime;
-
-  // time range split by system, used as key in map
-  private List<String> timeRanges;
-
-  // store multiple time range lower bounds and upper bounds, convert data into integer
-  private List<Integer> maxTimeRanges;
-  private List<Integer> minTimeRanges;
-
-
-  public void init(OlapQueryLayout query) throws ParseException {
-    this.selection = query.getSelection();
-  }
-
   /**
    * process dataChunk filter with time range.
    *
@@ -58,13 +35,13 @@ public class OLAPSelector {
    *      true = the record meet the requirement,
    *      false = the record don't meet the requirement.
    */
-  public BitSet selectRecordsOnDataChunk(ChunkRS dataChunk) {
+  public BitSet selectRecordsOnDataChunk(OLAPSelectionLayout selectionFilter, ChunkRS dataChunk) {
 
-    // if the query don't provide timeRange, all record is true
+    // init the result. all records are matched by default.
     BitSet bv = new BitSet(dataChunk.records());
     bv.set(0, dataChunk.records());
-
-    return select(this.selection, dataChunk, bv);
+    // recursively use the filter.
+    return select(selectionFilter, dataChunk, bv);
   }
 
   /**
@@ -80,10 +57,11 @@ public class OLAPSelector {
     if (selectionFilter == null) {
       return bs;
     }
-    // if this is the final filter.
     if (selectionFilter.getType().equals(SelectionType.filter)) {
+      // if this is the final filter, run select on it.
       FieldRS field = chunk.getField(selectionFilter.getDimension());
-      selectFields(bs, field, selectionFilter.getFilter());
+      int chunkSize = chunk.getRecords();
+      selectFromOneColumn(bs, field, chunkSize, selectionFilter.getFilter());
     } else if (selectionFilter.getType().equals(SelectionType.and)) {
       // for and operator
       for (OLAPSelectionLayout childFilter : selectionFilter.getFields()) {
@@ -95,7 +73,6 @@ public class OLAPSelector {
       for (OLAPSelectionLayout childFilter : selectionFilter.getFields()) {
         bitSets.add(select(childFilter, chunk, bs));
       }
-
       bs = this.orBitSets(bitSets);
     }
     return bs;
@@ -109,16 +86,14 @@ public class OLAPSelector {
     return bs;
   }
 
-  private void selectFields(BitSet bs, FieldRS field, Filter filter) {
-    // get local ids
-    InputVector fieldIn = field.getValueVector();
-    int off = 0;
-    while (off < fieldIn.size() && off >= 0) {
-      fieldIn.skipTo(off);
-      if (!filter.accept(fieldIn.next())) {
-        bs.clear(off);
+  // run selection on each file
+  private void selectFromOneColumn(BitSet bs, FieldRS field, int chunkSize, Filter filter) {
+
+    // for each record
+    for (int i = 0; i < chunkSize; i++) {
+      if (!filter.accept(field.getValueByIndex(i))) {
+        bs.clear(i);
       }
-      off = bs.nextSetBit(off + 1);
     }
   }
 }

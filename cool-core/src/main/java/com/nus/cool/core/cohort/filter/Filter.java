@@ -13,7 +13,7 @@ public interface Filter {
   /**
    * Range Filter implements this function.
    *
-   * @param value the Input Value to check
+   * @param value this is the global id.
    * @return true if the condition is met, otherwise false
    */
   public Boolean accept(Integer value) throws RuntimeException;

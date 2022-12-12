@@ -3,7 +3,8 @@ package com.nus.cool.core.cohort;
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.filter.FilterType;
 import com.nus.cool.core.cohort.olapselect.Aggregation;
-import com.nus.cool.core.cohort.olapselect.OLAPAggregation;
+import com.nus.cool.core.cohort.olapselect.OLAPAggregator;
+import com.nus.cool.core.cohort.olapselect.OLAPGroupBy;
 import com.nus.cool.core.cohort.olapselect.OLAPSelectionLayout;
 import com.nus.cool.core.cohort.olapselect.OLAPSelectionLayout.SelectionType;
 import com.nus.cool.core.cohort.olapselect.OLAPSelector;
@@ -29,32 +30,31 @@ import lombok.Getter;
  * OLAP Query Processing Engine.
  */
 @Data
-public class OlapProcessor {
+public class OLAPProcessor {
 
-  private OlapQueryLayout query;
-  private OLAPSelector selection = new OLAPSelector();
+  // points to layouts and
+  private OLAPQueryLayout query;
+
   private List<OlapRet> result = new ArrayList<>();
 
   @Getter
   private final HashSet<String> projectedSchemaSet = new HashSet<>();
 
-  public OlapProcessor(OlapQueryLayout layout) {
+  // Constructor
+  public OLAPProcessor(OLAPQueryLayout layout) {
     this.query = layout;
-    this.projectedSchemaSet.addAll(this.query.getSchemaSet());
+    this.projectedSchemaSet.addAll(layout.getSchemaSet());
   }
 
   /**
-   * execute iceberg query.
-   * timeRange, selection => groupBY => aggregate on each group.
+   * Execute iceberg query over each cublet.
    *
    * @param cube the cube that stores the data we need
    * @return the result of the query
    */
-  public List<OlapRet> process(CubeRS cube) throws Exception {
-
+  public List<OlapRet> processCube(CubeRS cube) {
     TableSchema tableschema = cube.getSchema();
-    // add this two schema into List
-
+    // add this two schema into list to be compatible with existing aggregator
     for (FieldSchema fieldSchema : tableschema.getFields()) {
       if (fieldSchema.getFieldType() == FieldType.UserKey) {
         this.projectedSchemaSet.add(fieldSchema.getName());
@@ -62,39 +62,31 @@ public class OlapProcessor {
         this.projectedSchemaSet.add(fieldSchema.getName());
       }
     }
-
-    this.selection.init(this.query);
+    // process each cublet
     for (CubletRS cublet : cube.getCublets()) {
-      processCublet(cublet);
-    }
-    return this.result;
-  }
-
-  /**
-   * Process each cublet.
-   *
-   * @param cubletRS cubletRS
-   */
-  private void processCublet(CubletRS cubletRS) {
-    MetaChunkRS metaChunk = cubletRS.getMetaChunk();
-    this.selection.getSelection().initSelectionFilter(metaChunk);
-    // if this cublet don't meet field requirements
-    if (!this.checkMetaChunk(metaChunk, selection.getSelection())) {
-      return;
-    }
-
-    for (ChunkRS dataChunk : cubletRS.getDataChunks()) {
-      if (this.checkDataChunk(dataChunk, selection.getSelection())) {
-        this.processDataChunk(metaChunk, dataChunk);
+      // 1. update filter condition according to current metaChunk
+      MetaChunkRS metaChunk = cublet.getMetaChunk();
+      this.query.getSelection().updateFilterCacheInfo(metaChunk);
+      // 2. check if this cublet requires filter requirement.
+      if (this.checkMetaChunk(metaChunk, this.query.getSelection())) {
+        // 3. process this cublet dataChunk by data Chunk
+        for (ChunkRS dataChunk : cublet.getDataChunks()) {
+          // 4. check dataChunk
+          if (this.checkDataChunk(dataChunk, this.query.getSelection())) {
+            // 5. process each data Chunk
+            this.processDataChunk(metaChunk, dataChunk);
+          }
+        }
       }
     }
+    return this.result;
   }
 
   /**
    * Check if this cublet contains the required field.
    *
    * @param metaChunk       hashMetaFields result
-   * @param selectionFilter selection filter
+   * @param selectionFilter selection filter, this is for recursively traverse the selection.
    * @return true: this metaChunk is valid, false: this metaChunk is invalid.
    */
   private Boolean checkMetaChunk(MetaChunkRS metaChunk, OLAPSelectionLayout selectionFilter) {
@@ -102,19 +94,14 @@ public class OlapProcessor {
     if (selectionFilter == null) {
       return true;
     }
-
     if (selectionFilter.getType().equals(SelectionType.filter)) {
-
       // get current filter and metaField
       MetaFieldRS metaField = metaChunk.getMetaField(selectionFilter.getDimension());
       Filter currentFilter = selectionFilter.getFilter();
-
       return this.checkMetaField(metaField, currentFilter);
-
     } else {
       // recursively check if this cublet requires checking
       boolean flag = selectionFilter.getType().equals(SelectionType.and);
-
       for (OLAPSelectionLayout childSelection : selectionFilter.getFields()) {
         if (selectionFilter.getType().equals(SelectionType.and)) {
           flag &= this.checkMetaChunk(metaChunk, childSelection);
@@ -133,9 +120,10 @@ public class OlapProcessor {
    * @param ft        filter
    * @return yes, no
    */
-  public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
+  private Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
     FilterType checkedType = ft.getType();
     if (checkedType.equals(FilterType.Set)) {
+      // if this is set, just check it.
       return true;
     } else if (checkedType.equals(FilterType.Range)) {
       Scope scope = new Scope(metaField.getMinValue(), metaField.getMaxValue());
@@ -158,17 +146,15 @@ public class OlapProcessor {
       return true;
     }
     if (selectionFilter.getType().equals(SelectionType.filter)) {
-
       FieldRS field = dataChunk.getField(selectionFilter.getDimension());
       Filter currentFilter = selectionFilter.getFilter();
-
       if (currentFilter.getType().equals(FilterType.Range)) {
         Scope scope = new Scope(field.minKey(), field.maxKey());
         return currentFilter.accept(scope);
+      } else {
+        // skip check in Set Filter
+        return true;
       }
-      // todo: how to check using Set Filter in dataChunk
-      return true;
-
     } else {
       boolean flag = selectionFilter.getType().equals(SelectionType.and);
       for (OLAPSelectionLayout childFilter : selectionFilter.getFields()) {
@@ -184,24 +170,37 @@ public class OlapProcessor {
 
   /**
    * Process data chunk.
+   * timeRange, selection => groupBY => aggregate on each group.
    *
    * @param metaChunk meta chunk
    * @param dataChunk data chunk
    */
   private void processDataChunk(MetaChunkRS metaChunk, ChunkRS dataChunk) {
+
     // 1. find all records in dataChunk meet the timeRange and selection requirements.
-    BitSet bs = this.selection.selectRecordsOnDataChunk(dataChunk);
+    // todo: init a selector each time for future optimization.
+    OLAPSelector selector = new OLAPSelector();
+    BitSet bs = selector.selectRecordsOnDataChunk(this.query.getSelection(), dataChunk);
+    // if none of records are selected
     if (bs.nextSetBit(0) == -1) {
       return;
     }
 
     // 2. run groupBy
-    OLAPAggregation olapAggregator = new OLAPAggregation();
-    olapAggregator.groupBy(bs, this.query.getGroupFields(), metaChunk, dataChunk,
+    OLAPGroupBy olapGroupBy = new OLAPGroupBy();
+    olapGroupBy.groupBy(
+        bs,
+        this.query.getGroupFields(),
+        metaChunk,
+        dataChunk,
         query.getGroupFieldsGranularity());
 
+    // 3. run aggregator
+    OLAPAggregator olapAgge = new OLAPAggregator();
     for (Aggregation aggregation : this.query.getAggregations()) {
-      ArrayList<OlapRet> res = olapAggregator.process(aggregation, this.projectedSchemaSet);
+      ArrayList<OlapRet> res =
+          olapAgge.process(metaChunk, dataChunk, aggregation, this.projectedSchemaSet,
+              olapGroupBy.getMergedGroup());
       result.addAll(res);
     }
   }

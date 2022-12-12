@@ -43,7 +43,7 @@ public class OLAPSelectionLayout {
   }
 
   // what type of selection
-  @JsonProperty("filter_type")
+  @JsonProperty("filterType")
   private SelectionType type;
 
   // which dimension to use
@@ -66,11 +66,11 @@ public class OLAPSelectionLayout {
   private Filter filter;
 
   /**
-   * recursively generate filter instance for this sub selection.
+   * recursively generate filter instance for the given metaChunk.
    *
    * @param metaChunk metaChunk
    */
-  public void initSelectionFilter(MetaChunkRS metaChunk) {
+  public void updateFilterCacheInfo(MetaChunkRS metaChunk) {
     if (this.type.equals(SelectionType.filter)) {
       FilterLayout selectionFilter = new FilterLayout(this.dimensionType == FilterType.Set,
           this.values.toArray(new String[0]), null);
@@ -79,14 +79,13 @@ public class OLAPSelectionLayout {
       this.filter.loadMetaInfo(metaChunk);
     } else {
       for (OLAPSelectionLayout childSelection : this.fields) {
-        childSelection.initSelectionFilter(metaChunk);
+        childSelection.updateFilterCacheInfo(metaChunk);
       }
     }
   }
 
   /**
    * getSchemaSet.
-   *
    *
    * @return hash of string.
    */

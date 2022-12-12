@@ -69,7 +69,6 @@ public class FilterLayout {
   }
 
   // ----------------- For Test ----------------------- //
-
   /**
    * Constructor for filterlayout.
    *

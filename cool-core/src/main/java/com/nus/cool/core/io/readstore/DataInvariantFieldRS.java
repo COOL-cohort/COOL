@@ -79,4 +79,9 @@ public class DataInvariantFieldRS implements FieldRS {
     return 0;
   }
 
+  @Override
+  public int getFieldSize() {
+    return this.userDataField.getFieldSize();
+  }
+
 }

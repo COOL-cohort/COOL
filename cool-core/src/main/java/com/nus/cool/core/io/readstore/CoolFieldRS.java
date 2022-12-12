@@ -152,4 +152,9 @@ public class CoolFieldRS implements FieldRS {
     return 0;
   }
 
+  @Override
+  public int getFieldSize() {
+    return this.valueVec.size();
+  }
+
 }

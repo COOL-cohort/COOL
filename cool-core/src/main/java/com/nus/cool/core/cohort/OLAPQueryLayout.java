@@ -15,7 +15,7 @@ import lombok.Getter;
  * Layout class to facilitate json serialization of olap query.
  */
 @Getter
-public class OlapQueryLayout {
+public class OLAPQueryLayout {
 
   /**
    *inner structure.
@@ -37,7 +37,7 @@ public class OlapQueryLayout {
   private List<String> groupFields;
 
   // granularity for groupBy, if the groupBy field is dataType,
-  @JsonProperty("groupFields_granularity")
+  @JsonProperty("groupFieldsGranularity")
   private GranularityType groupFieldsGranularity;
 
   // a list of aggregation functions, sum, count etc
@@ -48,12 +48,12 @@ public class OlapQueryLayout {
   @JsonProperty("granularity")
   private GranularityType granularity;
 
-  public static OlapQueryLayout readFromJson(File inputFile) throws IOException {
+  public static OLAPQueryLayout readFromJson(File inputFile) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    return mapper.readValue(inputFile, OlapQueryLayout.class);
+    return mapper.readValue(inputFile, OLAPQueryLayout.class);
   }
 
-  public static OlapQueryLayout readFromJson(String path) throws IOException {
+  public static OLAPQueryLayout readFromJson(String path) throws IOException {
     return readFromJson(new File(path));
   }
 

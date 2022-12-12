@@ -43,15 +43,10 @@ public class DataHashFieldRS implements FieldRS {
    * @param ft     fieldtype
    */
   public void readFromWithFieldType(ByteBuffer buffer, FieldType ft) {
-    // get codec (no used)
-    // buffer.get();
-
     this.fieldType = ft;
-    // this.keyVector = InputVectorFactory.readFrom(buf);
-
-    // this.valueVector = InputVectorFactory.readFrom(buf);
-
+    // global ids.
     this.keyVector = InputVectorFactory.readFrom(buffer);
+    // local ids.
     this.valueVector = InputVectorFactory.readFrom(buffer);
   }
 
@@ -71,10 +66,7 @@ public class DataHashFieldRS implements FieldRS {
     return this.keyVector.get(this.valueVector.get(idx));
   }
 
-
-
   // Methods to keep compatiablity with old version code
-
   @Override
   public InputVector getKeyVector() {
     // TODO Auto-generated method stub
@@ -95,6 +87,11 @@ public class DataHashFieldRS implements FieldRS {
 
   @Override
   public int maxKey() {
+    return this.valueVector.size();
+  }
+
+  @Override
+  public int getFieldSize() {
     return this.valueVector.size();
   }
 

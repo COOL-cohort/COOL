@@ -3,8 +3,8 @@ package com.nus.cool.core;
 
 import com.nus.cool.core.cohort.CohortProcessor;
 import com.nus.cool.core.cohort.CohortQueryLayout;
-import com.nus.cool.core.cohort.OlapProcessor;
-import com.nus.cool.core.cohort.OlapQueryLayout;
+import com.nus.cool.core.cohort.OLAPProcessor;
+import com.nus.cool.core.cohort.OLAPQueryLayout;
 import com.nus.cool.core.cohort.aggregate.AggregateType;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.cohort.storage.OlapRet;
@@ -96,15 +96,15 @@ public class ProcessorTest extends CsvLoaderTest {
     String queryName = "query.json";
     String resultName = "query_result.json";
     String queryPath = Paths.get(queryDir, queryName).toString();
-    OlapQueryLayout layout = OlapQueryLayout.readFromJson(queryPath);
+    OLAPQueryLayout layout = OLAPQueryLayout.readFromJson(queryPath);
     String dataSource = layout.getDataSource();
-    OlapProcessor olapProcessor = new OlapProcessor(layout);
+    OLAPProcessor olapProcessor = new OLAPProcessor(layout);
 
     // start a new cool model and reload the cube
     this.coolModel = new CoolModel(this.cubeRepo);
     coolModel.reload(dataSource);
     CubeRS cube = coolModel.getCube(dataSource);
-    List<OlapRet> ret = olapProcessor.process(cube);
+    List<OlapRet> ret = olapProcessor.processCube(cube);
     // System.out.println(ret);
 
     // verification:
