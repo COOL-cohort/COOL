@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package com.nus.cool.core.cohort.olapSelect;
+package com.nus.cool.core.cohort.olapselect;
 
-import com.nus.cool.core.cohort.OlapQueryLayout.granularityType;
+import com.nus.cool.core.cohort.OlapQueryLayout.GranularityType;
 import com.nus.cool.core.cohort.aggregate.AggregateFactory;
 import com.nus.cool.core.cohort.aggregate.AggregateFunc;
 import com.nus.cool.core.cohort.aggregate.AggregateType;
@@ -41,8 +41,14 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections.map.HashedMap;
 
-public class olapAggregation {
+/**
+ * OLAP aggregator and group by.
+ */
+public class OLAPAggregation {
 
+  /**
+   * GroupBy's Type.
+   */
   public enum GroupType {
 
     STRING,
@@ -77,12 +83,12 @@ public class olapAggregation {
   }
 
   /**
-   * Group by one column
+   * Group by one column.
    *
-   * @param field:    grouped filed read form one dataChunk
-   * @param bs        bitSet, filtered by timeRange and previous
-   * @param metaField grouped filed read form one metaChunk
-   * @param type      group by type
+   * @param field  grouped filed read form one dataChunk.
+   * @param bs bitSet, filtered by timeRange and previous.
+   * @param metaField grouped filed read form one metaChunk.
+   * @param type group by type.
    */
   private void group(FieldRS field, BitSet bs, MetaFieldRS metaField, GroupType type) {
     long beg = System.currentTimeMillis();
@@ -103,9 +109,8 @@ public class olapAggregation {
         BitSet groupBs = new BitSet(bs.size()); // number of records
         groupBs.set(nextPos);
         id2Bs.put(id, groupBs);
-      }
-      // if another record matches the same globalID, set the record position (nextPos) to be true
-      else {
+      } else {
+        // if another record matches the same globalID, set the record position (nextPos) to be true
         id2Bs.get(id).set(nextPos);
       }
       i = nextPos;
@@ -120,13 +125,13 @@ public class olapAggregation {
   }
 
   /**
-   * Group by one column
+   * Group by one column.
    *
-   * @param field:      grouped filed read form one dataChunk
-   * @param bs          bitSet, filtered by timeRange and previous
+   * @param field      grouped filed read form one dataChunk.
+   * @param bs         bitSet, filtered by timeRange and previous.
    * @param granularity when groupField is actionTime, group by granularity.
    */
-  private void group(FieldRS field, BitSet bs, granularityType granularity) {
+  private void group(FieldRS field, BitSet bs, GranularityType granularity) {
     assert field.getFieldType() == FieldType.ActionTime;
     long beg = System.currentTimeMillis();
     // timeStr: bitMap, multiple rows may have same localID
@@ -148,10 +153,10 @@ public class olapAggregation {
       // convert to month based string
       String[] parts = dataStr.split("-");
       String monStr;
-      if (granularity == granularityType.YEAR) {
+      if (granularity == GranularityType.YEAR) {
         monStr = parts[0];
 
-      } else if (granularity == granularityType.MONTH) {
+      } else if (granularity == GranularityType.MONTH) {
         monStr = String.join("-", parts[0], parts[1]);
       } else {
         monStr = dataStr;
@@ -180,11 +185,8 @@ public class olapAggregation {
       case SUM:
       case AVERAGE:
       case MAX:
-      case MIN: {
-        if (!fieldType.equals(FieldType.Metric)) {
-          return false;
-        }
-      }
+      case MIN:
+        return fieldType.equals(FieldType.Metric);
       case COUNT:
         return true;
       case DISTINCT:
@@ -212,7 +214,7 @@ public class olapAggregation {
   }
 
   /**
-   * groupBy aggregation instance
+   * groupBy aggregation instance.
    *
    * @param bs            bitMap, true means the record in time range
    * @param groupbyFields filed ot be group by
@@ -220,9 +222,10 @@ public class olapAggregation {
    * @param dataChunk     current metaChunk
    */
   public void groupBy(BitSet bs, List<String> groupbyFields, MetaChunkRS metaChunk,
-                      ChunkRS dataChunk, granularityType GroupFields_granularity) {
+                      ChunkRS dataChunk, GranularityType groupFieldsGranularity) {
 
-    System.out.println("Init OLAP query timeRanges, key = " + timeRange + ", matched records = " +
+    System.out.println("Init OLAP query timeRanges, key = " + timeRange + ", matched records = "
+        +
         bs.cardinality() + ", total size of BS = " + bs.size());
 
     this.timeRange = timeRange;
@@ -246,7 +249,7 @@ public class olapAggregation {
           group(dataField, bs, metaField, GroupType.NUMERIC);
           break;
         case ActionTime:
-          group(dataField, bs, GroupFields_granularity);
+          group(dataField, bs, groupFieldsGranularity);
           break;
         default:
           throw new UnsupportedOperationException(
@@ -256,6 +259,13 @@ public class olapAggregation {
     mergeGroups();
   }
 
+  /**
+   * Process.
+   *
+   * @param aggregation aggregation.
+   * @param projectedSchemaSet projectedSchemaSet.
+   * @return array of OlapRet.
+   */
   public ArrayList<OlapRet> process(Aggregation aggregation, HashSet<String> projectedSchemaSet) {
 
     // init projectedTuple.
@@ -269,8 +279,8 @@ public class olapAggregation {
     InputVector valueVec = field.getValueVector();
 
     // 2. init the Aggregate function
-    Map<AggregateType, AggregateFunc > aggMap = new HashMap<>();
-    for (AggregateType operator: aggregation.getOperators()) {
+    Map<AggregateType, AggregateFunc> aggMap = new HashMap<>();
+    for (AggregateType operator : aggregation.getOperators()) {
       if (!checkOperatorIllegal(fieldType, operator)) {
         throw new IllegalArgumentException(fieldName + " can not process " + operator);
       }
@@ -279,25 +289,25 @@ public class olapAggregation {
     }
 
     // 3. init the result
-    Map<String, Map<AggregateType, RetUnit> > resultMap = new HashMap<>();
+    Map<String, Map<AggregateType, RetUnit>> resultMap = new HashMap<>();
 
     // 4. traverse once and conduct all operations
-    for (Map.Entry<String, BitSet> entry: this.group.entrySet()){
+    for (Map.Entry<String, BitSet> entry : this.group.entrySet()) {
       String groupName = entry.getKey();
       BitSet groupBs = entry.getValue();
 
       Map<AggregateType, RetUnit> res = new HashMap<>();
       resultMap.put(groupName, res);
 
-      for (int i = 0; i < groupBs.size(); i++){
+      for (int i = 0; i < groupBs.size(); i++) {
         int nextpos = groupBs.nextSetBit(i);
-        if (nextpos < 0){
+        if (nextpos < 0) {
           break;
         }
         int value = valueVec.get(nextpos);
         tuple.loadAttr(value, fieldName);
         // for each operator.
-        for (AggregateType operator: aggregation.getOperators()) {
+        for (AggregateType operator : aggregation.getOperators()) {
           // init result into dict
           resultMap.get(groupName).putIfAbsent(operator, new RetUnit(0, 0));
           // do aggregation
@@ -310,7 +320,7 @@ public class olapAggregation {
 
     ArrayList<OlapRet> results = new ArrayList<>();
 
-    for (Map.Entry<String, Map<AggregateType, RetUnit> > entry : resultMap.entrySet()) {
+    for (Map.Entry<String, Map<AggregateType, RetUnit>> entry : resultMap.entrySet()) {
       String groupName = entry.getKey();
       Map<AggregateType, RetUnit> groupValue = entry.getValue();
 

@@ -17,21 +17,24 @@
  * under the License.
  */
 
-package com.nus.cool.core.cohort.olapSelect;
+package com.nus.cool.core.cohort.olapselect;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nus.cool.core.cohort.aggregate.AggregateType;
 import java.util.List;
 import lombok.Data;
 
+/**
+ * Aggregation.
+ */
 @Data
 public class Aggregation {
 
-    // filed name used to do the aggregation
-    @JsonProperty("fieldName")
-    private String fieldName;
+  // filed name used to do the aggregation
+  @JsonProperty("fieldName")
+  private String fieldName;
 
-    // get aggregator
-    @JsonProperty("operators")
-    private List<AggregateType> operators;
+  // get aggregator
+  @JsonProperty("operators")
+  private List<AggregateType> operators;
 }

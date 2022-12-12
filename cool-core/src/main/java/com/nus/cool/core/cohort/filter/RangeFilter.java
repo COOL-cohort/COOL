@@ -84,7 +84,7 @@ public class RangeFilter implements Filter {
     // TODO Auto-generated method stub
     return null;
   }
- 
+
   @Override
   public boolean accept(Scope scope) throws RuntimeException {
     for (Scope u : acceptRangeList) {
@@ -109,8 +109,7 @@ public class RangeFilter implements Filter {
    */
   private static Scope parse(String str) {
     String[] part = str.split(splitChar);
-    Preconditions.checkArgument(part.length == 2,
-        "Split RangeUnit failed");
+    Preconditions.checkArgument(part.length == 2, "Split RangeUnit failed");
     Integer l = null;
     Integer r = null;
     if (!part[0].equals(MinLimit)) {
@@ -132,11 +131,11 @@ public class RangeFilter implements Filter {
     // for range Filter, no need to load info
   }
 
-  private static int convertPartToInt(String dataStr){
-    if (dataStr.contains("-")){
+  private static int convertPartToInt(String dataStr) {
+    if (dataStr.contains("-")) {
       DayIntConverter dins = DayIntConverter.getInstance();
       return dins.toInt(dataStr);
-    }else{
+    } else {
       return Integer.parseInt(dataStr);
     }
   }

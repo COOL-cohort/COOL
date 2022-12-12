@@ -66,11 +66,11 @@ public class OlapRet {
       if ((o instanceof AggregatorResult)) {
         AggregatorResult another = (AggregatorResult) o;
 
-        if (! another.toString().equals(this.toString()) ){
+        if (!another.toString().equals(this.toString())) {
           return false;
         }
         return true;
-      }else{
+      } else {
         return false;
       }
     }
@@ -79,23 +79,23 @@ public class OlapRet {
 
       String json = "\n{";
 
-      if (this.count!=null){
-        json += "\n  count:"+count.toString();
+      if (this.count != null) {
+        json += "\n  count:" + count.toString();
       }
-      if (this.sum!=null){
-        json += "\n  count:"+sum.toString();
+      if (this.sum != null) {
+        json += "\n  count:" + sum.toString();
       }
-      if (this.average!=null){
-        json += "\n  count:"+average.toString();
+      if (this.average != null) {
+        json += "\n  count:" + average.toString();
       }
-      if (this.max!=null){
-        json += "\n  count:"+max.toString();
+      if (this.max != null) {
+        json += "\n  count:" + max.toString();
       }
-      if (this.min!=null){
-        json += "\n  count:"+min.toString();
+      if (this.min != null) {
+        json += "\n  count:" + min.toString();
       }
-      if (this.countDistinct!=null){
-        json += "\n  count:"+countDistinct.toString();
+      if (this.countDistinct != null) {
+        json += "\n  count:" + countDistinct.toString();
       }
 
       json += "}";
@@ -153,28 +153,31 @@ public class OlapRet {
       OlapRet another = (OlapRet) o;
       if (this.equalsKey(another)) {
 
-        if (!this.getFieldName().equals((another.getFieldName()))){
+        if (!this.getFieldName().equals((another.getFieldName()))) {
           return false;
         }
 
-        if (!this.getAggregatorResult().equals((another.getAggregatorResult()))){
+        if (!this.getAggregatorResult().equals((another.getAggregatorResult()))) {
           return false;
         }
 
         return true;
-      }
-      // not same key
-      else {
+      } else {
+        // not same key
         return false;
       }
-    }
-    // not OlapRet instance
-    else {
+    } else {
+      // not OlapRet instance
       return false;
     }
   }
 
-  public void initAggregator(Map<AggregateType, RetUnit> res){
+  /**
+   * initAggregator.
+   *
+   * @param res res.
+   */
+  public void initAggregator(Map<AggregateType, RetUnit> res) {
 
     for (Map.Entry<AggregateType, RetUnit> entry : res.entrySet()) {
       switch (entry.getKey()) {
@@ -238,13 +241,16 @@ public class OlapRet {
     return finalRes;
   }
 
+  /**
+   * to string.
+   *
+   * @return string.
+   */
   public String toString() {
 
-    String json =
-        "\n{timeRange: " + timeRange +
-        "\nkey:, "  + key +
-        "\nfieldName:"  + fieldName +
-        "\naggregatorResult:"  + aggregatorResult.toString();
+    String json = "\n{timeRange: " + timeRange + "\nkey:, " + key + "\nfieldName:" + fieldName
+        +
+        "\naggregatorResult:" + aggregatorResult.toString();
     return json;
   }
 

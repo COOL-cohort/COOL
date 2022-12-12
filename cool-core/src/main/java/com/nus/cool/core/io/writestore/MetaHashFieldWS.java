@@ -137,14 +137,9 @@ public class MetaHashFieldWS implements MetaFieldWS {
     }
 
     // generate finger bytes
-    Histogram hist = Histogram.builder()
-        .min(fingers[0])
-        .max(fingers[fingers.length - 1])
-        .numOfValues(fingers.length)
-        .rawSize(Ints.BYTES * fingers.length)
-        .type(CompressType.KeyFinger)
-        .sorted(true)
-        .build();
+    Histogram hist = Histogram.builder().min(fingers[0]).max(fingers[fingers.length - 1])
+        .numOfValues(fingers.length).rawSize(Ints.BYTES * fingers.length)
+        .type(CompressType.KeyFinger).sorted(true).build();
     this.compressor.reset(hist, fingers, 0, fingers.length);
     // Compress and write the fingers
     // Codec is written internal
@@ -152,10 +147,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
     bytesWritten += this.compressor.writeTo(out);
 
     // generate globalID bytes
-    hist = Histogram.builder()
-        .min(0)
-        .max(this.fingerToGid.size())
-        .numOfValues(globalIDs.length)
+    hist = Histogram.builder().min(0).max(this.fingerToGid.size()).numOfValues(globalIDs.length)
         .rawSize(Ints.BYTES * globalIDs.length)
         .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
         .build();
@@ -181,10 +173,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
       // Compress and write the buffer
       // The codec is written internal
-      hist = Histogram.builder()
-          .type(CompressType.KeyString)
-          .rawSize(buffer.size())
-          .build();
+      hist = Histogram.builder().type(CompressType.KeyString).rawSize(buffer.size()).build();
       this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
       bytesWritten += this.compressor.writeTo(out);
     }
@@ -195,9 +184,9 @@ public class MetaHashFieldWS implements MetaFieldWS {
   @Override
   public int writeCubeMeta(DataOutput out) throws IOException {
     int bytesWritten = 0;
-    if (this.fieldType == FieldType.Segment
-        || this.fieldType == FieldType.Action
-        || this.fieldType == FieldType.UserKey) {
+    if (this.fieldType == FieldType.Segment || this.fieldType == FieldType.Action
+        ||
+        this.fieldType == FieldType.UserKey) {
       try (DataOutputBuffer buffer = new DataOutputBuffer()) {
         buffer.writeInt(this.fieldValues.size());
         int off = 0;
@@ -211,10 +200,8 @@ public class MetaHashFieldWS implements MetaFieldWS {
           buffer.write(s.getBytes(this.charset));
         }
 
-        Histogram hist = Histogram.builder()
-            .type(CompressType.KeyString)
-            .rawSize(buffer.size())
-            .build();
+        Histogram hist =
+            Histogram.builder().type(CompressType.KeyString).rawSize(buffer.size()).build();
         this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
         bytesWritten = this.compressor.writeTo(out);
       }

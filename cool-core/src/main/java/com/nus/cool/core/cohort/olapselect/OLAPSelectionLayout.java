@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.nus.cool.core.cohort.olapSelect;
+package com.nus.cool.core.cohort.olapselect;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nus.cool.core.cohort.filter.Filter;
@@ -29,10 +29,15 @@ import java.util.HashSet;
 import java.util.List;
 import lombok.Data;
 
+/**
+ * Layout for OLAP.
+ */
 @Data
-public class olapSelectionLayout {
+public class OLAPSelectionLayout {
 
-  // inner data type for selection
+  /**
+   * inner data type for selection.
+   */
   public enum SelectionType {
     and, or, filter
   }
@@ -47,7 +52,7 @@ public class olapSelectionLayout {
 
   // dimension type
   @JsonProperty("type")
-  private FilterType dimension_type;
+  private FilterType dimensionType;
 
   // values accepted in this field
   @JsonProperty("acceptValue")
@@ -55,26 +60,36 @@ public class olapSelectionLayout {
 
   // sub-operation
   @JsonProperty("fields")
-  private List<olapSelectionLayout> fields = new ArrayList<>();
+  private List<OLAPSelectionLayout> fields = new ArrayList<>();
 
   // each selection layout has one filter,
   private Filter filter;
 
-  // recursively generate filter instance for this sub selection
+  /**
+   * recursively generate filter instance for this sub selection.
+   *
+   * @param metaChunk metaChunk
+   */
   public void initSelectionFilter(MetaChunkRS metaChunk) {
     if (this.type.equals(SelectionType.filter)) {
-      FilterLayout selectionFilter = new FilterLayout(this.dimension_type == FilterType.Set,
+      FilterLayout selectionFilter = new FilterLayout(this.dimensionType == FilterType.Set,
           this.values.toArray(new String[0]), null);
       selectionFilter.setFieldSchema(this.dimension);
       this.filter = selectionFilter.generateFilter();
       this.filter.loadMetaInfo(metaChunk);
     } else {
-      for (olapSelectionLayout childSelection : this.fields) {
+      for (OLAPSelectionLayout childSelection : this.fields) {
         childSelection.initSelectionFilter(metaChunk);
       }
     }
   }
 
+  /**
+   * getSchemaSet.
+   *
+   *
+   * @return hash of string.
+   */
   public HashSet<String> getSchemaSet() {
     HashSet<String> res = new HashSet<>();
     getSchemaSet(res);
@@ -85,7 +100,7 @@ public class olapSelectionLayout {
     if (this.type.equals(SelectionType.filter)) {
       res.add(dimension);
     } else {
-      for (olapSelectionLayout childSelection : this.fields) {
+      for (OLAPSelectionLayout childSelection : this.fields) {
         childSelection.getSchemaSet(res);
       }
     }

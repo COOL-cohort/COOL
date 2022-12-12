@@ -2,24 +2,26 @@ package com.nus.cool.core.cohort;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.olapSelect.Aggregation;
-import com.nus.cool.core.cohort.olapSelect.olapSelectionLayout;
+import com.nus.cool.core.cohort.olapselect.Aggregation;
+import com.nus.cool.core.cohort.olapselect.OLAPSelectionLayout;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import lombok.Getter;
-import java.io.File;
 
 
+/**
+ * Layout class to facilitate json serialization of olap query.
+ */
 @Getter
 public class OlapQueryLayout {
 
-  // inner structure
-  public enum granularityType{
-    DAY,
-    MONTH,
-    YEAR,
-    NULL
+  /**
+   *inner structure.
+  */
+  public enum GranularityType {
+    DAY, MONTH, YEAR, NULL
   }
 
   // datasource name
@@ -28,7 +30,7 @@ public class OlapQueryLayout {
 
   // select condition
   @JsonProperty("selection")
-  private olapSelectionLayout selection;
+  private OLAPSelectionLayout selection;
 
   // a list a groupFields
   @JsonProperty("groupFields")
@@ -36,7 +38,7 @@ public class OlapQueryLayout {
 
   // granularity for groupBy, if the groupBy field is dataType,
   @JsonProperty("groupFields_granularity")
-  private granularityType groupFields_granularity;
+  private GranularityType groupFieldsGranularity;
 
   // a list of aggregation functions, sum, count etc
   @JsonProperty("aggregations")
@@ -44,14 +46,14 @@ public class OlapQueryLayout {
 
   // granularity for time range
   @JsonProperty("granularity")
-  private granularityType granularity;
+  private GranularityType granularity;
 
-  public static OlapQueryLayout readFromJson(File inputFile) throws IOException{
+  public static OlapQueryLayout readFromJson(File inputFile) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     return mapper.readValue(inputFile, OlapQueryLayout.class);
   }
 
-  public static OlapQueryLayout readFromJson(String path) throws IOException{
+  public static OlapQueryLayout readFromJson(String path) throws IOException {
     return readFromJson(new File(path));
   }
 
@@ -61,7 +63,7 @@ public class OlapQueryLayout {
   public HashSet<String> getSchemaSet() {
 
     HashSet<String> ret = new HashSet<>(this.groupFields);
-    for (Aggregation agg: this.aggregations){
+    for (Aggregation agg : this.aggregations) {
       ret.add(agg.getFieldName());
     }
     ret.addAll(this.selection.getSchemaSet());

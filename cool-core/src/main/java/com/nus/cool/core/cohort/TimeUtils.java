@@ -20,9 +20,10 @@
 package com.nus.cool.core.cohort;
 
 import static com.google.common.base.Preconditions.checkArgument;
+
+import com.nus.cool.core.cohort.utils.TimeUtils.TimeUnit;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.util.converter.DateBase;
-import com.nus.cool.core.cohort.utils.TimeUtils.TimeUnit;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 

@@ -97,8 +97,8 @@ public class ChunkRS implements Input {
 
     this.fields = new FieldRS[fields];
 
-    MetaUserFieldRS userMetaField = (MetaUserFieldRS) this.metaChunkRS.getMetaField(
-        tableSchema.getUserKeyFieldName());
+    MetaUserFieldRS userMetaField =
+        (MetaUserFieldRS) this.metaChunkRS.getMetaField(tableSchema.getUserKeyFieldName());
 
     // initialized UserDataField first, it will become args for invariant field
     DataHashFieldRS userDataField = new DataHashFieldRS();
@@ -117,8 +117,8 @@ public class ChunkRS implements Input {
       if (tableSchema.isInvariantField(i)) {
         int invariantIdx = tableSchema.getInvariantFieldFlagMap()[i];
         // invariant_idx != -1;
-        this.fields[i] = new DataInvariantFieldRS(
-            fieldType, invariantIdx, userMetaField, userDataField);
+        this.fields[i] =
+            new DataInvariantFieldRS(fieldType, invariantIdx, userMetaField, userDataField);
       } else if (FieldType.isHashType(fieldType)) {
         this.fields[i] = DataHashFieldRS.readFrom(buffer, fieldType);
       } else {
@@ -138,7 +138,8 @@ public class ChunkRS implements Input {
   }
 
   /**
-   * Get the filed information according to fild name
+   * Get the filed information according to field name.
+   *
    * @param fieldName fileName
    * @return fields
    */

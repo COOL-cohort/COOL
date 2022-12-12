@@ -1,5 +1,6 @@
 package com.nus.cool.core;
 
+
 import com.nus.cool.core.cohort.CohortProcessor;
 import com.nus.cool.core.cohort.CohortQueryLayout;
 import com.nus.cool.core.cohort.OlapProcessor;
@@ -83,7 +84,7 @@ public class ProcessorTest extends CsvLoaderTest {
     return new Object[][] {
         // heath_rew
         {"../datasets/health_raw/sample_query_distinctcount/query.json",
-            "../datasets/health_raw/sample_query_distinctcount/query_result.json"},};
+            "../datasets/health_raw/sample_query_distinctcount/query_result.json"}};
   }
 
   /**
@@ -91,7 +92,7 @@ public class ProcessorTest extends CsvLoaderTest {
    */
   @Test(dataProvider = "ProcessQueryAP", dependsOnMethods = {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
-  public void ProcessQueryAndValidResultAP(String queryDir) throws Exception {
+  public void processQueryAndValidResultAP(String queryDir) throws Exception {
     String queryName = "query.json";
     String resultName = "query_result.json";
     String queryPath = Paths.get(queryDir, queryName).toString();
@@ -124,32 +125,34 @@ public class ProcessorTest extends CsvLoaderTest {
 
   @DataProvider(name = "ProcessQueryAP")
   public Object[][] queryDirDataProviderAP() {
-    return new Object[][] {
-        {"../datasets/olap-tpch"},
-        {"../datasets/ecommerce/queries"}};
+    return new Object[][] {{"../datasets/olap-tpch"}, {"../datasets/ecommerce/queries"}};
   }
 
   private ArrayList<OlapRet> generateResultForTPCH() {
     Map<String, Map<AggregateType, RetUnit>> resultMap = new HashMap<>();
     resultMap.put("RUSSIA|EUROPE", new HashMap<AggregateType, RetUnit>() {{
-      put(AggregateType.COUNT, new RetUnit(2, 0));
-      put(AggregateType.SUM, new RetUnit(312855, 0));
-    }});
+        put(AggregateType.COUNT, new RetUnit(2, 0));
+        put(AggregateType.SUM, new RetUnit(312855, 0));
+      }
+    });
 
     resultMap.put("GERMANY|EUROPE", new HashMap<AggregateType, RetUnit>() {{
-      put(AggregateType.COUNT, new RetUnit(1, 0));
-      put(AggregateType.SUM, new RetUnit(4820, 0));
-    }});
+        put(AggregateType.COUNT, new RetUnit(1, 0));
+        put(AggregateType.SUM, new RetUnit(4820, 0));
+      }
+    });
 
     resultMap.put("ROMANIA|EUROPE", new HashMap<AggregateType, RetUnit>() {{
-      put(AggregateType.COUNT, new RetUnit(2, 0));
-      put(AggregateType.SUM, new RetUnit(190137, 0));
-    }});
+        put(AggregateType.COUNT, new RetUnit(2, 0));
+        put(AggregateType.SUM, new RetUnit(190137, 0));
+      }
+    });
 
     resultMap.put("UNITED KINGDOM|EUROPE", new HashMap<AggregateType, RetUnit>() {{
-      put(AggregateType.COUNT, new RetUnit(1, 0));
-      put(AggregateType.SUM, new RetUnit(33248, 0));
-    }});
+        put(AggregateType.COUNT, new RetUnit(1, 0));
+        put(AggregateType.SUM, new RetUnit(33248, 0));
+      }
+    });
 
     ArrayList<OlapRet> results = new ArrayList<>();
 
@@ -171,8 +174,9 @@ public class ProcessorTest extends CsvLoaderTest {
   private ArrayList<OlapRet> generateResultForEcommerce() {
     Map<String, Map<AggregateType, RetUnit>> resultMap = new HashMap<>();
     resultMap.put("2021-01", new HashMap<AggregateType, RetUnit>() {{
-      put(AggregateType.DISTINCT, new RetUnit(235, 0));
-    }});
+        put(AggregateType.DISTINCT, new RetUnit(235, 0));
+      }
+    });
     ArrayList<OlapRet> results = new ArrayList<>();
 
     for (Map.Entry<String, Map<AggregateType, RetUnit>> entry : resultMap.entrySet()) {
