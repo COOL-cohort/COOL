@@ -32,7 +32,7 @@ public class ZIntBitInputVectorTest {
     ZIntBitInputVector in = ZIntBitInputVector.load(buffer);
 
     for (int i = 0; i < in.size(); i++) {
-      Assert.assertEquals(in.get(i), numbers[i]);
+      Assert.assertEquals(in.get(i).intValue(), numbers[i]);
     }
 
   }

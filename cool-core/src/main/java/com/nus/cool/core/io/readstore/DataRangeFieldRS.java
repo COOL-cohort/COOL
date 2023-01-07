@@ -1,7 +1,8 @@
 package com.nus.cool.core.io.readstore;
 
-import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.field.RangeField;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
+import com.nus.cool.core.io.storevector.RangeFieldInputVector;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
 
@@ -16,7 +17,7 @@ public class DataRangeFieldRS implements FieldRS {
   private int minKey;
   private int maxKey;
 
-  private InputVector valueVector;
+  private RangeFieldInputVector valueVector;
 
   /**
    * static create function.
@@ -33,8 +34,8 @@ public class DataRangeFieldRS implements FieldRS {
 
   @Override
   public void readFrom(ByteBuffer buffer) {
-    FieldType fieldType = FieldType.fromInteger(buffer.get());
-    this.readFromWithFieldType(buffer, fieldType);
+    FieldType ft = FieldType.fromInteger(buffer.get());
+    this.readFromWithFieldType(buffer, ft);
   }
 
   private void readFromWithFieldType(ByteBuffer buf, FieldType ft) {
@@ -43,7 +44,7 @@ public class DataRangeFieldRS implements FieldRS {
     this.fieldType = ft;
     this.minKey = buf.getInt();
     this.maxKey = buf.getInt();
-    this.valueVector = InputVectorFactory.readFrom(buf);
+    this.valueVector = InputVectorFactory.genRangeFieldInputVector(buf);
   }
 
   @Override
@@ -51,32 +52,32 @@ public class DataRangeFieldRS implements FieldRS {
     return this.fieldType;
   }
 
-  @Override
+  // @Override
   public int minKey() {
     return this.minKey;
   }
 
-  @Override
+  // @Override
   public int maxKey() {
     return this.maxKey;
   }
 
   @Override
-  public int getValueByIndex(int idx) {
-    return this.valueVector.get(idx);
+  public RangeField getValueByIndex(int idx) {
+    return this.valueVector.getValue(idx);
   }
 
 
-  // not used, only to keep compatiablity with old version code
-  @Override
-  public InputVector getKeyVector() {
-    // TODO Auto-generated method stub
-    return null;
-  }
+  // // not used, only to keep compatiablity with old version code
+  // @Override
+  // public InputVector getKeyVector() {
+  //   // TODO Auto-generated method stub
+  //   return null;
+  // }
 
-  @Override
-  public InputVector getValueVector() {
-    return this.valueVector;
-  }
+  // @Override
+  // public InputVector getValueVector() {
+  //   return this.valueVector;
+  // }
 
 }

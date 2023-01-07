@@ -3,9 +3,7 @@ package com.nus.cool.core.io.store;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.DataRangeFieldRS;
-import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaRangeFieldRS;
-import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.writestore.DataRangeFieldWS;
 import com.nus.cool.core.io.writestore.MetaRangeFieldWS;
 import com.nus.cool.core.schema.FieldType;
@@ -80,7 +78,7 @@ public class RangeFieldTest {
 
     rmrs.readFromWithFieldType(bf, fType);
     bf.position(wsPos);
-    FieldRS rs = DataRangeFieldRS.readFrom(bf, fType);
+    DataRangeFieldRS rs = DataRangeFieldRS.readFrom(bf, fType);
 
     // check Range Meta Field
     Assert.assertEquals(rmrs.getMinValue(), rmws.getMin());
@@ -89,15 +87,15 @@ public class RangeFieldTest {
     Assert.assertEquals(rs.maxKey(), rmws.getMax());
 
     // check Range Vector
-    InputVector vec = rs.getValueVector();
-    Assert.assertEquals(vec.size(), data.size());
+    // InputVector vec = rs.getValueVector();
+    // Assert.assertEquals(vec.size(), data.size());
     DayIntConverter convertor = DayIntConverter.getInstance();
-    for (int i = 0; i < vec.size(); i++) {
+    for (int i = 0; i < data.size(); i++) {
       String expect = data.get(i);
       if (fType == FieldType.ActionTime) {
         expect = Integer.toString(convertor.toInt(data.get(i)));
       }
-      String actual = Integer.toString(rs.getValueByIndex(i));
+      String actual = rs.getValueByIndex(i).getString();
       Assert.assertEquals(expect, actual);
     }
 

@@ -24,14 +24,14 @@ public class BitVectorInputVectorTest {
     // load the bytes with
     ByteBuffer buffer = ByteBuffer.wrap(compressed);
     buffer.order(ByteOrder.nativeOrder());
-    InputVector in = new BitVectorInputVector();
+    InputVector<Integer> in = new BitVectorInputVector();
     in.readFrom(buffer);
 
     for (int i = 0; i < in.size(); i++) {
-      Assert.assertEquals(in.get(i), i);
+      Assert.assertEquals(in.get(i).intValue(), i);
     }
     for (int i = 0; i < in.size(); i++) {
-      Assert.assertEquals(in.find(i), i);
+      Assert.assertEquals(in.find(i).intValue(), i);
     }
   }
 }

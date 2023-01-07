@@ -1,63 +1,65 @@
-package com.nus.cool.core.cohort;
+// package com.nus.cool.core.cohort;
 
-import com.nus.cool.core.io.readstore.FieldRS;
-import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.io.storevector.RLEInputVector;
-import java.util.Optional;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
+// import com.nus.cool.core.io.readstore.FieldRS;
+// import com.nus.cool.core.io.storevector.InputVector;
+// import com.nus.cool.core.io.storevector.RLEInputVector;
+// import java.util.Optional;
+// import lombok.AllArgsConstructor;
+// import lombok.NonNull;
 
-/**
- * Iterator class of a key field. (used for UserKey)
- */
-@AllArgsConstructor
-public class KeyFieldIterator {
-  private final RLEInputVector input;
+// [TODO] need logic update
 
-  private final InputVector keys;
+// /**
+//  * Iterator class of a key field. (used for UserKey)
+//  */
+// @AllArgsConstructor
+// public class KeyFieldIterator {
+//   private final RLEInputVector input;
 
-  private RLEInputVector.Block block;
+//   private final InputVector keys;
 
-  /**
-   * Iterate to the next item.
-   */
-  public boolean next() {
-    if (!input.hasNext()) {
-      return false;
-    }
-    input.nextBlock(block);
-    return true;
-  }
+//   private RLEInputVector.Block block;
 
-  // return the id of the next ke
-  public int key() {
-    return keys.get(block.value);
-  }
+//   /**
+//    * Iterate to the next item.
+//    */
+//   public boolean next() {
+//     if (!input.hasNext()) {
+//       return false;
+//     }
+//     input.nextBlock(block);
+//     return true;
+//   }
 
-  public int getStartOffset() {
-    return block.off;
-  }
+//   // return the id of the next key
+//   public int key() {
+//     return keys.get(block.value);
+//   }
 
-  public int getEndOffset() {
-    return block.off + block.len;
-  }
+//   public int getStartOffset() {
+//     return block.off;
+//   }
 
-  /**
-   * Builder class of KeyFieldIterator.
-   */
-  @AllArgsConstructor
-  public static class Builder {
-    @NonNull
-    private final FieldRS keyField;
+//   public int getEndOffset() {
+//     return block.off + block.len;
+//   }
 
-    /**
-     * Build and iterator over key field.
-     */
-    public Optional<KeyFieldIterator> build() {
-      return Optional.ofNullable((keyField.getValueVector() instanceof RLEInputVector)
-          ? new KeyFieldIterator((RLEInputVector) keyField.getValueVector(),
-              keyField.getKeyVector(), new RLEInputVector.Block())
-          : null);
-    }
-  }
-}
+//   /**
+//    * Builder class of KeyFieldIterator.
+//    */
+//   @AllArgsConstructor
+//   public static class Builder {
+//     @NonNull
+//     private final FieldRS keyField;
+
+//     /**
+//      * Build and iterator over key field.
+//      */
+//     public Optional<KeyFieldIterator> build() {
+//       return Optional.ofNullable((keyField.getValueVector() instanceof RLEInputVector)
+//           ? new KeyFieldIterator((RLEInputVector) keyField.getValueVector(),
+//               keyField.getKeyVector(), new RLEInputVector.Block())
+//           : null);
+//     }
+//   }
+// }

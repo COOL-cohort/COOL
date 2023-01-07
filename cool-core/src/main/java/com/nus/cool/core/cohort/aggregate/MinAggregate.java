@@ -18,8 +18,7 @@ public class MinAggregate implements AggregateFunc {
 
   @Override
   public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-    int parseValue = (Integer) tuple.getValueBySchema(this.schema);
-    float value = (float) parseValue;
+    float value = tuple.getValueBySchema(this.schema).getFloat();
     if (!retUnit.isUsed()) {
       retUnit.setValue(value);
       retUnit.setUsed(true);

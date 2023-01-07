@@ -30,37 +30,20 @@ import java.nio.ByteBuffer;
  * | count | ZInt compressed integers |
  * ------------------------------------
  */
-public class ZInt8Store implements InputVector, ZIntStore {
+public class ZInt8Store implements ZIntStore {
 
   /**
    * number of values.
    */
-  private final int count;
+  private int count;
 
 
-  private final boolean sorted;
+  private boolean sorted;
 
   /**
    * compressed data.
    */
   private ByteBuffer buffer;
-
-  public ZInt8Store(int count, boolean sorted) {
-    this.count = count;
-    this.sorted = sorted;
-  }
-
-  /**
-   * Create input vector on a buffer that is ZInt8 encoded.
-   */
-  public static ZIntStore load(ByteBuffer buffer) {
-    int n = buffer.getInt();
-    int flag = buffer.get(); // get byte into int
-    boolean sorted = flag == 1 ? true : false;
-    ZIntStore store = new ZInt8Store(n, sorted);
-    store.readFrom(buffer);
-    return store;
-  }
 
   @Override
   public int size() {
@@ -68,7 +51,7 @@ public class ZInt8Store implements InputVector, ZIntStore {
   }
 
   @Override
-  public int find(int key) {
+  public Integer find(int key) {
     if (key > Byte.MAX_VALUE || key < 0) {
       return -1;
     }
@@ -80,7 +63,7 @@ public class ZInt8Store implements InputVector, ZIntStore {
   }
 
   @Override
-  public int get(int index) {
+  public Integer get(int index) {
     return (this.buffer.get(index) & 0xFF);
   }
 
@@ -90,7 +73,7 @@ public class ZInt8Store implements InputVector, ZIntStore {
   }
 
   @Override
-  public int next() {
+  public Integer next() {
     return (this.buffer.get() & 0xFF);
   }
 
@@ -101,6 +84,9 @@ public class ZInt8Store implements InputVector, ZIntStore {
 
   @Override
   public void readFrom(ByteBuffer buffer) {
+    this.count = buffer.getInt();
+    int flag = buffer.get(); // get byte into int
+    this.sorted = flag == 1;
     int limit = buffer.limit();
     int newLimit = buffer.position() + this.count;
     buffer.limit(newLimit);

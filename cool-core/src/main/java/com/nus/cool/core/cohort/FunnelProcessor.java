@@ -4,6 +4,7 @@ import com.nus.cool.core.cohort.birthselect.BirthSelection;
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.utils.DateUtils;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
@@ -118,7 +119,7 @@ public class FunnelProcessor {
     for (int i = 0; i < chunk.getRecords(); i++) {
       // load data into tuple
       for (String schema : this.projectedSchemaSet) {
-        int value = chunk.getField(schema).getValueByIndex(i);
+        FieldValue value = chunk.getField(schema).getValueByIndex(i);
         this.tuple.loadAttr(value, schema);
       }
       this.processTuple(metaChunk);
@@ -127,12 +128,13 @@ public class FunnelProcessor {
 
   private void processTuple(MetaChunkRS metaChunk) {
     // For One Tuple, we firstly get the userId, and ActionTime
-    int userGlobalID = (int) tuple.getValueBySchema(this.userIdSchema);
+    int userGlobalID = tuple.getValueBySchema(this.userIdSchema).getInt();
     MetaFieldRS userMetaField = metaChunk.getMetaField(this.userIdSchema);
-    String userId = userMetaField.getString(userGlobalID);
+    // String userId = userMetaField.getString(userGlobalID);
+    String userId = userMetaField.get(userGlobalID).map(FieldValue::getString).orElse("");
 
     LocalDateTime actionTime =
-        DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
+        DateUtils.daysSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
     // check whether its birthEvent is selected
 
     // i: the number of birth event

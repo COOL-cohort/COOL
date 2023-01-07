@@ -88,14 +88,12 @@ public class ChunkRS implements Input {
     // Get #records
     this.records = buffer.getInt();
     // Get #fields
-    int fields = buffer.getInt();
+    int fieldCount = buffer.getInt();
     // Get field offsets
-    this.fieldOffsets = new int[fields];
-    for (int i = 0; i < fields; i++) {
+    this.fieldOffsets = new int[fieldCount];
+    for (int i = 0; i < fieldCount; i++) {
       this.fieldOffsets[i] = buffer.getInt();
     }
-
-    this.fields = new FieldRS[fields];
 
     MetaUserFieldRS userMetaField = (MetaUserFieldRS) this.metaChunkRS.getMetaField(
         tableSchema.getUserKeyFieldName());
@@ -103,7 +101,7 @@ public class ChunkRS implements Input {
     // initialized UserDataField first, it will become args for invariant field
     DataHashFieldRS userDataField = new DataHashFieldRS();
 
-    this.fields = new FieldRS[fields];
+    this.fields = new FieldRS[fieldCount];
     for (int i = 0; i < tableSchema.count(); i++) {
       buffer.position(fieldOffsets[i]);
       FieldType fieldType = tableSchema.getFieldType(i);

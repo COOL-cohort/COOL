@@ -25,13 +25,13 @@ import java.nio.ByteBuffer;
 /**
  * FoRInputVector.
  */
-public class FoRInputVector implements InputVector {
+public class FoRInputVector implements InputVector<Integer> {
 
   private int min;
 
   private int max;
 
-  private InputVector vecIn;
+  private ZIntStore vecIn;
 
   @Override
   public int size() {
@@ -39,7 +39,7 @@ public class FoRInputVector implements InputVector {
   }
 
   @Override
-  public int find(int key) {
+  public Integer find(int key) {
     if (key < this.min || key > this.max) {
       return -1;
     }
@@ -47,7 +47,7 @@ public class FoRInputVector implements InputVector {
   }
 
   @Override
-  public int get(int index) {
+  public Integer get(int index) {
     return this.min + this.vecIn.get(index);
   }
 
@@ -57,7 +57,7 @@ public class FoRInputVector implements InputVector {
   }
 
   @Override
-  public int next() {
+  public Integer next() {
     return this.min + this.vecIn.next();
   }
 
@@ -73,16 +73,17 @@ public class FoRInputVector implements InputVector {
     Codec codec = Codec.fromInteger(buffer.get());
     switch (codec) {
       case INT8:
-        this.vecIn = (InputVector) ZInt8Store.load(buffer);
+        this.vecIn = new ZInt8Store();
         break;
       case INT16:
-        this.vecIn = (InputVector) ZInt16Store.load(buffer);
+        this.vecIn = new ZInt16Store();
         break;
       case INT32:
-        this.vecIn = (InputVector) ZInt32Store.load(buffer);
+        this.vecIn = new ZInt32Store();
         break;
       default:
         throw new IllegalArgumentException("Unsupported codec: " + codec);
     }
+    this.vecIn.readFrom(buffer);
   }
 }

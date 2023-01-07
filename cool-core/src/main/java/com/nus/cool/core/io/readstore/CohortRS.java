@@ -29,7 +29,7 @@ import java.nio.ByteBuffer;
  */
 public class CohortRS implements Input {
 
-  private InputVector userList;
+  private InputVector<Integer> userList;
 
   private final ByteBuffer buffer;
 
@@ -54,7 +54,7 @@ public class CohortRS implements Input {
   /**
    * Return the users in the cohort as an input vector.
    */
-  public InputVector getUsers() {
+  public InputVector<Integer> getUsers() {
     // need to get a new input vector
     readFrom(buffer);
     return userList;

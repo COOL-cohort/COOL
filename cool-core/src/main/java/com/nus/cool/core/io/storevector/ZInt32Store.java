@@ -32,30 +32,13 @@ import java.nio.IntBuffer;
  * | count | ZInt compressed integers |
  * ------------------------------------
  */
-public class ZInt32Store implements ZIntStore, InputVector {
+public class ZInt32Store implements ZIntStore {
 
-  private final int count;
+  private int count;
 
-  private final boolean sorted;
+  private boolean sorted;
 
   private IntBuffer buffer;
-
-  public ZInt32Store(int count, boolean sorted) {
-    this.count = count;
-    this.sorted = sorted;
-  }
-
-  /**
-   * Create input vector on a buffer that is ZInt32 encoded.
-   */
-  public static ZIntStore load(ByteBuffer buffer) {
-    int n = buffer.getInt();
-    int flag = buffer.get(); // get byte into int
-    boolean sorted = flag == 1 ? true : false;
-    ZIntStore store = new ZInt32Store(n, sorted);
-    store.readFrom(buffer);
-    return store;
-  }
 
   @Override
   public int size() {
@@ -63,7 +46,7 @@ public class ZInt32Store implements ZIntStore, InputVector {
   }
 
   @Override
-  public int find(int key) {
+  public Integer find(int key) {
     if (this.sorted) {
       return IntBuffers.binarySearch(this.buffer, 0, this.buffer.limit(), key);
     } else {
@@ -72,7 +55,7 @@ public class ZInt32Store implements ZIntStore, InputVector {
   }
 
   @Override
-  public int get(int index) {
+  public Integer get(int index) {
     return this.buffer.get(index);
   }
 
@@ -82,7 +65,7 @@ public class ZInt32Store implements ZIntStore, InputVector {
   }
 
   @Override
-  public int next() {
+  public Integer next() {
     return this.buffer.get();
   }
 
@@ -93,6 +76,9 @@ public class ZInt32Store implements ZIntStore, InputVector {
 
   @Override
   public void readFrom(ByteBuffer buffer) {
+    this.count = buffer.getInt();
+    int flag = buffer.get(); // get byte into int
+    this.sorted = flag == 1;
     int limit = buffer.limit();
     int newLimit = buffer.position() + this.count * Ints.BYTES;
     buffer.limit(newLimit);

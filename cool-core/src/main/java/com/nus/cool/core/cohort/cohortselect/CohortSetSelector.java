@@ -3,6 +3,7 @@ package com.nus.cool.core.cohort.cohortselect;
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.filter.SetFilter;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 
@@ -25,11 +26,11 @@ public class CohortSetSelector implements CohortSelector {
       throw new RuntimeException("GlobalID of Selected Cohort Should Exist in Cublet");
     }
     MetaFieldRS metaField = metaChunkRS.getMetaField(this.filter.getFilterSchema());
-    return metaField.getString(gid);
+    return metaField.get(gid).map(FieldValue::getString).orElse(null);
   }
 
-  private Integer selectCohort(Object input) {
-    Integer i = (Integer) input;
+  private Integer selectCohort(FieldValue input) {
+    int i = input.getInt();
     if (this.filter.accept(i)) {
       return i;
     }
