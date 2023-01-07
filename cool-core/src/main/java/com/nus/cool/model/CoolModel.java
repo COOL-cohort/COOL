@@ -263,15 +263,14 @@ public class CoolModel implements Closeable {
   /**
    * Get users of a previously generated cohort.
    */
-  public InputVector getCohortUsers(String cohort) throws IOException {
+  public InputVector<Integer> getCohortUsers(String cohort) throws IOException {
     if (cohort == null) {
       return null;
     }
     if (!cohortStore.containsKey(cohort)) {
       loadCohorts(cohort, this.currentCube);
     }
-    InputVector ret = cohortStore.get(cohort).getUsers();
-    return ret;
+    return cohortStore.get(cohort).getUsers();
   }
 
   /**
@@ -288,19 +287,21 @@ public class CoolModel implements Closeable {
   }
 
   /**
-   * Reset a cube.
+   * Reset a cube. [TODO] should rethink the logic
    */
   public void resetCube(String cubeName) throws IOException {
     CubeRS cube = this.cubeStore.get(cubeName);
-    int userKeyId = cube.getTableSchema().getUserKeyFieldIdx();
-    for (CubletRS cubletRS : cube.getCublets()) {
-      for (ChunkRS dataChunk : cubletRS.getDataChunks()) {
-        FieldRS userField = dataChunk.getField(userKeyId);
-        RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
-        userInput.skipTo(0);
-      }
-    }
-    System.out.println("Cube " + cube + " has been reset.");
+    // [TODO] implement checking and loading of cublet cache.
+    
+    // int userKeyId = cube.getTableSchema().getUserKeyFieldIdx();
+    // for (CubletRS cubletRS : cube.getCublets()) {
+    //   for (ChunkRS dataChunk : cubletRS.getDataChunks()) {
+    //     FieldRS userField = dataChunk.getField(userKeyId);
+    //     RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
+    //     userInput.skipTo(0);
+    //   }
+    // }
+    // System.out.println("Cube " + cube + " has been reset.");
   }
 
   public void clearCohorts() throws IOException {

@@ -57,23 +57,24 @@ public class ZIntStoreTest {
 
     switch (codeType) {
       case INT8:
-        store = ZInt8Store.load(buffer);
+        store = new ZInt8Store();
+        store.readFrom(buffer);
         break;
-      case INT16:
-        store = ZInt16Store.load(buffer);
+        case INT16:
+        store = new ZInt16Store();
+        store.readFrom(buffer);
         break;
-      case INT32:
+        case INT32:
         // INT32
-        store = ZInt32Store.load(buffer);
+        store = new ZInt32Store();
+        store.readFrom(buffer);
         break;
       default:
         throw new IllegalArgumentException("Invalid INT code Type");
     }
 
-    InputVector in = (InputVector) store;
-
-    for (int i = 0; i < in.size(); i++) {
-      Assert.assertEquals(in.get(i), numbers[i]);
+    for (int i = 0; i < store.size(); i++) {
+      Assert.assertEquals(store.get(i).intValue(), numbers[i]);
     }
   }
 

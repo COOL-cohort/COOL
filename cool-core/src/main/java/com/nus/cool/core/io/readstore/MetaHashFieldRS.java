@@ -21,14 +21,15 @@ package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.nus.cool.core.field.HashField;
+import com.nus.cool.core.io.storevector.HashFieldInputVector;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
-import com.nus.cool.core.io.storevector.LZ4InputVector;
 import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * Meta HashField ReadStore.
@@ -41,15 +42,11 @@ public class MetaHashFieldRS implements MetaFieldRS {
 
   protected FieldType fieldType;
 
-  protected InputVector fingerVec;
+  protected InputVector<Integer> fingerVec;
 
-  protected InputVector globalIDVec;
+  protected InputVector<Integer> globalIDVec;
 
-  protected InputVector valueVec;
-
-  // inverse map from global id to the offset in values.
-  // only populated once when getString is called to retrieve from valueVec
-  protected Map<Integer, Integer> id2offset;
+  protected HashFieldInputVector valueVec;
 
   public MetaHashFieldRS(Charset charset) {
     this.charset = checkNotNull(charset);
@@ -72,17 +69,9 @@ public class MetaHashFieldRS implements MetaFieldRS {
   }
 
   @Override
-  public String getString(int i) {
-    // if (this.id2offset == null) {
-    // this.id2offset = Maps.newHashMap();
-    // // lazily populate the inverse index only once
-    // for (int j = 0; j < this.globalIDVec.size(); j++) {
-    // this.id2offset.put(this.globalIDVec.get(j), j);
-    // }
-    // }
-    // return ((LZ4InputVector) this.valueVec)
-    // .getString(this.id2offset.get(i), this.charset);
-    return ((LZ4InputVector) this.valueVec).getString(i, this.charset);
+  public Optional<HashField> get(int i) {
+    // return this.valueVec.get(i);
+    return (i < count()) ? Optional.of(this.valueVec.getValue(i)) : Optional.empty();
   }
 
   @Override
@@ -96,13 +85,14 @@ public class MetaHashFieldRS implements MetaFieldRS {
   }
 
   @Override
-  public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
+  public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType)
+      throws IllegalArgumentException {
     this.fieldType = fieldType;
-    this.fingerVec = InputVectorFactory.readFrom(buffer);
-    this.globalIDVec = InputVectorFactory.readFrom(buffer);
+    this.fingerVec = InputVectorFactory.genIntInputVector(buffer);
+    this.globalIDVec = InputVectorFactory.genIntInputVector(buffer);
     if (this.fieldType == FieldType.Action || this.fieldType == FieldType.Segment
         || this.fieldType == FieldType.AppKey) {
-      this.valueVec = InputVectorFactory.readFrom(buffer);
+      this.valueVec = InputVectorFactory.genHashFieldInputVector(buffer, charset);
     }
   }
 

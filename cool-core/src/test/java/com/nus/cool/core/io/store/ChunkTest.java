@@ -1,6 +1,7 @@
 package com.nus.cool.core.io.store;
 
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
@@ -125,8 +126,8 @@ public class ChunkTest {
     if (FieldType.isHashType(fieldRS.getFieldType())) {
       // HashField
       for (int i = 0; i < valueList.size(); i++) {
-        int gid = fieldRS.getValueByIndex(i);
-        String actual = metaFieldRS.getString(gid);
+        int gid = fieldRS.getValueByIndex(i).getInt();
+        String actual = metaFieldRS.get(gid).map(FieldValue::getString).orElse("");
         if (!actual.equals(valueList.get(i))) {
           return false;
         }
@@ -139,7 +140,7 @@ public class ChunkTest {
         if (fieldRS.getFieldType() == FieldType.ActionTime) {
           expect = Integer.toString(convertor.toInt(expect));
         }
-        String actual = Integer.toString(fieldRS.getValueByIndex(i));
+        String actual = fieldRS.getValueByIndex(i).getString();
         if (!actual.equals(expect)) {
           return false;
         }

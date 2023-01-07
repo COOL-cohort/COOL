@@ -2,13 +2,21 @@ package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.nus.cool.core.field.HashField;
+import com.nus.cool.core.field.IntRangeField;
+import com.nus.cool.core.field.RangeField;
+import com.nus.cool.core.io.storevector.HashFieldInputVector;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
+import com.nus.cool.core.io.storevector.IntFieldInputVector;
 import com.nus.cool.core.io.storevector.LZ4InputVector;
 import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Meta UserField ReadStore.
@@ -23,13 +31,13 @@ public class MetaUserFieldRS implements MetaFieldRS {
 
   protected FieldType fieldType;
 
-  protected InputVector fingerVec;
+  protected InputVector<Integer> fingerVec;
 
-  protected InputVector globalIDVec;
+  protected InputVector<Integer> globalIDVec;
 
-  protected InputVector valueVec;
+  protected HashFieldInputVector valueVec;
 
-  protected InputVector[] invarantMaps;
+  protected IntFieldInputVector[] invarantMaps;
   // the idx is the globalIdIdx, the value is the globalId of invariant field
 
   /**
@@ -42,7 +50,7 @@ public class MetaUserFieldRS implements MetaFieldRS {
     this.charset = checkNotNull(charset);
     this.metaChunkRS = metaChunkRS;
     int invariantSize = metaChunkRS.getSchema().getInvariantFieldNumber();
-    this.invarantMaps = new InputVector[invariantSize];
+    this.invarantMaps = new IntFieldInputVector[invariantSize];
   }
 
   @Override
@@ -68,8 +76,10 @@ public class MetaUserFieldRS implements MetaFieldRS {
   }
 
   @Override
-  public String getString(int i) {
-    return ((LZ4InputVector) this.valueVec).getString(i, this.charset);
+  public Optional<HashField> get(int i) {
+    // return ((LZ4InputVector) this.valueVec).getString(i, this.charset);
+    // return this.valueVec.get(i);
+    return (i < count()) ? Optional.of(this.valueVec.getValue(i)) : Optional.empty();
   }
 
   @Override
@@ -85,12 +95,12 @@ public class MetaUserFieldRS implements MetaFieldRS {
   @Override
   public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
     this.fieldType = fieldType;
-    this.fingerVec = InputVectorFactory.readFrom(buffer);
-    this.globalIDVec = InputVectorFactory.readFrom(buffer);
+    this.fingerVec = InputVectorFactory.genIntInputVector(buffer);
+    this.globalIDVec = InputVectorFactory.genIntInputVector(buffer);
     for (int i = 0; i < this.invarantMaps.length; i++) {
-      this.invarantMaps[i] = InputVectorFactory.readFrom(buffer);
+      this.invarantMaps[i] = InputVectorFactory.genIntFieldInputVector(buffer);
     }
-    this.valueVec = InputVectorFactory.readFrom(buffer);
+    this.valueVec = InputVectorFactory.genHashFieldInputVector(buffer, charset);
   }
 
   // --------------- specific method for MetaUserField ---------------
@@ -102,8 +112,8 @@ public class MetaUserFieldRS implements MetaFieldRS {
    * @param gid          the according gloablId of UserKey
    * @return int globalId
    */
-  public int getInvaraintValue(int invariantIdx, int gid) {
-    return this.invarantMaps[invariantIdx].get(gid);
+  public IntRangeField getInvaraintValue(int invariantIdx, int gid) {
+    return this.invarantMaps[invariantIdx].getValue(gid);
   }
 
 }

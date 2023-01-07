@@ -14,9 +14,11 @@
 
 package com.nus.cool.core.io.readstore;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 /**
  * For the moment, we only support Hash based meta field.
@@ -38,7 +40,7 @@ public interface MetaFieldRS extends Input {
   /**
    * Return the value for the given id.
    */
-  String getString(int i);
+  Optional<? extends FieldValue> get(int i);
 
   /**
    * Return the max value of the field.
@@ -50,5 +52,5 @@ public interface MetaFieldRS extends Input {
    */
   int getMinValue();
 
-  void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType);
+  void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) throws IllegalArgumentException;
 }

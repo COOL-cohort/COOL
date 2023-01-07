@@ -19,8 +19,10 @@
 
 package com.nus.cool.core.io.readstore;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 
 /**
@@ -50,8 +52,8 @@ public class MetaRangeFieldRS implements MetaFieldRS {
   }
 
   @Override
-  public String getString(int i) {
-    return null;
+  public Optional<FieldValue> get(int i) {
+    return Optional.empty();
   }
 
   @Override

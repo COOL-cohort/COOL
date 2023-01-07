@@ -95,16 +95,18 @@ public class CubeMetaRS implements Input {
 
     @Override
     public void readFrom(ByteBuffer buffer) {
-      InputVector vec = InputVectorFactory.readFrom(buffer);
-      if (!(vec instanceof LZ4InputVector)) {
+      InputVector<String> valueVec;
+      try {
+        valueVec = InputVectorFactory.genStrFieldInputVector(buffer, charset);
+      } catch (IllegalArgumentException e) {
+        System.err.println(e);
         return;
       }
 
-      LZ4InputVector valueVec = (LZ4InputVector) vec;
       int valueCount = valueVec.size();
       values = new ArrayList<>(valueCount);
       for (int i = 0; i < valueCount; i++) {
-        String value = valueVec.getString(i, this.charset);
+        String value = valueVec.get(i);
         values.add(value);
       }
     }

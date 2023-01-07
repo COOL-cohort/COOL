@@ -1,236 +1,240 @@
-package com.nus.cool.core.util.reader;
+// package com.nus.cool.core.util.reader;
 
-import com.nus.cool.core.cohort.KeyFieldIterator;
-import com.nus.cool.core.io.readstore.ChunkRS;
-import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.MetaChunkRS;
-import com.nus.cool.core.io.readstore.MetaHashFieldRS;
-import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.schema.FieldSchema;
-import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.converter.DayIntConverter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
+// import com.nus.cool.core.cohort.KeyFieldIterator;
+// import com.nus.cool.core.field.FieldValue;
+// import com.nus.cool.core.field.IntRangeField;
+// import com.nus.cool.core.io.readstore.ChunkRS;
+// import com.nus.cool.core.io.readstore.CubeRS;
+// import com.nus.cool.core.io.readstore.CubletRS;
+// import com.nus.cool.core.io.readstore.FieldRS;
+// import com.nus.cool.core.io.readstore.MetaChunkRS;
+// import com.nus.cool.core.io.readstore.MetaHashFieldRS;
+// import com.nus.cool.core.io.storevector.InputVector;
+// import com.nus.cool.core.schema.FieldSchema;
+// import com.nus.cool.core.schema.TableSchema;
+// import com.nus.cool.core.util.converter.DayIntConverter;
+// import java.io.IOException;
+// import java.util.ArrayList;
+// import java.util.List;
+// import java.util.ListIterator;
 
-// if the field is marked with PreCAL, we will not be able to reconstruct the tuple
+// [TODO] need logic update
 
-/**
- * Tuple reader of cool data format.
- */
-public class CoolTupleReader implements TupleReader {
+// // if the field is marked with PreCAL, we will not be able to reconstruct the tuple
 
-  private final TableSchema tableSchema;
+// /**
+//  * Tuple reader of cool data format.
+//  */
+// public class CoolTupleReader implements TupleReader {
 
-  // contains value mapping for all data chunks
-  private final MetaChunkRS metaChunk; // the metachunk
+//   private final TableSchema tableSchema;
 
-  // all data chunks should be governed by the same metachunk
-  private final List<ChunkRS> datachunks;
+//   // contains value mapping for all data chunks
+//   private final MetaChunkRS metaChunk; // the metachunk
 
-  // only tuples of users emitted
-  private final InputVector users;
+//   // all data chunks should be governed by the same metachunk
+//   private final List<ChunkRS> datachunks;
+
+//   // only tuples of users emitted
+//   private final InputVector<Integer> users;
 
 
-  // initialized once
-  private final int userKeyFieldIdx;
+//   // initialized once
+//   private final int userKeyFieldIdx;
 
-  private final List<ValueConverter> valueConverters;
+//   private final List<ValueConverter> valueConverters;
 
-  // variables describing current state
-  private boolean hasNext;
+//   // variables describing current state
+//   private boolean hasNext;
 
-  private final ListIterator<ChunkRS> chunkItr;
+//   private final ListIterator<ChunkRS> chunkItr;
 
-  private ChunkRS curChunk;
+//   private ChunkRS curChunk;
 
-  private final List<InputVector> fields;
+//   private final List<FieldRS> fields;
 
-  private KeyFieldIterator curChunkUserItr;
+//   private KeyFieldIterator curChunkUserItr;
 
-  private int curUser = -1;
+//   private int curUser = -1;
 
-  private int curTupleOffset = -1;
+//   private int curTupleOffset = -1;
 
-  private int validTupleOffsetUntil = -1;
+//   private int validTupleOffsetUntil = -1;
 
-  public CoolTupleReader(CubeRS cube) {
-    this(cube, null);
-  }
+//   public CoolTupleReader(CubeRS cube) {
+//     this(cube, null);
+//   }
 
-  /**
-   * Create a tuple reader for a cube and with a list of users as filter.
-   */
-  public CoolTupleReader(CubeRS cube, InputVector users) {
-    this.tableSchema = cube.getSchema();
-    this.datachunks = new ArrayList<>();
-    List<CubletRS> cublets = cube.getCublets();
-    for (CubletRS cublet : cublets) {
-      datachunks.addAll(cublet.getDataChunks());
-    }
-    // assuming the last cublet having an encompassing metachunk
-    this.metaChunk = cublets.get(cublets.size() - 1).getMetaChunk();
-    this.valueConverters = createValueConverters();
-    this.users = users;
-    if (this.users != null && this.users.hasNext()) {
-      curUser = this.users.next();
-    }
-    this.userKeyFieldIdx = this.tableSchema.getUserKeyFieldIdx();
-    this.chunkItr = datachunks.listIterator();
-    this.curChunk = null;
-    this.fields = new ArrayList<>();
-    this.hasNext = (chunkItr.hasNext()) ? skipToNextUser() : false;
-  }
+// // guoyu: need fix
 
-  interface ValueConverter {
-    String convert(int value);
+//   /**
+//    * Create a tuple reader for a cube and with a list of users as filter.
+//    */
+//   public CoolTupleReader(CubeRS cube, InputVector<Integer> users) {
+//     this.tableSchema = cube.getSchema();
+//     this.datachunks = new ArrayList<>();
+//     List<CubletRS> cublets = cube.getCublets();
+//     for (CubletRS cublet : cublets) {
+//       datachunks.addAll(cublet.getDataChunks());
+//     }
+//     // assuming the last cublet having an encompassing metachunk
+//     this.metaChunk = cublets.get(cublets.size() - 1).getMetaChunk();
+//     this.valueConverters = createValueConverters();
+//     this.users = users;
+//     if (this.users != null && this.users.hasNext()) {
+//       curUser = this.users.next();
+//     }
+//     this.userKeyFieldIdx = this.tableSchema.getUserKeyFieldIdx();
+//     this.chunkItr = datachunks.listIterator();
+//     this.curChunk = null;
+//     this.fields = new ArrayList<>();
+//     this.hasNext = (chunkItr.hasNext()) ? skipToNextUser() : false;
+//   }
 
-    public static ValueConverter createNullConverter() {
-      return new ValueConverter() {
-        @Override
-        public String convert(int value) {
-          return "NULL";
-        }
-      };
-    }
-  }
+//   interface ValueConverter {
+//     String convert(FieldValue value);
 
-  private List<ValueConverter> createValueConverters() {
-    List<ValueConverter> converters = new ArrayList<>();
-    for (FieldSchema fieldSchema : tableSchema.getFields()) {
-      if (fieldSchema.isPreCal()) {
-        converters.add(ValueConverter.createNullConverter());
-      } else {
-        switch (fieldSchema.getFieldType()) {
-          case AppKey:
-          case UserKey:
-          case Action:
-          case Segment:
-            converters.add(new ValueConverter() {
-              private final MetaHashFieldRS valueVec = (MetaHashFieldRS) metaChunk.getMetaField(
-                  fieldSchema.getName());
+//     public static ValueConverter createNullConverter() {
+//       // return new ValueConverter() {
+//       //   @Override
+//       //   public String convert(int value) {
+//       //     return "NULL";
+//       //   }
+//       // };
+//       return x -> "NULL";
+//     }
+//   }
 
-              @Override
-              public String convert(int value) {
-                return valueVec.getString(value);
-              }
-            });
-            break;
-          case ActionTime:
-            converters.add(new ValueConverter() {
-              private final DayIntConverter converter = DayIntConverter.getInstance();
+//   private List<ValueConverter> createValueConverters() {
+//     List<ValueConverter> converters = new ArrayList<>();
+//     for (FieldSchema fieldSchema : tableSchema.getFields()) {
+//       if (fieldSchema.isPreCal()) {
+//         converters.add(ValueConverter.createNullConverter());
+//       } else {
+//         switch (fieldSchema.getFieldType()) {
+//           case AppKey:
+//           case UserKey:
+//           case Action:
+//           case Segment:
+//             converters.add(new ValueConverter() {
+//               private final MetaHashFieldRS valueVec = (MetaHashFieldRS) metaChunk.getMetaField(
+//                   fieldSchema.getName());
 
-              @Override
-              public String convert(int value) {
-                return converter.getString(value);
-              }
-            });
-            break;
-          case Metric:
-            converters.add(new ValueConverter() {
-              @Override
-              public String convert(int value) {
-                return String.valueOf(value);
-              }
-            });
-            break;
-          default:
-            System.out.println("Unknown field type");
-            break;
-        }
-      }
-    }
-    return converters;
-  }
+//               @Override
+//               public String convert(FieldValue value) {
+//                 return valueVec.get(value.getInt()).map(FieldValue::getString).orElse(null);
+//               }
+//             });
+//             break;
+//           case ActionTime:
+//             converters.add(new ValueConverter() {
+//               private final DayIntConverter converter = DayIntConverter.getInstance();
 
-  // return false when there is no more chunk
-  private boolean switchToNextChunk() {
-    if (!chunkItr.hasNext()) {
-      return false;
-    }
-    curChunk = chunkItr.next();
-    curChunkUserItr = new KeyFieldIterator.Builder(curChunk.getField(userKeyFieldIdx)).build()
-        .get();
-    fields.clear();
-    for (FieldSchema fieldSchema : tableSchema.getFields()) {
-      fields.add(curChunk.getField(fieldSchema.getName()).getValueVector());
-    }
-    // if we cannot iterate over the user in current chunk
-    // (corrupted user field) we skip to the next chunk
-    return (curChunkUserItr == null) ? switchToNextChunk() : true;
-  }
+//               @Override
+//               public String convert(FieldValue value) {
+//                 return converter.getString(value.getInt());
+//               }
+//             });
+//             break;
+//           case Metric:
+//             converters.add(FieldValue::getString);
+//             break;
+//           default:
+//             System.out.println("Unknown field type");
+//             break;
+//         }
+//       }
+//     }
+//     return converters;
+//   }
 
-  private boolean skipToNextUser() {
-    // for first time invocation
-    if ((curChunk == null) && (!switchToNextChunk())) {
-      return false;
-    }
+//   // return false when there is no more chunk
+//   private boolean switchToNextChunk() {
+//     if (!chunkItr.hasNext()) {
+//       return false;
+//     }
+//     curChunk = chunkItr.next();
+//     curChunkUserItr = new KeyFieldIterator.Builder(curChunk.getField(userKeyFieldIdx)).build()
+//         .get();
+//     fields.clear();
+//     for (FieldSchema fieldSchema : tableSchema.getFields()) {
+//       // fields.add(curChunk.getField(fieldSchema.getName()).getValueVector());
+//       fields.add(curChunk.getField(fieldSchema.getName()));
+//     }
+//     // if we cannot iterate over the user in current chunk
+//     // (corrupted user field) we skip to the next chunk
+//     return (curChunkUserItr == null) ? switchToNextChunk() : true;
+//   }
 
-    // if ((curChunk == null || curChunkUserItr.next())
-    // && (!switchToNextChunk())) {
-    // return false;
-    // }
+//   private boolean skipToNextUser() {
+//     // for first time invocation
+//     if ((curChunk == null) && (!switchToNextChunk())) {
+//       return false;
+//     }
 
-    // we have valid chunk user itr
-    // looping users, when a chunk user itr reached the end,
-    // switch to a new valid chunk
-    while (curChunkUserItr.next() || (switchToNextChunk() && curChunkUserItr.next())) {
+//     // if ((curChunk == null || curChunkUserItr.next())
+//     // && (!switchToNextChunk())) {
+//     // return false;
+//     // }
 
-      if (users != null) {
-        if (curUser < 0) {
-          return false; // we have no more users to emit records for
-        }
-        if (curUser != curChunkUserItr.key()) {
-          continue;
-        }
-        // move to next target user the next time.
-        curUser = (users.hasNext()) ? users.next() : -1;
-      }
-      // set the current tuple offset and the validity boundary
-      curTupleOffset = curChunkUserItr.getStartOffset();
-      validTupleOffsetUntil = curChunkUserItr.getEndOffset() - 1;
-      return true;
-    }
-    return false;
-  }
+//     // we have valid chunk user itr
+//     // looping users, when a chunk user itr reached the end,
+//     // switch to a new valid chunk
+//     while (curChunkUserItr.next() || (switchToNextChunk() && curChunkUserItr.next())) {
 
-  // move to the next record
-  private boolean skipToNext() {
-    // the offsets will not be smaller than zero after initialization
-    if (curTupleOffset >= validTupleOffsetUntil) {
-      return skipToNextUser();
-    }
-    curTupleOffset++;
-    return true;
-  }
+//       if (users != null) {
+//         if (curUser < 0) {
+//           return false; // we have no more users to emit records for
+//         }
+//         if (curUser != curChunkUserItr.key()) {
+//           continue;
+//         }
+//         // move to next target user the next time.
+//         curUser = (users.hasNext()) ? users.next() : -1;
+//       }
+//       // set the current tuple offset and the validity boundary
+//       curTupleOffset = curChunkUserItr.getStartOffset();
+//       validTupleOffsetUntil = curChunkUserItr.getEndOffset() - 1;
+//       return true;
+//     }
+//     return false;
+//   }
 
-  private String[] getCurrentTuple() {
-    int numField = fields.size();
-    String[] ret = new String[numField];
-    for (int i = 0; i < numField; i++) {
-      ret[i] = (fields.get(i) == null)
-          ? "PreCAL" // for PreCAL field, no value vector will be initialized
-          : valueConverters.get(i).convert(fields.get(i).get(curTupleOffset));
-    }
-    return ret;
-  }
+//   // move to the next record
+//   private boolean skipToNext() {
+//     // the offsets will not be smaller than zero after initialization
+//     if (curTupleOffset >= validTupleOffsetUntil) {
+//       return skipToNextUser();
+//     }
+//     curTupleOffset++;
+//     return true;
+//   }
 
-  @Override
-  public boolean hasNext() {
-    return this.hasNext;
-  }
+//   private String[] getCurrentTuple() {
+//     int numField = fields.size();
+//     String[] ret = new String[numField];
+//     for (int i = 0; i < numField; i++) {
+//       ret[i] = (fields.get(i) == null)
+//           ? "PreCAL" // for PreCAL field, no value vector will be initialized
+//           : valueConverters.get(i).convert(fields.get(i).getValueByIndex(curTupleOffset));
+//     }
+//     return ret;
+//   }
 
-  @Override
-  public Object next() throws IOException {
-    String[] old = getCurrentTuple();
-    this.hasNext = skipToNext();
-    return old;
-  }
+//   @Override
+//   public boolean hasNext() {
+//     return this.hasNext;
+//   }
 
-  @Override
-  public void close() throws IOException {
-    // no-op
-  }
-}
+//   @Override
+//   public Object next() throws IOException {
+//     String[] old = getCurrentTuple();
+//     this.hasNext = skipToNext();
+//     return old;
+//   }
+
+//   @Override
+//   public void close() throws IOException {
+//     // no-op
+//   }
+// }

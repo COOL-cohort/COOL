@@ -31,7 +31,7 @@ public class EventSelection {
   public boolean accept(ProjectedTuple projectTuple) {
     for (int i = 0; i < filterList.size(); i++) {
       Filter filter = filterList.get(i);
-      Integer gid = (Integer) projectTuple.getValueBySchema(filter.getFilterSchema());
+      int gid = projectTuple.getValueBySchema(filter.getFilterSchema()).getInt();
       if (!filter.accept(gid)) {
         return false;
       }

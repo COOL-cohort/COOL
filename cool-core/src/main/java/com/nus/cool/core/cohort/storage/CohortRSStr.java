@@ -65,12 +65,11 @@ public class CohortRSStr implements Input {
 
   @Override
   public void readFrom(ByteBuffer buffer) {
-    InputVector vec = InputVectorFactory.readFrom(buffer);
-    LZ4InputVector valueVec = (LZ4InputVector) vec;
+    InputVector<String> valueVec = InputVectorFactory.genStrFieldInputVector(buffer, this.charset);
     int valueCount = valueVec.size();
     values = new ArrayList<>(valueCount);
     for (int i = 0; i < valueCount; i++) {
-      String value = valueVec.getString(i, this.charset);
+      String value = valueVec.get(i);
       values.add(value);
     }
   }

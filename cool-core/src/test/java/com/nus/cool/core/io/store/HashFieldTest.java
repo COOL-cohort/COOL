@@ -1,9 +1,9 @@
 package com.nus.cool.core.io.store;
 
+import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.DataHashFieldRS;
-import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaHashFieldRS;
 import com.nus.cool.core.io.writestore.DataHashFieldWS;
 import com.nus.cool.core.io.writestore.MetaHashFieldWS;
@@ -93,20 +93,20 @@ public class HashFieldTest {
 
     for (String expected : valueSet) {
       int gid = hmrs.find(expected);
-      String actual = hmrs.getString(gid);
+      String actual = hmrs.get(gid).map(HashField::getString).orElse("");
       Assert.assertEquals(actual, expected);
     }
 
     bf.position(wsPos);
-    FieldRS rs = DataHashFieldRS.readFrom(bf, fType);
+    DataHashFieldRS rs = DataHashFieldRS.readFrom(bf, fType);
 
     // Check the Key Point of HashMetaField and HashField
     Assert.assertEquals(hmws.count(), hmrs.count());
 
     for (int i = 0; i < data.size(); i++) {
       String expected = data.get(i);
-      int globalId = rs.getValueByIndex(i);
-      String actual = hmrs.getString(globalId);
+      int gid = rs.getValueByIndex(i).getInt();
+      String actual = hmrs.get(gid).map(HashField::getString).orElse("");
 
       Assert.assertEquals(actual, expected);
     }

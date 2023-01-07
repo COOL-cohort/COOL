@@ -64,12 +64,12 @@ public class LZ4InputVectorTest {
     // Decoding these readBuf
     ByteBuffer readBuf = ByteBuffer.wrap(compressed);
     readBuf.order(ByteOrder.nativeOrder());
-    LZ4InputVector res = new LZ4InputVector();
+    LZ4InputVector res = new LZ4InputVector(defaultCharset);
     res.readFrom(readBuf);
 
     // Validate these string
     for (int i = 0; i < valueList.length; i++) {
-      String actual = res.getString(i, defaultCharset);
+      String actual = res.get(i);
       String expect = String.valueOf(valueList[i]);
       if (!expect.equals(actual)) {
         logger.debug(String.format("Actual %s ,l:%d", actual, actual.length()));

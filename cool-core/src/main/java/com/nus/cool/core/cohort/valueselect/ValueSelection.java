@@ -45,11 +45,13 @@ public class ValueSelection {
    * @param tuple tuple
    */
   public boolean isSelected(ProjectedTuple tuple) {
-    for (Filter filter : filterList) {
-      if (!filter.accept((Integer) tuple.getValueBySchema(filter.getFilterSchema()))) {
-        return false;
-      }
-    }
-    return true;
+    // for (Filter filter : filterList) {
+    //   if (!filter.accept(tuple.getValueBySchema(filter.getFilterSchema()).getInt())) {
+    //     return false;
+    //   }
+    // }
+    // return true;
+    return filterList.stream()
+                     .allMatch(x -> x.accept(tuple.getValueBySchema(x.getFilterSchema()).getInt()));
   }
 }
