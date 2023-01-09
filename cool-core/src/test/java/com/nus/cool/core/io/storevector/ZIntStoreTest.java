@@ -60,11 +60,11 @@ public class ZIntStoreTest {
         store = new ZInt8Store();
         store.readFrom(buffer);
         break;
-        case INT16:
+      case INT16:
         store = new ZInt16Store();
         store.readFrom(buffer);
         break;
-        case INT32:
+      case INT32:
         // INT32
         store = new ZInt32Store();
         store.readFrom(buffer);

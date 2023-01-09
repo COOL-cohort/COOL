@@ -9,7 +9,6 @@ import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
-import com.nus.cool.core.io.storevector.LZ4InputVector;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;

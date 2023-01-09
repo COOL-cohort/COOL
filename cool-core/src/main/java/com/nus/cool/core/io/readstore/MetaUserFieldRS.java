@@ -4,18 +4,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.field.IntRangeField;
-import com.nus.cool.core.field.RangeField;
 import com.nus.cool.core.io.storevector.HashFieldInputVector;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
 import com.nus.cool.core.io.storevector.IntFieldInputVector;
-import com.nus.cool.core.io.storevector.LZ4InputVector;
 import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**

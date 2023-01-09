@@ -52,5 +52,6 @@ public interface MetaFieldRS extends Input {
    */
   int getMinValue();
 
-  void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) throws IllegalArgumentException;
+  void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType)
+      throws IllegalArgumentException;
 }

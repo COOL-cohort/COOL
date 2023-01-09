@@ -1,10 +1,9 @@
 package com.nus.cool.core.cohort.storage;
 
+import com.nus.cool.core.field.FieldValue;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
-
-import com.nus.cool.core.field.FieldValue;
 
 /**
  * Partial of a tuple in project, when generated, the layout of schemas is

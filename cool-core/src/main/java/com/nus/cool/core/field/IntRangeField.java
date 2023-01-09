@@ -2,6 +2,9 @@ package com.nus.cool.core.field;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Range field with underlying int value.
+ */
 @AllArgsConstructor
 public class IntRangeField implements RangeField {
   

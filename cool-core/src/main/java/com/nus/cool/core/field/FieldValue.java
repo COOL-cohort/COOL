@@ -1,5 +1,8 @@
 package com.nus.cool.core.field;
 
+/**
+ * Field value abstract the values stored and handled in COOL.
+ */
 public interface FieldValue {
   boolean checkEqual(Object o);
   
