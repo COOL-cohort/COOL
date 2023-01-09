@@ -22,7 +22,6 @@ package com.nus.cool.core.cohort.storage;
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
-import com.nus.cool.core.io.storevector.LZ4InputVector;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

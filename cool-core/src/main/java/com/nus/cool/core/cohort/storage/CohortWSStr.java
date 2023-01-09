@@ -106,6 +106,7 @@ public class CohortWSStr implements Output {
 
     OutputCompressor compressor = new OutputCompressor();
     compressor.reset(hist, buffer.getData(), 0, buffer.size());
+    buffer.close();
     return compressor.writeTo(out);
   }
 

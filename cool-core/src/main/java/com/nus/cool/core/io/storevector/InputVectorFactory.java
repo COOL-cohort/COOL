@@ -22,7 +22,6 @@ package com.nus.cool.core.io.storevector;
 import com.nus.cool.core.field.IntRangeField;
 import com.nus.cool.core.field.StringHashField;
 import com.nus.cool.core.schema.Codec;
-
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -31,7 +30,7 @@ import java.nio.charset.Charset;
  */
 public class InputVectorFactory {
 
-  private InputVectorFactory(){}
+  private InputVectorFactory() {}
 
   /**
    * Create an input vector for values from a buffer.
@@ -39,7 +38,7 @@ public class InputVectorFactory {
    * BitVector is only used for keyhash.
    */
   public static RangeFieldInputVector genRangeFieldInputVector(ByteBuffer buffer)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
     Codec codec = Codec.fromInteger(buffer.get());
     switch (codec) {
       case INT8: {
@@ -77,10 +76,11 @@ public class InputVectorFactory {
     }
   }
 
-
-  
+  /**
+   * Build an integer input vector on the data buffer. 
+   */
   public static InputVector<Integer> genIntInputVector(ByteBuffer buffer)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
     Codec codec = Codec.fromInteger(buffer.get());
     InputVector<Integer> result;
     switch (codec) {
@@ -116,21 +116,23 @@ public class InputVectorFactory {
   }
 
   public static IntFieldInputVector genIntFieldInputVector(ByteBuffer buffer)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
     InputVector<Integer> iv = genIntInputVector(buffer);
     return x -> new IntRangeField(iv.get(x));
   }
 
   // string is for now the only hash field type.
   public static HashFieldInputVector genHashFieldInputVector(ByteBuffer buffer, Charset charset)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
     InputVector<String> iv = genStrFieldInputVector(buffer, charset);
     return x -> new StringHashField(iv.get(x));
   }
 
-  // there is only one type of string encoding
+  /**
+   * Build an string input vector on the data buffer.
+   */
   public static InputVector<String> genStrFieldInputVector(ByteBuffer buffer, Charset charset)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
     Codec codec = Codec.fromInteger(buffer.get());
     // only lz4 encoding for string field now.
     if (codec != Codec.LZ4) {

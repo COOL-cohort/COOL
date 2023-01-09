@@ -1,7 +1,6 @@
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.field.IntRangeField;
-import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
 

@@ -2,6 +2,9 @@ package com.nus.cool.core.field;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Range field with underlying float value.
+ */
 @AllArgsConstructor
 public class FloatRangeField implements RangeField {
   
@@ -32,7 +35,7 @@ public class FloatRangeField implements RangeField {
     if (val == oVal) {
       return 0;
     }
-    return (val < oVal) ? -1 : 1 ;   
+    return (val < oVal) ? -1 : 1;
   }
 
   @Override
