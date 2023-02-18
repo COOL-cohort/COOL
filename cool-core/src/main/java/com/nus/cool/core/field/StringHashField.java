@@ -26,6 +26,14 @@ public class StringHashField implements HashField {
   }
 
   @Override
+  public int compareTo(FieldValue o) throws IllegalArgumentException {
+    if (!(o instanceof StringHashField)) {
+      throw new IllegalArgumentException("Invalid type to compare against IntRangeField");
+    }
+    return val.compareTo(((StringHashField) o).val);
+  }
+
+  @Override
   public String getString() {
     return val;
   }

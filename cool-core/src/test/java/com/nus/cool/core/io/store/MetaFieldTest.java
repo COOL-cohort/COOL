@@ -1,7 +1,6 @@
 package com.nus.cool.core.io.store;
 
 import com.nus.cool.core.io.DataOutputBuffer;
-import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.readstore.MetaHashFieldRS;
 import com.nus.cool.core.io.readstore.MetaRangeFieldRS;
@@ -35,7 +34,6 @@ public class MetaFieldTest {
   static final Logger logger = LoggerFactory.getLogger(MetaFieldTest.class);
 
   private Charset charset;
-  private OutputCompressor compressor;
   // private TestTable table;
 
   /**
@@ -45,19 +43,6 @@ public class MetaFieldTest {
   public void setUp() {
     logger.info("Start UnitTest " + MetaFieldTest.class.getSimpleName());
     this.charset = Charset.defaultCharset();
-    this.compressor = new OutputCompressor();
-    // // temporary test dataset
-    // String sourcePath = Paths.get(System.getProperty("user.dir"),
-    // "src",
-    // "test",
-    // "java",
-    // "com",
-    // "nus",
-    // "cool",
-    // "core",
-    // "resources").toString();
-    // String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
-    // this.table = TestTable.readFromCSV(filepath);
   }
 
   @AfterTest
@@ -151,7 +136,7 @@ public class MetaFieldTest {
     System.out.println(fieldName + type.toString());
     int fieldIdx = table.getField2Ids().get(fieldName);
     System.out.println(fieldIdx);
-    MetaFieldWS mws = new MetaHashFieldWS(type, this.charset, this.compressor);
+    MetaFieldWS mws = new MetaHashFieldWS(type, this.charset);
 
     // ground-truth value
     // value : gloablId

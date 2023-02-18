@@ -1,13 +1,16 @@
 package com.nus.cool.core.io.storevector;
 
-import com.nus.cool.core.io.DataOutputBuffer;
-import com.nus.cool.core.io.compression.Histogram;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueWrapper;
+import com.nus.cool.core.io.compression.CompressorOutput;
 import com.nus.cool.core.io.compression.LZ4JavaCompressor;
-import com.nus.cool.core.schema.CompressType;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -39,30 +42,17 @@ public class LZ4InputVectorTest {
     logger.info(
         String.format("Input LZ4InputVector UnitTest Data: ValueList Size %d", valueList.length));
 
-    DataOutputBuffer buf = new DataOutputBuffer();
-    // Write Size
-    buf.writeInt(valueList.length);
-    // Write Offset of Value and string value
-    int offset = 0;
-    for (String v : valueList) {
-      buf.writeInt(offset);
-      offset += v.getBytes().length;
-    }
+    List<FieldValue> values = Arrays.asList(valueList)
+        .stream()
+        .map(x -> ValueWrapper.of(x))
+        .collect(Collectors.toList());
+    LZ4JavaCompressor compressor = new LZ4JavaCompressor(defaultCharset);
+    CompressorOutput out = compressor.compress(values);
 
-    for (String v : valueList) {
-      buf.write(v.getBytes());
-    }
-    // Use LZ4JavaCompressor to Compress
-    Histogram hist = Histogram.builder().type(CompressType.KeyString).rawSize(buf.size()).build();
-    LZ4JavaCompressor compressor = new LZ4JavaCompressor(hist);
-    int maxLen = compressor.maxCompressedLength();
-    byte[] compressed = new byte[maxLen];
-    compressor.compress(buf.getData(), 0, buf.size(), compressed, 0, maxLen);
-
-    buf.close();
+    // buf.close();
 
     // Decoding these readBuf
-    ByteBuffer readBuf = ByteBuffer.wrap(compressed);
+    ByteBuffer readBuf = ByteBuffer.wrap(out.getBuf(), 0, out.getLen());
     readBuf.order(ByteOrder.nativeOrder());
     LZ4InputVector res = new LZ4InputVector(defaultCharset);
     res.readFrom(readBuf);

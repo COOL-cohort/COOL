@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Output;
-import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
@@ -93,7 +92,6 @@ public class MetaChunkWS implements Output {
    * @return MetaChunkWS instance
    */
   public static MetaChunkWS newMetaChunkWS(TableSchema schema, int offset) {
-    OutputCompressor compressor = new OutputCompressor();
     Charset charset = Charset.forName(schema.getCharset());
 
     // n: it denotes the number of columns
@@ -106,12 +104,12 @@ public class MetaChunkWS implements Output {
 
       switch (fieldType) {
         case UserKey:
-          metaFields[i] = new MetaUserFieldWS(fieldType, charset, compressor, metaChunk);
+          metaFields[i] = new MetaUserFieldWS(fieldType, charset, metaChunk);
           break;
         case AppKey:
         case Action:
         case Segment:
-          metaFields[i] = new MetaHashFieldWS(fieldType, charset, compressor);
+          metaFields[i] = new MetaHashFieldWS(fieldType, charset);
           break;
         case ActionTime:
         case Metric:

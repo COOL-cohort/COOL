@@ -26,7 +26,7 @@ public class IntRangeField implements RangeField {
   }
   
   @Override
-  public int compareTo(Object o) throws IllegalArgumentException {
+  public int compareTo(FieldValue o) throws IllegalArgumentException {
     if (!(o instanceof IntRangeField)) {
       throw new IllegalArgumentException("Invalid type to compare against IntRangeField");
     }

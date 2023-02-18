@@ -19,11 +19,10 @@
 
 package com.nus.cool.core.io.writestore;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.primitives.Ints;
-import com.nus.cool.core.io.DataInputBuffer;
-import com.nus.cool.core.io.DataOutputBuffer;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.RangeField;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.Codec;
@@ -33,6 +32,8 @@ import com.nus.cool.core.util.IntegerUtil;
 import com.nus.cool.core.util.converter.DayIntConverter;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Range index, used to store chunk data for two fieldTypes, including
@@ -51,16 +52,16 @@ public class DataRangeFieldWS implements DataFieldWS {
 
   private final FieldType fieldType;
 
-  private final DataOutputBuffer buffer = new DataOutputBuffer();
+  private final List<FieldValue> values = new LinkedList<>();
 
-  private final OutputCompressor compressor;
+  private RangeField min;
+  private RangeField max;
 
   /**
    * Create a write store of int field for data chunk.
    */
-  public DataRangeFieldWS(FieldType fieldType, OutputCompressor compressor) {
+  public DataRangeFieldWS(FieldType fieldType) {
     this.fieldType = fieldType;
-    this.compressor = checkNotNull(compressor);
   }
 
   @Override
@@ -76,53 +77,41 @@ public class DataRangeFieldWS implements DataFieldWS {
    */
   @Override
   public void put(String tupleValue) throws IOException {
+    RangeField v;
     if (this.fieldType == FieldType.ActionTime) {
       DayIntConverter converter = DayIntConverter.getInstance();
-      this.buffer.writeInt(converter.toInt(tupleValue));
+      v = ValueWrapper.of(converter.toInt(tupleValue));
     } else {
-      this.buffer.writeInt(Integer.parseInt(tupleValue));
+      v = ValueWrapper.of(Integer.parseInt(tupleValue));
     }
+    values.add(v);
+    min = ((min == null) || (min.compareTo(v) > 0)) ? v : min;
+    max = ((max == null) || (max.compareTo(v) < 0)) ? v : max;
   }
 
   @Override
   public int writeTo(DataOutput out) throws IOException {
     int bytesWritten = 0;
-    int[] key = { Integer.MAX_VALUE, Integer.MIN_VALUE };
-    // key[0] Min Key[1] Max
-    int[] value = new int[this.buffer.size() / Ints.BYTES];
-
-    // Read column data
-    try (DataInputBuffer input = new DataInputBuffer()) {
-      input.reset(this.buffer);
-      for (int i = 0; i < value.length; i++) {
-        value[i] = input.readInt();
-        key[0] = Math.min(value[i], key[0]);
-        key[1] = Math.max(value[i], key[1]);
-      }
-    }
 
     // Write codec
     out.write(Codec.Range.ordinal());
     bytesWritten++;
     // Write min value
-    out.writeInt(IntegerUtil.toNativeByteOrder(key[0]));
+    out.writeInt(IntegerUtil.toNativeByteOrder(min.getInt()));
     bytesWritten += Ints.BYTES;
     // Write max value
-    out.writeInt(IntegerUtil.toNativeByteOrder(key[1]));
+    out.writeInt(IntegerUtil.toNativeByteOrder(max.getInt()));
     bytesWritten += Ints.BYTES;
 
     // Write values, i.e. the data within the column
-    int count = value.length;
-    int rawSize = count * Ints.BYTES;
+    int count = values.size();
+    // int rawSize = count * Ints.BYTES;
     Histogram hist = Histogram.builder()
-        .min(key[0])
-        .max(key[1])
+        .min(min)
+        .max(max)
         .numOfValues(count)
-        .rawSize(rawSize)
-        .type(CompressType.ValueFast)
         .build();
-    this.compressor.reset(hist, value, 0, value.length);
-    bytesWritten += this.compressor.writeTo(out);
+    bytesWritten += OutputCompressor.writeTo(CompressType.ValueFast, hist, values, out);
     return bytesWritten;
   }
 }

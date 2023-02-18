@@ -2,7 +2,6 @@ package com.nus.cool.core.io.store;
 
 import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.io.DataOutputBuffer;
-import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.DataHashFieldRS;
 import com.nus.cool.core.io.readstore.MetaHashFieldRS;
 import com.nus.cool.core.io.writestore.DataHashFieldWS;
@@ -32,7 +31,6 @@ public class HashFieldTest {
   private String sourcePath;
   private TestTable table;
   private Charset charset;
-  private OutputCompressor compressor;
 
   /**
    * setup.
@@ -41,7 +39,6 @@ public class HashFieldTest {
   public void setUp() {
     logger.info("Start UnitTest " + HashFieldTest.class.getSimpleName());
     this.charset = Charset.defaultCharset();
-    this.compressor = new OutputCompressor();
     sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com", "nus",
         "cool", "core", "resources").toString();
     String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
@@ -65,8 +62,8 @@ public class HashFieldTest {
     ArrayList<String> data = table.getCols().get(fieldidx);
 
     // Generate MetaHashFieldWS
-    MetaHashFieldWS hmws = new MetaHashFieldWS(fType, charset, compressor);
-    DataHashFieldWS ws = new DataHashFieldWS(hmws.getFieldType(), hmws, compressor, false);
+    MetaHashFieldWS hmws = new MetaHashFieldWS(fType, charset);
+    DataHashFieldWS ws = new DataHashFieldWS(hmws.getFieldType(), hmws, false);
 
     // Input col data into metaField
     for (int idx = 0; idx < data.size(); idx++) {

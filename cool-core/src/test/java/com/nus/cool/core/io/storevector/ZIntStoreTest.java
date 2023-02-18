@@ -1,13 +1,16 @@
 package com.nus.cool.core.io.storevector;
 
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.compression.Compressor;
-import com.nus.cool.core.io.compression.Histogram;
+import com.nus.cool.core.io.compression.CompressorOutput;
 import com.nus.cool.core.io.compression.ZIntCompressor;
 import com.nus.cool.core.schema.Codec;
-import com.nus.cool.core.schema.CompressType;
-import com.nus.cool.core.util.ArrayUtil;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -38,20 +41,15 @@ public class ZIntStoreTest {
     logger.info(String.format("Input ZIntStore UnitTest Data: Code Type %s Input Data %s",
         codeType.name(), numbers.toString()));
 
-    int min = ArrayUtil.min(numbers);
-    int max = ArrayUtil.max(numbers);
-    int count = numbers.length;
-    int rawSize = count * codecByte(codeType);
+    List<FieldValue> values = IntStream.of(numbers)
+        .mapToObj(x -> ValueWrapper.of(x))
+        .collect(Collectors.toList());
 
-    Histogram hist = Histogram.builder().min(min).max(max).numOfValues(count).rawSize(rawSize)
-        .type(CompressType.KeyHash).build();
-    Compressor compressor = new ZIntCompressor(codeType, hist);
-    int maxLen = compressor.maxCompressedLength();
-    byte[] compressed = new byte[maxLen];
-    compressor.compress(numbers, 0, count, compressed, 0, maxLen);
+    Compressor compressor = new ZIntCompressor(codeType, false);
+    CompressorOutput compressed = compressor.compress(values);
 
     // load the bytes with
-    ByteBuffer buffer = ByteBuffer.wrap(compressed);
+    ByteBuffer buffer = ByteBuffer.wrap(compressed.getBuf(), 0, compressed.getLen());
     buffer.order(ByteOrder.nativeOrder());
     ZIntStore store;
 
@@ -88,18 +86,5 @@ public class ZIntStoreTest {
         { new int[] { 1, 5, 666, 777, 888, 999, 222 }, Codec.INT16 },
         { new int[] { 1, 7, 12, 11, 12, 44 }, Codec.INT8 },
     };
-  }
-
-  private int codecByte(Codec ctype) {
-    switch (ctype) {
-      case INT32:
-        return 4;
-      case INT16:
-        return 2;
-      case INT8:
-        return 1;
-      default:
-        throw new IllegalArgumentException("Invalid INT code Type");
-    }
   }
 }

@@ -10,8 +10,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -182,8 +180,7 @@ public class NativeDataWriter implements DataWriter {
     lastUser = curUser;
     // update metachunk / metafield
     metaChunk.put(insertTuple);
-    List<String> dataArray = new ArrayList<String>(Arrays.asList(insertTuple));
-    dataChunk.put((String[]) dataArray.toArray(new String[0]));
+    dataChunk.put(insertTuple);
     // update data chunk
     tupleCount++;
     return true;
