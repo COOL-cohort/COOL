@@ -26,6 +26,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Serialize and compress a list of field values to output.
+ */
 public class OutputCompressor {
 
   /**
