@@ -19,9 +19,11 @@
 
 package com.nus.cool.core.io.compression;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
 
 /**
  * Compress data sequences in which same data value occurs in many consecutive
@@ -48,12 +50,7 @@ public class RLECompressor implements Compressor {
    */
   public static final int HEADACC = 4 + 4;
 
-  private final int maxCompressedLen;
-
-  public RLECompressor(Histogram hist) {
-    int uncompressedSize = 3 * Integer.BYTES * hist.getNumOfValues();
-    this.maxCompressedLen = HEADACC + (Math.max(hist.getRawSize(), uncompressedSize));
-  }
+  public RLECompressor() {}
 
   /**
    * Write int value to a given buffer.
@@ -99,43 +96,35 @@ public class RLECompressor implements Compressor {
   }
 
   @Override
-  public int maxCompressedLength() {
-    return this.maxCompressedLen;
-  }
-
-  @Override
-  public int compress(byte[] src, int srcOff, int srcLen, byte[] dest,
-      int destOff, int maxDestLen) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int compress(int[] src, int srcOff, int srcLen, byte[] dest,
-      int destOff, int maxDestLen) {
-    int n = 1; // how many distinct value
-    ByteBuffer buf = ByteBuffer.wrap(dest, destOff, maxDestLen).order(ByteOrder.nativeOrder());
+  public CompressorOutput compress(List<? extends FieldValue> src) {
+    int maxCompressedLen = HEADACC + 3 * Integer.BYTES * src.size();
+    CompressorOutput out = new CompressorOutput(maxCompressedLen);
+    ByteBuffer buf = ByteBuffer.wrap(out.getBuf()).order(ByteOrder.nativeOrder());
     buf.position(HEADACC);
-    int v = src[srcOff];
-    int voff = 0;
-    int vlen = 1;
+    int nextV = src.get(0).getInt(); // get a different value
+    int currOff = 0;
+    int voff = currOff;
+    int vlen = 0;
+    int n = 1; // how many distinct value
     // for each record,
-    for (int i = srcOff + 1; i < srcOff + srcLen; i++) {
-      if (src[i] != v) {
-        write(buf, v, voff, vlen);
-        v = src[i];
+    for (FieldValue v : src) {
+      if (v.getInt() != nextV) {
+        write(buf, nextV, voff, vlen);
+        nextV = v.getInt();
         // re-init offset in output buffer, and length of distinct value
-        voff = i - srcOff;
-        vlen = 1;
+        vlen = 0;
+        voff = currOff;
         n++;
-      } else {
-        vlen++;
       }
+      vlen++;
+      currOff++;
     }
-    write(buf, v, voff, vlen);
+    // write the last value.
+    write(buf, nextV, voff, vlen);
     int zlen = buf.position() - HEADACC;
     buf.position(0);
     buf.putInt(zlen).putInt(n);
-    return zlen + HEADACC;
+    out.setLen(zlen + HEADACC);
+    return out;
   }
-
 }

@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.DataInputBuffer;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.Histogram;
@@ -32,9 +34,9 @@ import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.util.ArrayUtil;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
@@ -55,8 +57,6 @@ import java.util.Map;
 public class DataHashFieldWS implements DataFieldWS {
 
   private final MetaFieldWS metaField;
-
-  private final OutputCompressor compressor;
 
   private final FieldType fieldType;
 
@@ -79,11 +79,10 @@ public class DataHashFieldWS implements DataFieldWS {
    *
    * @param preCal is preCalculated
    */
-  public DataHashFieldWS(FieldType fieldType, MetaFieldWS metaField, OutputCompressor compressor,
-      boolean preCal) {
+  public DataHashFieldWS(FieldType fieldType, MetaFieldWS metaField, boolean preCal) {
     this.fieldType = fieldType;
     this.metaField = checkNotNull(metaField);
-    this.compressor = checkNotNull(compressor);
+    // this.compressor = checkNotNull(compressor);
     this.preCal = preCal;
   }
 
@@ -111,11 +110,16 @@ public class DataHashFieldWS implements DataFieldWS {
     int size = this.buffer.size() / Ints.BYTES;
 
     // Store globalID in order, key: unique global id
-    int[] key = new int[this.idMap.size()];
+    List<FieldValue> key = new ArrayList<>(this.idMap.size());
     // i: local id, indicate order or globalID
     int i = 0;
+    int min = Integer.MAX_VALUE;
+    int max = Integer.MIN_VALUE;
     for (Map.Entry<Integer, Integer> en : this.idMap.entrySet()) {
-      key[i] = en.getKey();
+      int k = en.getKey();
+      min = (min > k) ? k : min;
+      max = (max < k) ? k : max;
+      key.add(ValueWrapper.of(k));
       // Store localID into the map
       en.setValue(i);
       // Store value bitSet if pre-calculate
@@ -127,14 +131,14 @@ public class DataHashFieldWS implements DataFieldWS {
     }
 
     // Store value vector, local IDs
-    int[] value = new int[size];
+    List<FieldValue> value = new ArrayList<>(size);
     // outputBuffer to InputBuffer, for read
     try (DataInputBuffer input = new DataInputBuffer()) {
       input.reset(this.buffer);
       for (i = 0; i < size; i++) {
         int id = input.readInt(); // read globalID
         // Store localID to value i-th position
-        value[i] = this.idMap.get(id);
+        value.add(ValueWrapper.of(this.idMap.get(id)));
         if (this.preCal) {
           // Store value bitSet
           this.bitSetList.get(this.idMap.get(id)).set(i);
@@ -143,21 +147,13 @@ public class DataHashFieldWS implements DataFieldWS {
     }
 
     // Write compressed key vector (unique global id)
-    int min = ArrayUtil.min(key);
-    int max = ArrayUtil.max(key);
-    int count = key.length;
-    int rawSize = count * Ints.BYTES;
     Histogram hist = Histogram.builder()
         .sorted(true)
-        .min(min)
-        .max(max)
-        .numOfValues(count)
-        .rawSize(rawSize)
-        .type(CompressType.KeyHash)
+        .min(ValueWrapper.of(min))
+        .max(ValueWrapper.of(max))
+        .numOfValues(key.size())
         .build();
-    this.compressor.reset(hist, key, 0, key.length);
-    int bytesWritten = 0;
-    bytesWritten += this.compressor.writeTo(out);
+    int bytesWritten = OutputCompressor.writeTo(CompressType.KeyHash, hist, key, out);
 
     // Write compressed bitSetList if pre-calculate
     if (this.preCal) {
@@ -173,21 +169,12 @@ public class DataHashFieldWS implements DataFieldWS {
       }
     } else {
       // Write compressed value vector (local ids)
-      min = ArrayUtil.min(value);
-      max = ArrayUtil.max(value);
-      count = value.length;
-      rawSize = count * Ints.BYTES;
       hist = Histogram.builder()
-          // .sorted(this.fieldType == FieldType.AppKey || this.fieldType ==
-          // FieldType.UserKey)
-          .min(min)
-          .max(max)
-          .numOfValues(count)
-          .rawSize(rawSize)
-          .type(CompressType.Value)
+          .min(ValueWrapper.of(0))
+          .max(ValueWrapper.of(idMap.size()))
+          .numOfValues(value.size())
           .build();
-      this.compressor.reset(hist, value, 0, value.length);
-      bytesWritten += this.compressor.writeTo(out);
+      bytesWritten += OutputCompressor.writeTo(CompressType.Value, hist, value, out);
     }
     return bytesWritten;
   }

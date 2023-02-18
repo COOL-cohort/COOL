@@ -35,22 +35,22 @@ public class CompressorFactory {
       case INT8:
       case INT16:
       case INT32:
-        compressor = new ZIntCompressor(codec, hist);
+        compressor = new ZIntCompressor(codec, hist.isSorted());
         break;
       case LZ4:
-        compressor = new LZ4JavaCompressor(hist);
+        compressor = new LZ4JavaCompressor(hist.getCharset());
         break;
       case BitVector:
-        compressor = new BitVectorCompressor(hist);
+        compressor = new BitVectorCompressor(hist.getMax());
         break;
       case RLE:
-        compressor = new RLECompressor(hist);
+        compressor = new RLECompressor();
         break;
       case INTBit:
-        compressor = new ZIntBitCompressor(hist);
+        compressor = new ZIntBitCompressor(hist.getMax());
         break;
       case Delta:
-        compressor = new DeltaCompressor(hist);
+        compressor = new DeltaCompressor(hist.getMin(), hist.getMax());
         break;
       default:
         throw new IllegalArgumentException("Unsupported codec: " + codec);

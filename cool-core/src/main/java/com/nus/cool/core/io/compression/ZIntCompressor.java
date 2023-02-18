@@ -16,11 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package com.nus.cool.core.io.compression;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.schema.Codec;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
 
 /**
  * Compress integers using the leading zero suppressed schema. Each compressed integer is formatted
@@ -34,26 +37,24 @@ import java.nio.ByteOrder;
 public class ZIntCompressor implements Compressor {
 
   /**
-   * Bytes number for count and sorted
+   * Bytes number for count and sorted.
    */
   public static final int HEADACC = 5;
 
   /**
-   * Bytes number for compressed integer
+   * Bytes number for compressed integer.
    */
   private final int width;
   
   /**
-   *  Whether these value are sorted
+   *  Whether these value are sorted.
    */
   private final boolean sorted;
 
   /**
-   * Maximum size of compressed data
+   * Create a ZInt compressor with fixed width.
    */
-  private final int maxCompressedLength;
-
-  public ZIntCompressor(Codec codec, int numValues, boolean sorted) {
+  public ZIntCompressor(Codec codec, boolean sorted) {
     switch (codec) {
       case INT8:
         this.width = 1;
@@ -68,47 +69,64 @@ public class ZIntCompressor implements Compressor {
         throw new IllegalArgumentException("Unsupported codec: " + codec);
     }
     this.sorted = sorted;
-    this.maxCompressedLength = this.width * numValues + HEADACC;
   }
 
-  public ZIntCompressor(Codec codec, Histogram hist) {
-    this(codec, hist.getNumOfValues(), hist.isSorted());
-  }
-
-  @Override
-  public int maxCompressedLength() {
-    return this.maxCompressedLength;
-  }
-
-  @Override
-  public int compress(byte[] src, int srcOff, int srcLen, byte[] dest, int destOff,
+  /**
+   * Compress into pre-allocated buffer for DeltaCompressor.
+   */
+  public int compress(List<? extends FieldValue> src, byte[] dest, int destOff,
       int maxDestLen) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int compress(int[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen) {
     ByteBuffer buffer = ByteBuffer.wrap(dest, destOff, maxDestLen);
     buffer.order(ByteOrder.nativeOrder());
     // Write count, save srcLen for decompressing
-    buffer.putInt(srcLen);
+    buffer.putInt(src.size());
     byte sorted = this.sorted ? (byte) 1 : (byte) 0;
     buffer.put(sorted);
     // Write compressed data
-    for (int i = srcOff; i < srcOff + srcLen; i++) {
+    for (FieldValue v : src) {
       switch (this.width) {
         case 1:
-          buffer.put((byte) src[i]);
+          buffer.put((byte) v.getInt());
           break;
         case 2:
-          buffer.putShort((short) src[i]);
+          buffer.putShort((short) v.getInt());
           break;
         case 4:
-          buffer.putInt(src[i]);
+          buffer.putInt(v.getInt());
           break;
+        default:
+          throw new IllegalStateException("Invalid width: " + this.width);
       }
     }
     return buffer.position() - destOff;
   }
 
+  @Override
+  public CompressorOutput compress(List<? extends FieldValue> src) {
+    CompressorOutput out = new CompressorOutput(this.width * src.size() + HEADACC);
+    ByteBuffer buffer = ByteBuffer.wrap(out.getBuf());
+    buffer.order(ByteOrder.nativeOrder());
+    // Write count, save srcLen for decompressing
+    buffer.putInt(src.size());
+    byte sorted = this.sorted ? (byte) 1 : (byte) 0;
+    buffer.put(sorted);
+    // Write compressed data
+    for (FieldValue v : src) {
+      switch (this.width) {
+        case 1:
+          buffer.put((byte) v.getInt());
+          break;
+        case 2:
+          buffer.putShort((short) v.getInt());
+          break;
+        case 4:
+          buffer.putInt(v.getInt());
+          break;
+        default:
+          throw new IllegalStateException("Invalid width: " + this.width);
+      }
+    }
+    out.setLen(buffer.position());
+    return out;
+  }
 }

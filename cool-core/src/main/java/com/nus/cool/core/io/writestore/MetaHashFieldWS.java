@@ -21,8 +21,8 @@ package com.nus.cool.core.io.writestore;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Ints;
-import com.nus.cool.core.io.DataOutputBuffer;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
@@ -55,14 +55,14 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
   protected final Charset charset;
   protected final FieldType fieldType;
-  protected final OutputCompressor compressor;
+  // protected final OutputCompressor compressor;
   protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
   protected Map<Integer, Integer> fingerToGid = Maps.newTreeMap();
-  protected final List<String> valueList = new ArrayList<>();
+  protected final List<FieldValue> valueList = new ArrayList<>();
 
   // all possible values of the field.
-  protected final Set<String> fieldValues = Sets.newTreeSet();
+  protected final Set<FieldValue> fieldValues = Sets.newTreeSet();
 
   // global id
   protected int nextGid = 0;
@@ -72,12 +72,11 @@ public class MetaHashFieldWS implements MetaFieldWS {
    *
    * @param type       type
    * @param charset    charset
-   * @param compressor compressor
    */
-  public MetaHashFieldWS(FieldType type, Charset charset, OutputCompressor compressor) {
+  public MetaHashFieldWS(FieldType type, Charset charset) {
     this.fieldType = type;
     this.charset = charset;
-    this.compressor = compressor;
+    // this.compressor = compressor;
   }
 
   @Override
@@ -85,7 +84,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
     int hashKey = rhash.hash(tuple[idx]);
     if (!this.fingerToGid.containsKey(hashKey)) {
       this.fingerToGid.put(hashKey, nextGid++);
-      this.valueList.add(tuple[idx]);
+      this.valueList.add(ValueWrapper.of(tuple[idx]));
     }
   }
 
@@ -107,7 +106,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
   @Override
   public void complete() {
-    for (String v : this.valueList) {
+    for (FieldValue v : this.valueList) {
       fieldValues.add(v);
     }
   }
@@ -119,111 +118,64 @@ public class MetaHashFieldWS implements MetaFieldWS {
     this.nextGid = 0; // a field can have different id across cublet.
   }
 
-  @Override
-  public int writeTo(DataOutput out) throws IOException {
+  protected int writeFingersAndGids(DataOutput out) throws IOException {
     int bytesWritten = 0;
-
     // Write fingers, i.e., the hash values of the original string, into the array
     // fingers contain data's hash value
-    int[] fingers = new int[this.fingerToGid.size()];
+    List<FieldValue> fingers = new ArrayList<>(this.fingerToGid.size());
     // globalIDs contain the global ids in the hash order
-    int[] globalIDs = new int[this.fingerToGid.size()];
-    int i = 0;
+    List<FieldValue> globalIDs = new ArrayList<>(this.fingerToGid.size());
 
     for (Map.Entry<Integer, Integer> en : this.fingerToGid.entrySet()) {
-      globalIDs[i] = en.getValue();
-      fingers[i++] = en.getKey();
+      globalIDs.add(ValueWrapper.of(en.getValue()));
+      fingers.add(ValueWrapper.of(en.getKey()));
     }
 
     // generate finger bytes
     Histogram hist = Histogram.builder()
-        .min(fingers[0])
-        .max(fingers[fingers.length - 1])
-        .numOfValues(fingers.length)
-        .rawSize(Ints.BYTES * fingers.length)
-        .type(CompressType.KeyFinger)
         .sorted(true)
+        .min(fingers.get(0))
+        .max(fingers.get(fingers.size() - 1))
+        .numOfValues(fingers.size())
         .build();
-    this.compressor.reset(hist, fingers, 0, fingers.length);
     // Compress and write the fingers
     // Codec is written internal
-    // Actually data is not compressed here
-    bytesWritten += this.compressor.writeTo(out);
+    bytesWritten += OutputCompressor.writeTo(CompressType.KeyFinger, hist, fingers, out);
 
     // generate globalID bytes
     hist = Histogram.builder()
-        .min(0)
-        .max(this.fingerToGid.size())
-        .numOfValues(globalIDs.length)
-        .rawSize(Ints.BYTES * globalIDs.length)
-        .type(CompressType.Value)// choose value as it is used for hash field columns of global id.
+        .min(ValueWrapper.of(0))
+        .max(ValueWrapper.of(this.fingerToGid.size()))
+        .numOfValues(globalIDs.size())
         .build();
-    this.compressor.reset(hist, globalIDs, 0, globalIDs.length);
-    bytesWritten += this.compressor.writeTo(out);
+    bytesWritten += OutputCompressor.writeTo(CompressType.Value, hist, globalIDs, out);
+    return bytesWritten;
+  }
 
-    // Write values
-
-    try (DataOutputBuffer buffer = new DataOutputBuffer()) {
-      // Store offsets into the buffer first
-      buffer.writeInt(this.valueList.size());
-      // Value offsets begin with 0
-      int off = 0;
-      for (String t : this.valueList) {
-        buffer.writeInt(off);
-        off += t.getBytes(this.charset).length;
-      }
-
-      // Store String values into the buffer
-      for (String t : this.valueList) {
-        buffer.write(t.getBytes(this.charset));
-      }
-
-      // Compress and write the buffer
-      // The codec is written internal
-      hist = Histogram.builder()
-          .type(CompressType.KeyString)
-          .rawSize(buffer.size())
-          .build();
-      this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
-      bytesWritten += this.compressor.writeTo(out);
-    }
+  @Override
+  public int writeTo(DataOutput out) throws IOException {
+    int bytesWritten = writeFingersAndGids(out);
+    bytesWritten += OutputCompressor.writeTo(CompressType.KeyString,
+      Histogram.builder().charset(charset).build(),
+      valueList, out);
 
     return bytesWritten;
   }
 
   @Override
   public int writeCubeMeta(DataOutput out) throws IOException {
-    int bytesWritten = 0;
-    if (this.fieldType == FieldType.Segment
-        || this.fieldType == FieldType.Action
-        || this.fieldType == FieldType.UserKey) {
-      try (DataOutputBuffer buffer = new DataOutputBuffer()) {
-        buffer.writeInt(this.fieldValues.size());
-        int off = 0;
-
-        for (String s : this.fieldValues) {
-          buffer.writeInt(off);
-          off += s.getBytes(this.charset).length;
-        }
-
-        for (String s : this.fieldValues) {
-          buffer.write(s.getBytes(this.charset));
-        }
-
-        Histogram hist = Histogram.builder()
-            .type(CompressType.KeyString)
-            .rawSize(buffer.size())
-            .build();
-        this.compressor.reset(hist, buffer.getData(), 0, buffer.size());
-        bytesWritten = this.compressor.writeTo(out);
-      }
+    if (this.fieldType != FieldType.Segment
+        && this.fieldType != FieldType.Action
+        && this.fieldType != FieldType.UserKey) {
+      return 0;
     }
-    return bytesWritten;
+    return OutputCompressor.writeTo(CompressType.KeyString,
+      Histogram.builder().charset(charset).build(),
+      new ArrayList<FieldValue>(fieldValues), out);
   }
 
   @Override
   public String toString() {
     return "HashMetaField: " + valueList.toString();
   }
-
 }

@@ -14,7 +14,8 @@
 
 package com.nus.cool.core.io.compression;
 
-import com.nus.cool.core.schema.CompressType;
+import com.nus.cool.core.field.FieldValue;
+import java.nio.charset.Charset;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -24,10 +25,12 @@ import lombok.Getter;
 @Getter
 @Builder
 public class Histogram {
-  /**
-   * Compress data size.
-   */
-  private int rawSize;
+  // /**
+  //  * Compress data size.
+  //  */
+  // private int rawSize; // maybe we can have this later.
+
+  private Charset charset;
 
   /**
    * Means data value occurs in many consecutive data elements.
@@ -42,17 +45,17 @@ public class Histogram {
   /**
    * Max(Last) value in compress data.
    */
-  private long max;
+  private FieldValue max;
 
   /**
    * Min(First) value in compress data.
    */
-  private long min;
+  private FieldValue min;
 
-  /**
-   * Specific compress type.
-   */
-  private CompressType type;
+  // /**
+  //  * Specific compress type.
+  //  */
+  // private CompressType type;
 
-  private int uniqueValues;
+  // private int uniqueValues;
 }

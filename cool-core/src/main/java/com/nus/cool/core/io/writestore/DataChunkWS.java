@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Output;
-import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
@@ -92,7 +91,7 @@ public class DataChunkWS implements Output {
    * @return DataChunkWs instance
    */
   public static DataChunkWS newDataChunk(TableSchema schema, MetaFieldWS[] metaFields, int offset) {
-    OutputCompressor compressor = new OutputCompressor();
+    // OutputCompressor compressor = new OutputCompressor();
     int numOfFields = schema.count();
     // data chunk fields.
     // don't have to maintain dataField for invairant Field
@@ -110,7 +109,7 @@ public class DataChunkWS implements Output {
             fields[i] = new DataInvariantHashFieldWS(fieldType, metaFields[i]);
           } else {
             fields[i] = new DataHashFieldWS(fieldType, metaFields[i],
-                compressor, schema.getField(i).isPreCal());
+                schema.getField(i).isPreCal());
           }
           break;
         case ActionTime:
@@ -118,7 +117,7 @@ public class DataChunkWS implements Output {
           if (schema.isInvariantField(i)) {
             fields[i] = new DataInvariantRangeFieldWS(fieldType);
           } else {
-            fields[i] = new DataRangeFieldWS(fieldType, compressor);
+            fields[i] = new DataRangeFieldWS(fieldType);
           }
           break;
         default:

@@ -19,10 +19,12 @@
 
 package com.nus.cool.core.io.compression;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.BitSet;
+import java.util.List;
 
 /**
  * Compress a list of integers with BitVector encoding. The final BitSet is
@@ -51,39 +53,27 @@ public class BitVectorCompressor implements Compressor {
   /**
    * Compression operator for bit vector.
    */
-  public BitVectorCompressor(int max) {
-    int bitLength = IntegerUtil.numOfBits(max);
+  public BitVectorCompressor(FieldValue max) {
+    int bitLength = IntegerUtil.numOfBits(max.getInt());
     this.bitSet = new BitSet(bitLength);
     this.maxLength = (bitLength >>> 3) + 1;
   }
 
-  public BitVectorCompressor(Histogram hist) {
-    this((int) hist.getMax());
-  }
-
   @Override
-  public int maxCompressedLength() {
-    return this.maxLength;
-  }
-
-  @Override
-  public int compress(byte[] src, int srcOff, int srcLen, byte[] dest, int destOff,
-      int maxDestLen) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int compress(int[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen) {
-    for (int i = srcOff; i < srcOff + srcLen; i++) {
-      this.bitSet.set(src[i]);
+  public CompressorOutput compress(List<? extends FieldValue> src) {
+    // serialize
+    for (FieldValue v : src) {
+      this.bitSet.set(v.getInt());
     }
     long[] words = this.bitSet.toLongArray();
-    ByteBuffer buffer = ByteBuffer.wrap(dest, destOff, maxDestLen);
+    byte[] compressed = new byte[this.maxLength];
+    ByteBuffer buffer = ByteBuffer.wrap(compressed);
     buffer.order(ByteOrder.nativeOrder());
     buffer.put((byte) words.length);
     for (long w : words) {
       buffer.putLong(w);
     }
-    return buffer.position();
+    // compress
+    return new CompressorOutput(compressed, buffer.position());
   }
 }

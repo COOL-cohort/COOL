@@ -1,7 +1,6 @@
 package com.nus.cool.core.io.store;
 
 import com.nus.cool.core.io.DataOutputBuffer;
-import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.DataRangeFieldRS;
 import com.nus.cool.core.io.readstore.MetaRangeFieldRS;
 import com.nus.cool.core.io.writestore.DataRangeFieldWS;
@@ -28,7 +27,6 @@ public class RangeFieldTest {
   static final Logger logger = LoggerFactory.getLogger(RangeFieldTest.class);
   private String sourcePath;
   private TestTable table;
-  private OutputCompressor compressor;
 
   /**
    * setup.
@@ -36,7 +34,6 @@ public class RangeFieldTest {
   @BeforeTest
   public void setUp() {
     logger.info("Start UnitTest " + RangeFieldTest.class.getSimpleName());
-    this.compressor = new OutputCompressor();
     sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com", "nus",
         "cool", "core", "resources").toString();
     String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
@@ -59,7 +56,7 @@ public class RangeFieldTest {
 
     // For RangeField, RangeMetaField and RangeField can be test seperatly.
     MetaRangeFieldWS rmws = new MetaRangeFieldWS(fType);
-    DataRangeFieldWS ws = new DataRangeFieldWS(fType, compressor);
+    DataRangeFieldWS ws = new DataRangeFieldWS(fType);
     // put data into writeStore
     for (int idx = 0; idx < data.size(); idx++) {
       rmws.put(tuple, idx);
@@ -87,8 +84,6 @@ public class RangeFieldTest {
     Assert.assertEquals(rs.maxKey(), rmws.getMax());
 
     // check Range Vector
-    // InputVector vec = rs.getValueVector();
-    // Assert.assertEquals(vec.size(), data.size());
     DayIntConverter convertor = DayIntConverter.getInstance();
     for (int i = 0; i < data.size(); i++) {
       String expect = data.get(i);
