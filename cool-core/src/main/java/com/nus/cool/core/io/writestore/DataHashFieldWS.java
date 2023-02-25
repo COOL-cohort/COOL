@@ -21,13 +21,10 @@ package com.nus.cool.core.io.writestore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.primitives.Ints;
 import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.field.ValueWrapper;
-import com.nus.cool.core.io.DataInputBuffer;
-import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
@@ -38,6 +35,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +54,7 @@ import java.util.Map;
  */
 public class DataHashFieldWS implements DataFieldWS {
 
-  private final MetaFieldWS metaField;
+  private final MetaHashFieldWS metaField;
 
   private final FieldType fieldType;
 
@@ -68,9 +66,9 @@ public class DataHashFieldWS implements DataFieldWS {
   private final Map<Integer, Integer> idMap = Maps.newTreeMap();
 
   // buffer used to store global ID
-  private final DataOutputBuffer buffer = new DataOutputBuffer();
+  private final List<Integer> gIdList = new LinkedList<>();
 
-  private final List<BitSet> bitSetList = Lists.newArrayList();
+  private final List<BitSet> bitSetList = new ArrayList<>();
 
   private final Boolean preCal;
 
@@ -79,10 +77,9 @@ public class DataHashFieldWS implements DataFieldWS {
    *
    * @param preCal is preCalculated
    */
-  public DataHashFieldWS(FieldType fieldType, MetaFieldWS metaField, boolean preCal) {
+  public DataHashFieldWS(FieldType fieldType, MetaHashFieldWS metaField, boolean preCal) {
     this.fieldType = fieldType;
     this.metaField = checkNotNull(metaField);
-    // this.compressor = checkNotNull(compressor);
     this.preCal = preCal;
   }
 
@@ -92,13 +89,18 @@ public class DataHashFieldWS implements DataFieldWS {
   }
 
   @Override
-  public void put(String tupleValue) throws IOException {
-    final int gId = this.metaField.find(tupleValue);
+  public void put(FieldValue tupleValue) throws IllegalArgumentException {
+    if (!(tupleValue instanceof HashField)) {
+      throw new IllegalArgumentException(
+          "Invalid argument for DataHashFieldWS (HashField required)");
+    }
+    HashField v = (HashField) tupleValue;
+    final int gId = this.metaField.find(v);
     if (gId == -1) {
-      throw new IllegalArgumentException("Value not exist in dimension: " + tupleValue);
+      throw new IllegalArgumentException("Value not exist in dimension: " + v.getString());
     }
     // Write globalIDs as values for temporary
-    this.buffer.writeInt(gId);
+    this.gIdList.add(gId);
     // Set localID as 0 for temporary
     // It will be changed while calling writeTo function
     this.idMap.put(gId, 0);
@@ -107,7 +109,7 @@ public class DataHashFieldWS implements DataFieldWS {
   @Override
   public int writeTo(DataOutput out) throws IOException {
     // number of global id
-    int size = this.buffer.size() / Ints.BYTES;
+    int size = this.gIdList.size();
 
     // Store globalID in order, key: unique global id
     List<FieldValue> key = new ArrayList<>(this.idMap.size());
@@ -132,17 +134,13 @@ public class DataHashFieldWS implements DataFieldWS {
 
     // Store value vector, local IDs
     List<FieldValue> value = new ArrayList<>(size);
-    // outputBuffer to InputBuffer, for read
-    try (DataInputBuffer input = new DataInputBuffer()) {
-      input.reset(this.buffer);
-      for (i = 0; i < size; i++) {
-        int id = input.readInt(); // read globalID
-        // Store localID to value i-th position
-        value.add(ValueWrapper.of(this.idMap.get(id)));
-        if (this.preCal) {
-          // Store value bitSet
-          this.bitSetList.get(this.idMap.get(id)).set(i);
-        }
+    i = 0;
+    for (Integer id : gIdList) {
+      // Store localID to value i-th position
+      value.add(ValueWrapper.of(this.idMap.get(id)));
+      if (this.preCal) {
+        // Store value bitSet
+        this.bitSetList.get(this.idMap.get(id)).set(i++);
       }
     }
 

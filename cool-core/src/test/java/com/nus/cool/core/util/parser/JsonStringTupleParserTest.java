@@ -1,5 +1,8 @@
 package com.nus.cool.core.util.parser;
 
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueConverter;
+import com.nus.cool.core.field.ValueConverterConfig;
 import com.nus.cool.core.schema.TableSchema;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,15 +52,16 @@ public class JsonStringTupleParserTest {
           + "\"event\":\"fight\","
           + "\"money\":\"1638\","
           + "\"other\":\"Int96Value{Binary{3 constant bytes, [0, 0, 0]}}\"}";
-      JsonStringTupleParser parser = new JsonStringTupleParser(schema);
-      String[] ret = parser.parse(recordToParse);
-      Assert.assertEquals(ret[0], "fd1ec667");
-      Assert.assertEquals(ret[1], "43e3e0d84da1056");
-      Assert.assertEquals(ret[2], "stonegolem");
-      Assert.assertEquals(ret[3], "1638");
-      Assert.assertEquals(ret[4], "fight");
-      Assert.assertEquals(ret[5], "2013-05-21");
-      Assert.assertEquals(ret[6],
+      JsonStringTupleParser parser = new JsonStringTupleParser(schema,
+          new ValueConverter(schema, new ValueConverterConfig()));
+      FieldValue[] ret = parser.parse(recordToParse);
+      Assert.assertEquals(ret[0].getString(), "fd1ec667");
+      Assert.assertEquals(ret[1].getString(), "43e3e0d84da1056");
+      Assert.assertEquals(ret[2].getString(), "stonegolem");
+      Assert.assertEquals(ret[3].getString(), "1638");
+      Assert.assertEquals(ret[4].getString(), "fight");
+      Assert.assertEquals(ret[5].getString(), "15846");
+      Assert.assertEquals(ret[6].getString(),
           "Int96Value{Binary{3 constant bytes, [0, 0, 0]}}");
     } catch (IOException e) {
       System.err.println(e.getStackTrace());

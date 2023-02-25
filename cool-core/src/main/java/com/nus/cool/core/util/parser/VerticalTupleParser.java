@@ -19,11 +19,19 @@
 
 package com.nus.cool.core.util.parser;
 
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueConverter;
+import java.io.IOException;
+import lombok.AllArgsConstructor;
+
 /**
  * VerticalTupleParser is a parser to parse a field which is separated with a
  * vertical bar(the pipe character, |) to array.
  */
+@AllArgsConstructor
 public class VerticalTupleParser implements TupleParser {
+
+  private ValueConverter converter;
 
   /**
    * Parse vertical tuple to array.
@@ -32,8 +40,8 @@ public class VerticalTupleParser implements TupleParser {
    * @return string array
    */
   @Override
-  public String[] parse(Object tuple) {
+  public FieldValue[] parse(Object tuple) throws IOException {
     String record = (String) tuple;
-    return record.split("\\|", -1);
+    return converter.convert(record.split("\\|", -1));
   }
 }

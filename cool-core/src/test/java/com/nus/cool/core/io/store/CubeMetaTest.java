@@ -51,8 +51,8 @@ public class CubeMetaTest {
         "nus", "cool", "core", "resources").toString();
 
     String dirPath = Paths.get(sourcePath, "health").toString();
-    this.schema = Utils.loadSchema(dirPath);
     this.table = Utils.loadTable(dirPath);
+    this.schema = table.getSchema();
 
     this.metaws = MetaChunkWS.newMetaChunkWS(this.schema, 0);
   }

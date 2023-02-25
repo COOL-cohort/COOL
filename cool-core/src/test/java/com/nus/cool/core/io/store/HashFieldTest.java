@@ -1,5 +1,6 @@
 package com.nus.cool.core.io.store;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.readstore.DataHashFieldRS;
@@ -13,8 +14,8 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -41,8 +42,8 @@ public class HashFieldTest {
     this.charset = Charset.defaultCharset();
     sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com", "nus",
         "cool", "core", "resources").toString();
-    String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
-    table = TestTable.readFromCSV(filepath);
+    String filepath = Paths.get(sourcePath, "fieldtest").toString();
+    table = Utils.loadTable(filepath);
   }
 
   @AfterTest
@@ -59,7 +60,7 @@ public class HashFieldTest {
         + fType.toString());
 
     int fieldidx = table.getField2Ids().get(fieldName);
-    ArrayList<String> data = table.getCols().get(fieldidx);
+    ArrayList<FieldValue> data = table.getCols().get(fieldidx);
 
     // Generate MetaHashFieldWS
     MetaHashFieldWS hmws = new MetaHashFieldWS(fType, charset);
@@ -67,7 +68,7 @@ public class HashFieldTest {
 
     // Input col data into metaField
     for (int idx = 0; idx < data.size(); idx++) {
-      String[] tuple = table.getTuple(idx);
+      FieldValue[] tuple = table.getTuple(idx);
       hmws.put(tuple, fieldidx);
       ws.put(data.get(idx));
     }
@@ -86,7 +87,10 @@ public class HashFieldTest {
     hmrs.readFromWithFieldType(bf, fType);
 
     // validate the MetaField
-    Set<String> valueSet = new HashSet<String>(data);
+    // Set<String> valueSet = new HashSet<String>(data);
+    Set<String> valueSet = data.stream()
+                               .map(x -> x.getString())
+                               .collect(Collectors.toSet());
 
     for (String expected : valueSet) {
       int gid = hmrs.find(expected);
@@ -101,7 +105,7 @@ public class HashFieldTest {
     Assert.assertEquals(hmws.count(), hmrs.count());
 
     for (int i = 0; i < data.size(); i++) {
-      String expected = data.get(i);
+      String expected = data.get(i).getString();
       int gid = rs.getValueByIndex(i).getInt();
       String actual = hmrs.get(gid).map(HashField::getString).orElse("");
 

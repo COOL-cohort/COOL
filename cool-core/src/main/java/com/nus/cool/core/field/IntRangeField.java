@@ -37,4 +37,9 @@ public class IntRangeField implements RangeField {
   public String getString() {
     return String.valueOf(val);
   }
+
+  @Override
+  public String toString() {
+    return getString();
+  }
 }

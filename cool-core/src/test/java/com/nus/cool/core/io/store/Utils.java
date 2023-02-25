@@ -1,8 +1,5 @@
 package com.nus.cool.core.io.store;
 
-import com.nus.cool.core.schema.TableSchema;
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
@@ -10,13 +7,12 @@ import java.nio.file.Paths;
  */
 public class Utils {
 
+  /**
+   * Load table from the specified directory.
+   */
   public static TestTable loadTable(String dirPath) {
     String path = Paths.get(dirPath, "table.csv").toString();
-    return TestTable.readFromCSV(path);
-  }
-
-  public static TableSchema loadSchema(String dirPath) throws IOException {
-    File yamlFile = new File(dirPath, "table.yaml");
-    return TableSchema.read(yamlFile);
+    String schemaPath = Paths.get(dirPath, "table.yaml").toString();
+    return TestTable.readFromCSV(path, schemaPath);
   }
 }

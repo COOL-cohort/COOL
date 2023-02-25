@@ -11,7 +11,7 @@ public interface AggregateFunc {
   /**
    * Modify retUnit in place.
    */
-  public void calculate(RetUnit retUnit, ProjectedTuple tuple);
+  public void calculate(RetUnit retUnit, ProjectedTuple tuple) throws IllegalArgumentException;
 
   public AggregateType getType();
 

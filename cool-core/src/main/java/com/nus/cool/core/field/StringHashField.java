@@ -1,6 +1,8 @@
 package com.nus.cool.core.field;
 
+import com.rabinhash.RabinHashFunction32;
 import lombok.AllArgsConstructor;
+
 
 /**
  * Range field with underlying int value.
@@ -10,6 +12,9 @@ public class StringHashField implements HashField {
 
   private final String val;
   
+  private static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
+
+  
   @Override
   public boolean checkEqual(Object o) {
     return ((o instanceof StringHashField) && val.equals(((StringHashField) o).val));
@@ -17,12 +22,7 @@ public class StringHashField implements HashField {
 
   @Override
   public int getInt() {
-    return 0;
-  }
-
-  @Override
-  public float getFloat() {
-    return 0;
+    return rhash.hash(val);
   }
 
   @Override
@@ -35,6 +35,11 @@ public class StringHashField implements HashField {
 
   @Override
   public String getString() {
+    return val;
+  }
+
+  @Override
+  public String toString() {
     return val;
   }
 }

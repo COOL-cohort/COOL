@@ -1,5 +1,7 @@
 package com.nus.cool.core.util.writer;
 
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.StringHashField;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +16,8 @@ public class ListDataWriterTest {
 
   @Test
   public void testListDataWriter() {
-    String[] input1 = { "s11", "s12" };
-    String[] input2 = { "s21", "s22" };
+    FieldValue[] input1 = { new StringHashField("s11"), new StringHashField("s12") };
+    FieldValue[] input2 = { new StringHashField("s21"), new StringHashField("s22") };
     List<String> out = new ArrayList<>();
     ListDataWriter writer = new ListDataWriter(out);
     try {
