@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldSchema;
@@ -127,7 +128,7 @@ public class MetaChunkWS implements Output {
    *
    * @param tuple Plain data line
    */
-  public void put(String[] tuple) {
+  public void put(FieldValue[] tuple) {
     checkNotNull(tuple);
     checkArgument(tuple.length == this.tableSchema.getFields().size(),
         "input tuple's size is not equal to table schema's size");

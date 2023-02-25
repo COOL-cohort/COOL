@@ -12,7 +12,6 @@ import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.converter.DayIntConverter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -48,7 +47,7 @@ public class ChunkTest {
     logger.info("Input Chunk UnitTest Data: DataPath " + dirPath);
 
     TestTable table = Utils.loadTable(dirPath);
-    TableSchema schemas = Utils.loadSchema(dirPath);
+    TableSchema schemas = table.getSchema();
 
     // Generate MetaChunkWS
     MetaChunkWS metaChunkWS = MetaChunkWS.newMetaChunkWS(schemas, 0);
@@ -57,7 +56,7 @@ public class ChunkTest {
     for (int i = 0; i < table.getRowCounts(); i++) {
       // You have to update meta first,
       // you have to update globalId first
-      String[] tuple = table.getTuple(i);
+      FieldValue[] tuple = table.getTuple(i);
       metaChunkWS.put(tuple);
       chunkWS.put(tuple);
     }
@@ -91,7 +90,7 @@ public class ChunkTest {
     Assert.assertEquals(chunkRS.getRecords(), table.getRowCounts(), "Field Record Size");
 
     for (int i = 0; i < table.getColCounts(); i++) {
-      ArrayList<String> fieldValue = table.getCols().get(i);
+      ArrayList<FieldValue> fieldValue = table.getCols().get(i);
       FieldSchema fschema = schemas.getField(i);
       FieldRS fieldRS = chunkRS.getField(fschema.getName());
       MetaFieldRS metaFieldRS = metaChunkRS.getMetaField(fschema.getName());
@@ -122,24 +121,20 @@ public class ChunkTest {
    * @return True, correct Field or False something wrong
    */
   private Boolean isFieldCorrect(MetaFieldRS metaFieldRS, FieldRS fieldRS,
-      ArrayList<String> valueList) {
+      ArrayList<FieldValue> valueList) {
     if (FieldType.isHashType(fieldRS.getFieldType())) {
       // HashField
       for (int i = 0; i < valueList.size(); i++) {
         int gid = fieldRS.getValueByIndex(i).getInt();
         String actual = metaFieldRS.get(gid).map(FieldValue::getString).orElse("");
-        if (!actual.equals(valueList.get(i))) {
+        if (!actual.equals(valueList.get(i).getString())) {
           return false;
         }
       }
     } else {
       // RangeField
-      DayIntConverter convertor = DayIntConverter.getInstance();
       for (int i = 0; i < valueList.size(); i++) {
-        String expect = valueList.get(i);
-        if (fieldRS.getFieldType() == FieldType.ActionTime) {
-          expect = Integer.toString(convertor.toInt(expect));
-        }
+        String expect = valueList.get(i).getString();
         String actual = fieldRS.getValueByIndex(i).getString();
         if (!actual.equals(expect)) {
           return false;

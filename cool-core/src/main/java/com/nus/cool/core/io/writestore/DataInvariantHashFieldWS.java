@@ -1,5 +1,6 @@
 package com.nus.cool.core.io.writestore;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.schema.FieldType;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -29,8 +30,7 @@ public class DataInvariantHashFieldWS implements DataFieldWS {
   }
 
   @Override
-  public void put(String value) throws IOException {
+  public void put(FieldValue value) throws IllegalArgumentException {
     // // for invariant data field, no need to write data
   }
-
 }

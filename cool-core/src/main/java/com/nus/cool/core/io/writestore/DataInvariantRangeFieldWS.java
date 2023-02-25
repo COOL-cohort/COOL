@@ -1,5 +1,6 @@
 package com.nus.cool.core.io.writestore;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.schema.FieldType;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -32,8 +33,7 @@ public class DataInvariantRangeFieldWS implements DataFieldWS {
   }
 
   @Override
-  public void put(String tuple) throws IOException {
+  public void put(FieldValue tuple) throws IllegalArgumentException {
     // TODO Auto-generated method stub
   }
-
 }

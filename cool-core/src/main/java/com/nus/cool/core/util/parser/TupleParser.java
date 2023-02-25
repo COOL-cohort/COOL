@@ -19,6 +19,9 @@
 
 package com.nus.cool.core.util.parser;
 
+import com.nus.cool.core.field.FieldValue;
+import java.io.IOException;
+
 /**
  * TupleParser is a parser to parse a tuple to array.
  */
@@ -30,5 +33,5 @@ public interface TupleParser {
    * @param tuple target tuple
    * @return string array
    */
-  String[] parse(Object tuple);
+  FieldValue[] parse(Object tuple) throws IOException;
 }

@@ -1,5 +1,6 @@
 package com.nus.cool.core.util.writer;
 
+import com.nus.cool.core.field.FieldValue;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -15,13 +16,11 @@ public class CliDataWriter implements DataWriter {
   }
 
   @Override
-  public boolean add(Object tuple) throws IOException {
-    if (!(tuple instanceof String[])) {
-      System.out.println(
-          "Unexpected tuple type: tuple not in valid type for DataWriter");
-      return false;
+  public boolean add(FieldValue[] tuple) throws IOException {
+    String[] fields = new String[tuple.length];
+    for (int i = 0; i < tuple.length; i++) {
+      fields[i] = tuple[i].getString();
     }
-    String[] fields = (String[]) tuple;
     System.out.println(Arrays.toString(fields));
     return false;
   }

@@ -22,14 +22,12 @@ package com.nus.cool.core.io.writestore;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.field.RangeField;
-import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.util.IntegerUtil;
-import com.nus.cool.core.util.converter.DayIntConverter;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -76,14 +74,12 @@ public class DataRangeFieldWS implements DataFieldWS {
    * @throws IOException when string convert fail
    */
   @Override
-  public void put(String tupleValue) throws IOException {
-    RangeField v;
-    if (this.fieldType == FieldType.ActionTime) {
-      DayIntConverter converter = DayIntConverter.getInstance();
-      v = ValueWrapper.of(converter.toInt(tupleValue));
-    } else {
-      v = ValueWrapper.of(Integer.parseInt(tupleValue));
+  public void put(FieldValue tupleValue) throws IllegalArgumentException {
+    if (!(tupleValue instanceof RangeField)) {
+      throw new IllegalArgumentException(
+        "Invalid FieldValue for DataRangeFieldWS (RangeField required).");
     }
+    RangeField v = (RangeField) tupleValue;
     values.add(v);
     min = ((min == null) || (min.compareTo(v) > 0)) ? v : min;
     max = ((max == null) || (max.compareTo(v) < 0)) ? v : max;

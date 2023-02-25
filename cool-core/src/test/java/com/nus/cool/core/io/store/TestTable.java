@@ -1,5 +1,9 @@
 package com.nus.cool.core.io.store;
 
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueConverter;
+import com.nus.cool.core.field.ValueConverterConfig;
+import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.parser.CsvTupleParser;
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,8 +23,7 @@ public class TestTable {
   private ArrayList<String> fields;
 
   @Getter
-  private ArrayList<ArrayList<String>> cols;
-  private CsvTupleParser parser = null;
+  private ArrayList<ArrayList<FieldValue>> cols;
 
   @Getter
   private int rowCounts;
@@ -28,11 +31,13 @@ public class TestTable {
   @Getter
   private int colCounts;
 
+  @Getter
+  private TableSchema schema;
+
   private TestTable() {
     this.field2Ids = new HashMap<String, Integer>();
     this.fields = new ArrayList<>();
-    this.parser = new CsvTupleParser();
-    this.cols = new ArrayList<ArrayList<String>>();
+    this.cols = new ArrayList<ArrayList<FieldValue>>();
     this.rowCounts = 0;
     this.colCounts = 0;
   }
@@ -40,27 +45,35 @@ public class TestTable {
   /**
    * return new TestTable object which structured file data.
    */
-  public static TestTable readFromCSV(String filepath) {
+  public static TestTable readFromCSV(String filepath, String schemaPath) {
     TestTable table = new TestTable();
 
     try {
       File file = new File(filepath);
       FileReader fr = new FileReader(file);
       BufferedReader br = new BufferedReader(fr);
-      String line;
-      Boolean header = true;
+      
+      table.schema = TableSchema.read(new File(schemaPath));
+      
+      CsvTupleParser csvParser = new CsvTupleParser(
+          new ValueConverter(table.schema, new ValueConverterConfig()));
+        
+      // process header
+      String line = br.readLine();
+      if (line == null) {
+        fr.close();
+        return table; // empty
+      }
+      String[] fieldNames = line.split(",", -1);
+      for (int i = 0; i < fieldNames.length; i++) {
+        table.field2Ids.put(fieldNames[i], i);
+        table.fields.add(fieldNames[i]);
+        table.cols.add(new ArrayList<FieldValue>());
+      }
+      table.colCounts = table.field2Ids.size();
+      // parse data
       while ((line = br.readLine()) != null) {
-        String[] vs = table.parser.parse(line);
-        if (header) {
-          for (int i = 0; i < vs.length; i++) {
-            table.field2Ids.put(vs[i], i);
-            table.fields.add(vs[i]);
-            table.cols.add(new ArrayList<String>());
-          }
-          table.colCounts = table.field2Ids.size();
-          header = false;
-          continue;
-        }
+        FieldValue[] vs = csvParser.parse(line);
 
         for (int i = 0; i < table.field2Ids.size(); i++) {
           table.cols.get(i).add(vs[i]);
@@ -77,8 +90,8 @@ public class TestTable {
   /**
    * return the tuple at index idx.
    */
-  public String[] getTuple(int idx) {
-    String[] ret = new String[this.colCounts];
+  public FieldValue[] getTuple(int idx) {
+    FieldValue[] ret = new FieldValue[this.colCounts];
     for (int i = 0; i < this.colCounts; i++) {
       ret[i] = this.cols.get(i).get(idx);
     }

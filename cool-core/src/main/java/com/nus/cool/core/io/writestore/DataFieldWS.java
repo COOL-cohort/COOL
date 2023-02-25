@@ -14,9 +14,9 @@
 
 package com.nus.cool.core.io.writestore;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.FieldType;
-import java.io.IOException;
 
 /**
  * Interface for write stores of fields in data chunks.
@@ -35,5 +35,5 @@ public interface DataFieldWS extends Output {
    *
    * @param tuple value
    */
-  void put(String tuple) throws IOException;
+  void put(FieldValue tuple) throws IllegalArgumentException;
 }

@@ -1,15 +1,16 @@
 package com.nus.cool.core.io.writestore;
 
 import com.google.common.collect.Maps;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.field.IntRangeField;
+import com.nus.cool.core.field.RangeField;
 import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
-import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.converter.DayIntConverter;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -25,7 +26,7 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
   protected MetaChunkWS metaChunkWS;
 
   // key is the idx of invariant field
-  protected final Map<Integer, List<IntRangeField>> invariantIdxToValueList = Maps.newHashMap();
+  protected final Map<Integer, List<RangeField>> invariantIdxToValueList = Maps.newHashMap();
 
   /**
    * Constructor for MetaUserFieldWS.
@@ -43,8 +44,13 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
   }
 
   @Override
-  public void put(String[] tuple, int idx) {
-    int hashKey = rhash.hash(tuple[idx]);
+  public void put(FieldValue[] tuple, int idx) throws IllegalArgumentException {
+    if (!(tuple[idx] instanceof HashField)) {
+      throw new IllegalArgumentException(
+        "Illegal argument for MetaUserFieldWS (HashField required).");
+    }
+    HashField user = (HashField) tuple[idx];
+    int hashKey = user.getInt();
     if (this.fingerToGid.containsKey(hashKey)) {
       // skip existing key
       return;
@@ -52,29 +58,27 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
 
     // the Gid is the index of its coressponding value in valueList
     this.fingerToGid.put(hashKey, nextGid++);
-    this.valueList.add(ValueWrapper.of(tuple[idx]));
+    this.valueList.add(user);
 
     // register the invariant field gid
     int[] invariantIdxList = this.metaChunkWS.getTableSchema().getInvariantFieldIdxs();
     for (int invariantIdx : invariantIdxList) {
-      FieldSchema schema = this.metaChunkWS.getTableSchema().getField(invariantIdx);
-      String invariantV = tuple[invariantIdx];
-      IntRangeField v;
-      if (FieldType.isHashType(schema.getFieldType())) {
+      MetaFieldWS mws = this.metaChunkWS.getMetaFields()[invariantIdx];
+      FieldValue v = tuple[invariantIdx];
+      if (mws instanceof MetaHashFieldWS) {
         // if invariant field is set type
         // we should convert the invariant String to invariant gid
-        MetaFieldWS mws = this.metaChunkWS.getMetaFields()[invariantIdx];
-        int invariantGid = mws.find(tuple[invariantIdx]);
-        v = ValueWrapper.of(invariantGid);
-      } else {
-        // if invariant field is not set, directly store it
-        if (schema.getFieldType() == FieldType.ActionTime) {
-          v = ValueWrapper.of(DayIntConverter.getInstance().toInt(invariantV));
-        } else {
-          v = ValueWrapper.of(Integer.parseInt(invariantV));
+        if (!(v instanceof HashField)) {
+          throw new IllegalArgumentException("Invalid argument (HashField required).");
         }
+        int invariantGid = ((MetaHashFieldWS) mws).find((HashField) v);
+        this.invariantIdxToValueList.get(invariantIdx).add(new IntRangeField(invariantGid));
+      } else {
+        if (!(v instanceof RangeField)) {
+          throw new IllegalArgumentException("Invalid argument (RangeField required).");
+        }
+        this.invariantIdxToValueList.get(invariantIdx).add((RangeField) v);
       }
-      this.invariantIdxToValueList.get(invariantIdx).add(v);
     }
   }
 
@@ -100,8 +104,8 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
     // write invariant value
     int[] invariantIdxList = tableSchema.getInvariantFieldIdxs();
     for (int invariantIdx : invariantIdxList) {
-      List<IntRangeField> values = this.invariantIdxToValueList.get(invariantIdx);
-      int max = this.nextGid;
+      List<RangeField> values = this.invariantIdxToValueList.get(invariantIdx);
+      RangeField max = new IntRangeField(this.nextGid);
       if (!FieldType.isHashType(tableSchema.getFieldType(invariantIdx))) {
         // for matric type, get min, max from thier metaField
 
@@ -113,7 +117,7 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
       Histogram hist = Histogram.builder()
           .sorted(false)
           .min(ValueWrapper.of(0))
-          .max(ValueWrapper.of(max))
+          .max(max)
           .numOfValues(values.size())
           .build();
       bytesWritten += OutputCompressor.writeTo(CompressType.Value, hist,

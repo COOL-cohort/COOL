@@ -1,5 +1,6 @@
 package com.nus.cool.core.io.store;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.io.readstore.MetaHashFieldRS;
@@ -10,7 +11,6 @@ import com.nus.cool.core.io.writestore.MetaRangeFieldWS;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.converter.DayIntConverter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -34,7 +34,6 @@ public class MetaFieldTest {
   static final Logger logger = LoggerFactory.getLogger(MetaFieldTest.class);
 
   private Charset charset;
-  // private TestTable table;
 
   /**
    * setup.
@@ -53,7 +52,7 @@ public class MetaFieldTest {
   @Test(dataProvider = "MetaFieldDP", enabled = false)
   public void metaFieldUnitTest(String dataDirPath) throws IOException {
     TestTable table = Utils.loadTable(dataDirPath);
-    TableSchema schema = Utils.loadSchema(dataDirPath);
+    TableSchema schema = table.getSchema();
     for (FieldSchema fieldSchema : schema.getFields()) {
       if (fieldSchema.getFieldType() == FieldType.UserKey) {
         continue;
@@ -143,10 +142,10 @@ public class MetaFieldTest {
     Map<String, Integer> res = new HashMap<>();
     int gid = 0;
     for (int idx = 0; idx < table.getRowCounts(); idx++) {
-      String[] tuple = table.getTuple(idx);
+      FieldValue[] tuple = table.getTuple(idx);
       mws.put(tuple, fieldIdx);
-      if (!res.containsKey(tuple[fieldIdx])) {
-        res.put(tuple[fieldIdx], gid++);
+      if (!res.containsKey(tuple[fieldIdx].getString())) {
+        res.put(tuple[fieldIdx].getString(), gid++);
       }
     }
 
@@ -178,19 +177,13 @@ public class MetaFieldTest {
       throws IOException {
     int fieldIdx = table.getField2Ids().get(fieldName);
     MetaFieldWS mws = new MetaRangeFieldWS(type);
-    DayIntConverter converter = DayIntConverter.getInstance();
     int max = Integer.MIN_VALUE;
     int min = Integer.MAX_VALUE;
 
     for (int idx = 0; idx < table.getRowCounts(); idx++) {
-      String[] tuple = table.getTuple(idx);
+      FieldValue[] tuple = table.getTuple(idx);
       mws.put(tuple, fieldIdx);
-      int v = 0;
-      if (type == FieldType.ActionTime) {
-        v = converter.toInt(tuple[fieldIdx]);
-      } else {
-        v = Integer.parseInt(tuple[fieldIdx]);
-      }
+      int v = tuple[fieldIdx].getInt();
       min = Math.min(min, v);
       max = Math.max(max, v);
     }

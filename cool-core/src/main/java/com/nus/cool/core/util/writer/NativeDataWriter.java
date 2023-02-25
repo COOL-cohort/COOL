@@ -2,6 +2,7 @@ package com.nus.cool.core.util.writer;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.writestore.DataChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.TableSchema;
@@ -50,7 +51,7 @@ public class NativeDataWriter implements DataWriter {
 
   private int tupleCount = Integer.MAX_VALUE;
 
-  private String lastUser = null;
+  private FieldValue lastUser = null;
 
   // record the Header offset of each chunk
   private final List<Integer> chunkHeaderOffsets = Lists.newArrayList();
@@ -101,8 +102,8 @@ public class NativeDataWriter implements DataWriter {
    * @param curUser current user id
    * @return is chunk full or is last user
    */
-  private boolean maybeSwitchChunk(String curUser) throws IOException {
-    if ((tupleCount < chunkSize) || (curUser.equals(lastUser))) {
+  private boolean maybeSwitchChunk(FieldValue curUser) throws IOException {
+    if ((tupleCount < chunkSize) || (curUser.checkEqual(lastUser))) {
       return false;
     }
     finishChunk();
@@ -163,13 +164,8 @@ public class NativeDataWriter implements DataWriter {
   }
 
   @Override
-  public boolean add(Object tuple) throws IOException {
-    if (!(tuple instanceof String[])) {
-      System.out.println("Unexpected tuple type: tuple not in valid type for DataWriter");
-      return false;
-    }
-    String[] insertTuple = (String[]) tuple;
-    String curUser = insertTuple[userKeyIndex];
+  public boolean add(FieldValue[] tuple) throws IOException {
+    FieldValue curUser = tuple[userKeyIndex];
     if (lastUser == null) {
       lastUser = curUser;
     }
@@ -179,8 +175,8 @@ public class NativeDataWriter implements DataWriter {
     }
     lastUser = curUser;
     // update metachunk / metafield
-    metaChunk.put(insertTuple);
-    dataChunk.put(insertTuple);
+    metaChunk.put(tuple);
+    dataChunk.put(tuple);
     // update data chunk
     tupleCount++;
     return true;

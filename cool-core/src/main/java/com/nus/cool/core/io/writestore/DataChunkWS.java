@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
@@ -90,7 +91,8 @@ public class DataChunkWS implements Output {
    * @param offset     Offset in out stream
    * @return DataChunkWs instance
    */
-  public static DataChunkWS newDataChunk(TableSchema schema, MetaFieldWS[] metaFields, int offset) {
+  public static DataChunkWS newDataChunk(TableSchema schema, MetaFieldWS[] metaFields, int offset)
+      throws IllegalArgumentException {
     // OutputCompressor compressor = new OutputCompressor();
     int numOfFields = schema.count();
     // data chunk fields.
@@ -105,11 +107,14 @@ public class DataChunkWS implements Output {
         case AppKey:
         case Action:
         case Segment:
+          if (!(metaFields[i] instanceof MetaHashFieldWS)) {
+            throw new IllegalArgumentException("Mismatch in meta and data hash field.");
+          }
+          MetaHashFieldWS ws = (MetaHashFieldWS) metaFields[i];
           if (schema.isInvariantField(i)) {
-            fields[i] = new DataInvariantHashFieldWS(fieldType, metaFields[i]);
+            fields[i] = new DataInvariantHashFieldWS(fieldType, ws);
           } else {
-            fields[i] = new DataHashFieldWS(fieldType, metaFields[i],
-                schema.getField(i).isPreCal());
+            fields[i] = new DataHashFieldWS(fieldType, ws, schema.getField(i).isPreCal());
           }
           break;
         case ActionTime:
@@ -133,7 +138,7 @@ public class DataChunkWS implements Output {
    * @param tuple plain data
    * @throws IOException If an I/O error occurs
    */
-  public void put(String[] tuple) throws IOException {
+  public void put(FieldValue[] tuple) throws IOException {
     this.recordCount++;
     for (int i = 0; i < tuple.length; i++) {
       this.dataFields[i].put(tuple[i]);

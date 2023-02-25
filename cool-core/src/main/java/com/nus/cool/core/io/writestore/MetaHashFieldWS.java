@@ -22,12 +22,12 @@ package com.nus.cool.core.io.writestore;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
-import com.rabinhash.RabinHashFunction32;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -55,11 +55,9 @@ public class MetaHashFieldWS implements MetaFieldWS {
 
   protected final Charset charset;
   protected final FieldType fieldType;
-  // protected final OutputCompressor compressor;
-  protected final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 
   protected Map<Integer, Integer> fingerToGid = Maps.newTreeMap();
-  protected final List<FieldValue> valueList = new ArrayList<>();
+  protected final List<HashField> valueList = new ArrayList<>();
 
   // all possible values of the field.
   protected final Set<FieldValue> fieldValues = Sets.newTreeSet();
@@ -76,22 +74,34 @@ public class MetaHashFieldWS implements MetaFieldWS {
   public MetaHashFieldWS(FieldType type, Charset charset) {
     this.fieldType = type;
     this.charset = charset;
-    // this.compressor = compressor;
   }
 
   @Override
-  public void put(String[] tuple, int idx) {
-    int hashKey = rhash.hash(tuple[idx]);
+  public void put(FieldValue[] tuple, int idx) throws IllegalArgumentException {
+    // int hashKey = rhash.hash(tuple[idx]);
+    if (!(tuple[idx] instanceof HashField)) {
+      throw new IllegalArgumentException(
+        "Invalid argument for MetaHashFieldWS (HashField required).");
+    }
+    HashField v = (HashField) tuple[idx];
+    int hashKey = v.getInt();
     if (!this.fingerToGid.containsKey(hashKey)) {
       this.fingerToGid.put(hashKey, nextGid++);
-      this.valueList.add(ValueWrapper.of(tuple[idx]));
+      this.valueList.add(v);
     }
   }
 
-  @Override
-  public int find(String v) {
-    int fp = this.rhash.hash(v);
-    return this.fingerToGid.containsKey(fp) ? this.fingerToGid.get(fp) : -1;
+  /**
+   * Find the index of value in this meta field, return -1 if no such value
+   * exists.
+   *
+   * @param v target value
+   * @return index of value in this meta field
+   */
+  public int find(HashField v) {
+    // int fp = this.rhash.hash(v);
+    int hashKey = v.getInt();
+    return this.fingerToGid.containsKey(hashKey) ? this.fingerToGid.get(hashKey) : -1;
   }
 
   @Override

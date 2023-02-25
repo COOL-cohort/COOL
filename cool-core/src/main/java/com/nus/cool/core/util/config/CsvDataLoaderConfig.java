@@ -1,5 +1,7 @@
 package com.nus.cool.core.util.config;
 
+import com.nus.cool.core.field.ValueConverter;
+import com.nus.cool.core.field.ValueConverterConfig;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.parser.CsvTupleParser;
 import com.nus.cool.core.util.parser.TupleParser;
@@ -37,7 +39,7 @@ public class CsvDataLoaderConfig extends DataLoaderConfig {
   }
 
   @Override
-  public TupleParser createTupleParser(TableSchema tableSchema) {
-    return new CsvTupleParser();
+  public TupleParser createTupleParser(TableSchema tableSchema, ValueConverterConfig vsConfig) {
+    return new CsvTupleParser(new ValueConverter(tableSchema, vsConfig));
   }
 }

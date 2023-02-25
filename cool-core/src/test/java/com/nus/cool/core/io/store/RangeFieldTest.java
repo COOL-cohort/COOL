@@ -1,12 +1,12 @@
 package com.nus.cool.core.io.store;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.DataOutputBuffer;
 import com.nus.cool.core.io.readstore.DataRangeFieldRS;
 import com.nus.cool.core.io.readstore.MetaRangeFieldRS;
 import com.nus.cool.core.io.writestore.DataRangeFieldWS;
 import com.nus.cool.core.io.writestore.MetaRangeFieldWS;
 import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.util.converter.DayIntConverter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -36,8 +36,8 @@ public class RangeFieldTest {
     logger.info("Start UnitTest " + RangeFieldTest.class.getSimpleName());
     sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com", "nus",
         "cool", "core", "resources").toString();
-    String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
-    table = TestTable.readFromCSV(filepath);
+    String filepath = Paths.get(sourcePath, "fieldtest").toString();
+    table = Utils.loadTable(filepath);
   }
 
   @AfterTest
@@ -51,8 +51,8 @@ public class RangeFieldTest {
         + fType.toString());
 
     int fieldidx = table.getField2Ids().get(fieldName);
-    ArrayList<String> data = table.getCols().get(fieldidx);
-    String[] tuple = data.toArray(new String[data.size()]);
+    ArrayList<FieldValue> data = table.getCols().get(fieldidx);
+    FieldValue[] tuple = data.toArray(new FieldValue[data.size()]);
 
     // For RangeField, RangeMetaField and RangeField can be test seperatly.
     MetaRangeFieldWS rmws = new MetaRangeFieldWS(fType);
@@ -78,18 +78,14 @@ public class RangeFieldTest {
     DataRangeFieldRS rs = DataRangeFieldRS.readFrom(bf, fType);
 
     // check Range Meta Field
-    Assert.assertEquals(rmrs.getMinValue(), rmws.getMin());
-    Assert.assertEquals(rmrs.getMaxValue(), rmws.getMax());
-    Assert.assertEquals(rs.minKey(), rmws.getMin());
-    Assert.assertEquals(rs.maxKey(), rmws.getMax());
+    Assert.assertEquals(rmrs.getMinValue(), rmws.getMin().getInt());
+    Assert.assertEquals(rmrs.getMaxValue(), rmws.getMax().getInt());
+    Assert.assertEquals(rs.minKey(), rmws.getMin().getInt());
+    Assert.assertEquals(rs.maxKey(), rmws.getMax().getInt());
 
     // check Range Vector
-    DayIntConverter convertor = DayIntConverter.getInstance();
     for (int i = 0; i < data.size(); i++) {
-      String expect = data.get(i);
-      if (fType == FieldType.ActionTime) {
-        expect = Integer.toString(convertor.toInt(data.get(i)));
-      }
+      String expect = data.get(i).getString();
       String actual = rs.getValueByIndex(i).getString();
       Assert.assertEquals(expect, actual);
     }
@@ -101,5 +97,4 @@ public class RangeFieldTest {
     return new Object[][] { { "birthYear", FieldType.Metric }, { "attr4", FieldType.Metric },
         { "time", FieldType.ActionTime } };
   }
-
 }
