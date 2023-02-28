@@ -3,7 +3,7 @@ package com.nus.cool.core.io.storevector;
 import java.nio.ByteBuffer;
 
 // make inputvector a generic
-public class FloatInputVector {
+public class FloatInputVector implements InputVector<Float> {
 
   private int curOff;
 
@@ -17,6 +17,7 @@ public class FloatInputVector {
     if (decoded) {
       return;
     }
+    
 
   }
 
@@ -26,12 +27,12 @@ public class FloatInputVector {
   }
 
   // unify the search buffers.
-  public float find(float key) {
+  public Float find(Float key) {
     decode();
     // not implemented
   }
 
-  public float get(int index) {
+  public Float get(int index) {
     decode();
     return this.data[index];
   }
@@ -41,7 +42,7 @@ public class FloatInputVector {
     return this.curOff < size();
   }
 
-  public float next() {
+  public Float next() {
     decode();
     return (this.curOff == size()) ? data[this.curOff - 1] : data[this.curOff++];
   }
