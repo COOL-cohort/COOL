@@ -1,5 +1,6 @@
 package com.nus.cool.core.field;
 
+import com.nus.cool.core.schema.FieldType;
 import lombok.AllArgsConstructor;
 
 /**
@@ -9,6 +10,11 @@ import lombok.AllArgsConstructor;
 public class IntRangeField implements RangeField {
   
   private final int val;
+
+  @Override
+  public FieldType getType() {
+    return FieldType.Metric;
+  }
 
   @Override
   public boolean checkEqual(Object o) {
@@ -27,10 +33,14 @@ public class IntRangeField implements RangeField {
   
   @Override
   public int compareTo(FieldValue o) throws IllegalArgumentException {
-    if (!(o instanceof IntRangeField)) {
+    if (!(o instanceof RangeField)) {
       throw new IllegalArgumentException("Invalid type to compare against IntRangeField");
     }
-    return val - ((IntRangeField) o).val;
+    float oVal = ((RangeField) o).getFloat();
+    if (getFloat() == oVal) {
+      return 0;
+    }
+    return getFloat() < oVal ? -1 : 1;
   }
 
   @Override

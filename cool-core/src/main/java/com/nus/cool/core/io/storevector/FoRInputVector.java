@@ -39,7 +39,7 @@ public class FoRInputVector implements InputVector<Integer> {
   }
 
   @Override
-  public Integer find(int key) {
+  public Integer find(Integer key) {
     if (key < this.min || key > this.max) {
       return -1;
     }

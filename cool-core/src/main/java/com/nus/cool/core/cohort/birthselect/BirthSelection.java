@@ -1,17 +1,15 @@
 package com.nus.cool.core.cohort.birthselect;
 
-import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
+import com.nus.cool.core.io.readstore.MetaChunkRS;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
 
 /**
  * This class shows how to choose the birthAction according to cohort query.
  */
-@Getter
+// @Getter
 public class BirthSelection {
 
   // a list of events filter, if any item pass the filter, it can be considered as
@@ -78,7 +76,7 @@ public class BirthSelection {
     // if no birthEvents in query
     // which means that all event is acceptable
     // thus, we just to record the first actionItem's time.
-    if (birthEvents == null) {
+    if (birthEvents.isEmpty()) {
       if (!context.isUserSelected(userId)) {
         context.setUserSelected(userId, date);
         return true;
@@ -107,17 +105,24 @@ public class BirthSelection {
   }
 
   /**
-   * Before processing, change the value in setFilter into globalID.
+   * Initialize filters with meta chunk info.
    */
-  public List<Filter> getFilterList() {
-    List<Filter> ret = new ArrayList<Filter>();
-    if (this.birthEvents == null) {
-      return ret;
+  public void loadMetaInfo(MetaChunkRS metachunk) {
+    for (EventSelection es : this.birthEvents) {
+      es.loadMetaInfo(metachunk);
     }
+  }
 
-    for (EventSelection eventSelection : this.birthEvents) {
-      ret.addAll(eventSelection.getFilterList());
+  /**
+   * Determine if we can skip the cubelet.
+   *
+   * @return If none of the values in the Cublet will be accepted by the filter.
+   */
+  public Boolean maybeSkipMetaChunk(MetaChunkRS metachunk) {
+    if (birthEvents.isEmpty()) {
+      return false;
     }
-    return ret;
+    // other logics to be implemented
+    return false;
   }
 }

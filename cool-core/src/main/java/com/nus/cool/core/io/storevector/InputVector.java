@@ -43,7 +43,7 @@ public interface InputVector<T> extends Input {
    * @param key target value
    * @return index
    */
-  T find(int key);
+  T find(T key);
 
   /**
    * Get value by index.

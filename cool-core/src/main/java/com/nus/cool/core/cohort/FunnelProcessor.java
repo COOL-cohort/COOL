@@ -95,7 +95,7 @@ public class FunnelProcessor {
     this.filterInit(metaChunk);
 
     // use MetaChunk to skip Cublet
-    if (!this.checkMetaChunk(metaChunk)) {
+    if (this.skipMetaChunk(metaChunk)) {
       return;
     }
 
@@ -164,33 +164,20 @@ public class FunnelProcessor {
    */
   private void filterInit(MetaChunkRS metaChunkRS) {
     // init birthSelector
-    for (int i = 0; i < this.birthSelector.size(); i++) {
-      for (Filter filter : this.birthSelector.get(i).getFilterList()) {
-        filter.loadMetaInfo(metaChunkRS);
-      }
-    }
+    birthSelector.stream().forEach(x -> x.loadMetaInfo(metaChunkRS));
   }
 
-  private Boolean checkMetaChunk(MetaChunkRS metaChunk) {
-
+  /**
+   * Check if this cublet contains the required field.
+   *
+   * @param metaChunk hashMetaFields result
+   * @return true: this metaChunk is skipped , false otherwise.
+   */
+  private Boolean skipMetaChunk(MetaChunkRS metaChunk) {
     // 1. check birth selection
     // if the metaChunk contains all birth filter's accept value, then the metaChunk
     // is valid.
-    for (int i = 0; i < this.birthSelector.size(); i++) {
-      if (this.birthSelector.get(i).getBirthEvents() == null) {
-        return true;
-      }
-    }
-    for (int i = 0; i < this.birthSelector.size(); i++) {
-      for (Filter filter : this.birthSelector.get(i).getFilterList()) {
-        String checkedSchema = filter.getFilterSchema();
-        MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
-        if (this.checkMetaField(metaField, filter)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return birthSelector.stream().allMatch(x -> x.maybeSkipMetaChunk(metaChunk));
   }
 
   /**

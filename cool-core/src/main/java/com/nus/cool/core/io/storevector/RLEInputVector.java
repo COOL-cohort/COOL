@@ -48,7 +48,7 @@ public class RLEInputVector implements InputVector<Integer> {
   }
 
   @Override
-  public Integer find(int key) {
+  public Integer find(Integer key) {
     throw new UnsupportedOperationException();
   }
 

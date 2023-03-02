@@ -46,14 +46,15 @@ public class ZInt16Store implements ZIntStore {
   }
 
   @Override
-  public Integer find(int key) {
+  public Integer find(Integer key) {
     if (key > Short.MAX_VALUE || key < 0) {
       return -1;
     }
     if (this.sorted) {
-      return ShortBuffers.binarySearchUnsigned(this.buffer, 0, this.buffer.limit(), (short) key);
+      return ShortBuffers.binarySearchUnsigned(this.buffer, 0,
+        this.buffer.limit(), key.shortValue());
     } else {
-      return ShortBuffers.traverseSearch(this.buffer, 0, this.buffer.limit(), (short) key);
+      return ShortBuffers.traverseSearch(this.buffer, 0, this.buffer.limit(), key.shortValue());
     }
   }
 

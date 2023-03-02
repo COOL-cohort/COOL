@@ -1,5 +1,6 @@
 package com.nus.cool.core.field;
 
+import com.nus.cool.core.schema.FieldType;
 import lombok.AllArgsConstructor;
 
 /**
@@ -9,6 +10,11 @@ import lombok.AllArgsConstructor;
 public class FloatRangeField implements RangeField {
   
   private final float val;
+
+  @Override
+  public FieldType getType() {
+    return FieldType.Float;
+  }
 
   @Override
   public boolean checkEqual(Object o) {

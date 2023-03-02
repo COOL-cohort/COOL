@@ -32,13 +32,13 @@ public class BirthSelectionLayout {
    * @return BirthSelection
    */
   public BirthSelection generate() {
-    ArrayList<EventSelection> birthEvents = new ArrayList<>();
     this.relatedSchemas = new HashSet<>();
     if (this.eventLayoutList == null) {
       // no birthEvent filter, means that all event can be selected as birthEvent
-      return new BirthSelection(null, new BirthSelectionContext(timeWindow, null));
+      return new BirthSelection(new ArrayList<>(), new BirthSelectionContext(timeWindow, null));
     }
     // init event
+    ArrayList<EventSelection> birthEvents = new ArrayList<>();
     int[] eventMinFrequency = new int[this.eventLayoutList.size()];
     int i = 0;
     for (EventSelectionLayout layout : this.eventLayoutList) {
@@ -46,6 +46,7 @@ public class BirthSelectionLayout {
       this.relatedSchemas.addAll(layout.getSchemaList());
       eventMinFrequency[i++] = layout.getFrequency();
     }
+
     return new BirthSelection(birthEvents,
         new BirthSelectionContext(timeWindow, eventMinFrequency));
   }

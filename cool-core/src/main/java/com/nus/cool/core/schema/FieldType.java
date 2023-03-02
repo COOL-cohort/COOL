@@ -52,7 +52,12 @@ public enum FieldType {
   /**
    * Numeric.
    */
-  Metric;
+  Metric,
+
+  /**
+   * Float.
+   */
+  Float;
 
   /**
    * Translate an integer to its corresponding field type.

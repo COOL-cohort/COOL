@@ -51,14 +51,14 @@ public class ZInt8Store implements ZIntStore {
   }
 
   @Override
-  public Integer find(int key) {
+  public Integer find(Integer key) {
     if (key > Byte.MAX_VALUE || key < 0) {
       return -1;
     }
     if (this.sorted) {
-      return ByteBuffers.binarySearchUnsigned(this.buffer, 0, this.buffer.limit(), (byte) key);
+      return ByteBuffers.binarySearchUnsigned(this.buffer, 0, this.buffer.limit(), key.byteValue());
     } else {
-      return ByteBuffers.traverseSearch(this.buffer, 0, this.buffer.limit(), (byte) key);
+      return ByteBuffers.traverseSearch(this.buffer, 0, this.buffer.limit(), key.byteValue());
     }
   }
 

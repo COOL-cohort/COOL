@@ -3,6 +3,8 @@ package com.nus.cool.core.cohort.birthselect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.io.readstore.MetaChunkRS;
 import java.util.List;
 import lombok.Getter;
 
@@ -31,12 +33,20 @@ public class EventSelection {
   public boolean accept(ProjectedTuple projectTuple) {
     for (int i = 0; i < filterList.size(); i++) {
       Filter filter = filterList.get(i);
-      int gid = projectTuple.getValueBySchema(filter.getFilterSchema()).getInt();
-      if (!filter.accept(gid)) {
+      FieldValue v = projectTuple.getValueBySchema(filter.getFilterSchema());
+      if (!filter.accept(v)) {
         return false;
       }
     }
     return true;
   }
 
+  /**
+   * Initialize filters with meta chunk info.
+   */
+  public void loadMetaInfo(MetaChunkRS metachunk) {
+    for (Filter f : filterList) {
+      f.loadMetaInfo(metachunk);
+    }
+  }
 }

@@ -41,7 +41,7 @@ public class BitVectorInputVector implements InputVector<Integer> {
   }
 
   @Override
-  public Integer find(int key) {
+  public Integer find(Integer key) {
     int i = wordIndex(key);
     int j = remainder(key);
     long bits = this.words[i] << (63 - j);

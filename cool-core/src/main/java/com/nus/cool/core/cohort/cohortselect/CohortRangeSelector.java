@@ -1,10 +1,11 @@
 package com.nus.cool.core.cohort.cohortselect;
 
-import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.filter.RangeFilter;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.IntRangeField;
+import com.nus.cool.core.field.RangeField;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import java.util.List;
 
@@ -21,27 +22,35 @@ public class CohortRangeSelector implements CohortSelector {
   }
 
   @Override
+  public Boolean selectAll() {
+    return false;
+  }
+
+  @Override
   public String selectCohort(ProjectedTuple tuple, MetaChunkRS metaChunkRS) {
     return selectCohort(tuple.getValueBySchema(this.getSchema()));
   }
 
-  private String selectCohort(FieldValue input) {
-    Integer i = input.getInt();
-    for (Scope u : this.filter.getAcceptRangeList()) {
-      if (u.isInScope(i)) {
-        return u.toString();
-      }
+  private String selectCohort(FieldValue input) throws IllegalArgumentException {
+    if (!(input instanceof RangeField)) {
+      throw new IllegalArgumentException(
+        "Invalid input for CohortRangeSelector (RangeField required)");
     }
-    return null;
+    Scope s = new Scope(null, null);
+    return filter.accept((RangeField) input, s) 
+      ? s.getString(input instanceof IntRangeField) : null;
   }
 
+  @Override
   public String getSchema() {
     return this.filter.getFilterSchema();
   }
 
   @Override
-  public Filter getFilter() {
-    return filter;
-  }
+  public void loadMetaInfo(MetaChunkRS metachunk) {}
 
+  @Override
+  public Boolean maybeSkipMetaChunk(MetaChunkRS metachunk) {
+    return false;
+  }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.filter.FilterType;
 import com.nus.cool.core.cohort.storage.Scope;
+import com.nus.cool.core.field.FloatRangeField;
 import java.util.ArrayList;
 import lombok.Getter;
 
@@ -19,13 +20,13 @@ public class CohortSelectionLayout {
   private FilterType type = FilterType.ALL;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Integer max;
+  private Float max;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Integer min;
+  private Float min;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Integer interval;
+  private Float interval;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String[] acceptValue;
@@ -46,15 +47,11 @@ public class CohortSelectionLayout {
       case Range:
         return generateRangeSelector();
       case ALL:
-        return generateAllSelector();
+        return CohortSelector.generateAllSelector(this.fieldSchema);
       default:
         throw new IllegalArgumentException(
             String.format("No filter of this type named %s", type.toString()));
     }
-  }
-
-  private CohortAllSelector generateAllSelector() {
-    return new CohortAllSelector();
   }
 
   private CohortRangeSelector generateRangeSelector() {
@@ -64,12 +61,13 @@ public class CohortSelectionLayout {
         "Min attribute in SetCohortSelection should not be NULL");
     Preconditions.checkArgument(this.max > this.min, "Max should be larger than Min");
     if (this.interval == null) {
-      this.interval = 1;
+      this.interval = 1.0f;
     }
+    // guoyu should use type to differentiate if we use int or float.
     ArrayList<Scope> scopeList = new ArrayList<>();
-    for (int i = this.min; i <= this.max; i += this.interval) {
-      int uplevel = i + this.interval > this.max ? this.max + 1 : i + this.interval;
-      Scope u = new Scope(i, uplevel);
+    for (Float i = this.min; i <= this.max; i += this.interval) {
+      Float uplevel = i + this.interval > this.max ? this.max + 1 : i + this.interval;
+      Scope u = new Scope(new FloatRangeField(i), new FloatRangeField(uplevel));
       scopeList.add(u);
     }
     return new CohortRangeSelector(this.fieldSchema, scopeList);
@@ -80,11 +78,6 @@ public class CohortSelectionLayout {
    * We consider the situation that all value in this schema can be chosen as a
    */
   private CohortSetSelector generateSetSelector() {
-
-    if (this.acceptValue == null && this.rejectValue == null) {
-      this.rejectValue = new String[0];
-    }
     return new CohortSetSelector(this.fieldSchema, this.acceptValue, this.rejectValue);
   }
-
 }

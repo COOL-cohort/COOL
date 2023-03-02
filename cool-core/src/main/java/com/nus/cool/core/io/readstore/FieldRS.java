@@ -31,48 +31,6 @@ public interface FieldRS extends Input {
 
   FieldType getFieldType();
 
-  // /**
-  //  * Return the hash index vector. If the field is
-  //  * indexed by range indexing, an IllegalStateException is thrown.
-  //  *
-  //  * @return InputVector
-  //  *
-  //  * @deprecated
-  //  *             This method is no longer acceptable to get the value from FieldRS
-  //  *             <p>
-  //  *             Use {@link #getValueByIndex(int) instead}.
-  //  */
-  // InputVector getKeyVector();
-
-  // /**
-  //  * Return the local id of each tuple.
-  //  *
-  //  * @return InputVector
-  //  *
-  //  * @deprecated
-  //  *             This method is no longer acceptable to get the value from FieldRS
-  //  *             <p>
-  //  *             Use {@link #getValueByIndex(int) instead}.
-  //  *             Returns the value vector of this field.
-  //  */
-  // InputVector getValueVector();
-
-  // /**
-  //  * Returns the minKey if the field is range indexed.
-  //  * IllegalStateException is thrown if the field is hash indexed.
-  //  *
-  //  * @return int
-  //  */
-  // int minKey();
-
-  // /**
-  //  * Returns the maxKey if the field is range indexed.
-  //  * IllegalStateException is thrown if the field is hash indexed.
-  //  *
-  //  * @return int
-  //  */
-  // int maxKey();
-
   /**
    * Get the idx tuple's value in this field.
    *
@@ -80,7 +38,4 @@ public interface FieldRS extends Input {
    * @return int globalId of value
    */
   FieldValue getValueByIndex(int idx);
-
-  // void readFromWithFieldType(ByteBuffer buf, FieldType fieldType);
-
 }
