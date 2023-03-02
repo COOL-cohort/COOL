@@ -1,17 +1,16 @@
 package com.nus.cool.core.cohort.filter;
 
-import com.nus.cool.core.cohort.storage.Scope;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * Set filter.
  */
-public class SetFilter implements Filter {
+public abstract class SetFilter implements Filter {
 
   protected final FilterType type = FilterType.Set;
 
@@ -25,34 +24,55 @@ public class SetFilter implements Filter {
   }
 
   /**
-   * Create instance of SetFilter.
+   * Create an empty SetFilter.
    */
-  public static Filter generateSetFilter(String fieldSchema,
-      String[] acceptValues, String[] rejectValues) {
-    if (acceptValues != null) {
-      return new SetAcceptFilter(fieldSchema, acceptValues);
-    } else if (rejectValues != null) {
-      return new SetRejectFilter(fieldSchema, rejectValues);
-    } else {
-      throw new IllegalArgumentException(
-          "For SetFilter, acceptValue and rejectValue aren't equal to null at the same time");
+  public static SetFilter generateEmptySetFilter(String fieldSchema) {
+    return new SetFilter(fieldSchema, new String[0]) {
+      @Override
+      public Boolean accept(Integer value) {
+        return true;
+      }
+      
+      @Override
+      public Boolean accept(String value) {
+        return true;
+      }
+
+      @Override
+      public BitSet accept(String[] values) {
+        BitSet res = new BitSet(values.length);
+        res.set(0, values.length);
+        return res;
+      }
+    };
+  }
+
+  // filter based on global id
+  protected abstract Boolean accept(Integer value) throws IllegalStateException;
+
+  // filter based on value
+  protected abstract Boolean accept(String value);
+
+  @Override
+  public Boolean accept(FieldValue v) throws IllegalArgumentException, IllegalStateException {
+    switch (v.getType()) {
+      case Metric:
+        return accept(v.getInt());
+      case Segment:
+        return accept(v.getString());
+      default:
+        throw new IllegalArgumentException(
+            "Invalid argument for SetFilter (IntRangeField or HashField expected)");
     }
   }
 
-  @Override
-  public Boolean accept(Integer value) throws RuntimeException {
-    throw new UnsupportedOperationException(
-        "ChildClass of SetFilter should override to implement Accept");
-  }
-
-  @Override
-  public Boolean accept(String value) throws RuntimeException {
-    throw new UnsupportedOperationException(
-        "ChildClass of SetFilter should override to implement Accept");
-  }
-
-  @Override
-  public BitSet accept(String[] values) throws RuntimeException {
+  /**
+   * check a batch of values.
+   *
+   * @return a bit map. accepted values have their corresponding bits set.
+   */
+  // @Override
+  public BitSet accept(String[] values) {
     BitSet res = new BitSet(values.length);
     for (int i = 0; i < values.length; i++) {
       if (this.accept(values[i])) {
@@ -60,27 +80,6 @@ public class SetFilter implements Filter {
       }
     }
     return res;
-  }
-
-  @Override
-  public BitSet accept(List<Integer> values) throws RuntimeException {
-    BitSet res = new BitSet(values.size());
-    for (int i = 0; i < values.size(); i++) {
-      if (this.accept(values.get(i))) {
-        res.set(i);
-      }
-    }
-    return res;
-  }
-
-  @Override
-  public boolean accept(Scope scope) throws RuntimeException {
-    for (int i = scope.getLeft(); i < scope.getRight(); i++) {
-      if (!this.accept(i)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   @Override
@@ -106,5 +105,4 @@ public class SetFilter implements Filter {
       this.gidSet.add(gid);
     }
   }
-
 }

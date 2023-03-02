@@ -1,8 +1,8 @@
 package com.nus.cool.core.field;
 
+import com.nus.cool.core.schema.FieldType;
 import com.rabinhash.RabinHashFunction32;
 import lombok.AllArgsConstructor;
-
 
 /**
  * Range field with underlying int value.
@@ -11,6 +11,11 @@ import lombok.AllArgsConstructor;
 public class StringHashField implements HashField {
 
   private final String val;
+
+  @Override
+  public FieldType getType() {
+    return FieldType.Segment;
+  }
   
   private static final RabinHashFunction32 rhash = RabinHashFunction32.DEFAULT_HASH_FUNCTION;
 

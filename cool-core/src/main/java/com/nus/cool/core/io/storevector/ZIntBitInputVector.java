@@ -73,7 +73,7 @@ public class ZIntBitInputVector implements ZIntStore {
   }
 
   @Override
-  public Integer find(int key) {
+  public Integer find(Integer key) {
     throw new UnsupportedOperationException();
   }
 

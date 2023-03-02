@@ -101,5 +101,4 @@ public class MetaHashFieldRS implements MetaFieldRS {
     FieldType fieldType = FieldType.fromInteger(buffer.get());
     this.readFromWithFieldType(buffer, fieldType);
   }
-
 }

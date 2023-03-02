@@ -46,7 +46,7 @@ public class ZInt32Store implements ZIntStore {
   }
 
   @Override
-  public Integer find(int key) {
+  public Integer find(Integer key) {
     if (this.sorted) {
       return IntBuffers.binarySearch(this.buffer, 0, this.buffer.limit(), key);
     } else {

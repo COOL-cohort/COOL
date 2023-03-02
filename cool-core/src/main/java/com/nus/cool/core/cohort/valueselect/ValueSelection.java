@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.aggregate.AggregateFunc;
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
+import com.nus.cool.core.io.readstore.MetaChunkRS;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -14,7 +15,6 @@ import lombok.Getter;
  */
 public class ValueSelection {
 
-  @Getter
   private List<Filter> filterList;
 
   @JsonIgnore
@@ -45,13 +45,18 @@ public class ValueSelection {
    * @param tuple tuple
    */
   public boolean isSelected(ProjectedTuple tuple) {
-    // for (Filter filter : filterList) {
-    //   if (!filter.accept(tuple.getValueBySchema(filter.getFilterSchema()).getInt())) {
-    //     return false;
-    //   }
-    // }
-    // return true;
     return filterList.stream()
-                     .allMatch(x -> x.accept(tuple.getValueBySchema(x.getFilterSchema()).getInt()));
+                     .allMatch(x -> x.accept(tuple.getValueBySchema(x.getFilterSchema())));
+  }
+
+  /**
+   * Initialize filters with meta chunk info.
+   */
+  public void loadMetaInfo(MetaChunkRS metachunk) {
+    filterList.stream().forEach(x -> x.loadMetaInfo(metachunk));
+  }
+
+  public Boolean maybeSkipMetaChunk(MetaChunkRS metachunk) {
+    return false;
   }
 }

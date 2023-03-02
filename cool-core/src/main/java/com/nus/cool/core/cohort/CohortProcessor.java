@@ -5,8 +5,6 @@ import com.google.common.io.Files;
 import com.nus.cool.core.cohort.ageselect.AgeSelection;
 import com.nus.cool.core.cohort.birthselect.BirthSelection;
 import com.nus.cool.core.cohort.cohortselect.CohortSelector;
-import com.nus.cool.core.cohort.filter.Filter;
-import com.nus.cool.core.cohort.filter.FilterType;
 import com.nus.cool.core.cohort.storage.CohortRSStr;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.cohort.storage.CohortWSStr;
@@ -94,7 +92,7 @@ public class CohortProcessor {
     }
     // get cohort selector
     this.cohortSelector = layout.getCohortSelectionLayout().generate();
-    if (this.cohortSelector.getFilter().getType() == FilterType.ALL) {
+    if (this.cohortSelector.selectAll()) {
       this.result = new CohortRet();
     }
     // get value selector
@@ -261,15 +259,16 @@ public class CohortProcessor {
     this.filterInit(metaChunk);
 
     // use MetaChunk to skip Cublet
-    if (!this.checkMetaChunk(metaChunk)) {
+    if (this.skipMetaChunk(metaChunk)) {
       return;
     }
 
     // Now start to pass the DataChunk
     for (ChunkRS chunk : cublet.getDataChunks()) {
-      if (this.checkDataChunk(chunk)) {
-        this.processDataChunk(chunk, metaChunk);
+      if (this.skipDataChunk(chunk)) {
+        continue;
       }
+      this.processDataChunk(chunk, metaChunk);
     }
   }
 
@@ -352,56 +351,25 @@ public class CohortProcessor {
    * Check if this cublet contains the required field.
    *
    * @param metaChunk hashMetaFields result
-   * @return true: this metaChunk is valid, false: this metaChunk is invalid.
+   * @return true: this metaChunk is skipped , false otherwise.
    */
-  private Boolean checkMetaChunk(MetaChunkRS metaChunk) {
-
+  private Boolean skipMetaChunk(MetaChunkRS metaChunk) {
     // 1. check birth selection
     // if the metaChunk contains all birth filter's accept value, then the metaChunk
     // is valid.
-    if (this.birthSelector.getBirthEvents() == null) {
-      return true;
-    }
-
-    for (Filter filter : this.birthSelector.getFilterList()) {
-      String checkedSchema = filter.getFilterSchema();
-      MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
-      if (this.checkMetaField(metaField, filter)) {
-        return true;
-      }
-    }
-
     // 2. check birth selection
-    Filter cohortFilter = this.cohortSelector.getFilter();
-    String checkedSchema = cohortFilter.getFilterSchema();
-    MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
-    if (this.checkMetaField(metaField, cohortFilter)) {
-      return true;
-    }
-
     // 3. check value Selector,
-    for (Filter ft : this.valueSelector.getFilterList()) {
-      String valueSchema = ft.getFilterSchema();
-      MetaFieldRS valueMetaField = metaChunk.getMetaField(valueSchema);
-      if (this.checkMetaField(valueMetaField, ft)) {
-        return true;
-      }
-    }
-    return false;
+    return birthSelector.maybeSkipMetaChunk(metaChunk)
+      && cohortSelector.maybeSkipMetaChunk(metaChunk)
+      && valueSelector.maybeSkipMetaChunk(metaChunk);
   }
 
-  /**
-   * Now is not implemented.
-   */
-  public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
-    return true;
-  }
 
   /***
    * Now is not implemented.
    */
-  public Boolean checkDataChunk(ChunkRS chunk) {
-    return true;
+  public Boolean skipDataChunk(ChunkRS chunk) {
+    return false;
   }
 
   /**
@@ -411,19 +379,14 @@ public class CohortProcessor {
    */
   private void filterInit(MetaChunkRS metaChunkRS) {
     // init birthSelector
-    for (Filter filter : this.birthSelector.getFilterList()) {
-      filter.loadMetaInfo(metaChunkRS);
-    }
+    this.birthSelector.loadMetaInfo(metaChunkRS);
 
     // init cohort
-    this.cohortSelector.getFilter().loadMetaInfo(metaChunkRS);
+    this.cohortSelector.loadMetaInfo(metaChunkRS);
 
     // value age
     if (this.valueSelector != null) {
-      for (Filter filter : this.valueSelector.getFilterList()) {
-        filter.loadMetaInfo(metaChunkRS);
-      }
+      valueSelector.loadMetaInfo(metaChunkRS);
     }
-
   }
 }

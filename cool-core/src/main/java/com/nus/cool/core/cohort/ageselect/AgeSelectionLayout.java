@@ -3,6 +3,7 @@ package com.nus.cool.core.cohort.ageselect;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.cohort.utils.TimeUtils;
+import com.nus.cool.core.field.IntRangeField;
 import lombok.Getter;
 
 /**
@@ -30,7 +31,7 @@ public class AgeSelectionLayout {
         "AgeSelection's min is not allowed to be missing");
     Preconditions.checkArgument(this.max != null,
         "AgeSelection's max is not allowed to be missing");
-    Scope scope = new Scope(min, max + 1);
+    Scope scope = new Scope(new IntRangeField(min), new IntRangeField(max + 1));
     return new AgeSelection(scope, unit);
   }
 }

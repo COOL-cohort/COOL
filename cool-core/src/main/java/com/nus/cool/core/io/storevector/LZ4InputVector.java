@@ -82,7 +82,7 @@ public class LZ4InputVector implements InputVector<String> {
   }
 
   @Override
-  public String find(int key) {
+  public String find(String key) {
     throw new UnsupportedOperationException();
   }
 
@@ -128,21 +128,4 @@ public class LZ4InputVector implements InputVector<String> {
     buffer.position(newLimit);
     buffer.limit(oldLimit);
   }
-
-  // /**
-  //  * Return the string value given its index.
-  //  */
-  // public String getString(int index, Charset charset) {
-  //   if (!decoded) {
-  //     decode();
-  //   }
-  //   checkArgument(index < this.offsets.length && index >= 0);
-  //   int last = this.offsets.length - 1;
-  //   int off = this.offsets[index];
-  //   int end = index == last ? this.data.length : this.offsets[index + 1];
-  //   int len = end - off;
-  //   byte[] tmp = new byte[len];
-  //   System.arraycopy(this.data, off, tmp, 0, len);
-  //   return new String(tmp, charset);
-  // }
 }
