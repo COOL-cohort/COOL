@@ -32,7 +32,8 @@ public class CoolTupleReader implements TupleReader {
 
   // only tuples of users emitted
   // we no longer maintain user key sorted assumption
-  // if we are to maintain chunk or cube sorted that is another matter, we can revert back to a sorted list of users as filter input.
+  // if we are to maintain chunk or cube sorted that is another matter,
+  //  we can revert back to a sorted list of users as filter input.
   private final Set<Integer> users;
 
 
@@ -107,32 +108,32 @@ public class CoolTupleReader implements TupleReader {
       // if (fieldSchema.isPreCal()) {
       //   converters.add(ValueConverter.createNullConverter());
       // } else {
-        switch (fieldSchema.getFieldType()) {
-          case AppKey:
-          case UserKey:
-          case Action:
-          case Segment:
-            converters.add(new ValueConverter() {
-              private final MetaHashFieldRS valueVec = (MetaHashFieldRS) metaChunk.getMetaField(
-                  fieldSchema.getName());
+      switch (fieldSchema.getFieldType()) {
+        case AppKey:
+        case UserKey:
+        case Action:
+        case Segment:
+          converters.add(new ValueConverter() {
+            private final MetaHashFieldRS valueVec = (MetaHashFieldRS) metaChunk.getMetaField(
+                fieldSchema.getName());
 
-              @Override
-              public FieldValue convert(FieldValue value) {
-                // return valueVec.get(value.getInt()).map(FieldValue::getString).orElse(null);
-                return valueVec.get(value.getInt()).orElse(null);
-              }
-            });
-            break;
-          case ActionTime:
-            break;
-          case Metric:
-            // converters.add(FieldValue::getString);
-            converters.add(x -> x);
-            break;
-          default:
-            System.out.println("Unknown field type");
-            break;
-        }
+            @Override
+            public FieldValue convert(FieldValue value) {
+              // return valueVec.get(value.getInt()).map(FieldValue::getString).orElse(null);
+              return valueVec.get(value.getInt()).orElse(null);
+            }
+          });
+          break;
+        case ActionTime:
+          break;
+        case Metric:
+          // converters.add(FieldValue::getString);
+          converters.add(x -> x);
+          break;
+        default:
+          System.out.println("Unknown field type");
+          break;
+      }
       // }
     }
     return converters;
