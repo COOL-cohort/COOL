@@ -22,7 +22,6 @@ package com.nus.cool.core.io.compression;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.BitSet;
 import java.util.List;
 
@@ -68,7 +67,6 @@ public class BitVectorCompressor implements Compressor {
     long[] words = this.bitSet.toLongArray();
     byte[] compressed = new byte[this.maxLength];
     ByteBuffer buffer = ByteBuffer.wrap(compressed);
-    buffer.order(ByteOrder.nativeOrder());
     buffer.put((byte) words.length);
     for (long w : words) {
       buffer.putLong(w);

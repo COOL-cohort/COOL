@@ -52,6 +52,9 @@ public class CompressorFactory {
       case Delta:
         compressor = new DeltaCompressor(hist.getMin(), hist.getMax());
         break;
+      case Float:
+        compressor = new FloatCompressor();
+        break;
       default:
         throw new IllegalArgumentException("Unsupported codec: " + codec);
     }

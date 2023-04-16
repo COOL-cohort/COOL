@@ -19,6 +19,7 @@
 
 package com.nus.cool.core.io.storevector;
 
+import com.nus.cool.core.field.FloatRangeField;
 import com.nus.cool.core.field.IntRangeField;
 import com.nus.cool.core.field.StringHashField;
 import com.nus.cool.core.schema.Codec;
@@ -70,6 +71,11 @@ public class InputVectorFactory {
         FoRInputVector iv = new FoRInputVector();
         iv.readFrom(buffer);
         return x -> new IntRangeField(iv.get(x));      
+      }
+      case Float: {
+        FloatInputVector iv = new FloatInputVector();
+        iv.readFrom(buffer);
+        return x -> new FloatRangeField(iv.get(x));      
       }
       default:
         throw new IllegalArgumentException("Invalid codec for RangeFieldInputVector: " + codec);

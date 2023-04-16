@@ -25,7 +25,6 @@ import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,7 +69,6 @@ public class DeltaCompressor implements Compressor {
     int maxValue = max.getInt();
     byte[] buf = new byte[maxCompressedLength(src.size())];
     ByteBuffer buffer = ByteBuffer.wrap(buf);
-    buffer.order(ByteOrder.nativeOrder());
     buffer.putInt(minValue);
     buffer.putInt(maxValue);
 

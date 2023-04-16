@@ -125,8 +125,10 @@ public class CoolTupleReader implements TupleReader {
           });
           break;
         case ActionTime:
+          // [BUG] action time converter is not added
           break;
         case Metric:
+        case Float:
           // converters.add(FieldValue::getString);
           converters.add(x -> x);
           break;

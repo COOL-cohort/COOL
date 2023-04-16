@@ -49,6 +49,8 @@ public class CompressorAdviser {
         return adviseForValue(hist);
       case ValueFast:
         return Codec.Delta;
+      case Float:
+        return Codec.Float;
       default:
         throw new IllegalArgumentException("Unsupported compress type: " + type);
     }

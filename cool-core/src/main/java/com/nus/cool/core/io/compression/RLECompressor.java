@@ -22,7 +22,6 @@ package com.nus.cool.core.io.compression;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 
 /**
@@ -99,7 +98,7 @@ public class RLECompressor implements Compressor {
   public CompressorOutput compress(List<? extends FieldValue> src) {
     int maxCompressedLen = HEADACC + 3 * Integer.BYTES * src.size();
     CompressorOutput out = new CompressorOutput(maxCompressedLen);
-    ByteBuffer buf = ByteBuffer.wrap(out.getBuf()).order(ByteOrder.nativeOrder());
+    ByteBuffer buf = ByteBuffer.wrap(out.getBuf());
     buf.position(HEADACC);
     int nextV = src.get(0).getInt(); // get a different value
     int currOff = 0;

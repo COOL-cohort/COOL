@@ -72,7 +72,12 @@ public enum Codec {
   /**
    * Code for numeric data, use delta encoding.
    */
-  Delta;
+  Delta,
+  
+  /**
+   * Code for float data.
+   */
+  Float;
 
   /**
    * Translate an interger to its corresponding codec.
@@ -101,6 +106,8 @@ public enum Codec {
         return Set;
       case 10:
         return Delta;
+      case 11:
+        return Float;
       default:
         throw new IllegalArgumentException("Invalid codec ordinal: " + c);
 

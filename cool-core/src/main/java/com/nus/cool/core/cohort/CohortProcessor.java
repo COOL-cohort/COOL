@@ -25,7 +25,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -207,7 +206,7 @@ public class CohortProcessor {
       }
       String extension = f.getName().substring(pointIndex);
       if (!f.isDirectory() && extension.equals(".cohort")) {
-        crs.readFrom(Files.map(f).order(ByteOrder.nativeOrder()));
+        crs.readFrom(Files.map(f));
         this.previousCohortUsers.addAll(crs.getUsers());
       }
     }
@@ -243,7 +242,7 @@ public class CohortProcessor {
     }
     String extension = cohortFile.getName().substring(pointIndex);
     if (!cohortFile.isDirectory() && extension.equals(".cohort")) {
-      crs.readFrom(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
+      crs.readFrom(Files.map(cohortFile));
       this.previousCohortUsers.addAll(crs.getUsers());
     }
   }

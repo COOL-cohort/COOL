@@ -1,6 +1,7 @@
 package com.nus.cool.core.io.readstore;
 
 import com.nus.cool.core.field.RangeField;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
 import com.nus.cool.core.io.storevector.RangeFieldInputVector;
 import com.nus.cool.core.schema.FieldType;
@@ -14,8 +15,8 @@ public class DataRangeFieldRS implements FieldRS {
 
   private FieldType fieldType;
 
-  private int minKey;
-  private int maxKey;
+  private RangeField minKey;
+  private RangeField maxKey;
 
   private RangeFieldInputVector valueVector;
 
@@ -41,9 +42,20 @@ public class DataRangeFieldRS implements FieldRS {
   private void readFromWithFieldType(ByteBuffer buf, FieldType ft) {
     // get codec (no used)
     buf.get();
+    switch (ft) {
+      case Metric:
+      case ActionTime:
+        this.minKey = ValueWrapper.of(buf.getInt());
+        this.maxKey = ValueWrapper.of(buf.getInt());
+        break;
+      case Float:
+        this.minKey = ValueWrapper.of(buf.getFloat());
+        this.maxKey = ValueWrapper.of(buf.getFloat());
+        break;
+      default:
+        throw new IllegalArgumentException("Unexpected FieldType: " + ft);
+    }
     this.fieldType = ft;
-    this.minKey = buf.getInt();
-    this.maxKey = buf.getInt();
     this.valueVector = InputVectorFactory.genRangeFieldInputVector(buf);
   }
 
@@ -53,12 +65,12 @@ public class DataRangeFieldRS implements FieldRS {
   }
 
   // @Override
-  public int minKey() {
+  public RangeField minKey() {
     return this.minKey;
   }
 
   // @Override
-  public int maxKey() {
+  public RangeField maxKey() {
     return this.maxKey;
   }
 
@@ -66,18 +78,5 @@ public class DataRangeFieldRS implements FieldRS {
   public RangeField getValueByIndex(int idx) {
     return this.valueVector.getValue(idx);
   }
-
-
-  // // not used, only to keep compatiablity with old version code
-  // @Override
-  // public InputVector getKeyVector() {
-  //   // TODO Auto-generated method stub
-  //   return null;
-  // }
-
-  // @Override
-  // public InputVector getValueVector() {
-  //   return this.valueVector;
-  // }
 
 }
