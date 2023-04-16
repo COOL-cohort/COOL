@@ -52,7 +52,7 @@ public class FloatCompressor implements Compressor {
     ctx.lastVal = f;
 
     dest.set(startOff);
-    if (diffSize == ctx.lastDiffSize) {
+    if ((diffSize == ctx.lastDiffSize) && (diffFirst == ctx.lastDiffStart)) {
       // case 2: same xor size
       // set meaningful xor bits
       append(xorBits, diffFirst, dest, startOff + 2, diffSize);
