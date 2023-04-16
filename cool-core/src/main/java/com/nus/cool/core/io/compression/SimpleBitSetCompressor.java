@@ -20,7 +20,6 @@
 package com.nus.cool.core.io.compression;
 
 import com.google.common.primitives.Ints;
-import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -66,10 +65,10 @@ public class SimpleBitSetCompressor {
     }
     out.write(bs.get(0) ? 1 : 0);
     bytesWritten++;
-    out.writeInt(IntegerUtil.toNativeByteOrder(blks.size()));
+    out.writeInt(blks.size());
     bytesWritten += Ints.BYTES;
     for (int blk : blks) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(blk));
+      out.writeInt(blk);
       bytesWritten += Ints.BYTES;
     }
     return bytesWritten;

@@ -23,7 +23,6 @@ import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.DataOutputBuffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.List;
 import net.jpountz.lz4.LZ4Compressor;
@@ -82,7 +81,7 @@ public class LZ4JavaCompressor implements Compressor {
       System.out.print(srcBuf.size());
       int zlen = this.lz4.compress(srcBuf.getData(), 0, srcBuf.size(), compressed,
           HEADACC, maxLen - HEADACC);
-      ByteBuffer buffer = ByteBuffer.wrap(compressed, 0, HEADACC).order(ByteOrder.nativeOrder());
+      ByteBuffer buffer = ByteBuffer.wrap(compressed, 0, HEADACC);
       // write z len and raw len for decompressing
       buffer.putInt(zlen);
       buffer.putInt(srcBuf.size());

@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.field.IntRangeField;
+import com.nus.cool.core.field.RangeField;
 import com.nus.cool.core.io.storevector.HashFieldInputVector;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
@@ -79,13 +80,13 @@ public class MetaUserFieldRS implements MetaFieldRS {
   }
 
   @Override
-  public int getMaxValue() {
-    return this.count() - 1;
+  public RangeField getMaxValue() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
-  public int getMinValue() {
-    return 0;
+  public RangeField getMinValue() {
+    throw new UnsupportedOperationException();
   }
 
   @Override

@@ -22,7 +22,6 @@ package com.nus.cool.core.io.compression;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.schema.Codec;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 
 /**
@@ -77,7 +76,6 @@ public class ZIntCompressor implements Compressor {
   public int compress(List<? extends FieldValue> src, byte[] dest, int destOff,
       int maxDestLen) {
     ByteBuffer buffer = ByteBuffer.wrap(dest, destOff, maxDestLen);
-    buffer.order(ByteOrder.nativeOrder());
     // Write count, save srcLen for decompressing
     buffer.putInt(src.size());
     byte sorted = this.sorted ? (byte) 1 : (byte) 0;
@@ -105,7 +103,6 @@ public class ZIntCompressor implements Compressor {
   public CompressorOutput compress(List<? extends FieldValue> src) {
     CompressorOutput out = new CompressorOutput(this.width * src.size() + HEADACC);
     ByteBuffer buffer = ByteBuffer.wrap(out.getBuf());
-    buffer.order(ByteOrder.nativeOrder());
     // Write count, save srcLen for decompressing
     buffer.putInt(src.size());
     byte sorted = this.sorted ? (byte) 1 : (byte) 0;

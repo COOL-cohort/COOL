@@ -23,6 +23,8 @@ public class ValueConverter {
         return new StringHashField(v);
       case Metric:
         return new IntRangeField(Integer.parseInt(v));
+      case Float:
+        return new FloatRangeField(Float.parseFloat(v));
       case ActionTime:
         return new IntRangeField(config.actionTimeIntConverter.toInt(v));
       default:

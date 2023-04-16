@@ -6,7 +6,6 @@ import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.writestore.DataChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -125,13 +124,13 @@ public class NativeDataWriter implements DataWriter {
     // record header offset
     chunkHeaderOffsets.add(offset - Ints.BYTES);
     // 1. write number of chunks
-    out.writeInt(IntegerUtil.toNativeByteOrder(chunkHeaderOffsets.size()));
+    out.writeInt(chunkHeaderOffsets.size());
     // 2. write header of each chunk
     for (int chunkOff : chunkHeaderOffsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
+      out.writeInt(chunkOff);
     }
     // 3. write the header offset.
-    out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+    out.writeInt(offset);
     // 4. flush after writing whole Cublet.
     out.flush();
     out.close();

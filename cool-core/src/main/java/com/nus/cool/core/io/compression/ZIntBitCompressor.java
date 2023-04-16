@@ -23,7 +23,6 @@ import com.google.common.primitives.Longs;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 
 /**
@@ -52,7 +51,6 @@ public class ZIntBitCompressor implements Compressor {
     int numOfPack = (numOfVal - 1) / numOfValPerPack + 2;
     byte[] compressed = new byte[numOfPack * Longs.BYTES];
     ByteBuffer buffer = ByteBuffer.wrap(compressed);
-    buffer.order(ByteOrder.nativeOrder());
     buffer.putInt(src.size());
     buffer.putInt(numOfBits);
 

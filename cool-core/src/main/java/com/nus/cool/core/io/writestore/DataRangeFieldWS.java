@@ -27,7 +27,6 @@ import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.schema.CompressType;
 import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -93,10 +92,10 @@ public class DataRangeFieldWS implements DataFieldWS {
     out.write(Codec.Range.ordinal());
     bytesWritten++;
     // Write min value
-    out.writeInt(IntegerUtil.toNativeByteOrder(min.getInt()));
+    out.writeInt(min.getInt());
     bytesWritten += Ints.BYTES;
     // Write max value
-    out.writeInt(IntegerUtil.toNativeByteOrder(max.getInt()));
+    out.writeInt(max.getInt());
     bytesWritten += Ints.BYTES;
 
     // Write values, i.e. the data within the column
@@ -107,7 +106,11 @@ public class DataRangeFieldWS implements DataFieldWS {
         .max(max)
         .numOfValues(count)
         .build();
-    bytesWritten += OutputCompressor.writeTo(CompressType.ValueFast, hist, values, out);
+    if (this.fieldType == FieldType.Float) {
+      bytesWritten += OutputCompressor.writeTo(CompressType.Float, hist, values, out);
+    } else {
+      bytesWritten += OutputCompressor.writeTo(CompressType.ValueFast, hist, values, out);
+    }
     return bytesWritten;
   }
 }

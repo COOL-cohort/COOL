@@ -22,7 +22,6 @@ package com.nus.cool.core.io.writestore;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.field.RangeField;
 import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutput;
 import java.io.IOException;
 import lombok.Getter;
@@ -92,10 +91,15 @@ public class MetaRangeFieldWS implements MetaFieldWS {
   public int writeTo(DataOutput out) throws IOException {
     int bytesWritten = 0;
     switch (this.fieldType) {
+      case Float:
+        out.writeFloat(this.min.getFloat());
+        out.writeFloat(this.max.getFloat());
+        bytesWritten += 2 * Float.BYTES;
+        break;
       case Metric:
       case ActionTime:
-        out.writeInt(IntegerUtil.toNativeByteOrder(this.min.getInt()));
-        out.writeInt(IntegerUtil.toNativeByteOrder(this.max.getInt()));
+        out.writeInt(this.min.getInt());
+        out.writeInt(this.max.getInt());
         bytesWritten += 2 * Integer.BYTES;
         break;
       default:
@@ -108,10 +112,15 @@ public class MetaRangeFieldWS implements MetaFieldWS {
   public int writeCubeMeta(DataOutput out) throws IOException {
     int bytesWritten = 0;
     switch (this.fieldType) {
+      case Float:
+        out.writeFloat(this.cubeMin.getFloat());
+        out.writeFloat(this.cubeMax.getFloat());
+        bytesWritten += 2 * Float.BYTES;
+        break;
       case Metric:
       case ActionTime:
-        out.writeInt(IntegerUtil.toNativeByteOrder(this.cubeMin.getInt()));
-        out.writeInt(IntegerUtil.toNativeByteOrder(this.cubeMax.getInt()));
+        out.writeInt(this.cubeMin.getInt());
+        out.writeInt(this.cubeMax.getInt());
         bytesWritten += 2 * Integer.BYTES;
         break;
       default:

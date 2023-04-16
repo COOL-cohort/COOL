@@ -47,6 +47,11 @@ public enum CompressType {
   /**
    * Compress type for values of rangeField.
    */
-  ValueFast
+  ValueFast,
+
+  /**
+   * Compress type for values of float rangeField.
+   */
+  Float,
 
 }

@@ -28,7 +28,6 @@ import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutput;
 import java.io.IOException;
 
@@ -119,6 +118,7 @@ public class DataChunkWS implements Output {
           break;
         case ActionTime:
         case Metric:
+        case Float:
           if (schema.isInvariantField(i)) {
             fields[i] = new DataInvariantRangeFieldWS(fieldType);
           } else {
@@ -174,19 +174,19 @@ public class DataChunkWS implements Output {
     out.write(ChunkType.DATA.ordinal());
     bytesWritten++;
     // 2.2 Write #records
-    out.writeInt(IntegerUtil.toNativeByteOrder(this.recordCount));
+    out.writeInt(this.recordCount);
     bytesWritten += Ints.BYTES;
     // 2.3 Write #fields
-    out.writeInt(IntegerUtil.toNativeByteOrder(this.dataFields.length));
+    out.writeInt(this.dataFields.length);
     bytesWritten += Ints.BYTES;
     // 2.4 Write field offsets
     for (int offset : offsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+      out.writeInt(offset);
       bytesWritten += Ints.BYTES;
     }
 
     // 3. Write header offset
-    out.writeInt(IntegerUtil.toNativeByteOrder(chunkHeadOff));
+    out.writeInt(chunkHeadOff);
     bytesWritten += Ints.BYTES;
     return bytesWritten;
   }

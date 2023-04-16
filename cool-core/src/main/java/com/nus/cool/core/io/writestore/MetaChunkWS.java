@@ -29,7 +29,6 @@ import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -113,6 +112,7 @@ public class MetaChunkWS implements Output {
           metaFields[i] = new MetaHashFieldWS(fieldType, charset);
           break;
         case ActionTime:
+        case Float:
         case Metric:
           metaFields[i] = new MetaRangeFieldWS(fieldType);
           break;
@@ -179,17 +179,17 @@ public class MetaChunkWS implements Output {
     bytesWritten++;
 
     // 2.1 Write fields for header layout
-    out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
+    out.writeInt(this.metaFields.length);
     bytesWritten += Ints.BYTES;
 
     // 2.2 Write field offsets for header layout
     for (int offset : offsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+      out.writeInt(offset);
       bytesWritten += Ints.BYTES;
     }
 
     // 3. Write header offset for MetaChunk layout
-    out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
+    out.writeInt(headOffset);
     bytesWritten += Ints.BYTES;
     return bytesWritten;
   }
@@ -230,17 +230,17 @@ public class MetaChunkWS implements Output {
     bytesWritten++;
 
     // 2.1 Write fields for header layout
-    out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
+    out.writeInt(this.metaFields.length);
     bytesWritten += Ints.BYTES;
 
     // 2.2 Write field offsets for header layout
     for (int offset : offsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+      out.writeInt(offset);
       bytesWritten += Ints.BYTES;
     }
 
     // 3. Write header offset for MetaChunk layout
-    out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
+    out.writeInt(headOffset);
     bytesWritten += Ints.BYTES;
     return bytesWritten;
   }
