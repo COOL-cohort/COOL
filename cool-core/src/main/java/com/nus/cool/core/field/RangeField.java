@@ -8,4 +8,7 @@ public interface RangeField extends FieldValue {
   
   @Override
   int compareTo(FieldValue o) throws IllegalArgumentException;
+
+  @Override
+  boolean equals(Object obj);
 }
