@@ -44,6 +44,14 @@ public class IntRangeField implements RangeField {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof IntRangeField)) {
+      return false;
+    }
+    return val == ((IntRangeField) o).val;
+  }
+
+  @Override
   public String getString() {
     return String.valueOf(val);
   }

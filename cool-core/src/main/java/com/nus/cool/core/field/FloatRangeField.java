@@ -45,6 +45,14 @@ public class FloatRangeField implements RangeField {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof FloatRangeField)) {
+      return false;
+    }
+    return val == ((FloatRangeField) o).val;
+  }
+
+  @Override
   public String getString() {
     return String.valueOf(val);
   }

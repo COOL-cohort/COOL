@@ -1,5 +1,6 @@
 package com.nus.cool.core.field;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.nus.cool.core.schema.FieldType;
 
 /**
@@ -16,5 +17,6 @@ public interface FieldValue extends Comparable<FieldValue> {
   int getInt();
 
   // serialize to string as output
+  @JsonValue
   String getString();
 }
