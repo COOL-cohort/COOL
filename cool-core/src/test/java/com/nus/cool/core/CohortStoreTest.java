@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +40,7 @@ public class CohortStoreTest {
 
     // read the above
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
-    crs.readFrom(Files.map(cohortResFile).order(ByteOrder.nativeOrder()));
+    crs.readFrom(Files.map(cohortResFile));
     List<String> redRes = crs.getUsers();
 
     // assert the read the original data.

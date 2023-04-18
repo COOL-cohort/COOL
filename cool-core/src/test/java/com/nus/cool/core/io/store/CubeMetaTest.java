@@ -7,7 +7,6 @@ import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.TableSchema;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,7 @@ public class CubeMetaTest {
   private String[] expected = {
     "{\"charset\":\"UTF-8\",\"type\":\"UserKey\",\"values\":[\"P-0\",\"P-1\",\"P-10\",\"P-11\","
       + "\"P-12\",\"P-2\",\"P-3\",\"P-4\",\"P-5\",\"P-6\",\"P-7\",\"P-8\",\"P-9\"]}",
-    "{\"type\":\"Metric\",\"min\":1954,\"max\":2000}",
+    "{\"type\":\"Metric\",\"min\":\"1954\",\"max\":\"2000\"}",
     "{\"charset\":\"UTF-8\",\"type\":\"Action\",\"values\":[\"diagnose\",\"labtest\","
       + "\"prescribe\"]}",
     "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Disease-A\",\"Disease-B\","
@@ -37,8 +36,8 @@ public class CubeMetaTest {
       + "\"Medicine-C\",\"None\"]}",
     "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Labtest-A\",\"Labtest-B\","
       + "\"Labtest-C\",\"None\"]}",
-    "{\"type\":\"Metric\",\"min\":0,\"max\":70}",
-    "{\"type\":\"ActionTime\",\"min\":15340,\"max\":15696}"
+    "{\"type\":\"Float\",\"min\":\"0.0\",\"max\":\"70.0\"}",
+    "{\"type\":\"ActionTime\",\"min\":\"15340\",\"max\":\"15696\"}"
   };
 
   /**
@@ -73,7 +72,7 @@ public class CubeMetaTest {
     int written = metaws.writeCubeMeta(out);
     out.close();
 
-    ByteBuffer buffer = ByteBuffer.wrap(out.getData()).order(ByteOrder.nativeOrder());
+    ByteBuffer buffer = ByteBuffer.wrap(out.getData());
     buffer.limit(written);
 
     CubeMetaRS cubemeta = new CubeMetaRS(this.schema);

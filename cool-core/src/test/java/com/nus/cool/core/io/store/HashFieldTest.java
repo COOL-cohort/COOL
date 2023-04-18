@@ -10,7 +10,6 @@ import com.nus.cool.core.io.writestore.MetaHashFieldWS;
 import com.nus.cool.core.schema.FieldType;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -80,7 +79,6 @@ public class HashFieldTest {
 
     // Convert DataOutputBuffer to ByteBuffer
     ByteBuffer bf = ByteBuffer.wrap(dob.getData());
-    bf.order(ByteOrder.nativeOrder());
 
     // Read from File
     MetaHashFieldRS hmrs = new MetaHashFieldRS(charset);

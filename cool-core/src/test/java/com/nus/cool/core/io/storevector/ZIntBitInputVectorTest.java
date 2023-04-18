@@ -7,7 +7,6 @@ import com.nus.cool.core.io.compression.CompressorOutput;
 import com.nus.cool.core.io.compression.ZIntBitCompressor;
 import com.nus.cool.core.util.ArrayUtil;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,7 +30,6 @@ public class ZIntBitInputVectorTest {
     Compressor compressor = new ZIntBitCompressor(ValueWrapper.of(max));
     CompressorOutput compressed = compressor.compress(values);
     ByteBuffer buffer = ByteBuffer.wrap(compressed.getBuf(), 0, compressed.getLen());
-    buffer.order(ByteOrder.nativeOrder());
     ZIntBitInputVector in = ZIntBitInputVector.load(buffer);
 
     for (int i = 0; i < in.size(); i++) {

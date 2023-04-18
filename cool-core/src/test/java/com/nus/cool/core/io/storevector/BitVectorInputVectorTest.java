@@ -6,7 +6,6 @@ import com.nus.cool.core.io.compression.BitVectorCompressor;
 import com.nus.cool.core.io.compression.Compressor;
 import com.nus.cool.core.io.compression.CompressorOutput;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +29,6 @@ public class BitVectorInputVectorTest {
 
     // load the bytes with
     ByteBuffer buffer = ByteBuffer.wrap(compressed.getBuf(), 0, compressed.getLen());
-    buffer.order(ByteOrder.nativeOrder());
     InputVector<Integer> in = new BitVectorInputVector();
     in.readFrom(buffer);
 

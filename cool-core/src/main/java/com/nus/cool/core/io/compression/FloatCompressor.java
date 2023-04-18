@@ -43,7 +43,6 @@ public class FloatCompressor implements Compressor {
     // get the xor value
     int xor = Float.floatToIntBits(f) ^ Float.floatToIntBits(ctx.lastVal);
     BitSet xorBits = BitSet.valueOf(new long[]{xor});
-    System.out.println(xorBits.toString());
     // get the diff range
     int diffFirst = xorBits.nextSetBit(0);
     int diffLast = xorBits.previousSetBit(xorBits.size());

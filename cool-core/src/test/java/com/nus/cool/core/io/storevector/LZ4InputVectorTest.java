@@ -6,7 +6,6 @@ import com.nus.cool.core.io.compression.CompressorOutput;
 import com.nus.cool.core.io.compression.LZ4JavaCompressor;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +52,6 @@ public class LZ4InputVectorTest {
 
     // Decoding these readBuf
     ByteBuffer readBuf = ByteBuffer.wrap(out.getBuf(), 0, out.getLen());
-    readBuf.order(ByteOrder.nativeOrder());
     LZ4InputVector res = new LZ4InputVector(defaultCharset);
     res.readFrom(readBuf);
 
