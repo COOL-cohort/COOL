@@ -7,7 +7,6 @@ import com.nus.cool.core.io.compression.CompressorOutput;
 import com.nus.cool.core.io.compression.ZIntCompressor;
 import com.nus.cool.core.schema.Codec;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -50,7 +49,6 @@ public class ZIntStoreTest {
 
     // load the bytes with
     ByteBuffer buffer = ByteBuffer.wrap(compressed.getBuf(), 0, compressed.getLen());
-    buffer.order(ByteOrder.nativeOrder());
     ZIntStore store;
 
     switch (codeType) {

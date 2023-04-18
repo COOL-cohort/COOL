@@ -14,7 +14,6 @@ import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import org.slf4j.Logger;
@@ -70,8 +69,6 @@ public class ChunkTest {
     // ReadFrom
     ByteBuffer metaBF = ByteBuffer.wrap(metaDOB.getData());
     ByteBuffer chunkBF = ByteBuffer.wrap(chunkDOB.getData());
-    metaBF.order(ByteOrder.nativeOrder());
-    chunkBF.order(ByteOrder.nativeOrder());
 
     // decode these data
     MetaChunkRS metaChunkRS = new MetaChunkRS(schemas);

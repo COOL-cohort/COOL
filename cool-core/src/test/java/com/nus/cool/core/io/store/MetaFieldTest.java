@@ -13,7 +13,6 @@ import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -154,7 +153,6 @@ public class MetaFieldTest {
     mws.writeTo(dob);
     // set byteBuffer
     ByteBuffer bf = ByteBuffer.wrap(dob.getData());
-    bf.order(ByteOrder.nativeOrder());
 
     // read
     MetaFieldRS mrs = new MetaHashFieldRS(this.charset);
@@ -193,7 +191,6 @@ public class MetaFieldTest {
     mws.writeTo(dob);
 
     ByteBuffer bf = ByteBuffer.wrap(dob.getData());
-    bf.order(ByteOrder.nativeOrder());
 
     // read
     MetaFieldRS mrs = new MetaRangeFieldRS();

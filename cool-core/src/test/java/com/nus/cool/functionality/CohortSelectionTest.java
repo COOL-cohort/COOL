@@ -6,7 +6,6 @@ import com.google.common.io.Files;
 import com.nus.cool.core.cohort.storage.CohortRSStr;
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
@@ -44,7 +43,7 @@ public class CohortSelectionTest {
 
     File cohortResFile = new File(cohortStoragePath, "all.cohort");
     CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
-    crs.readFrom(Files.map(cohortResFile).order(ByteOrder.nativeOrder()));
+    crs.readFrom(Files.map(cohortResFile));
     List<String> redRes = crs.getUsers();
     Assert.assertEquals(redRes.size(), cohortSize);
   }

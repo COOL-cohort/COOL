@@ -25,7 +25,7 @@ fields:
   invariantField: false
   name: labtest
 - preCal: false
-  fieldType: Metric
+  fieldType: Float
   invariantField: false
   name: value
 - preCal: false

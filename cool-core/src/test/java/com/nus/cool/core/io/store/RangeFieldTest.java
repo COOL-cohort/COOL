@@ -9,7 +9,6 @@ import com.nus.cool.core.io.writestore.MetaRangeFieldWS;
 import com.nus.cool.core.schema.FieldType;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import org.slf4j.Logger;
@@ -69,7 +68,6 @@ public class RangeFieldTest {
     ws.writeTo(dobf);
     // Convert DataOutputBuffer to ByteBuffer
     ByteBuffer bf = ByteBuffer.wrap(dobf.getData());
-    bf.order(ByteOrder.nativeOrder());
     // Read from Buffer
     MetaRangeFieldRS rmrs = new MetaRangeFieldRS();
 
@@ -78,10 +76,10 @@ public class RangeFieldTest {
     DataRangeFieldRS rs = DataRangeFieldRS.readFrom(bf, fType);
 
     // check Range Meta Field
-    Assert.assertEquals(rmrs.getMinValue(), rmws.getMin().getInt());
-    Assert.assertEquals(rmrs.getMaxValue(), rmws.getMax().getInt());
-    Assert.assertEquals(rs.minKey(), rmws.getMin().getInt());
-    Assert.assertEquals(rs.maxKey(), rmws.getMax().getInt());
+    Assert.assertEquals(rmrs.getMinValue(), rmws.getMin());
+    Assert.assertEquals(rmrs.getMaxValue(), rmws.getMax());
+    Assert.assertEquals(rs.minKey(), rmws.getMin());
+    Assert.assertEquals(rs.maxKey(), rmws.getMax());
 
     // check Range Vector
     for (int i = 0; i < data.size(); i++) {

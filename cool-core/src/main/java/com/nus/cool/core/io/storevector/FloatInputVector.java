@@ -75,7 +75,6 @@ public class FloatInputVector implements InputVector<Float> {
       }
     }
     decoded = true;
-    System.out.println("decoding float input vector finished");
   }
 
   @Override
