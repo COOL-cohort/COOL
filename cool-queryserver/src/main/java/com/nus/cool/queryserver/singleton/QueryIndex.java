@@ -1,12 +1,11 @@
 package com.nus.cool.queryserver.singleton;
 
 import com.nus.cool.queryserver.model.QueryInfo;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Initialize QueryIndex, record query information
+ * Initialize QueryIndex, record query information.
  */
 public class QueryIndex {
 
@@ -15,6 +14,9 @@ public class QueryIndex {
   // keep QueryIndex in memory, preventing thread copying it to local register.
   private static volatile QueryIndex instance = null;
 
+  /**
+   * getInstance.
+   */
   // Thread Safe Singleton
   public static QueryIndex getInstance() {
     if (instance == null) {

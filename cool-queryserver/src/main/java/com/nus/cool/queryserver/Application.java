@@ -1,11 +1,14 @@
 package com.nus.cool.queryserver;
 
+
 import com.nus.cool.queryserver.singleton.HDFSConnection;
 import com.nus.cool.queryserver.singleton.ModelConfig;
 import com.nus.cool.queryserver.singleton.QueryIndex;
 import com.nus.cool.queryserver.singleton.TaskQueue;
 import com.nus.cool.queryserver.singleton.WorkerIndex;
 import com.nus.cool.queryserver.singleton.ZKConnection;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import org.apache.zookeeper.KeeperException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,17 +16,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Arrays;
 
+/**
+ * Server main function.
+ */
 @SpringBootApplication
 public class Application {
 
-  public enum Role {STANDALONE, WORKER, BROKER}
+  /**
+   * Roles.
+   */
+  public enum Role { STANDALONE, WORKER, BROKER }
 
   /**
-   * Run server
+   * Run server.
    *
    * @param args empty
    * @throws InterruptedException ZKConnection
@@ -37,7 +43,7 @@ public class Application {
     // read configs
     ModelConfig.getInstance();
     String rawRole = ModelConfig.props.getProperty("run.model");
-    String url = "0.0.0.0:"+ModelConfig.props.getProperty("server.port");
+    String url = "0.0.0.0:" + ModelConfig.props.getProperty("server.port");
 
     Role role = Role.valueOf(rawRole);
 
@@ -82,6 +88,11 @@ public class Application {
     app.run();
   }
 
+  /**
+   * Run server.
+   *
+   * @param ctx empty
+   */
   @Bean
   public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
     return args -> {

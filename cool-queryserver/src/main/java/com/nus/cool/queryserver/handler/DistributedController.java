@@ -9,13 +9,14 @@ import com.nus.cool.core.cohort.QueryResult;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.cohort.storage.OLAPRet;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
-import com.nus.cool.core.iceberg.result.BaseResult;
-import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.model.CoolModel;
 import com.nus.cool.queryserver.singleton.HDFSConnection;
 import com.nus.cool.queryserver.singleton.ModelConfig;
 import com.nus.cool.queryserver.singleton.ZKConnection;
-import com.nus.cool.result.ExtendedResultTuple;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
 import javax.validation.Valid;
 import org.apache.zookeeper.KeeperException;
 import org.springframework.http.HttpHeaders;
@@ -25,32 +26,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
 
+/**
+ * DistributedController.
+ */
 @RestController
 @RequestMapping("/dist")
 public class DistributedController {
 
+  /**
+   * CohortAnalysis controller.
+   */
   @GetMapping(value = "/cohort")
-  public ResponseEntity<String> CohortAnalysis(@Valid @RequestParam Map<String, String> params)
+  public ResponseEntity<String> cohortAnalysis(@Valid @RequestParam Map<String, String> params)
       throws IOException, InterruptedException, URISyntaxException, KeeperException {
 
     // 1. parser the parameters
     String path = params.get("path");
     String file = params.get("file");
     String queryId = params.get("queryId");
-    String workerName = params.get("worker");
+
     System.out.println("process file: " + path);
 
     // 2. connect to zookeeper and HDFS
-    ZKConnection zk;
-    HDFSConnection fs;
-    zk = ZKConnection.getInstance();
-    fs = HDFSConnection.getInstance();
+
+    HDFSConnection fs = HDFSConnection.getInstance();
 
     // 3. read query from hdfs
     ExtendedCohortQuery query = fs.readCohortQuery(queryId);
@@ -62,7 +62,7 @@ public class DistributedController {
 
     // 5. execute the query.
     QueryResult results;
-    long begin = System.currentTimeMillis();
+    final long begin = System.currentTimeMillis();
 
     ModelConfig.cachedCoolModel.reload(cubeName, buffer, fs.readTableSchema(path));
 
@@ -85,25 +85,28 @@ public class DistributedController {
     fs.createResult(queryId, content);
 
     // 7. release one worker.
+    ZKConnection zk = ZKConnection.getInstance();
+    String workerName = params.get("worker");
     zk.relaseWorker(workerName);
 
     return ResponseEntity.ok().headers(HttpHeaders.EMPTY).body("Done");
   }
 
+  /**
+   * IceBergAnalysis controller.
+   */
   @GetMapping(value = "/iceberg")
-  public ResponseEntity<String> IceBergAnalysis(@RequestParam Map<String, String> params)
+  public ResponseEntity<String> iceBergAnalysis(@RequestParam Map<String, String> params)
       throws IOException, InterruptedException, KeeperException, URISyntaxException {
 
     // 1. parser the parameters
     String path = params.get("path");
     String file = params.get("file");
     String queryId = params.get("queryId");
-    String workerName = params.get("worker");
 
     System.out.println("process file: " + path);
 
     // 2. connect to zookeeper and HDFS
-    ZKConnection zk = ZKConnection.getInstance();
     HDFSConnection fs = HDFSConnection.getInstance();
 
     // 3. read query from hdfs
@@ -129,8 +132,10 @@ public class DistributedController {
     // 6. add result to shard storage.
     String content = new ObjectMapper().writeValueAsString(result);
     fs.createResult(queryId, content);
+    ZKConnection zk = ZKConnection.getInstance();
 
     // 7. release one worker.
+    String workerName = params.get("worker");
     zk.relaseWorker(workerName);
 
     return ResponseEntity.ok().headers(HttpHeaders.EMPTY).body("Done");

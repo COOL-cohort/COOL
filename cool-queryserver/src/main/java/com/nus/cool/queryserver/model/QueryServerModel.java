@@ -13,17 +13,21 @@ import com.nus.cool.extension.util.config.ParquetDataLoaderConfig;
 import com.nus.cool.loader.LoadQuery;
 import com.nus.cool.model.CoolLoader;
 import com.nus.cool.model.CoolModel;
+import com.nus.cool.queryserver.singleton.ModelConfig;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import com.nus.cool.queryserver.singleton.*;
-import java.io.IOException;
-import java.io.File;
-import java.util.List;
 
+
+/**
+ * QueryServerModel.
+ */
 public class QueryServerModel {
 
   /**
-   * List all existing cubes
+   * List all existing cubes.
    *
    * @return cubes
    */
@@ -33,7 +37,7 @@ public class QueryServerModel {
   }
 
   /**
-   * List all version of cuvbe
+   * List all version of cube.
    *
    * @return cubes
    */
@@ -44,7 +48,7 @@ public class QueryServerModel {
   }
 
   /**
-   * List all columns of cuvbe
+   * List all columns of cube.
    *
    * @return cubes
    */
@@ -55,7 +59,7 @@ public class QueryServerModel {
   }
 
   /**
-   * List all existing cohorts
+   * List all existing cohorts.
    *
    * @return cubes
    */
@@ -66,7 +70,7 @@ public class QueryServerModel {
   }
 
   /**
-   * cohort selection
+   * cohort selection.
    *
    * @return cubes
    */
@@ -86,7 +90,7 @@ public class QueryServerModel {
   }
 
   /**
-   * cohort analysis
+   * cohort analysis.
    *
    * @return result
    */
@@ -129,34 +133,34 @@ public class QueryServerModel {
     return ResponseEntity.ok().headers(HttpHeaders.EMPTY).body(ret.toString());
   }
 
-    /**
-     * Load a new cube
-     *
-     * @param q query instance
-     * @return Response
-     */
-    public static ResponseEntity<String> loadCube(LoadQuery q) throws IOException {
-      q.isValid();
-      String fileType = q.getDataFileType().toUpperCase();
-      DataLoaderConfig config;
-      switch (fileType) {
-        case "CSV":
-          config = new CsvDataLoaderConfig();
-          break;
-        case "PARQUET":
-          config = new ParquetDataLoaderConfig();
-          break;
-        case "AVRO":
-          config = new AvroDataLoaderConfig(new File(q.getConfigPath()));
-          break;
-        default:
-          throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
-      }
-      System.out.println(config.getClass().getName());
-      CoolLoader coolLoader = new CoolLoader(config);
-      coolLoader.load(q.getCubeName(), q.getSchemaPath(), q.getDataPath(), q.getOutputPath());
-      String resStr = "Cube " + q.getCubeName() + " is loaded successfully";
-      return ResponseEntity.ok().headers(HttpHeaders.EMPTY).body(resStr);
+  /**
+   * Load a new cube.
+   *
+   * @param q query instance
+   * @return Response
+   */
+  public static ResponseEntity<String> loadCube(LoadQuery q) throws IOException {
+    q.isValid();
+    String fileType = q.getDataFileType().toUpperCase();
+    DataLoaderConfig config;
+    switch (fileType) {
+      case "CSV":
+        config = new CsvDataLoaderConfig();
+        break;
+      case "PARQUET":
+        config = new ParquetDataLoaderConfig();
+        break;
+      case "AVRO":
+        config = new AvroDataLoaderConfig(new File(q.getConfigPath()));
+        break;
+      default:
+        throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
     }
+    System.out.println(config.getClass().getName());
+    CoolLoader coolLoader = new CoolLoader(config);
+    coolLoader.load(q.getCubeName(), q.getSchemaPath(), q.getDataPath(), q.getOutputPath());
+    String resStr = "Cube " + q.getCubeName() + " is loaded successfully";
+    return ResponseEntity.ok().headers(HttpHeaders.EMPTY).body(resStr);
+  }
 
 }

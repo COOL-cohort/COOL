@@ -1,7 +1,7 @@
 package com.nus.cool.queryserver.model;
 
 /**
- * Record query's needed workerNum and startTime
+ * Record query's needed workerNum and startTime.
  */
 public class QueryInfo {
 

@@ -1,5 +1,8 @@
 package com.nus.cool.queryserver.model;
 
+/**
+ * worker.
+ */
 public class Worker {
 
   private String workerName;

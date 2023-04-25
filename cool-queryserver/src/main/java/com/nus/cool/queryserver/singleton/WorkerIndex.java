@@ -2,7 +2,6 @@ package com.nus.cool.queryserver.singleton;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,9 @@ public class WorkerIndex {
   private WorkerIndex() {
   }
 
+  /**
+   * WorkerIndex singleton.
+   */
   public static WorkerIndex getInstance() {
     if (instance == null) {
       synchronized (WorkerIndex.class) {
@@ -37,7 +39,7 @@ public class WorkerIndex {
   }
 
   /**
-   * Get all url contents of the give worker list
+   * Get all url contents of the give worker list.
    *
    * @param workers give worker list
    * @return all url contents assigned to those worker.
@@ -53,10 +55,16 @@ public class WorkerIndex {
     return parameters;
   }
 
+  /**
+   * remove worker.
+   */
   public void remove(String worker) {
     this.index.remove(worker);
   }
 
+  /**
+   * To string.
+   */
   public String toString() {
     String content = null;
     try {
