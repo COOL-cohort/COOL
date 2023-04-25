@@ -123,6 +123,10 @@ public class ProcessorTest extends CsvLoaderTest {
     }
   }
 
+
+  /**
+   * Test OLAP query. Data provider
+   */
   @DataProvider(name = "ProcessQueryAP")
   public Object[][] queryDirDataProviderAP() {
     return new Object[][] {

@@ -27,7 +27,7 @@ public class OLAPAnalysisTest {
 
   @Test(dataProvider = "OLAPAnalysisTestDPArgObjects", dependsOnMethods = {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
-  public void OLAPAnalysisUnitTest(String cubeRepo, String queryPath) throws IOException {
+  public void analysisUnitTest(String cubeRepo, String queryPath) throws IOException {
     List<OLAPRet>  ret = performOLAPAnalysis(cubeRepo, queryPath);
     System.out.println(ret);
   }
@@ -36,7 +36,7 @@ public class OLAPAnalysisTest {
    * Data provider for cohort analysis without input cohort.
    */
   @DataProvider(name = "OLAPAnalysisTestDPArgObjects")
-  public Object[][] OLAPAnalysisTestDPArgObjects() {
+  public Object[][] dataProvider() {
     String cubeRepo = Paths.get(System.getProperty("user.dir"), "..",
         "CubeRepo/TestCube").toString();
     return new Object[][] {
