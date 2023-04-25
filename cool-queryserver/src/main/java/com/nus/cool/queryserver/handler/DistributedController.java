@@ -4,11 +4,10 @@ import static com.nus.cool.functionality.CohortAnalysis.performCohortAnalysis;
 import static com.nus.cool.functionality.OLAPAnalysis.performOLAPAnalysis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.ExtendedCohortQuery;
-import com.nus.cool.core.cohort.QueryResult;
+import com.nus.cool.core.cohort.CohortQueryLayout;
+import com.nus.cool.core.cohort.OLAPQueryLayout;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.cohort.storage.OLAPRet;
-import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.queryserver.singleton.HDFSConnection;
 import com.nus.cool.queryserver.singleton.ModelConfig;
 import com.nus.cool.queryserver.singleton.ZKConnection;
@@ -53,7 +52,7 @@ public class DistributedController {
     HDFSConnection fs = HDFSConnection.getInstance();
 
     // 3. read query from hdfs
-    ExtendedCohortQuery query = fs.readCohortQuery(queryId);
+    CohortQueryLayout query = fs.readCohortQuery(queryId);
 
     String cubeName = query.getDataSource();
 
@@ -61,7 +60,6 @@ public class DistributedController {
     ByteBuffer buffer = fs.readCublet(path, file);
 
     // 5. execute the query.
-    QueryResult results;
     final long begin = System.currentTimeMillis();
 
     ModelConfig.cachedCoolModel.reload(cubeName, buffer, fs.readTableSchema(path));
@@ -73,15 +71,14 @@ public class DistributedController {
     }
     CohortRet resValue =
         performCohortAnalysis(cubeName, "");
-    results = QueryResult.ok(resValue);
 
-    System.out.println("Result for the query is  " + results);
+    System.out.println("Result for the query is  " + resValue);
 
     long end = System.currentTimeMillis();
     System.out.println("query elapsed: " + (end - begin));
 
     // 6. add result to shard storage.
-    String content = new ObjectMapper().writeValueAsString(results);
+    String content = new ObjectMapper().writeValueAsString(resValue);
     fs.createResult(queryId, content);
 
     // 7. release one worker.
@@ -110,7 +107,7 @@ public class DistributedController {
     HDFSConnection fs = HDFSConnection.getInstance();
 
     // 3. read query from hdfs
-    IcebergQuery query = fs.readIcebergQuery(queryId);
+    OLAPQueryLayout query = fs.readIcebergQuery(queryId);
     String cubeName = query.getDataSource();
 
     // 4. get Cublet from hdfs
@@ -123,14 +120,13 @@ public class DistributedController {
 
     List<OLAPRet> results =
         performOLAPAnalysis(cubeName, "");
-    QueryResult result = QueryResult.ok(results);
     System.out.println("Result for the query is  " + results);
 
     long end = System.currentTimeMillis();
     System.out.println("query elapsed: " + (end - begin));
 
     // 6. add result to shard storage.
-    String content = new ObjectMapper().writeValueAsString(result);
+    String content = new ObjectMapper().writeValueAsString(results);
     fs.createResult(queryId, content);
     ZKConnection zk = ZKConnection.getInstance();
 
