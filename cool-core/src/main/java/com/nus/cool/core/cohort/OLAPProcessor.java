@@ -9,7 +9,7 @@ import com.nus.cool.core.cohort.olapselect.OLAPGroupBy;
 import com.nus.cool.core.cohort.olapselect.OLAPSelectionLayout;
 import com.nus.cool.core.cohort.olapselect.OLAPSelectionLayout.SelectionType;
 import com.nus.cool.core.cohort.olapselect.OLAPSelector;
-import com.nus.cool.core.cohort.storage.OlapRet;
+import com.nus.cool.core.cohort.storage.OLAPRet;
 import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
@@ -37,7 +37,7 @@ public class OLAPProcessor {
   // points to layouts and
   private OLAPQueryLayout query;
 
-  private List<OlapRet> result = new ArrayList<>();
+  private List<OLAPRet> result = new ArrayList<>();
 
   @Getter
   private final HashSet<String> projectedSchemaSet = new HashSet<>();
@@ -54,7 +54,7 @@ public class OLAPProcessor {
    * @param cube the cube that stores the data we need
    * @return the result of the query
    */
-  public List<OlapRet> processCube(CubeRS cube) {
+  public List<OLAPRet> processCube(CubeRS cube) {
     TableSchema tableschema = cube.getSchema();
     // add this two schema into list to be compatible with existing aggregator
     for (FieldSchema fieldSchema : tableschema.getFields()) {
@@ -203,7 +203,7 @@ public class OLAPProcessor {
     // 3. run aggregator
     OLAPAggregator olapAgge = new OLAPAggregator();
     for (AggregationLayout aggregation : this.query.getAggregations()) {
-      ArrayList<OlapRet> res =
+      ArrayList<OLAPRet> res =
           olapAgge.process(metaChunk, dataChunk, aggregation, this.projectedSchemaSet,
               olapGroupBy.getMergedGroup());
       result.addAll(res);

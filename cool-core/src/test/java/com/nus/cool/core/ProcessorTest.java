@@ -7,7 +7,7 @@ import com.nus.cool.core.cohort.OLAPProcessor;
 import com.nus.cool.core.cohort.OLAPQueryLayout;
 import com.nus.cool.core.cohort.aggregate.AggregateType;
 import com.nus.cool.core.cohort.storage.CohortRet;
-import com.nus.cool.core.cohort.storage.OlapRet;
+import com.nus.cool.core.cohort.storage.OLAPRet;
 import com.nus.cool.core.cohort.storage.RetUnit;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.functionality.CsvLoaderTest;
@@ -104,19 +104,19 @@ public class ProcessorTest extends CsvLoaderTest {
     this.coolModel = new CoolModel(this.cubeRepo);
     coolModel.reload(dataSource);
     CubeRS cube = coolModel.getCube(dataSource);
-    List<OlapRet> ret = olapProcessor.processCube(cube);
+    List<OLAPRet> ret = olapProcessor.processCube(cube);
     // System.out.println(ret);
 
     // verification:
     if (queryDir.equals("../datasets/olap-tpch")) {
-      ArrayList<OlapRet> result = generateResultForTPCH();
+      ArrayList<OLAPRet> result = generateResultForTPCH();
       for (int i = 0; i < ret.size(); i++) {
         Assert.assertEquals(result.get(i), ret.get(i));
       }
     }
 
     if (queryDir.equals("../datasets/ecommerce/queries")) {
-      ArrayList<OlapRet> result = generateResultForEcommerce();
+      ArrayList<OLAPRet> result = generateResultForEcommerce();
       for (int i = 0; i < ret.size(); i++) {
         Assert.assertEquals(result.get(i), ret.get(i));
       }
@@ -125,10 +125,12 @@ public class ProcessorTest extends CsvLoaderTest {
 
   @DataProvider(name = "ProcessQueryAP")
   public Object[][] queryDirDataProviderAP() {
-    return new Object[][] {{"../datasets/olap-tpch"}, {"../datasets/ecommerce/queries"}};
+    return new Object[][] {
+        {"../datasets/olap-tpch"},
+        {"../datasets/ecommerce/queries"}};
   }
 
-  private ArrayList<OlapRet> generateResultForTPCH() {
+  private ArrayList<OLAPRet> generateResultForTPCH() {
     Map<String, Map<AggregateType, RetUnit>> resultMap = new HashMap<>();
     resultMap.put("RUSSIA|EUROPE", new HashMap<AggregateType, RetUnit>() {{
         put(AggregateType.COUNT, new RetUnit(2, 0));
@@ -154,14 +156,14 @@ public class ProcessorTest extends CsvLoaderTest {
       }
     });
 
-    ArrayList<OlapRet> results = new ArrayList<>();
+    ArrayList<OLAPRet> results = new ArrayList<>();
 
     for (Map.Entry<String, Map<AggregateType, RetUnit>> entry : resultMap.entrySet()) {
       String groupName = entry.getKey();
       Map<AggregateType, RetUnit> groupValue = entry.getValue();
 
       // assign new result
-      OlapRet newEle = new OlapRet();
+      OLAPRet newEle = new OLAPRet();
       newEle.setTimeRange(null);
       newEle.setKey(groupName);
       newEle.setFieldName("O_TOTALPRICE");
@@ -171,20 +173,20 @@ public class ProcessorTest extends CsvLoaderTest {
     return results;
   }
 
-  private ArrayList<OlapRet> generateResultForEcommerce() {
+  private ArrayList<OLAPRet> generateResultForEcommerce() {
     Map<String, Map<AggregateType, RetUnit>> resultMap = new HashMap<>();
     resultMap.put("2021-01", new HashMap<AggregateType, RetUnit>() {{
         put(AggregateType.DISTINCT, new RetUnit(235, 0));
       }
     });
-    ArrayList<OlapRet> results = new ArrayList<>();
+    ArrayList<OLAPRet> results = new ArrayList<>();
 
     for (Map.Entry<String, Map<AggregateType, RetUnit>> entry : resultMap.entrySet()) {
       String groupName = entry.getKey();
       Map<AggregateType, RetUnit> groupValue = entry.getValue();
 
       // assign new result
-      OlapRet newEle = new OlapRet();
+      OLAPRet newEle = new OLAPRet();
       newEle.setTimeRange(null);
       newEle.setKey(groupName);
       newEle.setFieldName("Product_ID");

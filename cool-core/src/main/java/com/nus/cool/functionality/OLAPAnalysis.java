@@ -22,48 +22,39 @@ package com.nus.cool.functionality;
 
 import com.nus.cool.core.cohort.CohortProcessor;
 import com.nus.cool.core.cohort.CohortQueryLayout;
+import com.nus.cool.core.cohort.OLAPProcessor;
+import com.nus.cool.core.cohort.OLAPQueryLayout;
 import com.nus.cool.core.cohort.storage.CohortRet;
+import com.nus.cool.core.cohort.storage.OLAPRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * OLAP analysis operation.
  */
 public class OLAPAnalysis {
   /**
-   * perform cohort query to conduct cohort analysis.
+   * perform OLAP query to conduct cohort analysis.
    *
    * @param cubeRepo cube path: the path to all datasets, e.g., CubeRepo
    * @param queryPath query path: the path to the cohort query, e.g.,
-   *                  datasets/health_raw/sample_query_distinctcount/query.json
+   *                  datasets/ecommerce/queries/query.json
    */
-  public static CohortRet performCohortAnalysis(String cubeRepo, String queryPath)
+  public static List<OLAPRet> performOLAPAnalysis(String cubeRepo, String queryPath)
       throws IOException {
-    CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
-    CohortProcessor cohortProcessor = new CohortProcessor(layout);
+
+    OLAPQueryLayout layout = OLAPQueryLayout.readFromJson(queryPath);
+    OLAPProcessor olapProcessor = new OLAPProcessor(layout);
 
     // start a new cool model and reload the cube
     CoolModel coolModel = new CoolModel(cubeRepo);
-    coolModel.reload(cohortProcessor.getDataSource());
-    CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
-    File currentVersion = coolModel.getCubeStorePath(cohortProcessor.getDataSource());
-
-    // load input cohort
-    if (cohortProcessor.getInputCohort() != null) {
-      File cohortFile = new File(currentVersion, "cohort/" + cohortProcessor.getInputCohort());
-      if (cohortFile.exists()) {
-        cohortProcessor.readOneCohort(cohortFile);
-      }
-    }
-
-    // get current dir path
-    CohortRet ret = cohortProcessor.process(cube);
-    String cohortStoragePath = cohortProcessor.persistCohort(currentVersion.toString());
-    cohortProcessor.readQueryCohorts(cohortStoragePath);
+    coolModel.reload(layout.getDataSource());
+    CubeRS cube = coolModel.getCube(layout.getDataSource());
+    List<OLAPRet> ret = olapProcessor.processCube(cube);
     coolModel.close();
-
     return ret;
   }
 
@@ -78,7 +69,7 @@ public class OLAPAnalysis {
     String queryPath = args[1];
 
     try {
-      CohortRet ret = performCohortAnalysis(cubeRepo, queryPath);
+      List<OLAPRet> ret = performOLAPAnalysis(cubeRepo, queryPath);
       System.out.println("Result for the query is  " + ret.toString());
     } catch (IOException e) {
       System.out.println(e);

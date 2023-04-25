@@ -3,7 +3,7 @@ package com.nus.cool.core.cohort.olapselect;
 import com.nus.cool.core.cohort.aggregate.AggregateFactory;
 import com.nus.cool.core.cohort.aggregate.AggregateFunc;
 import com.nus.cool.core.cohort.aggregate.AggregateType;
-import com.nus.cool.core.cohort.storage.OlapRet;
+import com.nus.cool.core.cohort.storage.OLAPRet;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.storage.RetUnit;
 import com.nus.cool.core.field.FieldValue;
@@ -28,9 +28,9 @@ public class OLAPAggregator {
    *
    * @param aggregation        aggregation.
    * @param projectedSchemaSet projectedSchemaSet.
-   * @return array of OlapRet.
+   * @return array of OLAPRet.
    */
-  public ArrayList<OlapRet> process(MetaChunkRS metaChunk, ChunkRS dataChunk,
+  public ArrayList<OLAPRet> process(MetaChunkRS metaChunk, ChunkRS dataChunk,
                                     AggregationLayout aggregation,
                                            HashSet<String> projectedSchemaSet,
                                            Map<String, BitSet> group) {
@@ -85,14 +85,14 @@ public class OLAPAggregator {
       }
     }
 
-    ArrayList<OlapRet> results = new ArrayList<>();
+    ArrayList<OLAPRet> results = new ArrayList<>();
 
     for (Map.Entry<String, Map<AggregateType, RetUnit>> entry : resultMap.entrySet()) {
       String groupName = entry.getKey();
       Map<AggregateType, RetUnit> groupValue = entry.getValue();
 
       // assign new result
-      OlapRet newEle = new OlapRet();
+      OLAPRet newEle = new OLAPRet();
       // newEle.setTimeRange(this.timeRange);
       newEle.setKey(groupName);
       newEle.setFieldName(fieldName);

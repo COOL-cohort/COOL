@@ -38,7 +38,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OlapRet {
+public class OLAPRet {
 
   @Data
   private static class AggregatorResult {
@@ -137,7 +137,7 @@ public class OlapRet {
 
   private AggregatorResult aggregatorResult = new AggregatorResult();
 
-  private boolean equalsKey(OlapRet another) {
+  private boolean equalsKey(OLAPRet another) {
     Set<String> set1 = new HashSet<>(Arrays.asList(this.getKey().split("|")));
     Set<String> set2 = new HashSet<>(Arrays.asList(another.getKey().split("|")));
     return set1.equals(set2);
@@ -149,8 +149,8 @@ public class OlapRet {
       return true;
     }
 
-    if ((o instanceof OlapRet)) {
-      OlapRet another = (OlapRet) o;
+    if ((o instanceof OLAPRet)) {
+      OLAPRet another = (OLAPRet) o;
       if (this.equalsKey(another)) {
 
         if (!this.getFieldName().equals((another.getFieldName()))) {
@@ -167,7 +167,7 @@ public class OlapRet {
         return false;
       }
     } else {
-      // not OlapRet instance
+      // not OLAPRet instance
       return false;
     }
   }
@@ -208,7 +208,7 @@ public class OlapRet {
   /**
    * Merge two base results.
    */
-  public static List<OlapRet> merge(List<OlapRet> results) {
+  public static List<OLAPRet> merge(List<OLAPRet> results) {
     BitSet bs = new BitSet();
     bs.set(0, results.size());
     for (int i = 0; i < bs.size(); i++) {
@@ -216,20 +216,20 @@ public class OlapRet {
       if (i < 0) {
         break;
       }
-      OlapRet res1 = results.get(i);
+      OLAPRet res1 = results.get(i);
       for (int j = i + 1; j < bs.size(); j++) {
         j = bs.nextSetBit(j);
         if (j < 0) {
           break;
         }
-        OlapRet res2 = results.get(j);
+        OLAPRet res2 = results.get(j);
         if (res1.equals(res2)) {
           res1.getAggregatorResult().merge(res2.getAggregatorResult());
           bs.clear(j);
         }
       }
     }
-    List<OlapRet> finalRes = new ArrayList<>();
+    List<OLAPRet> finalRes = new ArrayList<>();
     for (int i = 0; i < bs.size(); i++) {
       i = bs.nextSetBit(i);
       if (i < 0) {
