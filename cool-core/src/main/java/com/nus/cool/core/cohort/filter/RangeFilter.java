@@ -133,12 +133,12 @@ public class RangeFilter implements Filter {
     }
 
 
-    RangeField l, r;
-    try{
+    RangeField l;
+    RangeField r;
+    try {
       l = part[0].equals(MinLimit) ? null : ValueWrapper.of(Float.parseFloat(part[0]));
       r = part[1].equals(MaxLimit) ? null : ValueWrapper.of(Float.parseFloat(part[1]));
-    }
-    catch (Exception e)  {
+    } catch (Exception e)  {
       System.out.println("[Warning]. Parse using float failed, element = " + part[0]);
       DayIntConverter dataConverter = new DayIntConverter();
       int intValueMin = dataConverter.toInt(part[0]);
@@ -156,7 +156,7 @@ public class RangeFilter implements Filter {
   }
 
   @Override
-  public void loadMetaInfo(MetaChunkRS metaChunkRS) {
+  public void loadMetaInfo(MetaChunkRS metaChunkRs) {
     // for range Filter, no need to load info
   }
 

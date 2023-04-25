@@ -152,7 +152,7 @@ public class OLAPProcessor {
       FieldRS field = dataChunk.getField(selectionFilter.getDimension());
       Filter currentFilter = selectionFilter.getFilter();
       if (currentFilter.getType().equals(FilterType.Range)) {
-        DataRangeFieldRS rangeField = (DataRangeFieldRS)field;
+        DataRangeFieldRS rangeField = (DataRangeFieldRS) field;
         Scope scope = new Scope(rangeField.minKey(), rangeField.maxKey());
         RangeFilter rangeFilter = (RangeFilter) currentFilter;
         return rangeFilter.accept(scope);
