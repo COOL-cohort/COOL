@@ -18,7 +18,7 @@ import lombok.Getter;
  */
 public class CohortRet {
 
-  private HashMap<String, Xaxis> cohortToValueList;
+  private final HashMap<String, Xaxis> cohortToValueList;
 
   private int min;
 
