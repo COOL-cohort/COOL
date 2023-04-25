@@ -110,7 +110,7 @@
 //   /**
 //    * IO interface.
 //    *
-//    * @param buffer input 
+//    * @param buffer input
 //    * @param fieldType fieldtype
 //    */
 //   public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {

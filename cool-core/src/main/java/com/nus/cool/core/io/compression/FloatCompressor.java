@@ -28,7 +28,7 @@ public class FloatCompressor implements Compressor {
   }
 
   private static void append(BitSet src, int srcStart, BitSet dest, int destStart, int size) {
-    // simplist is to set bit by bit
+    // simplest is to set bit by bit
     for (int i = 0; i < size; i++) {
       dest.set(destStart + i, src.get(srcStart + i));
     }

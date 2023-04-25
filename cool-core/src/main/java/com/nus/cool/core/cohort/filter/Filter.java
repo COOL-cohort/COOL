@@ -1,5 +1,6 @@
 package com.nus.cool.core.cohort.filter;
 
+import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 
@@ -11,7 +12,7 @@ public interface Filter {
   /**
    * Filter a value.
    *
-   * @param value the Input Value to check
+   * @param value this is the global id.
    * @return true if the condition is met, otherwise false
    */
   public Boolean accept(FieldValue value) throws IllegalArgumentException, IllegalStateException;

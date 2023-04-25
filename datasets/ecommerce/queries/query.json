@@ -1,0 +1,14 @@
+{
+  "dataSource": "ecommerce_query",
+  "selection": {
+    "filterType": "filter",
+    "fieldSchema": "Reported_Date",
+    "acceptValue": ["2021-01-01 to 2021-02-01"],
+    "type":"RANGE"},
+  "groupFields":["Reported_Date"],
+  "groupFieldsGranularity": "MONTH",
+  "aggregations":[
+    {"fieldName":"Product_ID","operators":["DISTINCT"]}
+  ],
+  "granularity":"MONTH"
+}

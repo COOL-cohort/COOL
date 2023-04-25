@@ -85,7 +85,8 @@ public class FilterTest {
   public Object[][] generateRangeFilterAcceptInput() {
     return new Object[][] {
         {
-            new FilterLayout(false, new String[] { "MIN-15", "16-2000", "2555-MAX" }, null),
+            new FilterLayout(false, new String[] { "MIN to 15", "16 to 2000", "2555 to MAX" },
+                null),
             new int[] { 12, 55, 555555, 1999, 14, 16, 1999, 2555 } }
         };
   }
@@ -97,7 +98,8 @@ public class FilterTest {
   public Object[][] generateRangeFilterRejectInput() {
     return new Object[][] {
         {
-            new FilterLayout(false, new String[] { "MIN-15", "16-2000", "2555-MAX" }, null),
+            new FilterLayout(false, new String[] { "MIN to 15", "16 to 2000", "2555 to MAX" },
+                null),
             new int[] { 2001, 2222, 2244 } }
         };
   }

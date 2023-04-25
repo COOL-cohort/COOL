@@ -128,6 +128,7 @@ public class CohortProcessor {
     for (CubletRS cublet : cube.getCublets()) {
       processCublet(cublet);
 
+      // todo: separate a new method
       // record result user id list
       for (Map.Entry<String, List<String>> ele : this.result.getCohortToUserIdList().entrySet()) {
         String cohortName = ele.getKey();
@@ -302,6 +303,7 @@ public class CohortProcessor {
     String userId = userMetaField.get(userGlobalID).map(FieldValue::getString).orElse("");
 
     // only process the user in previous cohort.
+    // todo: nl why?
     if (!this.previousCohortUsers.isEmpty() && !previousCohortUsers.contains(userId)) {
       return;
     }

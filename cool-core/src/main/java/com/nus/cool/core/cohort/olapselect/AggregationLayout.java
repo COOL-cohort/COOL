@@ -17,24 +17,24 @@
  * under the License.
  */
 
-package com.nus.cool.core.io.readstore;
+package com.nus.cool.core.cohort.olapselect;
 
-import com.nus.cool.core.field.FieldValue;
-import com.nus.cool.core.io.Input;
-import com.nus.cool.core.schema.FieldType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.nus.cool.core.cohort.aggregate.AggregateType;
+import java.util.List;
+import lombok.Data;
 
 /**
- * Interface of read stores of fields in data chunks.
+ * Aggregation.
  */
-public interface FieldRS extends Input {
+@Data
+public class AggregationLayout {
 
-  FieldType getFieldType();
+  // filed name used to do the aggregation
+  @JsonProperty("fieldName")
+  private String fieldName;
 
-  /**
-   * Get the idx tuple's value in this field.
-   *
-   * @param idx index of tuple
-   * @return int globalId of value
-   */
-  FieldValue getValueByIndex(int idx);
+  // get aggregator
+  @JsonProperty("operators")
+  private List<AggregateType> operators;
 }

@@ -3,6 +3,7 @@ package com.nus.cool.core.cohort.filter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Read from json file into FilterLayout.
@@ -10,6 +11,7 @@ import lombok.Getter;
  **/
 public class FilterLayout {
   @Getter
+  @Setter
   private String fieldSchema;
 
   @Getter

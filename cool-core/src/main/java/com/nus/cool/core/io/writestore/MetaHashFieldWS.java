@@ -56,6 +56,7 @@ public class MetaHashFieldWS implements MetaFieldWS {
   protected final Charset charset;
   protected final FieldType fieldType;
 
+  // hash(value): global id
   protected Map<Integer, Integer> fingerToGid = Maps.newTreeMap();
   protected final List<HashField> valueList = new ArrayList<>();
 

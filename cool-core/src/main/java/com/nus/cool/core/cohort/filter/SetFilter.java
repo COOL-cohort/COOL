@@ -1,5 +1,6 @@
 package com.nus.cool.core.cohort.filter;
 
+import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
@@ -32,7 +33,7 @@ public abstract class SetFilter implements Filter {
       public Boolean accept(Integer value) {
         return true;
       }
-      
+
       @Override
       public Boolean accept(String value) {
         return true;

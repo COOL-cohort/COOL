@@ -56,14 +56,14 @@ public class DayIntConverter implements ActionTimeIntConverter {
     return Days.daysBetween(BASE, end).getDays();
   }
 
-  // /**
-  //  * Get date according to number of days past the reference day.
-  //  *
-  //  * @param days number of days past the reference day
-  //  * @return date string value for specific format
-  //  */
-  // public String getString(int days) {
-  //   DateTime dt = DateBase.BASE.plusDays(days);
-  //   return DateBase.FORMATTER.print(dt);
-  // }
+  /**
+   * Get date according to number of days past the reference day.
+   *
+   * @param days number of days past the reference day
+   * @return date string value for specific format
+   */
+  public String getString(int days) {
+    DateTime dt = BASE.plusDays(days);
+    return FORMATTER.print(dt);
+  }
 }

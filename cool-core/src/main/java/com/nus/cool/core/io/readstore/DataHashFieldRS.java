@@ -45,9 +45,6 @@ public class DataHashFieldRS implements FieldRS {
    * @param ft     fieldtype
    */
   public void readFromWithFieldType(ByteBuffer buffer, FieldType ft) {
-    // get codec (no used)
-    // buffer.get();
-
     this.fieldType = ft;
     // this.keyVector = InputVectorFactory.readFrom(buf);
 
@@ -72,7 +69,6 @@ public class DataHashFieldRS implements FieldRS {
   public IntRangeField getValueByIndex(int idx) {
     return this.keyVector.getValue(this.valueVector.get(idx));
   }
-
 
 
   // // Methods to keep compatiablity with old version code

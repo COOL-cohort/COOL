@@ -24,7 +24,7 @@ public class DataRangeFieldRS implements FieldRS {
    * static create function.
    *
    * @param buf memory
-   * @param ft     fieldtype
+   * @param ft  fieldtype
    * @return DataRangeFieldRS
    */
   public static DataRangeFieldRS readFrom(ByteBuffer buf, FieldType ft) {
