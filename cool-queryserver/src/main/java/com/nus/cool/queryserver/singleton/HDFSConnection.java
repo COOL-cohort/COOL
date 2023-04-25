@@ -6,14 +6,6 @@ import com.nus.cool.core.cohort.ExtendedCohortQuery;
 import com.nus.cool.core.iceberg.query.IcebergQuery;
 import com.nus.cool.core.iceberg.result.BaseResult;
 import com.nus.cool.core.schema.TableSchema;
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,11 +14,17 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+
 
 /**
- * Initialize HDFS connection
+ * Initialize HDFS connection.
  */
 public class HDFSConnection {
 
@@ -34,6 +32,9 @@ public class HDFSConnection {
 
   private FileSystem fs;
 
+  /**
+   * getInstance.
+   */
   public static HDFSConnection getInstance() throws URISyntaxException, IOException {
     if (instance == null) {
       synchronized (HDFSConnection.class) {
@@ -50,27 +51,28 @@ public class HDFSConnection {
   }
 
   /**
-   * Connect to hdfs
+   * Connect to hdfs.
    *
-   * @throws URISyntaxException
-   * @throws IOException
+   * @throws URISyntaxException URISyntaxException
+   * @throws IOException IOException
    */
   public void connect() throws URISyntaxException, IOException {
     System.out.println("connect to HDFS");
 
     ModelConfig.getInstance();
-    String HDFS_HOST = "hdfs://" + ModelConfig.props.getProperty("hdfs.host") + ":9000";
-    fs = FileSystem.get(new URI(HDFS_HOST), new Configuration());
+    String hdfsHost = "hdfs://" + ModelConfig.props.getProperty("hdfs.host") + ":9000";
+    fs = FileSystem.get(new URI(hdfsHost), new Configuration());
   }
 
   /**
-   * Return contents of url assigned to each worker
+   * Return contents of url assigned to each worker.
    *
    * @param source    cubeName, data source name
    * @param queryId   0, 1 which kinds of query to run
    * @param queryType cohort / iceberg
-   * @return list of contents, eg. cohort?path=hdfs://localhost:9000/cube/health/v1/&file=1805b2fdb75.dz&queryId=1
-   * @throws IOException
+   * @return list of contents,
+   *     eg. cohort?path=hdfs://localhost:9000/cube/health/v1/&file=1805b2fdb75.dz&queryId=1
+   * @throws IOException IOException
    */
   public List<String> getParameters(String source, String queryId, String queryType)
       throws IOException {
@@ -95,11 +97,11 @@ public class HDFSConnection {
   }
 
   /**
-   * Read result from HDFS
+   * Read result from HDFS.
    *
-   * @param queryId
-   * @return
-   * @throws IOException
+   * @param queryId queryId
+   * @return result
+   * @throws IOException IOException
    */
   public List<BaseResult> getResult(String queryId) throws IOException {
     FileStatus[] statuses = fs.listStatus(new Path("/tmp/" + queryId + "/results"));
@@ -117,22 +119,21 @@ public class HDFSConnection {
   }
 
   /**
-   * Get query resut from hdfs
+   * Get query resut from hdfs.
    *
-   * @param queryId
-   * @return
-   * @throws IOException
+   * @param queryId queryId
+   * @throws IOException IOException
    */
   public FileStatus[] getResults(String queryId) throws IOException {
     return fs.listStatus(new Path("/tmp/" + queryId + "/results"));
   }
 
   /**
-   * Add query result from hdfs
+   * Add query result from hdfs.
    *
-   * @param queryId
-   * @param content
-   * @throws IOException
+   * @param queryId queryId
+   * @param content content
+   * @throws IOException IOException
    */
   public void createResult(String queryId, String content) throws IOException {
     String resId = "res_" + UUID.randomUUID().toString();
@@ -141,11 +142,10 @@ public class HDFSConnection {
   }
 
   /**
-   * Create query file in hdfs
+   * Create query file in hdfs.
    *
-   * @param query
-   * @return
-   * @throws IOException
+   * @param query query
+   * @throws IOException IOException
    */
   public String createQuery(IcebergQuery query) throws IOException {
     String queryId = UUID.randomUUID().toString();
@@ -156,22 +156,20 @@ public class HDFSConnection {
   }
 
   /**
-   * Read icebergQuery from HDFS
+   * Read icebergQuery from HDFS.
    *
-   * @param queryId
-   * @return
-   * @throws IOException
+   * @param queryId queryId
+   * @throws IOException IOException
    */
   public IcebergQuery readIcebergQuery(String queryId) throws IOException {
     return IcebergQuery.read(fs.open(new Path("/tmp/" + queryId + "/query.json")));
   }
 
   /**
-   * Read cohort query from HDFS
+   * Read cohort query from HDFS.
    *
-   * @param queryId
-   * @return
-   * @throws IOException
+   * @param queryId queryId
+   * @throws IOException IOException
    */
   public ExtendedCohortQuery readCohortQuery(String queryId) throws IOException {
     return ExtendedCohortQuery.read(fs.open(new Path("/tmp/" + queryId + "/query.json")));
@@ -179,22 +177,22 @@ public class HDFSConnection {
 
 
   /**
-   * Copy local file to hdfs
+   * Copy local file to hdfs.
    *
    * @param localPath localPath
    * @param dfsPath   localPath
-   * @throws IOException
+   * @throws IOException IOException
    */
   public void uploadToDfs(String localPath, String dfsPath) throws IOException {
     fs.copyFromLocalFile(new Path(localPath), new Path(dfsPath));
   }
 
   /**
-   * Read cohort tableSchema from HDFS
+   * Read cohort tableSchema from HDFS.
    *
    * @param path yaml path
    * @return table schema instance
-   * @throws IOException
+   * @throws IOException IOException
    */
   public TableSchema readTableSchema(String path) throws IOException {
     InputStream in = fs.open(new Path(path + "table.yaml"));
@@ -202,7 +200,7 @@ public class HDFSConnection {
   }
 
   /**
-   * Create path for table yaml
+   * Create path for table yaml.
    *
    * @param path path for yaml file
    */
@@ -213,18 +211,25 @@ public class HDFSConnection {
   }
 
   /**
-   * Read readCublet tableSchema from HDFS
+   * Read readCublet tableSchema from HDFS.
    *
    * @param path path
    * @param file file
    * @return ByteBuffer
-   * @throws IOException
+   * @throws IOException IOException
    */
   public ByteBuffer readCublet(String path, String file) throws IOException {
     // System.out.println("start read cublet");
     return ByteBuffer.wrap(IOUtils.toByteArray(fs.open(new Path(path + file))));
   }
 
+  /**
+   * Main func .
+   *
+   * @param args args
+   * @throws URISyntaxException URISyntaxException
+   * @throws IOException IOException
+   */
   public static void main(String[] args) throws URISyntaxException, IOException {
     HDFSConnection fs = HDFSConnection.getInstance();
 
@@ -246,6 +251,6 @@ public class HDFSConnection {
     String dfsPath2 = "/cube/health/v1/table.yaml";
     fs.uploadToDfs(localPath2, dfsPath2);
 
-//        ByteBuffer res = fs.readCublet("/health", "/1805b2fdb75.dz");
+    //        ByteBuffer res = fs.readCublet("/health", "/1805b2fdb75.dz");
   }
 }

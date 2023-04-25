@@ -1,12 +1,11 @@
 package com.nus.cool.queryserver.singleton;
 
 import com.nus.cool.queryserver.model.Parameter;
-
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
- * Controller assign task into queue
+ * Controller assign task into queue.
  */
 public class TaskQueue {
 
@@ -17,6 +16,9 @@ public class TaskQueue {
   private TaskQueue() {
   }
 
+  /**
+   * getInstance.
+   */
   public static TaskQueue getInstance() {
     if (instance == null) {
       synchronized (TaskQueue.class) {

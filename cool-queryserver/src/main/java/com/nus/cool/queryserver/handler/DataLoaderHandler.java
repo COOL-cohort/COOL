@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 
+/**
+ * DataLoaderHandler.
+ */
 @RestController
 public class DataLoaderHandler {
 
@@ -21,13 +24,16 @@ public class DataLoaderHandler {
     return "This is the backend for the COOL system.\n";
   }
 
-    @PostMapping(value = "/load",
-        produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> load(@RequestBody LoadQuery req) throws IOException {
-      System.out.println("[*] This query is for loading a new cube: " + req);
+  /**
+   * load cube.
+   */
+  @PostMapping(value = "/load",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> load(@RequestBody LoadQuery req) throws IOException {
+    System.out.println("[*] This query is for loading a new cube: " + req);
 
-      return QueryServerModel.loadCube(req);
-    }
+    return QueryServerModel.loadCube(req);
+  }
 
 }

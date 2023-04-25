@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+/**
+ * RequestInterceptor.
+ */
 @Component
 public class RequestInterceptor implements HandlerInterceptor {
 

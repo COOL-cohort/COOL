@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.Properties;
 import lombok.Data;
 
+/**
+ * Global config.
+ */
 @Data
 public class ModelConfig {
 
@@ -17,6 +20,9 @@ public class ModelConfig {
 
   private static volatile ModelConfig instance = null;
 
+  /**
+   * getInstance.
+   */
   public static ModelConfig getInstance() throws IOException {
     if (instance == null) {
       synchronized (ModelConfig.class) {

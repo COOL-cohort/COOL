@@ -4,15 +4,15 @@ import com.nus.cool.queryserver.model.Parameter;
 import com.nus.cool.queryserver.singleton.TaskQueue;
 import com.nus.cool.queryserver.singleton.WorkerIndex;
 import com.nus.cool.queryserver.singleton.ZKConnection;
+import java.util.List;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
-import java.util.List;
 
 /**
- * listening when zookeeper has change,
+ * listening when zookeeper has change.
  */
 public class WorkerWatcher implements Watcher {
 

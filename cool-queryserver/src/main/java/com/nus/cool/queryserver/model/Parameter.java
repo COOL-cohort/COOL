@@ -1,5 +1,8 @@
 package com.nus.cool.queryserver.model;
 
+/**
+ * cube.
+ */
 public class Parameter implements Comparable<Parameter> {
 
   private final Integer priority;

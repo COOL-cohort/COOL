@@ -3,18 +3,22 @@ package com.nus.cool.queryserver.singleton;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nus.cool.queryserver.model.NodeInfo;
 import com.nus.cool.queryserver.model.Worker;
-import org.apache.zookeeper.*;
-import org.apache.zookeeper.data.Stat;
-
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
 
+
+/**
+ * Zookeeper singleton.
+ */
 public class ZKConnection {
 
   private static volatile ZKConnection instance = null;
@@ -23,6 +27,9 @@ public class ZKConnection {
 
   private ZooKeeper zk;
 
+  /**
+   * crate ins.
+   */
   public static ZKConnection getInstance() throws InterruptedException, IOException {
     if (instance == null) {
       synchronized (ZKConnection.class) {
@@ -38,22 +45,25 @@ public class ZKConnection {
     this.connect();
   }
 
+  /**
+   * crate ins.
+   */
   public void connect() throws IOException, InterruptedException {
     System.out.println("connect to zookeeper");
-    String ZK_HOST = "";
+    String zkHost = "";
     ModelConfig.getInstance();
-    ZK_HOST = ModelConfig.props.getProperty("zookeeper.host");
+    zkHost = ModelConfig.props.getProperty("zookeeper.host");
     CountDownLatch latch = new CountDownLatch(1);
-    zk = new ZooKeeper(ZK_HOST, ZK_PORT, watchedEvent -> {
-        if (watchedEvent.getState() == Watcher.Event.KeeperState.SyncConnected) {
-            latch.countDown();
-        }
+    zk = new ZooKeeper(zkHost, ZK_PORT, watchedEvent -> {
+      if (watchedEvent.getState() == Watcher.Event.KeeperState.SyncConnected) {
+        latch.countDown();
+      }
     });
     latch.await();
   }
 
   /**
-   * Add worker information to zookeeper
+   * Add worker information to zookeeper.
    *
    * @param serverHost worker address
    * @throws JsonProcessingException .
@@ -76,6 +86,9 @@ public class ZKConnection {
     zk.create("/broker", serverHost.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
   }
 
+  /**
+   * getWorkers singleton.
+   */
   public List<Worker> getWorkers() throws InterruptedException, KeeperException, IOException {
     List<Worker> workers = new ArrayList<>();
     List<String> workerNameList = zk.getChildren("/workers", false);
@@ -87,18 +100,24 @@ public class ZKConnection {
     return workers;
   }
 
+  /**
+   * getFreeWorkers.
+   */
   public List<Worker> getFreeWorkers() throws InterruptedException, KeeperException, IOException {
     List<Worker> workers = this.getWorkers();
     List<Worker> freeWorkers = new ArrayList<>();
     for (Worker worker : workers) {
       NodeInfo info = worker.getInfo();
-        if (info.getStatus() == NodeInfo.Status.FREE) {
-            freeWorkers.add(worker);
-        }
+      if (info.getStatus() == NodeInfo.Status.FREE) {
+        freeWorkers.add(worker);
+      }
     }
     return freeWorkers;
   }
 
+  /**
+   * allocateWorker.
+   */
   public void allocateWorker(String workerName)
       throws IOException, KeeperException, InterruptedException {
     NodeInfo info = this.getInfo("/workers/" + workerName);
@@ -106,6 +125,9 @@ public class ZKConnection {
     this.zk.setData("/workers/" + workerName, info.toByteArray(), -1);
   }
 
+  /**
+   * relaseWorker.
+   */
   public void relaseWorker(String workerName)
       throws IOException, KeeperException, InterruptedException {
     NodeInfo info = this.getInfo("/workers/" + workerName);
@@ -113,6 +135,9 @@ public class ZKConnection {
     this.zk.setData("/workers/" + workerName, info.toByteArray(), -1);
   }
 
+  /**
+   * getInfo.
+   */
   public NodeInfo getInfo(String path) throws KeeperException, InterruptedException, IOException {
     byte[] bytes = zk.getData(path, false, null);
     return NodeInfo.read(bytes);

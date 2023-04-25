@@ -1,13 +1,21 @@
 package com.nus.cool.queryserver;
 
+import com.nus.cool.queryserver.model.Parameter;
+import com.nus.cool.queryserver.model.QueryInfo;
+import com.nus.cool.queryserver.model.Worker;
 import com.nus.cool.queryserver.singleton.HDFSConnection;
 import com.nus.cool.queryserver.singleton.QueryIndex;
 import com.nus.cool.queryserver.singleton.TaskQueue;
 import com.nus.cool.queryserver.singleton.WorkerIndex;
 import com.nus.cool.queryserver.singleton.ZKConnection;
-import com.nus.cool.queryserver.model.Parameter;
-import com.nus.cool.queryserver.model.QueryInfo;
-import com.nus.cool.queryserver.model.Worker;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -17,17 +25,15 @@ import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * BrokerConsumerThread threads.
+ */
 public class BrokerConsumerThread extends Thread {
 
+  /**
+   * Run.zk.
+   */
   public void run() {
     try {
       // 1. retrieve zk, task queue.
@@ -41,18 +47,18 @@ public class BrokerConsumerThread extends Thread {
       while (true) {
         try {
           TimeUnit.SECONDS.sleep(1);
-            if (taskQueue.size() == 0) {
-                continue;
-            }
+          if (taskQueue.size() == 0) {
+            continue;
+          }
           List<Worker> workers = zk.getFreeWorkers();
-            if (workers == null) {
-                continue;
-            }
+          if (workers == null) {
+            continue;
+          }
           WorkerIndex workerIndex = WorkerIndex.getInstance();
           for (Worker worker : workers) {
-              if (taskQueue.size() == 0) {
-                  break;
-              }
+            if (taskQueue.size() == 0) {
+              break;
+            }
             Parameter p = taskQueue.poll();
             workerIndex.put(worker.getWokerName(), p.getContent());
 
@@ -103,7 +109,8 @@ public class BrokerConsumerThread extends Thread {
             long st = System.currentTimeMillis();
             int index = p.getContent().indexOf("queryId=");
             String queryId = p.getContent().substring(index + 8, index + 9);
-            System.out.println("waiting elapsed: " +
+            System.out.println("waiting elapsed: "
+                +
                 (st - QueryIndex.getInstance().get(queryId).getStartTime()));
           }
         } catch (Exception e) {
@@ -117,6 +124,11 @@ public class BrokerConsumerThread extends Thread {
     }
   }
 
+  /**
+   * Run server.
+   *
+   * @param queryId empty
+   */
   public void check(String queryId) throws IOException, URISyntaxException {
     long end = System.currentTimeMillis();
     QueryIndex queryIndex = QueryIndex.getInstance();
