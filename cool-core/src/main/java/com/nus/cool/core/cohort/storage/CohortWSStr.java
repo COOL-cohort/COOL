@@ -20,7 +20,8 @@
 
 package com.nus.cool.core.cohort.storage;
 
-import com.nus.cool.core.io.DataOutputBuffer;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.io.compression.Histogram;
 import com.nus.cool.core.io.compression.OutputCompressor;
@@ -82,31 +83,13 @@ public class CohortWSStr implements Output {
 
   @Override
   public int writeTo(DataOutput out) throws IOException {
-
     // convert hash set to array
-    ArrayList<String> usersStrSetList = new ArrayList<>(usersStrSet);
-    DataOutputBuffer buffer = new DataOutputBuffer();
-    buffer.writeInt(usersStrSetList.size());
-
-    // Value offsets begin with 0
-    int offset = 0;
-    for (String userIdStr : usersStrSet) {
-      buffer.writeInt(offset);
-      offset += userIdStr.getBytes(this.charset).length;
+    List<FieldValue> userStrArr = new ArrayList<>(usersStrSet.size()); 
+    for (String s : usersStrSet) {
+      userStrArr.add(ValueWrapper.of(s)); 
     }
-
-    // Store String values into the buffer
-    for (String userIdStr : usersStrSet) {
-      buffer.write(userIdStr.getBytes(this.charset));
-    }
-
-    // The codec is written internal
-    Histogram hist =
-        Histogram.builder().type(CompressType.KeyString).rawSize(buffer.size()).build();
-
-    OutputCompressor compressor = new OutputCompressor();
-    compressor.reset(hist, buffer.getData(), 0, buffer.size());
-    return compressor.writeTo(out);
+    return OutputCompressor.writeTo(CompressType.KeyString,
+      Histogram.builder().charset(charset).build(),
+      userStrArr, out);
   }
-
 }

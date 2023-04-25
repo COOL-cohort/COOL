@@ -25,7 +25,7 @@ import java.util.BitSet;
 /**
  * Input vector of a bit vector structure.
  */
-public class BitVectorInputVector implements InputVector {
+public class BitVectorInputVector implements InputVector<Integer> {
 
   private long[] words;
 
@@ -41,7 +41,7 @@ public class BitVectorInputVector implements InputVector {
   }
 
   @Override
-  public int find(int key) {
+  public Integer find(Integer key) {
     int i = wordIndex(key);
     int j = remainder(key);
     long bits = this.words[i] << (63 - j);
@@ -49,7 +49,7 @@ public class BitVectorInputVector implements InputVector {
   }
 
   @Override
-  public int get(int index) {
+  public Integer get(int index) {
     if (this.globalIDs.length == 0) {
       return 0;
     }
@@ -62,7 +62,7 @@ public class BitVectorInputVector implements InputVector {
   }
 
   @Override
-  public int next() {
+  public Integer next() {
     throw new UnsupportedOperationException();
   }
 

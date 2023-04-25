@@ -2,16 +2,14 @@ package com.nus.cool.core.util.writer;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.writestore.DataChunkWS;
 import com.nus.cool.core.io.writestore.MetaChunkWS;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +50,7 @@ public class NativeDataWriter implements DataWriter {
 
   private int tupleCount = Integer.MAX_VALUE;
 
-  private String lastUser = null;
+  private FieldValue lastUser = null;
 
   // record the Header offset of each chunk
   private final List<Integer> chunkHeaderOffsets = Lists.newArrayList();
@@ -103,8 +101,8 @@ public class NativeDataWriter implements DataWriter {
    * @param curUser current user id
    * @return is chunk full or is last user
    */
-  private boolean maybeSwitchChunk(String curUser) throws IOException {
-    if ((tupleCount < chunkSize) || (curUser.equals(lastUser))) {
+  private boolean maybeSwitchChunk(FieldValue curUser) throws IOException {
+    if ((tupleCount < chunkSize) || (curUser.checkEqual(lastUser))) {
       return false;
     }
     finishChunk();
@@ -126,13 +124,13 @@ public class NativeDataWriter implements DataWriter {
     // record header offset
     chunkHeaderOffsets.add(offset - Ints.BYTES);
     // 1. write number of chunks
-    out.writeInt(IntegerUtil.toNativeByteOrder(chunkHeaderOffsets.size()));
+    out.writeInt(chunkHeaderOffsets.size());
     // 2. write header of each chunk
     for (int chunkOff : chunkHeaderOffsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(chunkOff));
+      out.writeInt(chunkOff);
     }
     // 3. write the header offset.
-    out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+    out.writeInt(offset);
     // 4. flush after writing whole Cublet.
     out.flush();
     out.close();
@@ -165,13 +163,8 @@ public class NativeDataWriter implements DataWriter {
   }
 
   @Override
-  public boolean add(Object tuple) throws IOException {
-    if (!(tuple instanceof String[])) {
-      System.out.println("Unexpected tuple type: tuple not in valid type for DataWriter");
-      return false;
-    }
-    String[] insertTuple = (String[]) tuple;
-    String curUser = insertTuple[userKeyIndex];
+  public boolean add(FieldValue[] tuple) throws IOException {
+    FieldValue curUser = tuple[userKeyIndex];
     if (lastUser == null) {
       lastUser = curUser;
     }
@@ -181,9 +174,8 @@ public class NativeDataWriter implements DataWriter {
     }
     lastUser = curUser;
     // update metachunk / metafield
-    metaChunk.put(insertTuple);
-    List<String> dataArray = new ArrayList<String>(Arrays.asList(insertTuple));
-    dataChunk.put((String[]) dataArray.toArray(new String[0]));
+    metaChunk.put(tuple);
+    dataChunk.put(tuple);
     // update data chunk
     tupleCount++;
     return true;

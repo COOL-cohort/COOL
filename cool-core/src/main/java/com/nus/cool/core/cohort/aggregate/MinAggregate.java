@@ -2,6 +2,8 @@ package com.nus.cool.core.cohort.aggregate;
 
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.storage.RetUnit;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.RangeField;
 
 /**
  * Min aggregator.
@@ -18,8 +20,11 @@ public class MinAggregate implements AggregateFunc {
 
   @Override
   public void calculate(RetUnit retUnit, ProjectedTuple tuple) {
-    int parseValue = (Integer) tuple.getValueBySchema(this.schema);
-    float value = (float) parseValue;
+    FieldValue fv = tuple.getValueBySchema(this.schema);
+    if (!(fv instanceof RangeField)) {
+      throw new IllegalArgumentException("Aggregation requires range field");
+    }
+    float value = ((RangeField) fv).getFloat();
     if (!retUnit.isUsed()) {
       retUnit.setValue(value);
       retUnit.setUsed(true);

@@ -37,8 +37,7 @@ public class CompressorAdviser {
   /**
    * Advise the type of compressor to use.
    */
-  public static Codec advise(Histogram hist) {
-    CompressType type = hist.getType();
+  public static Codec advise(CompressType type, Histogram hist) {
     switch (type) {
       case KeyFinger:
         return Codec.INT32;
@@ -50,6 +49,8 @@ public class CompressorAdviser {
         return adviseForValue(hist);
       case ValueFast:
         return Codec.Delta;
+      case Float:
+        return Codec.Float;
       default:
         throw new IllegalArgumentException("Unsupported compress type: " + type);
     }
@@ -61,7 +62,7 @@ public class CompressorAdviser {
   private static Codec adviseForKeyHash(Histogram hist) {
     // max value determine which numeric type is better
     // including INT8, INT16, INT32.
-    int max = (int) hist.getMax();
+    int max = hist.getMax().getInt();
 
     // Get bitSet size to represent n values, n equals max
     int bitmapLength = IntegerUtil.numOfBits(max);
@@ -98,7 +99,7 @@ public class CompressorAdviser {
     //   return Codec.RLE;
     // }
 
-    int max = (int) hist.getMax();
+    int max = hist.getMax().getInt();
     int bitLength = IntegerUtil.minBits(max);
     int byteLength = IntegerUtil.minBytes(max);
     if (bitLength / (byteLength * 8.0) >= 0.7) {

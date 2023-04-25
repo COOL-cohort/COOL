@@ -14,11 +14,8 @@
 
 package com.nus.cool.core.io.storevector;
 
-import com.nus.cool.core.io.Input;
-
 /**
  * Interface for ZIntX encoded structure.
  */
-public interface ZIntStore extends Input {
-
+public interface ZIntStore extends InputVector<Integer> {
 }

@@ -20,9 +20,10 @@
 package com.nus.cool.core.io.compression;
 
 import com.google.common.primitives.Longs;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.util.List;
 
 /**
  * ZIntBitCompressor.
@@ -31,47 +32,31 @@ public class ZIntBitCompressor implements Compressor {
 
   private int numOfBits;
 
-  private int maxCompressedLength;
-
   /**
    * Create a ZintBitCompressor from a histogram.
    */
-  public ZIntBitCompressor(Histogram hist) {
-    if (hist.getMax() >= (1L << 32)) {
+  public ZIntBitCompressor(FieldValue max) {
+    int maxValue = max.getInt();
+    if (maxValue >= (1L << 32)) {
       numOfBits = 64;
     } else {
-      this.numOfBits = IntegerUtil.minBits((int) (hist.getMax() + 1));
+      this.numOfBits = IntegerUtil.minBits(maxValue + 1);
     }
-    int numOfVal = hist.getNumOfValues();
+  }
 
+  @Override
+  public CompressorOutput compress(List<? extends FieldValue> src) {
+    int numOfVal = src.size();
     int numOfValPerPack = 64 / numOfBits;
     int numOfPack = (numOfVal - 1) / numOfValPerPack + 2;
-    this.maxCompressedLength = numOfPack * Longs.BYTES;
-  }
-
-  @Override
-  public int maxCompressedLength() {
-    return this.maxCompressedLength;
-  }
-
-  @Override
-  public int compress(byte[] src, int srcOff, int srcLen, byte[] dest,
-      int destOff, int maxDestLen) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int compress(int[] src, int srcOff, int srcLen, byte[] dest,
-      int destOff, int maxDestLen) {
-
-    ByteBuffer buffer = ByteBuffer.wrap(dest, destOff, maxDestLen);
-    buffer.order(ByteOrder.nativeOrder());
-    buffer.putInt(srcLen);
+    byte[] compressed = new byte[numOfPack * Longs.BYTES];
+    ByteBuffer buffer = ByteBuffer.wrap(compressed);
+    buffer.putInt(src.size());
     buffer.putInt(numOfBits);
 
     Pack packer = new Pack();
-    for (int i = 0; i < srcLen; i++) {
-      packer.pushNext(src[i + srcOff]);
+    for (FieldValue v : src) {
+      packer.pushNext(v.getInt());
 
       if (!packer.hasSlot()) {
         buffer.putLong(packer.pack);
@@ -83,9 +68,7 @@ public class ZIntBitCompressor implements Compressor {
       buffer.putLong(packer.pack);
     }
 
-    // System.out.println(packer.offset);
-
-    return buffer.position();
+    return new CompressorOutput(compressed, buffer.position());
   }
 
   class Pack {

@@ -20,10 +20,13 @@
 package com.nus.cool.core.io.compression;
 
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.schema.Codec;
 import com.nus.cool.core.util.IntegerUtil;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Compress integers using delta encoding, get max delta by max value and min
@@ -44,56 +47,46 @@ public class DeltaCompressor implements Compressor {
    */
   public static final int HEADACC = 8 + 1;
 
-  private int numOfVal;
+  // private int numOfVal;
 
-  private int minValue;
+  private FieldValue min;
 
-  private int maxValue;
+  private FieldValue max;
 
-  public DeltaCompressor(Histogram hist) {
-    this.numOfVal = hist.getNumOfValues();
+  public DeltaCompressor(FieldValue min, FieldValue max) {
+    this.min = min;
+    this.max = max;
+  }
+
+  // @Override
+  private int maxCompressedLength(int count) {
+    return  count * Ints.BYTES + ZIntCompressor.HEADACC + HEADACC;
   }
 
   @Override
-  public int maxCompressedLength() {
-    return (this.numOfVal * Ints.BYTES) + ZIntCompressor.HEADACC + HEADACC;
-  }
-
-  @Override
-  public int compress(byte[] src, int srcOff, int srcLen, byte[] dest,
-      int destOff, int maxDestLen) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int compress(int[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen) {
-    // Get min, max and number of values
-    getMetaData(src, srcOff, srcLen);
-
-    // prepare delta data for compression
-    int[] valuesToCompress = new int[srcLen];
-    for (int i = 0; i < srcLen; i++) {
-      valuesToCompress[i] = src[srcOff + i] - minValue;
-    }
-
-    ByteBuffer buffer = ByteBuffer.wrap(dest, destOff, maxDestLen);
-    buffer.order(ByteOrder.nativeOrder());
+  public CompressorOutput compress(List<? extends FieldValue> src) {
+    int minValue = min.getInt();
+    int maxValue = max.getInt();
+    byte[] buf = new byte[maxCompressedLength(src.size())];
+    ByteBuffer buffer = ByteBuffer.wrap(buf);
     buffer.putInt(minValue);
     buffer.putInt(maxValue);
 
+    // prepare delta data for compression
+    List<FieldValue> valuesToCompress = src.stream()
+        .map(x -> ValueWrapper.of(x.getInt() - minValue))
+        .collect(Collectors.toList());
+
     // Get ZIntCompressor by max delta
     int maxDelta = maxValue - minValue;
-    Histogram hist = Histogram.builder()
-        .max(maxDelta)
-        .numOfValues(numOfVal)
-        .build();
     Codec codec = getCodec(maxDelta);
     // Write codec for ZIntCompressor type, i.e. INT8, INT16, INT32
     buffer.put((byte) codec.ordinal());
-    ZIntCompressor compressor = new ZIntCompressor(codec, hist);
+    ZIntCompressor compressor = new ZIntCompressor(codec, false);
     int offset = HEADACC;
-    return HEADACC + compressor.compress(valuesToCompress, 0, srcLen,
-        dest, destOff + offset, maxDestLen - offset);
+    int compressedDeltaLen = compressor.compress(valuesToCompress,
+        buf, offset, buf.length - offset);
+    return new CompressorOutput(buf, HEADACC + compressedDeltaLen);
   }
 
   private Codec getCodec(int v) {
@@ -107,22 +100,6 @@ public class DeltaCompressor implements Compressor {
         return Codec.INT32;
       default:
         throw new IllegalArgumentException("Unsupported width: " + width);
-    }
-  }
-
-  private void getMetaData(int[] src, int srcOff, int srcLen) {
-    numOfVal = srcLen;
-    minValue = src[0];
-    maxValue = src[0];
-
-    for (int i = 1; i < srcLen; i++) {
-      int cur = src[i + srcOff];
-      if (minValue > cur) {
-        minValue = cur;
-      }
-      if (maxValue < cur) {
-        maxValue = cur;
-      }
     }
   }
 }

@@ -10,15 +10,15 @@ public class SetAcceptFilter extends SetFilter {
   }
 
   @Override
-  public Boolean accept(Integer value) throws RuntimeException {
+  public Boolean accept(Integer value) throws IllegalStateException {
     if (this.gidSet == null) {
-      throw new RuntimeException("Filter is not initialized");
+      throw new IllegalStateException("Filter is not initialized");
     }
     return this.gidSet.contains(value);
   }
 
   @Override
-  public Boolean accept(String value) throws RuntimeException {
+  public Boolean accept(String value) {
     return this.valueSet.contains(value);
   }
 }

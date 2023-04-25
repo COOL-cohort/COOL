@@ -6,6 +6,7 @@ import com.nus.cool.core.cohort.aggregate.AggregateType;
 import com.nus.cool.core.cohort.storage.OlapRet;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.storage.RetUnit;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
@@ -42,7 +43,6 @@ public class OLAPAggregator {
     FieldType fieldType = metaChunk.getMetaField(fieldName).getFieldType();
 
     FieldRS field = dataChunk.getField(fieldName);
-    InputVector valueVec = field.getValueVector();
 
     // 2. init the Aggregate function
     Map<AggregateType, AggregateFunc> aggMap = new HashMap<>();
@@ -70,7 +70,8 @@ public class OLAPAggregator {
         if (nextpos < 0) {
           break;
         }
-        int value = valueVec.get(nextpos);
+
+        FieldValue value = field.getValueByIndex(nextpos);
         tuple.loadAttr(value, fieldName);
         // for each operator.
         for (AggregateType operator : aggregation.getOperators()) {

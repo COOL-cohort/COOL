@@ -5,9 +5,9 @@ import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.cohort.utils.DateUtils;
 import com.nus.cool.core.cohort.utils.TimeUtils;
 import com.nus.cool.core.cohort.utils.TimeWindow;
+import com.nus.cool.core.field.IntRangeField;
+import com.nus.cool.core.field.RangeField;
 import java.time.LocalDateTime;
-
-
 
 /**
  * Store Age condition and filter valid age for cohort Analysis.
@@ -38,9 +38,9 @@ public class AgeSelection {
    */
   public int generateAge(LocalDateTime birthDate, LocalDateTime actionTime) {
     TimeWindow tw = DateUtils.getDifference(birthDate, actionTime, this.unit);
-    int age = (int) tw.getLength();
+    RangeField age = new IntRangeField((int) tw.getLength());
     if (this.scope.isInScope(age)) {
-      return age;
+      return age.getInt();
     }
     return -1;
   }

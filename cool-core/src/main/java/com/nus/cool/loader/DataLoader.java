@@ -19,6 +19,7 @@
 
 package com.nus.cool.loader;
 
+import com.nus.cool.core.field.ValueConverterConfig;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
@@ -142,7 +143,7 @@ public class DataLoader {
      */
     public DataLoader build() throws IOException {
       return new DataLoader(dataSetName, config.createTupleReader(dataFile),
-          config.createTupleParser(tableSchema),
+          config.createTupleParser(tableSchema, new ValueConverterConfig()),
           new NativeDataWriter(tableSchema, outputDir, config.getChunkSize(),
               config.getCubletSize()));
     }

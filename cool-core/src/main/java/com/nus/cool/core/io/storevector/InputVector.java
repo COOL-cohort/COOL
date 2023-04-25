@@ -28,7 +28,7 @@ import com.nus.cool.core.io.Input;
  * If random access method(i.e., find() and get()) is implemented. The find() should be completed at
  * O(log(n)) and the get() should be completed at O(1).
  */
-public interface InputVector extends Input {
+public interface InputVector<T> extends Input {
 
   /**
    * Get number of values of this vector.
@@ -43,7 +43,7 @@ public interface InputVector extends Input {
    * @param key target value
    * @return index
    */
-  int find(int key);
+  T find(T key);
 
   /**
    * Get value by index.
@@ -51,7 +51,7 @@ public interface InputVector extends Input {
    * @param index index
    * @return target value
    */
-  int get(int index);
+  T get(int index);
 
   /**
    * Get vector has next or not.
@@ -65,7 +65,7 @@ public interface InputVector extends Input {
    *
    * @return next value
    */
-  int next();
+  T next();
 
   /**
    * Skip to specific position.

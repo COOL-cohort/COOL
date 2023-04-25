@@ -19,8 +19,12 @@
 
 package com.nus.cool.core.io.readstore;
 
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.RangeField;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.schema.FieldType;
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 
 /**
@@ -30,9 +34,9 @@ public class MetaRangeFieldRS implements MetaFieldRS {
 
   private FieldType fieldType;
 
-  private int min;
+  private RangeField min; // maybe better to use RangeField
 
-  private int max;
+  private RangeField max;
 
   @Override
   public FieldType getFieldType() {
@@ -50,25 +54,30 @@ public class MetaRangeFieldRS implements MetaFieldRS {
   }
 
   @Override
-  public String getString(int i) {
-    return null;
+  public Optional<FieldValue> get(int i) {
+    return Optional.empty();
   }
 
   @Override
-  public int getMaxValue() {
+  public RangeField getMaxValue() {
     return this.max;
   }
 
   @Override
-  public int getMinValue() {
+  public RangeField getMinValue() {
     return this.min;
   }
 
   @Override
   public void readFromWithFieldType(ByteBuffer buffer, FieldType fieldType) {
     this.fieldType = fieldType;
-    this.min = buffer.getInt();
-    this.max = buffer.getInt();
+    if (fieldType == FieldType.Float) {
+      this.min = ValueWrapper.of(buffer.getFloat());
+      this.max = ValueWrapper.of(buffer.getFloat());
+    } else {
+      this.min = ValueWrapper.of(buffer.getInt());
+      this.max = ValueWrapper.of(buffer.getInt());
+    }
   }
 
   @Override

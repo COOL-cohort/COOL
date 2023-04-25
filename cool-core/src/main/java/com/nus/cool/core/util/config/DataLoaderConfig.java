@@ -1,5 +1,6 @@
 package com.nus.cool.core.util.config;
 
+import com.nus.cool.core.field.ValueConverterConfig;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.TupleReader;
@@ -35,5 +36,6 @@ public abstract class DataLoaderConfig {
   public abstract TupleReader createTupleReader(File dataFile)
       throws IOException;
 
-  public abstract TupleParser createTupleParser(TableSchema tableSchema);
+  public abstract TupleParser createTupleParser(TableSchema tableSchema,
+      ValueConverterConfig vcConfig);
 }

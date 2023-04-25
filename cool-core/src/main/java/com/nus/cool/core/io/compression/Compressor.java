@@ -19,41 +19,18 @@
 
 package com.nus.cool.core.io.compression;
 
+import com.nus.cool.core.field.FieldValue;
+import java.util.List;
+
 /**
  * Interface for compression opertors applying to various data structure used in COOL. 
  */
 public interface Compressor {
-
   /**
-   * Estimate the maximum size of compressed data in byte.
-   *
-   * @return number of bytes
-   */
-  int maxCompressedLength();
-
-  /**
-   * Compress a byte array.
+   * Compress an field value array to a byte buffer.
    *
    * @param src        the compressed data
-   * @param srcOff     the start offset in sec
-   * @param srcLen     the number of bytes to compress
-   * @param dest       the destination buffer
-   * @param destOff    the start offset in dest
-   * @param maxDestLen the maximum number of bytes to write in dest
-   * @return the compressed size
+   * @return the compressed bytes
    */
-  int compress(byte[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen);
-
-  /**
-   * Compress an integer array.
-   *
-   * @param src        the compressed data
-   * @param srcOff     the start offset in sec
-   * @param srcLen     the number of bytes to compress
-   * @param dest       the destination buffer
-   * @param destOff    the start offset in dest
-   * @param maxDestLen the maximum number of bytes to write in dest
-   * @return the compressed size
-   */
-  int compress(int[] src, int srcOff, int srcLen, byte[] dest, int destOff, int maxDestLen);
+  CompressorOutput compress(List<? extends FieldValue> src);
 }

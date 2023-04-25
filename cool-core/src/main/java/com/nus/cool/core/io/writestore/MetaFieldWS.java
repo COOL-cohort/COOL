@@ -19,6 +19,7 @@
 
 package com.nus.cool.core.io.writestore;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.Output;
 import com.nus.cool.core.schema.FieldType;
 import java.io.DataOutput;
@@ -35,16 +36,16 @@ public interface MetaFieldWS extends Output {
    * @param tuple tuple item
    * @param idx index of value in tuple
    */
-  void put(String[] tuple, int idx);
+  void put(FieldValue[] tuple, int idx) throws IllegalArgumentException;
 
-  /**
-   * Find the index of value in this meta field, return -1 if no such value
-   * exists.
-   *
-   * @param v target value
-   * @return index of value in this meta field
-   */
-  int find(String v);
+  // /**
+  //  * Find the index of value in this meta field, return -1 if no such value
+  //  * exists.
+  //  *
+  //  * @param v target value
+  //  * @return index of value in this meta field
+  //  */
+  // int find(FieldValue v);
 
   /**
    * Number of entries in this field.

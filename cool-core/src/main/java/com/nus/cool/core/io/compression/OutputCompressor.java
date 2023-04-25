@@ -19,85 +19,38 @@
 
 package com.nus.cool.core.io.compression;
 
-import com.nus.cool.core.io.Output;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.schema.Codec;
+import com.nus.cool.core.schema.CompressType;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.List;
 
 /**
- * Utility class for writing a compressed integer/string vector into disk.
+ * Serialize and compress a list of field values to output.
  */
-public class OutputCompressor implements Output {
-
-  // int or string,
-  private DataType dataType;
-  // Integers vector to be compressed
-  private int[] vec;
-  // String vector to be compressed
-  private byte[] strVec;
-  // the start offset in the data
-  private int off;
-  // the number of bytes read
-  private int len;
-  // statistic information of the vec / strVec
-  private Histogram hist;
+public class OutputCompressor {
 
   /**
-   * Reset the Histogram with an int array.
-   *
-   * @param h   histogram of compress data
-   * @param vec compress data
-   * @param off the start offset in the data
-   * @param len the number of bytes read
+   * Compress the data and write to a data output.
    */
-  public void reset(Histogram h, int[] vec, int off, int len) {
-    this.hist = h;
-    this.vec = vec;
-    this.off = off;
-    this.len = len;
-    this.dataType = DataType.INTEGER;
-  }
-
-  /**
-   * Reset the histogram with a byte array.
-   *
-   * @param h   histogram of compress data
-   * @param vec compress data
-   * @param off the start offset in the data
-   * @param len the number of bytes read
-   */
-  public void reset(Histogram h, byte[] vec, int off, int len) {
-    this.hist = h;
-    this.strVec = vec;
-    this.off = off;
-    this.len = len;
-    this.dataType = DataType.STRING;
-  }
-
-  @Override
-  public int writeTo(DataOutput out) throws IOException {
+  public static int writeTo(CompressType type, Histogram h,
+      List<? extends FieldValue> vec, DataOutput out)
+      throws IOException {
     int bytesWritten = 0;
     // 1. select a compressor type
-    Codec codec = CompressorAdviser.advise(this.hist);
+    Codec codec = CompressorAdviser.advise(type, h);
     // 2. create compressor instance according to the type
-    Compressor compressor = CompressorFactory.newCompressor(codec, this.hist);
-    int maxLen = compressor.maxCompressedLength();
+    Compressor compressor = CompressorFactory.newCompressor(codec, h);
     // 3. compress it and record output to compressed array
-    byte[] compressed = new byte[maxLen];
-    int compressLen = this.dataType == DataType.INTEGER
-        ? compressor.compress(this.vec, this.off, this.len, compressed, 0, maxLen)
-        : compressor.compress(this.strVec, this.off, this.len, compressed, 0, maxLen);
+    CompressorOutput compressed = compressor.compress(vec);
 
     // Write compressor type
     out.writeByte(codec.ordinal());
     bytesWritten++;
     // Write compressed data
-    out.write(compressed, 0, compressLen);
-    bytesWritten += compressLen;
+    out.write(compressed.getBuf(), 0, compressed.getLen());
+    bytesWritten += compressed.getLen();
     return bytesWritten;
-  }
-
-  private enum DataType {
-    INTEGER, STRING
   }
 }

@@ -1,21 +1,20 @@
 package com.nus.cool.core.io.store;
 
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.HashField;
 import com.nus.cool.core.io.DataOutputBuffer;
-import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.io.readstore.DataHashFieldRS;
-import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaHashFieldRS;
 import com.nus.cool.core.io.writestore.DataHashFieldWS;
 import com.nus.cool.core.io.writestore.MetaHashFieldWS;
 import com.nus.cool.core.schema.FieldType;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -32,7 +31,6 @@ public class HashFieldTest {
   private String sourcePath;
   private TestTable table;
   private Charset charset;
-  private OutputCompressor compressor;
 
   /**
    * setup.
@@ -41,11 +39,10 @@ public class HashFieldTest {
   public void setUp() {
     logger.info("Start UnitTest " + HashFieldTest.class.getSimpleName());
     this.charset = Charset.defaultCharset();
-    this.compressor = new OutputCompressor();
     sourcePath = Paths.get(System.getProperty("user.dir"), "src", "test", "java", "com", "nus",
         "cool", "core", "resources").toString();
-    String filepath = Paths.get(sourcePath, "fieldtest", "table.csv").toString();
-    table = TestTable.readFromCSV(filepath);
+    String filepath = Paths.get(sourcePath, "fieldtest").toString();
+    table = Utils.loadTable(filepath);
   }
 
   @AfterTest
@@ -62,15 +59,15 @@ public class HashFieldTest {
         + fType.toString());
 
     int fieldidx = table.getField2Ids().get(fieldName);
-    ArrayList<String> data = table.getCols().get(fieldidx);
+    ArrayList<FieldValue> data = table.getCols().get(fieldidx);
 
     // Generate MetaHashFieldWS
-    MetaHashFieldWS hmws = new MetaHashFieldWS(fType, charset, compressor);
-    DataHashFieldWS ws = new DataHashFieldWS(hmws.getFieldType(), hmws, compressor, false);
+    MetaHashFieldWS hmws = new MetaHashFieldWS(fType, charset);
+    DataHashFieldWS ws = new DataHashFieldWS(hmws.getFieldType(), hmws, false);
 
     // Input col data into metaField
     for (int idx = 0; idx < data.size(); idx++) {
-      String[] tuple = table.getTuple(idx);
+      FieldValue[] tuple = table.getTuple(idx);
       hmws.put(tuple, fieldidx);
       ws.put(data.get(idx));
     }
@@ -82,31 +79,33 @@ public class HashFieldTest {
 
     // Convert DataOutputBuffer to ByteBuffer
     ByteBuffer bf = ByteBuffer.wrap(dob.getData());
-    bf.order(ByteOrder.nativeOrder());
 
     // Read from File
     MetaHashFieldRS hmrs = new MetaHashFieldRS(charset);
     hmrs.readFromWithFieldType(bf, fType);
 
     // validate the MetaField
-    Set<String> valueSet = new HashSet<String>(data);
+    // Set<String> valueSet = new HashSet<String>(data);
+    Set<String> valueSet = data.stream()
+                               .map(x -> x.getString())
+                               .collect(Collectors.toSet());
 
     for (String expected : valueSet) {
       int gid = hmrs.find(expected);
-      String actual = hmrs.getString(gid);
+      String actual = hmrs.get(gid).map(HashField::getString).orElse("");
       Assert.assertEquals(actual, expected);
     }
 
     bf.position(wsPos);
-    FieldRS rs = DataHashFieldRS.readFrom(bf, fType);
+    DataHashFieldRS rs = DataHashFieldRS.readFrom(bf, fType);
 
     // Check the Key Point of HashMetaField and HashField
     Assert.assertEquals(hmws.count(), hmrs.count());
 
     for (int i = 0; i < data.size(); i++) {
-      String expected = data.get(i);
-      int globalId = rs.getValueByIndex(i);
-      String actual = hmrs.getString(globalId);
+      String expected = data.get(i).getString();
+      int gid = rs.getValueByIndex(i).getInt();
+      String actual = hmrs.get(gid).map(HashField::getString).orElse("");
 
       Assert.assertEquals(actual, expected);
     }

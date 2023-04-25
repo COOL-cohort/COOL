@@ -13,6 +13,7 @@ import com.nus.cool.core.cohort.storage.Scope;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
+import com.nus.cool.core.io.readstore.DataRangeFieldRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
@@ -69,7 +70,7 @@ public class OLAPProcessor {
       this.query.getSelection().updateFilterCacheInfo(metaChunk);
       // 2. check if this cublet requires filter requirement.
       if (this.checkMetaChunk(metaChunk, this.query.getSelection())) {
-        // 3. process this cublet dataChunk by data Chunk
+        // 3. process this cublet dataChunk
         for (ChunkRS dataChunk : cublet.getDataChunks()) {
           // 4. check dataChunk
           if (this.checkDataChunk(dataChunk, this.query.getSelection())) {
@@ -149,7 +150,8 @@ public class OLAPProcessor {
       FieldRS field = dataChunk.getField(selectionFilter.getDimension());
       Filter currentFilter = selectionFilter.getFilter();
       if (currentFilter.getType().equals(FilterType.Range)) {
-        Scope scope = new Scope(field.minKey(), field.maxKey());
+        DataRangeFieldRS rangeField = (DataRangeFieldRS)field;
+        Scope scope = new Scope(rangeField.minKey(), rangeField.maxKey());
         return currentFilter.accept(scope);
       } else {
         // skip check in Set Filter

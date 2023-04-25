@@ -5,8 +5,6 @@ import com.google.common.io.Files;
 import com.nus.cool.core.cohort.ageselect.AgeSelection;
 import com.nus.cool.core.cohort.birthselect.BirthSelection;
 import com.nus.cool.core.cohort.cohortselect.CohortSelector;
-import com.nus.cool.core.cohort.filter.Filter;
-import com.nus.cool.core.cohort.filter.FilterType;
 import com.nus.cool.core.cohort.storage.CohortRSStr;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.cohort.storage.CohortWSStr;
@@ -14,6 +12,7 @@ import com.nus.cool.core.cohort.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.storage.RetUnit;
 import com.nus.cool.core.cohort.utils.DateUtils;
 import com.nus.cool.core.cohort.valueselect.ValueSelection;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
@@ -26,7 +25,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -93,7 +91,7 @@ public class CohortProcessor {
     }
     // get cohort selector
     this.cohortSelector = layout.getCohortSelectionLayout().generate();
-    if (this.cohortSelector.getFilter().getType() == FilterType.ALL) {
+    if (this.cohortSelector.selectAll()) {
       this.result = new CohortRet();
     }
     // get value selector
@@ -130,6 +128,7 @@ public class CohortProcessor {
     for (CubletRS cublet : cube.getCublets()) {
       processCublet(cublet);
 
+      // todo: separate a new method
       // record result user id list
       for (Map.Entry<String, List<String>> ele : this.result.getCohortToUserIdList().entrySet()) {
         String cohortName = ele.getKey();
@@ -208,7 +207,7 @@ public class CohortProcessor {
       }
       String extension = f.getName().substring(pointIndex);
       if (!f.isDirectory() && extension.equals(".cohort")) {
-        crs.readFrom(Files.map(f).order(ByteOrder.nativeOrder()));
+        crs.readFrom(Files.map(f));
         this.previousCohortUsers.addAll(crs.getUsers());
       }
     }
@@ -244,7 +243,7 @@ public class CohortProcessor {
     }
     String extension = cohortFile.getName().substring(pointIndex);
     if (!cohortFile.isDirectory() && extension.equals(".cohort")) {
-      crs.readFrom(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
+      crs.readFrom(Files.map(cohortFile));
       this.previousCohortUsers.addAll(crs.getUsers());
     }
   }
@@ -260,15 +259,16 @@ public class CohortProcessor {
     this.filterInit(metaChunk);
 
     // use MetaChunk to skip Cublet
-    if (!this.checkMetaChunk(metaChunk)) {
+    if (this.skipMetaChunk(metaChunk)) {
       return;
     }
 
     // Now start to pass the DataChunk
     for (ChunkRS chunk : cublet.getDataChunks()) {
-      if (this.checkDataChunk(chunk)) {
-        this.processDataChunk(chunk, metaChunk);
+      if (this.skipDataChunk(chunk)) {
+        continue;
       }
+      this.processDataChunk(chunk, metaChunk);
     }
   }
 
@@ -283,13 +283,11 @@ public class CohortProcessor {
     for (int i = 0; i < chunk.getRecords(); i++) {
       // load data into tuple
       for (String schema : this.projectedSchemaSet) {
-        int value = chunk.getField(schema).getValueByIndex(i);
+        FieldValue value = chunk.getField(schema).getValueByIndex(i);
         this.tuple.loadAttr(value, schema);
       }
-
       this.processTuple(metaChunk);
     }
-
   }
 
   /**
@@ -297,11 +295,13 @@ public class CohortProcessor {
    */
   private void processTuple(MetaChunkRS metaChunk) {
     // For One Tuple, we firstly get the userId, and ActionTime
-    int userGlobalID = (int) tuple.getValueBySchema(this.userIdSchema);
+    int userGlobalID = tuple.getValueBySchema(this.userIdSchema).getInt();
     MetaFieldRS userMetaField = metaChunk.getMetaField(this.userIdSchema);
-    String userId = userMetaField.getString(userGlobalID);
+    // String userId = userMetaField.getString(userGlobalID);
+    String userId = userMetaField.get(userGlobalID).map(FieldValue::getString).orElse("");
 
     // only process the user in previous cohort.
+    // todo: nl why?
     if (!this.previousCohortUsers.isEmpty() && !previousCohortUsers.contains(userId)) {
       return;
     }
@@ -310,13 +310,11 @@ public class CohortProcessor {
     // Error: A user with only one record will never be birthed.
     // Please check the CohortSelectionTest.java file
     LocalDateTime actionTime =
-        DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
+        DateUtils.daysSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
     // check whether its birthEvent is selected
     if (!this.birthSelector.isUserSelected(userId)) {
-      // if birthEvent is not selected
       this.birthSelector.selectEvent(userId, actionTime, this.tuple);
     } else {
-      // the birthEvent is selected
       // extract the cohort this tuple belong to
       String cohortName = this.cohortSelector.selectCohort(this.tuple, metaChunk);
       if (cohortName == null) {
@@ -350,56 +348,25 @@ public class CohortProcessor {
    * Check if this cublet contains the required field.
    *
    * @param metaChunk hashMetaFields result
-   * @return true: this metaChunk is valid, false: this metaChunk is invalid.
+   * @return true: this metaChunk is skipped , false otherwise.
    */
-  private Boolean checkMetaChunk(MetaChunkRS metaChunk) {
-
+  private Boolean skipMetaChunk(MetaChunkRS metaChunk) {
     // 1. check birth selection
     // if the metaChunk contains all birth filter's accept value, then the metaChunk
     // is valid.
-    if (this.birthSelector.getBirthEvents() == null) {
-      return true;
-    }
-
-    for (Filter filter : this.birthSelector.getFilterList()) {
-      String checkedSchema = filter.getFilterSchema();
-      MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
-      if (this.checkMetaField(metaField, filter)) {
-        return true;
-      }
-    }
-
     // 2. check birth selection
-    Filter cohortFilter = this.cohortSelector.getFilter();
-    String checkedSchema = cohortFilter.getFilterSchema();
-    MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
-    if (this.checkMetaField(metaField, cohortFilter)) {
-      return true;
-    }
-
     // 3. check value Selector,
-    for (Filter ft : this.valueSelector.getFilterList()) {
-      String valueSchema = ft.getFilterSchema();
-      MetaFieldRS valueMetaField = metaChunk.getMetaField(valueSchema);
-      if (this.checkMetaField(valueMetaField, ft)) {
-        return true;
-      }
-    }
-    return false;
+    return birthSelector.maybeSkipMetaChunk(metaChunk)
+      && cohortSelector.maybeSkipMetaChunk(metaChunk)
+      && valueSelector.maybeSkipMetaChunk(metaChunk);
   }
 
-  /**
-   * Now is not implemented.
-   */
-  public Boolean checkMetaField(MetaFieldRS metaField, Filter ft) {
-    return true;
-  }
 
   /***
    * Now is not implemented.
    */
-  public Boolean checkDataChunk(ChunkRS chunk) {
-    return true;
+  public Boolean skipDataChunk(ChunkRS chunk) {
+    return false;
   }
 
   /**
@@ -409,19 +376,14 @@ public class CohortProcessor {
    */
   private void filterInit(MetaChunkRS metaChunkRS) {
     // init birthSelector
-    for (Filter filter : this.birthSelector.getFilterList()) {
-      filter.loadMetaInfo(metaChunkRS);
-    }
+    this.birthSelector.loadMetaInfo(metaChunkRS);
 
     // init cohort
-    this.cohortSelector.getFilter().loadMetaInfo(metaChunkRS);
+    this.cohortSelector.loadMetaInfo(metaChunkRS);
 
     // value age
     if (this.valueSelector != null) {
-      for (Filter filter : this.valueSelector.getFilterList()) {
-        filter.loadMetaInfo(metaChunkRS);
-      }
+      valueSelector.loadMetaInfo(metaChunkRS);
     }
-
   }
 }

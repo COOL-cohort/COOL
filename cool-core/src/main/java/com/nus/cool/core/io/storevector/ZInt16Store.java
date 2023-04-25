@@ -32,30 +32,13 @@ import java.nio.ShortBuffer;
  * | count | ZInt compressed integers |
  * ------------------------------------
  */
-public class ZInt16Store implements ZIntStore, InputVector {
+public class ZInt16Store implements ZIntStore {
 
-  private final int count;
+  private int count;
 
-  private final boolean sorted;
+  private boolean sorted;
 
   private ShortBuffer buffer;
-
-  public ZInt16Store(int count, boolean sorted) {
-    this.count = count;
-    this.sorted = sorted;
-  }
-
-  /**
-   * Create input vector on a buffer that is ZInt16 encoded.
-   */
-  public static ZIntStore load(ByteBuffer buffer) {
-    int n = buffer.getInt();
-    int flag = buffer.get(); // get byte into int
-    boolean sorted = flag == 1 ? true : false;
-    ZIntStore store = new ZInt16Store(n, sorted);
-    store.readFrom(buffer);
-    return store;
-  }
 
   @Override
   public int size() {
@@ -63,19 +46,20 @@ public class ZInt16Store implements ZIntStore, InputVector {
   }
 
   @Override
-  public int find(int key) {
+  public Integer find(Integer key) {
     if (key > Short.MAX_VALUE || key < 0) {
       return -1;
     }
     if (this.sorted) {
-      return ShortBuffers.binarySearchUnsigned(this.buffer, 0, this.buffer.limit(), (short) key);
+      return ShortBuffers.binarySearchUnsigned(this.buffer, 0,
+        this.buffer.limit(), key.shortValue());
     } else {
-      return ShortBuffers.traverseSearch(this.buffer, 0, this.buffer.limit(), (short) key);
+      return ShortBuffers.traverseSearch(this.buffer, 0, this.buffer.limit(), key.shortValue());
     }
   }
 
   @Override
-  public int get(int index) {
+  public Integer get(int index) {
     return (this.buffer.get(index) & 0xFFFF);
   }
 
@@ -85,7 +69,7 @@ public class ZInt16Store implements ZIntStore, InputVector {
   }
 
   @Override
-  public int next() {
+  public Integer next() {
     return (this.buffer.get() & 0xFFFF);
   }
 
@@ -96,6 +80,9 @@ public class ZInt16Store implements ZIntStore, InputVector {
 
   @Override
   public void readFrom(ByteBuffer buffer) {
+    this.count = buffer.getInt();
+    int flag = buffer.get(); // get byte into int
+    this.sorted = flag == 1;
     int limit = buffer.limit();
     int newLimit = buffer.position() + this.count * Shorts.BYTES;
     buffer.limit(newLimit);

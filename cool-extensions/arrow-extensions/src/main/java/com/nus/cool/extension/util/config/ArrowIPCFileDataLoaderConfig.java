@@ -1,16 +1,17 @@
 package com.nus.cool.extension.util.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
+import com.nus.cool.core.field.FieldValue;
+import com.nus.cool.core.field.ValueConverter;
+import com.nus.cool.core.field.ValueConverterConfig;
 import com.nus.cool.core.schema.TableSchema;
 import com.nus.cool.core.util.config.DataLoaderConfig;
 import com.nus.cool.core.util.parser.TupleParser;
 import com.nus.cool.core.util.reader.TupleReader;
 import com.nus.cool.extension.util.arrow.ArrowRowView;
 import com.nus.cool.extension.util.reader.ArrowIPCFileTupleReader;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import org.apache.arrow.memory.RootAllocator;
 
 /**
@@ -33,29 +34,30 @@ public class ArrowIPCFileDataLoaderConfig extends DataLoaderConfig {
 
   @Override
   public TupleReader createTupleReader(File dataFile)
-    throws IOException {
+      throws IOException {
     FileInputStream fileInputStream = new FileInputStream(dataFile); 
     return new ArrowIPCFileTupleReader(fileInputStream, new RootAllocator());
   }
 
   @Override
-  public TupleParser createTupleParser(TableSchema tableSchema) {
+  public TupleParser createTupleParser(TableSchema tableSchema, ValueConverterConfig vcConfig) {
     return new TupleParser() {
+      private final ValueConverter converter = new ValueConverter(tableSchema, vcConfig);
+
       @Override
-      public String[] parse(Object tuple) {
+      public FieldValue[] parse(Object tuple) throws IOException {
         if (!(tuple instanceof ArrowRowView)) {
-          System.out.println("Unexpected tuple type: not ArrowRowView.");
-          return new String[0];
+          throw new IOException("Invalid input to arrow tuple parser");
         }
 
         ArrowRowView arrowTuple = (ArrowRowView) tuple;
         
-        return tableSchema.getFields()
+        return converter.convert(tableSchema.getFields()
                           .stream()
                           .map(x -> arrowTuple.getField(x.getName())
                                               .map(s -> s.toString())
                                               .orElse("null"))
-                          .toArray(String[]::new);
+                          .toArray(String[]::new));
       }
     };
   }

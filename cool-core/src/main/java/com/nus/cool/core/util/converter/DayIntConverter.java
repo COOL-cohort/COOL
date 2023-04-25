@@ -21,22 +21,27 @@ package com.nus.cool.core.util.converter;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * DayIntConverter converts the input day represented in format yyyy-MM-dd to integer which is the
  * number of days past the reference day.
  */
-public class DayIntConverter implements NumericConverter {
+public class DayIntConverter implements ActionTimeIntConverter {
 
-  private static class DayIntConverterHolder {
-    private static final DayIntConverter INSTANCE = new DayIntConverter();
-  }
+  /**
+   * Date formatter.
+   */
+  public static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
 
-  private DayIntConverter() {
-  }
+  /**
+   * Reference day.
+   */
+  public static final DateTime BASE = FORMATTER.parseDateTime("1970-01-01");
 
-  public static DayIntConverter getInstance() {
-    return DayIntConverterHolder.INSTANCE;
+  public static ActionTimeIntConverter getInstance() {
+    return x -> Days.daysBetween(BASE, FORMATTER.parseDateTime(x)).getDays();
   }
 
   /**
@@ -45,19 +50,20 @@ public class DayIntConverter implements NumericConverter {
    * @param v date string value
    * @return number of days past the reference day
    */
+  @Override
   public int toInt(String v) {
-    DateTime end = DateBase.FORMATTER.parseDateTime(v);
-    return Days.daysBetween(DateBase.BASE, end).getDays();
+    DateTime end = FORMATTER.parseDateTime(v);
+    return Days.daysBetween(BASE, end).getDays();
   }
 
-  /**
-   * Get date according to number of days past the reference day.
-   *
-   * @param days number of days past the reference day
-   * @return date string value for specific format
-   */
-  public String getString(int days) {
-    DateTime dt = DateBase.BASE.plusDays(days);
-    return DateBase.FORMATTER.print(dt);
-  }
+   /**
+    * Get date according to number of days past the reference day.
+    *
+    * @param days number of days past the reference day
+    * @return date string value for specific format
+    */
+   public String getString(int days) {
+     DateTime dt = BASE.plusDays(days);
+     return FORMATTER.print(dt);
+   }
 }

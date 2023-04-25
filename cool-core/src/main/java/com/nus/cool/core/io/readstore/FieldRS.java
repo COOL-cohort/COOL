@@ -19,8 +19,8 @@
 
 package com.nus.cool.core.io.readstore;
 
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.Input;
-import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.schema.FieldType;
 
 /**
@@ -31,62 +31,10 @@ public interface FieldRS extends Input {
   FieldType getFieldType();
 
   /**
-   * Return the hash index vector. If the field is
-   * indexed by range indexing, an IllegalStateException is thrown.
-   *
-   * @return InputVector
-   *
-   * @deprecated
-   *             This method is no longer acceptable to get the value from FieldRS
-   *             <p>
-   *             Use {@link #getValueByIndex(int) instead}.
-   */
-  InputVector getKeyVector();
-
-  /**
-   * Return the local id of each column.
-   *
-   * @return InputVector
-   *
-   * @deprecated
-   *             This method is no longer acceptable to get the value from FieldRS
-   *             <p>
-   *             Use {@link #getValueByIndex(int) instead}.
-   *             Returns the value vector of this field.
-   */
-  InputVector getValueVector();
-
-  /**
-   * Returns the minKey if the field is range indexed.
-   * IllegalStateException is thrown if the field is hash indexed.
-   *
-   * @return int
-   */
-  int minKey();
-
-  /**
-   * Returns the maxKey if the field is range indexed.
-   * IllegalStateException is thrown if the field is hash indexed.
-   *
-   * @return int
-   */
-  int maxKey();
-
-  /**
-   * Get the global id for set, or actual value for range.
+   * Get the idx tuple's value in this field.
    *
    * @param idx index of tuple
    * @return int globalId of value
    */
-  int getValueByIndex(int idx);
-
-  // void readFromWithFieldType(ByteBuffer buf, FieldType fieldType);
-
-  /**
-   * Get the number of record in this field.
-   *
-   * @return i number of records
-   */
-  int getFieldSize();
-
+  FieldValue getValueByIndex(int idx);
 }

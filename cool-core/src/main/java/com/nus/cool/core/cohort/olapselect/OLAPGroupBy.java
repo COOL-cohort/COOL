@@ -20,6 +20,7 @@
 package com.nus.cool.core.cohort.olapselect;
 
 import com.nus.cool.core.cohort.OLAPQueryLayout.GranularityType;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
@@ -31,6 +32,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.Getter;
 
 /**
@@ -113,14 +115,14 @@ public class OLAPGroupBy {
     // get all local ids ( hash ), or value ( range )
 
     int i = 0;
-    while (i < field.getFieldSize()) {
+    while (i < bs.size()) {
       // get the true position starting from i
       int nextPos = bs.nextSetBit(i);
       // if no true, skip checking.
       if (nextPos < 0) {
         break;
       }
-      int id = field.getValueByIndex(nextPos);
+      int id = field.getValueByIndex(nextPos).getInt();
       if (id2Bs.get(id) == null) {
         BitSet groupBs = new BitSet(bs.size()); // number of records
         groupBs.set(nextPos);
@@ -160,14 +162,14 @@ public class OLAPGroupBy {
     // get all local ids ( hash ), or value ( range )
 
     int i = 0;
-    while (i < field.getFieldSize()) {
+    while (i < bs.size()) {
       int nextPos = bs.nextSetBit(i);
       if (nextPos < 0) {
         break;
       }
       // convert data int to month str according to granularity
-      int dataInt = field.getValueByIndex(nextPos);
-      DayIntConverter converter = DayIntConverter.getInstance();
+      int dataInt = field.getValueByIndex(nextPos).getInt();
+      DayIntConverter converter = new DayIntConverter();
       String dataStr = converter.getString(dataInt);
       // convert to month based string
       String[] parts = dataStr.split("-");
@@ -229,7 +231,7 @@ public class OLAPGroupBy {
     switch (type) {
       case STRING: {
         // value is globalId => the filed => string
-        return metaField.getString(value);
+        return metaField.get(value).map(FieldValue::getString).orElse("");
       }
       case NUMERIC: {
         return String.valueOf(value);

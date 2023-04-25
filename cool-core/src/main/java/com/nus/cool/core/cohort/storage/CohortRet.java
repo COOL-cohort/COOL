@@ -82,7 +82,7 @@ public class CohortRet {
    */
   private int getCohortAge(int index) {
     Preconditions.checkArgument(index <= max && index >= min,
-        "input tuple didn't pass the ageSelection");
+        "input tuple didn't pass the ageSelection" + index + "min: " + min + "max: " + max);
     int offset = (index - this.min) / this.interval;
     return offset;
   }

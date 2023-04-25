@@ -52,7 +52,12 @@ public enum FieldType {
   /**
    * Numeric.
    */
-  Metric;
+  Metric,
+
+  /**
+   * Float.
+   */
+  Float;
 
   /**
    * Translate an integer to its corresponding field type.
@@ -71,6 +76,8 @@ public enum FieldType {
         return Segment;
       case 5:
         return Metric;
+      case 6:
+        return Float;
       default:
         throw new IllegalArgumentException("Invalid field type int: " + i);
     }
@@ -88,6 +95,7 @@ public enum FieldType {
         return true;
       case ActionTime:
       case Metric:
+      case Float:
         return false;
       default:
         throw new IllegalArgumentException("Invalid field" + fieldType.toString());

@@ -4,6 +4,7 @@ import com.nus.cool.core.cohort.birthselect.BirthSelection;
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.storage.ProjectedTuple;
 import com.nus.cool.core.cohort.utils.DateUtils;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.readstore.CubletRS;
@@ -94,7 +95,7 @@ public class FunnelProcessor {
     this.filterInit(metaChunk);
 
     // use MetaChunk to skip Cublet
-    if (!this.checkMetaChunk(metaChunk)) {
+    if (this.skipMetaChunk(metaChunk)) {
       return;
     }
 
@@ -118,7 +119,7 @@ public class FunnelProcessor {
     for (int i = 0; i < chunk.getRecords(); i++) {
       // load data into tuple
       for (String schema : this.projectedSchemaSet) {
-        int value = chunk.getField(schema).getValueByIndex(i);
+        FieldValue value = chunk.getField(schema).getValueByIndex(i);
         this.tuple.loadAttr(value, schema);
       }
       this.processTuple(metaChunk);
@@ -127,12 +128,13 @@ public class FunnelProcessor {
 
   private void processTuple(MetaChunkRS metaChunk) {
     // For One Tuple, we firstly get the userId, and ActionTime
-    int userGlobalID = (int) tuple.getValueBySchema(this.userIdSchema);
+    int userGlobalID = tuple.getValueBySchema(this.userIdSchema).getInt();
     MetaFieldRS userMetaField = metaChunk.getMetaField(this.userIdSchema);
-    String userId = userMetaField.getString(userGlobalID);
+    // String userId = userMetaField.getString(userGlobalID);
+    String userId = userMetaField.get(userGlobalID).map(FieldValue::getString).orElse("");
 
     LocalDateTime actionTime =
-        DateUtils.daysSinceEpoch((int) tuple.getValueBySchema(this.actionTimeSchema));
+        DateUtils.daysSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
     // check whether its birthEvent is selected
 
     // i: the number of birth event
@@ -162,33 +164,20 @@ public class FunnelProcessor {
    */
   private void filterInit(MetaChunkRS metaChunkRS) {
     // init birthSelector
-    for (int i = 0; i < this.birthSelector.size(); i++) {
-      for (Filter filter : this.birthSelector.get(i).getFilterList()) {
-        filter.loadMetaInfo(metaChunkRS);
-      }
-    }
+    birthSelector.stream().forEach(x -> x.loadMetaInfo(metaChunkRS));
   }
 
-  private Boolean checkMetaChunk(MetaChunkRS metaChunk) {
-
+  /**
+   * Check if this cublet contains the required field.
+   *
+   * @param metaChunk hashMetaFields result
+   * @return true: this metaChunk is skipped , false otherwise.
+   */
+  private Boolean skipMetaChunk(MetaChunkRS metaChunk) {
     // 1. check birth selection
     // if the metaChunk contains all birth filter's accept value, then the metaChunk
     // is valid.
-    for (int i = 0; i < this.birthSelector.size(); i++) {
-      if (this.birthSelector.get(i).getBirthEvents() == null) {
-        return true;
-      }
-    }
-    for (int i = 0; i < this.birthSelector.size(); i++) {
-      for (Filter filter : this.birthSelector.get(i).getFilterList()) {
-        String checkedSchema = filter.getFilterSchema();
-        MetaFieldRS metaField = metaChunk.getMetaField(checkedSchema);
-        if (this.checkMetaField(metaField, filter)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return birthSelector.stream().allMatch(x -> x.maybeSkipMetaChunk(metaChunk));
   }
 
   /**

@@ -23,13 +23,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.io.Output;
-import com.nus.cool.core.io.compression.OutputCompressor;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
-import com.nus.cool.core.util.IntegerUtil;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -93,7 +92,6 @@ public class MetaChunkWS implements Output {
    * @return MetaChunkWS instance
    */
   public static MetaChunkWS newMetaChunkWS(TableSchema schema, int offset) {
-    OutputCompressor compressor = new OutputCompressor();
     Charset charset = Charset.forName(schema.getCharset());
 
     // n: it denotes the number of columns
@@ -106,14 +104,15 @@ public class MetaChunkWS implements Output {
 
       switch (fieldType) {
         case UserKey:
-          metaFields[i] = new MetaUserFieldWS(fieldType, charset, compressor, metaChunk);
+          metaFields[i] = new MetaUserFieldWS(fieldType, charset, metaChunk);
           break;
         case AppKey:
         case Action:
         case Segment:
-          metaFields[i] = new MetaHashFieldWS(fieldType, charset, compressor);
+          metaFields[i] = new MetaHashFieldWS(fieldType, charset);
           break;
         case ActionTime:
+        case Float:
         case Metric:
           metaFields[i] = new MetaRangeFieldWS(fieldType);
           break;
@@ -129,7 +128,7 @@ public class MetaChunkWS implements Output {
    *
    * @param tuple Plain data line
    */
-  public void put(String[] tuple) {
+  public void put(FieldValue[] tuple) {
     checkNotNull(tuple);
     checkArgument(tuple.length == this.tableSchema.getFields().size(),
         "input tuple's size is not equal to table schema's size");
@@ -180,17 +179,17 @@ public class MetaChunkWS implements Output {
     bytesWritten++;
 
     // 2.1 Write fields for header layout
-    out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
+    out.writeInt(this.metaFields.length);
     bytesWritten += Ints.BYTES;
 
     // 2.2 Write field offsets for header layout
     for (int offset : offsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+      out.writeInt(offset);
       bytesWritten += Ints.BYTES;
     }
 
     // 3. Write header offset for MetaChunk layout
-    out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
+    out.writeInt(headOffset);
     bytesWritten += Ints.BYTES;
     return bytesWritten;
   }
@@ -231,17 +230,17 @@ public class MetaChunkWS implements Output {
     bytesWritten++;
 
     // 2.1 Write fields for header layout
-    out.writeInt(IntegerUtil.toNativeByteOrder(this.metaFields.length));
+    out.writeInt(this.metaFields.length);
     bytesWritten += Ints.BYTES;
 
     // 2.2 Write field offsets for header layout
     for (int offset : offsets) {
-      out.writeInt(IntegerUtil.toNativeByteOrder(offset));
+      out.writeInt(offset);
       bytesWritten += Ints.BYTES;
     }
 
     // 3. Write header offset for MetaChunk layout
-    out.writeInt(IntegerUtil.toNativeByteOrder(headOffset));
+    out.writeInt(headOffset);
     bytesWritten += Ints.BYTES;
     return bytesWritten;
   }

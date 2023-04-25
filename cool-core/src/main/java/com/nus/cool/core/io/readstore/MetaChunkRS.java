@@ -129,6 +129,7 @@ public class MetaChunkRS implements Input {
         metaField = new MetaHashFieldRS(this.charset);
         break;
       case Metric:
+      case Float:
       case ActionTime:
         metaField = new MetaRangeFieldRS();
         break;

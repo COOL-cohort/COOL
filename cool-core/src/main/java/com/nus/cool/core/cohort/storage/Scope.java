@@ -1,42 +1,50 @@
 package com.nus.cool.core.cohort.storage;
 
-import lombok.Getter;
+import com.nus.cool.core.field.RangeField;
+import lombok.AllArgsConstructor;
 
 /**
  * Represent a range from left to right [left, right).
  */
+@AllArgsConstructor
 public class Scope {
 
-  @Getter
-  private Integer left;
+  private RangeField left;
 
-  @Getter
-  private Integer right;
+  private RangeField right;
 
-  public Scope(Integer l, Integer r) {
-    this.left = l == null ? Integer.MIN_VALUE : l;
-    this.right = r == null ? Integer.MAX_VALUE : r;
-  }
-
-  public Boolean isInScope(Integer i) {
-    return i < this.right && i >= this.left;
+  public Boolean isInScope(RangeField i) {
+    return (left == null || i.compareTo(left) >= 0)
+      && (right == null || i.compareTo(right) < 0);
   }
 
   /**
    * Check if two scopes intersect.
    */
   public Boolean isIntersection(Scope scope) {
-    return !(scope.getLeft() >= this.right || scope.getRight() <= this.left);
+    return !(
+      (scope.left != null && right != null && scope.left.compareTo(right) >= 0) 
+      || (scope.right != null && left != null && scope.right.compareTo(left) <= 0));
   }
 
   public Boolean isSubset(Scope scope) {
-    return scope.getLeft() >= this.left && scope.getRight() <= this.right;
+    return (left == null || (scope.left != null && scope.left.compareTo(left) >= 0)) 
+      && (right == null || (scope.right != null && scope.right.compareTo(right) <= 0));
   }
 
-  @Override
-  public String toString() {
-    String l = this.left == Integer.MIN_VALUE ? "MIN" : this.left.toString();
-    String r = this.right == Integer.MAX_VALUE ? "MAX" : this.right.toString();
+  public void copy(Scope in) {
+    left = in.left;
+    right = in.right;
+  }
+
+  /**
+   * Generate a string representation.
+   */
+  public String getString(Boolean useInt) {
+    String l = this.left == null ? "MIN" :
+        (useInt ? String.valueOf(this.left.getInt()) : this.left.toString());
+    String r = this.right == null ? "MAX" :
+        (useInt ? String.valueOf(this.right.getInt()) : this.right.toString());
     return l + "-" + r;
   }
 }

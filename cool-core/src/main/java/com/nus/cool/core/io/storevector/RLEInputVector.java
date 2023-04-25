@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
 /**
  * Input vector of a run-length-encoded structure.
  */
-public class RLEInputVector implements InputVector {
+public class RLEInputVector implements InputVector<Integer> {
 
   // total number of blocks
   private int blks;
@@ -48,12 +48,12 @@ public class RLEInputVector implements InputVector {
   }
 
   @Override
-  public int find(int key) {
+  public Integer find(Integer key) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public int get(int index) {
+  public Integer get(int index) {
     int offset = this.boff;
     this.skipTo(index); // skip to one block, and read the value
     int v = next();
@@ -67,7 +67,7 @@ public class RLEInputVector implements InputVector {
   }
 
   @Override
-  public int next() {
+  public Integer next() {
     if (this.boff < this.bend) {
       this.boff++;
       return bval;

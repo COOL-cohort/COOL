@@ -25,7 +25,6 @@ import com.nus.cool.core.schema.TableSchema;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 import lombok.Getter;
 
@@ -57,7 +56,7 @@ public class CubeRS {
    */
   public void addCublet(File cubletFile) throws IOException {
     CubletRS cubletRS = new CubletRS(this.schema);
-    cubletRS.readFrom(Files.map(cubletFile).order(ByteOrder.nativeOrder()));
+    cubletRS.readFrom(Files.map(cubletFile));
     cubletRS.setFile(cubletFile.getName());
     this.cublets.add(cubletRS);
   }
@@ -69,7 +68,7 @@ public class CubeRS {
    */
   public void addCublet(ByteBuffer buffer) {
     CubletRS cubletRS = new CubletRS(this.schema);
-    cubletRS.readFrom(buffer.order(ByteOrder.nativeOrder()));
+    cubletRS.readFrom(buffer);
     this.cublets.add(cubletRS);
 
   }

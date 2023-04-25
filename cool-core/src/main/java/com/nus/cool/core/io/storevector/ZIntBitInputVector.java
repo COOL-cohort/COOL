@@ -25,7 +25,7 @@ import java.nio.LongBuffer;
 /**
  * Input vector of ZIntBit compressed structure.
  */
-public class ZIntBitInputVector implements ZIntStore, InputVector {
+public class ZIntBitInputVector implements ZIntStore {
 
   private final LongBuffer bitPack;
 
@@ -73,12 +73,12 @@ public class ZIntBitInputVector implements ZIntStore, InputVector {
   }
 
   @Override
-  public int find(int key) {
+  public Integer find(Integer key) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public int get(int index) {
+  public Integer get(int index) {
     if (index >= this.capacity) {
       throw new IndexOutOfBoundsException();
     }
@@ -94,7 +94,7 @@ public class ZIntBitInputVector implements ZIntStore, InputVector {
   }
 
   @Override
-  public int next() {
+  public Integer next() {
     return (int) nextLong();
   }
 

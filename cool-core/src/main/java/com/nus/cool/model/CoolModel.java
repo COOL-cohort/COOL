@@ -23,14 +23,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import com.nus.cool.core.io.readstore.ChunkRS;
 import com.nus.cool.core.io.readstore.CohortRS;
 import com.nus.cool.core.io.readstore.CubeMetaRS;
 import com.nus.cool.core.io.readstore.CubeRS;
-import com.nus.cool.core.io.readstore.CubletRS;
-import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.storevector.InputVector;
-import com.nus.cool.core.io.storevector.RLEInputVector;
 import com.nus.cool.core.schema.TableSchema;
 import java.io.Closeable;
 import java.io.File;
@@ -38,7 +34,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -218,7 +213,7 @@ public class CoolModel implements Closeable {
     // load the cube meta.
     cubeMeta = new CubeMetaRS(schema);
     File cubeMetaFile = new File(currentVersion, "cubemeta");
-    cubeMeta.readFrom(Files.map(cubeMetaFile).order(ByteOrder.nativeOrder()));
+    cubeMeta.readFrom(Files.map(cubeMetaFile));
     this.cubeMetaStore.put(cube, cubeMeta);
     return cubeMeta;
   }
@@ -252,7 +247,7 @@ public class CoolModel implements Closeable {
   public synchronized void loadCohorts(String inputCohorts, String cube) throws IOException {
     File cohortFile = new File(new File(getCubeStorePath(cube), "cohort"), inputCohorts);
     if (cohortFile.exists()) {
-      CohortRS store = CohortRS.load(Files.map(cohortFile).order(ByteOrder.nativeOrder()));
+      CohortRS store = CohortRS.load(Files.map(cohortFile));
       this.cohortStore.put(cohortFile.getName(), store);
     } else {
       throw new IOException("[x] Cohort File " + cohortFile
@@ -263,15 +258,14 @@ public class CoolModel implements Closeable {
   /**
    * Get users of a previously generated cohort.
    */
-  public InputVector getCohortUsers(String cohort) throws IOException {
+  public InputVector<Integer> getCohortUsers(String cohort) throws IOException {
     if (cohort == null) {
       return null;
     }
     if (!cohortStore.containsKey(cohort)) {
       loadCohorts(cohort, this.currentCube);
     }
-    InputVector ret = cohortStore.get(cohort).getUsers();
-    return ret;
+    return cohortStore.get(cohort).getUsers();
   }
 
   /**
@@ -288,19 +282,22 @@ public class CoolModel implements Closeable {
   }
 
   /**
-   * Reset a cube.
+   * Reset a cube. [TODO] should rethink the logic
    */
   public void resetCube(String cubeName) throws IOException {
-    CubeRS cube = this.cubeStore.get(cubeName);
-    int userKeyId = cube.getTableSchema().getUserKeyFieldIdx();
-    for (CubletRS cubletRS : cube.getCublets()) {
-      for (ChunkRS dataChunk : cubletRS.getDataChunks()) {
-        FieldRS userField = dataChunk.getField(userKeyId);
-        RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
-        userInput.skipTo(0);
-      }
-    }
-    System.out.println("Cube " + cube + " has been reset.");
+    // CubeRS cube = 
+    this.cubeStore.get(cubeName);
+    // [TODO] implement checking and loading of cublet cache.
+    
+    // int userKeyId = cube.getTableSchema().getUserKeyFieldIdx();
+    // for (CubletRS cubletRS : cube.getCublets()) {
+    //   for (ChunkRS dataChunk : cubletRS.getDataChunks()) {
+    //     FieldRS userField = dataChunk.getField(userKeyId);
+    //     RLEInputVector userInput = (RLEInputVector) userField.getValueVector();
+    //     userInput.skipTo(0);
+    //   }
+    // }
+    // System.out.println("Cube " + cube + " has been reset.");
   }
 
   public void clearCohorts() throws IOException {

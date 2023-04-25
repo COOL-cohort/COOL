@@ -6,10 +6,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
+import com.nus.cool.core.field.RangeField;
+import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.io.storevector.InputVector;
 import com.nus.cool.core.io.storevector.InputVectorFactory;
-import com.nus.cool.core.io.storevector.LZ4InputVector;
 import com.nus.cool.core.schema.ChunkType;
 import com.nus.cool.core.schema.FieldType;
 import com.nus.cool.core.schema.TableSchema;
@@ -53,9 +54,9 @@ public class CubeMetaRS implements Input {
   private class RangeFieldMeta implements FieldMeta {
     private FieldType type;
 
-    private int min;
+    private RangeField min;
 
-    private int max;
+    private RangeField max;
 
     public RangeFieldMeta(FieldType type) {
       this.type = type;
@@ -63,8 +64,14 @@ public class CubeMetaRS implements Input {
 
     @Override
     public void readFrom(ByteBuffer buf) {
-      this.min = buffer.getInt();
-      this.max = buffer.getInt();
+      if (this.type == FieldType.Float) {
+        this.min = ValueWrapper.of(buffer.getFloat());
+        this.max = ValueWrapper.of(buffer.getFloat());
+      } else {
+        // integer / action time
+        this.min = ValueWrapper.of(buffer.getInt());
+        this.max = ValueWrapper.of(buffer.getInt());
+      }
     }
 
     @Override
@@ -95,16 +102,18 @@ public class CubeMetaRS implements Input {
 
     @Override
     public void readFrom(ByteBuffer buffer) {
-      InputVector vec = InputVectorFactory.readFrom(buffer);
-      if (!(vec instanceof LZ4InputVector)) {
+      InputVector<String> valueVec;
+      try {
+        valueVec = InputVectorFactory.genStrFieldInputVector(buffer, charset);
+      } catch (IllegalArgumentException e) {
+        System.err.println(e);
         return;
       }
 
-      LZ4InputVector valueVec = (LZ4InputVector) vec;
       int valueCount = valueVec.size();
       values = new ArrayList<>(valueCount);
       for (int i = 0; i < valueCount; i++) {
-        String value = valueVec.getString(i, this.charset);
+        String value = valueVec.get(i);
         values.add(value);
       }
     }
@@ -175,6 +184,7 @@ public class CubeMetaRS implements Input {
         field = new HashFieldMeta(type, this.charset);
         break;
       case Metric:
+      case Float:
       case ActionTime:
         field = new RangeFieldMeta(type);
         break;
