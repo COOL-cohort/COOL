@@ -1,6 +1,5 @@
 package com.nus.cool.core;
 
-
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.filter.FilterLayout;
 import com.nus.cool.core.cohort.filter.RangeFilter;
@@ -51,10 +50,15 @@ public class FilterTest {
    */
   @DataProvider(name = "SetFilterAcceptDP")
   public Object[][] generateSetFilterAcceptInput() {
-    return new Object[][] {{new FilterLayout(true, new String[] {"A", "B", "C", "D", "E"}, null),
-        new String[] {"A", "A", "B", "B", "D", "E", "C", "C"}},
-        {new FilterLayout(true, null, new String[] {"11", "222", "3333", "44444", "555555"}),
-            new String[] {"1111", "222222", "33", "44", "55", "22222"}}};
+    return new Object[][] {
+        {
+            new FilterLayout(true, new String[] { "A", "B", "C", "D", "E" }, null),
+            new String[] { "A", "A", "B", "B", "D", "E", "C", "C" },
+        },
+        {
+            new FilterLayout(true, null, new String[] { "11", "222", "3333", "44444", "555555" }),
+            new String[] { "1111", "222222", "33", "44", "55", "22222" } }
+        };
   }
 
   /**
@@ -62,11 +66,16 @@ public class FilterTest {
    */
   @DataProvider(name = "SetFilterRejectDP")
   public Object[][] generateSetFilterRejectInput() {
-    return new Object[][] {{new FilterLayout(true, new String[] {"A", "B", "C", "D", "E"}, null),
-        new String[] {"111", "CCCCC", "KKK", "MMM", "12334"}},
+    return new Object[][] {
+        {
+            new FilterLayout(true, new String[] { "A", "B", "C", "D", "E" }, null),
+            new String[] { "111", "CCCCC", "KKK", "MMM", "12334" },
+        },
 
-        {new FilterLayout(true, null, new String[] {"11", "222", "3333", "44444", "555555"}),
-            new String[] {"11", "222", "3333", "44444", "555555"}}};
+        {
+            new FilterLayout(true, null, new String[] { "11", "222", "3333", "44444", "555555" }),
+            new String[] { "11", "222", "3333", "44444", "555555" } }
+        };
   }
 
   /**
@@ -75,8 +84,10 @@ public class FilterTest {
   @DataProvider(name = "RangeFilterAcceptDP")
   public Object[][] generateRangeFilterAcceptInput() {
     return new Object[][] {
-        {new FilterLayout(false, new String[] {"MIN to 15", "16 to 2000", "2555 to MAX"}, null),
-            new int[] {12, 55, 555555, 1999, 14, 16, 1999, 2555}}};
+        {
+            new FilterLayout(false, new String[] { "MIN to 15", "16 to 2000", "2555 to MAX" }, null),
+            new int[] { 12, 55, 555555, 1999, 14, 16, 1999, 2555 } }
+        };
   }
 
   /**
@@ -85,7 +96,9 @@ public class FilterTest {
   @DataProvider(name = "RangeFilterRejectDP")
   public Object[][] generateRangeFilterRejectInput() {
     return new Object[][] {
-        {new FilterLayout(false, new String[] {"MIN to 15", "16 to 2000", "2555 to MAX"}, null),
-            new int[] {2001, 2222, 2244}}};
+        {
+            new FilterLayout(false, new String[] { "MIN to 15", "16 to 2000", "2555 to MAX" }, null),
+            new int[] { 2001, 2222, 2244 } }
+        };
   }
 }

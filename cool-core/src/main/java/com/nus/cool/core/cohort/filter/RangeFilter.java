@@ -5,6 +5,7 @@ import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.field.RangeField;
 import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
+import com.nus.cool.core.util.converter.DayIntConverter;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -54,7 +55,6 @@ public class RangeFilter implements Filter {
    *
    * @return True if accepted, false otherwise
    */
-  // @Override
   public Boolean accept(RangeField value) {
     for (Scope u : acceptRangeList) {
       if (u.isInScope(value)) {
@@ -69,7 +69,6 @@ public class RangeFilter implements Filter {
    *
    * @return True if accepted, false otherwise
    */
-  // @Override
   public Boolean accept(RangeField value, Scope selected) {
     for (Scope u : acceptRangeList) {
       if (u.isInScope(value)) {
@@ -85,7 +84,6 @@ public class RangeFilter implements Filter {
    *
    * @return a bit map. accepted values have their corresponding bits set.
    */
-  // @Override
   public BitSet accept(List<RangeField> values) {
     BitSet res = new BitSet(values.size());
     for (int i = 0; i < values.size(); i++) {
@@ -104,17 +102,9 @@ public class RangeFilter implements Filter {
     return accept((RangeField) value);
   }
 
-//  public BitSet accept(String[] values) throws RuntimeException {
-//    // TODO Auto-generated method stub
-//    return null;
-//  }
-
-//  @Override
-//  public boolean accept(Scope scope) throws RuntimeException {
   /**
    * check if a value range is a subset of the filters'.
    */
-  // @Override
   public boolean accept(Scope scope) {
     for (Scope u : acceptRangeList) {
       if (u.isSubset(scope) || u.isIntersection(scope)) {
@@ -138,13 +128,24 @@ public class RangeFilter implements Filter {
    */
   private static Scope parse(String acceptRange) throws IllegalArgumentException {
     String[] part = acceptRange.split(splitChar);
-    // Preconditions.checkArgument(part.length == 2,
-    //     "Split RangeUnit failed");
     if (part.length != 2) {
       throw new IllegalArgumentException("Range of filter is in invalid form");
     }
-    RangeField l = part[0].equals(MinLimit) ? null : ValueWrapper.of(Float.parseFloat(part[0]));
-    RangeField r = part[1].equals(MaxLimit) ? null : ValueWrapper.of(Float.parseFloat(part[1]));
+
+
+    RangeField l, r;
+    try{
+      l = part[0].equals(MinLimit) ? null : ValueWrapper.of(Float.parseFloat(part[0]));
+      r = part[1].equals(MaxLimit) ? null : ValueWrapper.of(Float.parseFloat(part[1]));
+    }
+    catch (Exception e)  {
+      System.out.println("[Warning]. Parse using float failed, element = " + part[0]);
+      DayIntConverter dataConverter = new DayIntConverter();
+      int intValueMin = dataConverter.toInt(part[0]);
+      int intValueMax = dataConverter.toInt(part[1]);
+      l = part[0].equals(MinLimit) ? null : ValueWrapper.of(intValueMin);
+      r = part[1].equals(MaxLimit) ? null : ValueWrapper.of(intValueMax);
+    }
 
     return new Scope(l, r);
   }
@@ -158,15 +159,6 @@ public class RangeFilter implements Filter {
   public void loadMetaInfo(MetaChunkRS metaChunkRS) {
     // for range Filter, no need to load info
   }
-
-//  private static int convertPartToInt(String dataStr) {
-//    if (dataStr.contains(RangeFilter.TimeDelimiter)) {
-//      DayIntConverter dins = DayIntConverter.getInstance();
-//      return dins.toInt(dataStr);
-//    } else {
-//      return Integer.parseInt(dataStr);
-//    }
-//  }
 
 
 }

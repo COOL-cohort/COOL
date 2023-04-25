@@ -36,8 +36,8 @@ public class FilterLayout {
       rejStr = rejectValue.toString();
     }
     return String.format(
-        "FilterLayout fieldSchema %s filter type %s, acceptValue %s, rejectValue %s", fieldSchema,
-        type, acStr, rejStr);
+        "FilterLayout fieldSchema %s filter type %s, acceptValue %s, rejectValue %s",
+        fieldSchema, type, acStr, rejStr);
   }
 
   /**
@@ -58,7 +58,8 @@ public class FilterLayout {
         }
         return null;
       default:
-        throw new IllegalArgumentException(String.format("No filter of this type named %s", type));
+        throw new IllegalArgumentException(
+            String.format("No filter of this type named %s", type));
     }
   }
 

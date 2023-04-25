@@ -96,9 +96,4 @@ public class DataHashFieldRS implements FieldRS {
   //   return this.valueVector.size();
   // }
 
-  @Override
-  public int getFieldSize() {
-    return this.valueVector.size();
-  }
-
 }

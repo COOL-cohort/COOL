@@ -40,7 +40,7 @@ public class DayIntConverter implements ActionTimeIntConverter {
    */
   public static final DateTime BASE = FORMATTER.parseDateTime("1970-01-01");
 
-  public static ActionTimeIntConverter getInstance() {
+  public static final ActionTimeIntConverter getInstance() {
     return x -> Days.daysBetween(BASE, FORMATTER.parseDateTime(x)).getDays();
   }
 

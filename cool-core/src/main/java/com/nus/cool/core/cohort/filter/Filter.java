@@ -18,14 +18,6 @@ public interface Filter {
   public Boolean accept(FieldValue value) throws IllegalArgumentException, IllegalStateException;
 
   /**
-   * Range Filter implements this function.
-   *
-   * @param values Scope of time_min-time_max
-   * @return whether all value in this scope can be accepted
-   */
-  public boolean accept(Scope values) throws RuntimeException;
-
-  /**
    * Get Filter type.
    *
    * @return the type of Filter

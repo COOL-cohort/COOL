@@ -286,8 +286,10 @@ public class CohortProcessor {
         FieldValue value = chunk.getField(schema).getValueByIndex(i);
         this.tuple.loadAttr(value, schema);
       }
+
       this.processTuple(metaChunk);
     }
+
   }
 
   /**
@@ -313,8 +315,10 @@ public class CohortProcessor {
         DateUtils.daysSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
     // check whether its birthEvent is selected
     if (!this.birthSelector.isUserSelected(userId)) {
+      // if birthEvent is not selected
       this.birthSelector.selectEvent(userId, actionTime, this.tuple);
     } else {
+      // the birthEvent is selected
       // extract the cohort this tuple belong to
       String cohortName = this.cohortSelector.selectCohort(this.tuple, metaChunk);
       if (cohortName == null) {

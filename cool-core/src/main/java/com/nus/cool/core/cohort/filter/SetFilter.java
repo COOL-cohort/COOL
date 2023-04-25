@@ -30,11 +30,6 @@ public abstract class SetFilter implements Filter {
   public static SetFilter generateEmptySetFilter(String fieldSchema) {
     return new SetFilter(fieldSchema, new String[0]) {
       @Override
-      public boolean accept(Scope values) throws RuntimeException {
-        return false;
-      }
-
-      @Override
       public Boolean accept(Integer value) {
         return true;
       }

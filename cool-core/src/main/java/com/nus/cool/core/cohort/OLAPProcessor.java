@@ -2,6 +2,7 @@ package com.nus.cool.core.cohort;
 
 import com.nus.cool.core.cohort.filter.Filter;
 import com.nus.cool.core.cohort.filter.FilterType;
+import com.nus.cool.core.cohort.filter.RangeFilter;
 import com.nus.cool.core.cohort.olapselect.AggregationLayout;
 import com.nus.cool.core.cohort.olapselect.OLAPAggregator;
 import com.nus.cool.core.cohort.olapselect.OLAPGroupBy;
@@ -129,7 +130,8 @@ public class OLAPProcessor {
     } else if (checkedType.equals(FilterType.Range)) {
       Scope scope = new Scope(metaField.getMinValue(), metaField.getMaxValue());
       // if there is no true in res, then no record meet the requirement
-      return ft.accept(scope);
+      RangeFilter rangeFilter = (RangeFilter) ft;
+      return rangeFilter.accept(scope);
     } else {
       throw new IllegalArgumentException("Only support set or range");
     }
@@ -152,7 +154,8 @@ public class OLAPProcessor {
       if (currentFilter.getType().equals(FilterType.Range)) {
         DataRangeFieldRS rangeField = (DataRangeFieldRS)field;
         Scope scope = new Scope(rangeField.minKey(), rangeField.maxKey());
-        return currentFilter.accept(scope);
+        RangeFilter rangeFilter = (RangeFilter) currentFilter;
+        return rangeFilter.accept(scope);
       } else {
         // skip check in Set Filter
         return true;
