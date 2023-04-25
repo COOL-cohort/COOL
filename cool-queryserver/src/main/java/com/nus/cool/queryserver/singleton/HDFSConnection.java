@@ -2,9 +2,8 @@ package com.nus.cool.queryserver.singleton;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nus.cool.core.cohort.ExtendedCohortQuery;
-import com.nus.cool.core.iceberg.query.IcebergQuery;
-import com.nus.cool.core.iceberg.result.BaseResult;
+import com.nus.cool.core.cohort.CohortQueryLayout;
+import com.nus.cool.core.cohort.OLAPQueryLayout;
 import com.nus.cool.core.schema.TableSchema;
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,19 +102,17 @@ public class HDFSConnection {
    * @return result
    * @throws IOException IOException
    */
-  public List<BaseResult> getResult(String queryId) throws IOException {
+  public List<String> getResult(String queryId) throws IOException {
     FileStatus[] statuses = fs.listStatus(new Path("/tmp/" + queryId + "/results"));
-    List<BaseResult> raw = new ArrayList<>();
+    List<JavaType> raw = new ArrayList<>();
     ObjectMapper mapper = new ObjectMapper();
     for (FileStatus status : statuses) {
       String content = mapper.readValue((InputStream) fs.open(status.getPath()), String.class);
       JavaType javaType =
-          mapper.getTypeFactory().constructParametricType(ArrayList.class, BaseResult.class);
-      List<BaseResult> results = mapper.readValue(content, javaType);
-      raw.addAll(results);
+          mapper.getTypeFactory().constructParametricType(ArrayList.class, JavaType.class);
+      JavaType results = mapper.readValue(content, javaType);
     }
-    raw = BaseResult.merge(raw);
-    return raw;
+    return new ArrayList<>();
   }
 
   /**
@@ -147,7 +144,7 @@ public class HDFSConnection {
    * @param query query
    * @throws IOException IOException
    */
-  public String createQuery(IcebergQuery query) throws IOException {
+  public String createQuery(OLAPQueryLayout query) throws IOException {
     String queryId = UUID.randomUUID().toString();
     FSDataOutputStream out = fs.create(new Path("/tmp/" + queryId + "/query.json"));
     ObjectMapper mapper = new ObjectMapper();
@@ -161,8 +158,9 @@ public class HDFSConnection {
    * @param queryId queryId
    * @throws IOException IOException
    */
-  public IcebergQuery readIcebergQuery(String queryId) throws IOException {
-    return IcebergQuery.read(fs.open(new Path("/tmp/" + queryId + "/query.json")));
+  public OLAPQueryLayout readIcebergQuery(String queryId) throws IOException {
+    //    return OLAPQueryLayout.read(fs.open(new Path("/tmp/" + queryId + "/query.json")));
+    return new OLAPQueryLayout();
   }
 
   /**
@@ -171,8 +169,9 @@ public class HDFSConnection {
    * @param queryId queryId
    * @throws IOException IOException
    */
-  public ExtendedCohortQuery readCohortQuery(String queryId) throws IOException {
-    return ExtendedCohortQuery.read(fs.open(new Path("/tmp/" + queryId + "/query.json")));
+  public CohortQueryLayout readCohortQuery(String queryId) throws IOException {
+    //    return CohortQueryLayout.read(fs.open(new Path("/tmp/" + queryId + "/query.json")));
+    return new CohortQueryLayout();
   }
 
 
