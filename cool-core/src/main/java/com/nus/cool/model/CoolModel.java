@@ -27,6 +27,7 @@ import com.nus.cool.core.io.readstore.CohortRS;
 import com.nus.cool.core.io.readstore.CubeMetaRS;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.core.io.storevector.InputVector;
+import com.nus.cool.core.schema.FieldSchema;
 import com.nus.cool.core.schema.TableSchema;
 import java.io.Closeable;
 import java.io.File;
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class CoolModel implements Closeable {
 
   static final Logger logger = LoggerFactory.getLogger(CoolModel.class);
 
-  // Container of loaded cubes
+  // Container of loaded cubes, e,g. currentCube: CubeRS
   private final Map<String, CubeRS> cubeStore = Maps.newHashMap();
 
   // separate store for cube meta (not needed for processing)
@@ -57,12 +57,14 @@ public class CoolModel implements Closeable {
   // Container of loaded cohorts
   private final Map<String, CohortRS> cohortStore = Maps.newHashMap();
 
-  // Store path of loaded cubes (contains version information)
+  // Store file paths of currentCube (contains version information),
+  // e,g. File(./yaml, /data.dz, ./metacube)
   private final Map<String, File> storePath = Maps.newHashMap();
 
-  // Directory containing a set of cube files considered a repository
+  // Directory repository containing a set of cubes
   private final File localRepo;
 
+  // name of the current cube, e,g. health_raw
   private String currentCube = "";
 
   /**
@@ -112,19 +114,20 @@ public class CoolModel implements Closeable {
    * @param cube the cube name
    */
   public synchronized void reload(String cube) throws IOException {
+    System.out.println("reloading...");
     // Skip the reload process if the cube is the current one and is the latest one
     if (currentCube.equals(cube) && islatestCubeLoaded(cube)) {
       return;
     }
     // Skip the reload process if the cube is loaded
-    if (islatestCubeLoaded(cube)) {
-      if (!Objects.equals(currentCube, cube)) {
-        this.cohortStore.clear();
-      }
-      currentCube = cube;
-      resetCube(cube);
-      return;
-    }
+    //    if (islatestCubeLoaded(cube)) {
+    //      if (!Objects.equals(currentCube, cube)) {
+    //        this.cohortStore.clear();
+    //      }
+    //      currentCube = cube;
+    //      resetCube(cube);
+    //      return;
+    //    }
 
     // Remove the old version of the cube
     this.cubeStore.remove(cube);
@@ -310,5 +313,33 @@ public class CoolModel implements Closeable {
   public synchronized boolean isCubeExist(String cube) throws IOException {
     File cubeRoot = new File(this.localRepo, cube);
     return cubeRoot.exists();
+  }
+
+  /**
+   * Load the latest version directory of a cube.
+   * caller: reload(String) and getCubeMeta(String)
+   */
+  public String[] getAllVersions(String cube) throws IOException {
+    // Check the existence of cube under this repository
+    File cubeRoot = new File(this.localRepo, cube);
+    if (!cubeRoot.exists()) {
+      throw new FileNotFoundException("[x] Cube " + cube + " was not found in the repository.");
+    }
+
+    File[] versions = cubeRoot.listFiles(File::isDirectory);
+    assert versions != null;
+    return Arrays.stream(versions)
+        .map(File::getName)
+        .toArray(String[]::new);
+  }
+
+  public String[] getCubeColumns(String cube){
+    CubeRS cubeRS = this.cubeStore.get(cube);
+    return cubeRS
+        .getTableSchema()
+        .getFields()
+        .stream()
+        .map(FieldSchema::toString)
+        .toArray(String[]::new);
   }
 }
