@@ -1,8 +1,13 @@
 package com.nus.cool.queryserver.handler;
 
-import com.nus.cool.loader.LoadQuery;
-import com.nus.cool.queryserver.model.QueryServerModel;
+import com.nus.cool.core.util.config.CsvDataLoaderConfig;
+import com.nus.cool.core.util.config.DataLoaderConfig;
+import com.nus.cool.extension.util.config.AvroDataLoaderConfig;
+import com.nus.cool.extension.util.config.ParquetDataLoaderConfig;
+import com.nus.cool.model.CoolLoader;
+import com.nus.cool.queryserver.model.LoadQuery;
 import com.nus.cool.queryserver.utils.Util;
+import java.io.File;
 import java.io.IOException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +35,30 @@ public class DataLoaderHandler {
   @PostMapping(value = "/load",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> load(@RequestBody LoadQuery req) throws IOException {
-    System.out.println("[*] This query is for loading a new cube: " + req);
-
-    return QueryServerModel.loadCube(req);
+  public ResponseEntity<String> load(@RequestBody LoadQuery query) throws IOException {
+    System.out.println("[*] This query is for loading a new cube: " + query);
+    query.isValid();
+    String fileType = query.getDataFileType().toUpperCase();
+    DataLoaderConfig config;
+    switch (fileType) {
+      case "CSV":
+        config = new CsvDataLoaderConfig();
+        break;
+      case "PARQUET":
+        config = new ParquetDataLoaderConfig();
+        break;
+      case "AVRO":
+        config = new AvroDataLoaderConfig(new File(query.getConfigPath()));
+        break;
+      default:
+        throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
+    }
+    System.out.println(config.getClass().getName());
+    CoolLoader coolLoader = new CoolLoader(config);
+    coolLoader.load(query.getCubeName(), query.getSchemaPath(), query.getDataPath(),
+        query.getOutputPath());
+    String resStr = "Cube " + query.getCubeName() + " is loaded successfully";
+    return ResponseEntity.ok().body(resStr);
   }
 
 }

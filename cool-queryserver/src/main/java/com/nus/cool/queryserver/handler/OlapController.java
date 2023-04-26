@@ -1,9 +1,13 @@
 package com.nus.cool.queryserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nus.cool.core.cohort.OLAPProcessor;
 import com.nus.cool.core.cohort.OLAPQueryLayout;
-import com.nus.cool.queryserver.model.QueryServerModel;
+import com.nus.cool.core.cohort.storage.OLAPRet;
+import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.queryserver.singleton.ModelConfig;
 import java.io.IOException;
+import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +35,14 @@ public class OlapController {
     System.out.println("[*] Server serve OLAP query, " + queryFile);
     String queryContent = new String(queryFile.getBytes());
     ObjectMapper mapper = new ObjectMapper();
-    OLAPQueryLayout q = mapper.readValue(queryContent, OLAPQueryLayout.class);
-    return QueryServerModel.precessIcebergQuery(q);
+    OLAPQueryLayout layout = mapper.readValue(queryContent, OLAPQueryLayout.class);
+    String inputSource = layout.getDataSource();
+    ModelConfig.cachedCoolModel.reload(inputSource);
+    OLAPProcessor olapProcessor = new OLAPProcessor(layout);
+    // start a new cool model and reload the cube
+    CubeRS cube = ModelConfig.cachedCoolModel.getCube(layout.getDataSource());
+    List<OLAPRet> ret = olapProcessor.processCube(cube);
+    return ResponseEntity.ok().body(ret.toString());
   }
 
 }
