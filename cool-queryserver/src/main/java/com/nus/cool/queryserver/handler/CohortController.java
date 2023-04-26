@@ -1,9 +1,13 @@
 package com.nus.cool.queryserver.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nus.cool.core.cohort.CohortProcessor;
 import com.nus.cool.core.cohort.CohortQueryLayout;
-import com.nus.cool.queryserver.model.QueryServerModel;
+import com.nus.cool.core.io.readstore.CubeRS;
+import com.nus.cool.model.CoolModel;
+import com.nus.cool.queryserver.singleton.ModelConfig;
 import com.nus.cool.queryserver.utils.Util;
+import java.io.File;
 import java.io.IOException;
 import javax.ws.rs.QueryParam;
 import org.springframework.http.MediaType;
@@ -31,7 +35,7 @@ public class CohortController {
   public ResponseEntity<String[]> listCubes() {
     Util.getTimeClock();
     System.out.println("[*] Server is listing all cubes.");
-    return QueryServerModel.listCubes();
+    return ResponseEntity.ok().body(CoolModel.listCubes(ModelConfig.dataSourcePath));
   }
 
   /**
@@ -42,7 +46,9 @@ public class CohortController {
   public ResponseEntity<String[]> listCubeVersions(@QueryParam("cube") String cube)
       throws IOException {
     System.out.println("[*] Server serve listCubeVersions, cubeName = " + cube);
-    return QueryServerModel.listCubeVersions(cube);
+    ModelConfig.cachedCoolModel.reload(cube);
+    String[] versions = ModelConfig.cachedCoolModel.getAllVersions(cube);
+    return ResponseEntity.ok().body(versions);
   }
 
   /**
@@ -53,7 +59,9 @@ public class CohortController {
   public ResponseEntity<String[]> listCubeColumns(@QueryParam("cube") String cube)
       throws IOException {
     System.out.println("[*] Server is listing all cohorts." + cube);
-    return QueryServerModel.listCubeColumns(cube);
+    ModelConfig.cachedCoolModel.reload(cube);
+    String[] cols = ModelConfig.cachedCoolModel.getCubeColumns(cube);
+    return ResponseEntity.ok().body(cols);
   }
 
   /**
@@ -63,7 +71,9 @@ public class CohortController {
       produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String[]> listCohorts(@QueryParam("cube") String cube) throws IOException {
     System.out.println("[*] Server is listing all cohorts." + cube);
-    return QueryServerModel.listCohorts(cube);
+    ModelConfig.cachedCoolModel.reload(cube);
+    String[] cohorts = ModelConfig.cachedCoolModel.listCohorts(cube);
+    return ResponseEntity.ok().body(cohorts);
   }
 
 
@@ -78,8 +88,17 @@ public class CohortController {
     System.out.println("[*] Server is performing the cohort query, " + queryFile);
     String queryContent = new String(queryFile.getBytes());
     ObjectMapper mapper = new ObjectMapper();
-    CohortQueryLayout q = mapper.readValue(queryContent, CohortQueryLayout.class);
-    return QueryServerModel.cohortSelection(q);
+    CohortQueryLayout layout = mapper.readValue(queryContent, CohortQueryLayout.class);
+    String cube = layout.getDataSource();
+    ModelConfig.cachedCoolModel.reload(cube);
+    System.out.println("reload success...");
+    CohortProcessor cohortProcessor = new CohortProcessor(layout);
+    CubeRS cubeRS = ModelConfig.cachedCoolModel.getCube(cohortProcessor.getDataSource());
+    String res = cohortProcessor.process(cubeRS).toString();
+    File currentVersion =
+        ModelConfig.cachedCoolModel.getLatestVersion(cohortProcessor.getDataSource());
+    cohortProcessor.persistCohort(currentVersion.toString());
+    return ResponseEntity.ok().body(res);
   }
 
   /**
@@ -91,10 +110,29 @@ public class CohortController {
   public ResponseEntity<String> performCohortAnalysis(
       @RequestParam("queryFile") MultipartFile queryFile) throws IOException {
     System.out.println("[*] Server serve cohort analysis, " + queryFile);
+    // 1. analysis query
     String queryContent = new String(queryFile.getBytes());
     ObjectMapper mapper = new ObjectMapper();
-    CohortQueryLayout q = mapper.readValue(queryContent, CohortQueryLayout.class);
-    return QueryServerModel.cohortAnalysis(q);
+    CohortQueryLayout layout = mapper.readValue(queryContent, CohortQueryLayout.class);
+    String cube = layout.getDataSource();
+    // 2. process query
+    ModelConfig.cachedCoolModel.reload(cube);
+    CohortProcessor cohortProcessor = new CohortProcessor(layout);
+    CubeRS cubeRS = ModelConfig.cachedCoolModel.getCube(cohortProcessor.getDataSource());
+    File currentVersion =
+        ModelConfig.cachedCoolModel.getCubeStorePath(cohortProcessor.getDataSource());
+
+    // 3. load input cohort
+    if (cohortProcessor.getInputCohort() != null) {
+      File cohortFile = new File(currentVersion, "cohort/" + cohortProcessor.getInputCohort());
+      if (cohortFile.exists()) {
+        cohortProcessor.readOneCohort(cohortFile);
+      }
+    }
+
+    // process
+    String res = cohortProcessor.process(cubeRS).toString();
+    return ResponseEntity.ok().body(res);
   }
 
   //    @PostMapping(value = "/funnel-analysis",
