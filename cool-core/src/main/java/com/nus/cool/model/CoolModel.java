@@ -333,7 +333,10 @@ public class CoolModel implements Closeable {
         .toArray(String[]::new);
   }
 
-  public String[] getCubeColumns(String cube){
+  /**
+   * getCubeColumns.
+   */
+  public String[] getCubeColumns(String cube) {
     CubeRS cubeRS = this.cubeStore.get(cube);
     return cubeRS
         .getTableSchema()

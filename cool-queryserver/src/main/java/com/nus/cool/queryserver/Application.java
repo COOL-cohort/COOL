@@ -26,7 +26,8 @@ public class Application {
   /**
    * Roles.
    */
-  public enum Role { STANDALONE, WORKER, BROKER }
+  public enum Role { STANDALONE, WORKER, BROKER
+  }
 
   /**
    * Run server.
