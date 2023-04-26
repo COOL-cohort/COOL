@@ -12,7 +12,8 @@ public class NodeInfo {
   /**
    * worker status can be free, busy.
    */
-  public enum Status { FREE, BUSY }
+  public enum Status { FREE, BUSY
+  }
 
   private String ip;
 
