@@ -66,6 +66,8 @@ public class FloatInputVectorTest {
         { new Float[] { 15.5f, 135296f, 132096f, 136320f, 132352f}}, // test case 2
         { new Float[] { 10.3f, 1.2f, 1.2f, 1.2f, 1.2f, 1.2f, 1.2f, 1.2f, 1.2f,
             1.2f}}, // test case 1 with many equal values
+        { new Float[] { -1.0f, -1.0f, -1.0f, -1.0f, 29.60f, 6.70f,
+            60.5f}}, // test case with xor 32 bit value
     };
   }
 }
