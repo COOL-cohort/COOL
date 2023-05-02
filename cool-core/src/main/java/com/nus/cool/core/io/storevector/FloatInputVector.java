@@ -45,7 +45,7 @@ public class FloatInputVector implements InputVector<Float> {
         for (int j = 0; j < lastDiffSize; j++) {
           xor.set(lastDiffStart + j, bs.get(startoff + 2 + j));
         }
-        xor.xor(BitSet.valueOf(new long[]{Float.floatToIntBits(lastVal)}));
+        xor.xor(BitSet.valueOf(new long[]{Integer.toUnsignedLong(Float.floatToIntBits(lastVal))}));
         float targetVal = Float.intBitsToFloat(xor.isEmpty() ? 0 : (int) xor.toLongArray()[0]);
         lastVal = targetVal;
         data[i] = lastVal;
@@ -67,7 +67,7 @@ public class FloatInputVector implements InputVector<Float> {
         for (int j = 0; j < lastDiffSize; j++) {
           xor.set(lastDiffStart + j, bs.get(startoff + 2 + 5 + 6 + j));
         }
-        xor.xor(BitSet.valueOf(new long[]{Float.floatToIntBits(lastVal)}));
+        xor.xor(BitSet.valueOf(new long[]{Integer.toUnsignedLong(Float.floatToIntBits(lastVal))}));
         float targetVal = Float.intBitsToFloat(xor.isEmpty() ? 0 : (int) xor.toLongArray()[0]);
         lastVal = targetVal;
         data[i] = lastVal;
