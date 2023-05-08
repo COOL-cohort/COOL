@@ -38,7 +38,7 @@ public class ModelConfig {
     props = new Properties();
     try {
       props.load(new FileInputStream(
-          "cool-queryserver/src/main/resources/application.properties"));
+          "./application.properties"));
       dataSourcePath = props.getProperty("datasource.path");
       cachedCoolModel = new CoolModel(dataSourcePath);
 
