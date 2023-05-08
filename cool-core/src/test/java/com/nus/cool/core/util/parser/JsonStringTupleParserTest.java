@@ -60,7 +60,7 @@ public class JsonStringTupleParserTest {
       Assert.assertEquals(ret[2].getString(), "stonegolem");
       Assert.assertEquals(ret[3].getString(), "1638");
       Assert.assertEquals(ret[4].getString(), "fight");
-      Assert.assertEquals(ret[5].getString(), "15846");
+      Assert.assertEquals(ret[5].getString(), Integer.toString(15846 * 24 * 3600));
       Assert.assertEquals(ret[6].getString(),
           "Int96Value{Binary{3 constant bytes, [0, 0, 0]}}");
     } catch (IOException e) {
