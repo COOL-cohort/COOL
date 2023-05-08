@@ -20,7 +20,8 @@
 package com.nus.cool.core.util.converter;
 
 import org.joda.time.DateTime;
-import org.joda.time.Days;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -33,15 +34,18 @@ public class DayIntConverter implements ActionTimeIntConverter {
   /**
    * Date formatter.
    */
-  public static final DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
+  public static final DateTimeFormatter FORMATTER
+      = DateTimeFormat.forPattern("yyyy-MM-dd").withZoneUTC();
 
   /**
    * Reference day.
    */
-  public static final DateTime BASE = FORMATTER.parseDateTime("1970-01-01");
+  public static final DateTime BASE
+      = FORMATTER.parseDateTime("1970-01-01").withZone(DateTimeZone.UTC);
 
   public static final ActionTimeIntConverter getInstance() {
-    return x -> Days.daysBetween(BASE, FORMATTER.parseDateTime(x)).getDays();
+    // return x -> Days.daysBetween(BASE, FORMATTER.parseDateTime(x)).getDays();
+    return x -> Seconds.secondsBetween(BASE, FORMATTER.parseDateTime(x)).getSeconds();
   }
 
   /**
@@ -53,17 +57,17 @@ public class DayIntConverter implements ActionTimeIntConverter {
   @Override
   public int toInt(String v) {
     DateTime end = FORMATTER.parseDateTime(v);
-    return Days.daysBetween(BASE, end).getDays();
+    return Seconds.secondsBetween(BASE, end).getSeconds();
   }
 
   /**
    * Get date according to number of days past the reference day.
    *
-   * @param days number of days past the reference day
+   * @param seconds number of seconds past the reference day
    * @return date string value for specific format
    */
-  public String getString(int days) {
-    DateTime dt = BASE.plusDays(days);
+  public String getString(int seconds) {
+    DateTime dt = BASE.plusSeconds(seconds);
     return FORMATTER.print(dt);
   }
 }

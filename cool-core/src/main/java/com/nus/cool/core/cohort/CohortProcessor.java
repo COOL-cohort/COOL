@@ -312,7 +312,7 @@ public class CohortProcessor {
     // Error: A user with only one record will never be birthed.
     // Please check the CohortSelectionTest.java file
     LocalDateTime actionTime =
-        DateUtils.daysSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
+        DateUtils.secondsSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
     // check whether its birthEvent is selected
     if (!this.birthSelector.isUserSelected(userId)) {
       // if birthEvent is not selected

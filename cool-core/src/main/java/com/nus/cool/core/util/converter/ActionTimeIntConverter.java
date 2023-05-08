@@ -5,6 +5,7 @@ package com.nus.cool.core.util.converter;
  */
 public interface ActionTimeIntConverter {
   
+  // convert the input action time to time since epoch in seconds
   public int toInt(String v);
 
 }
