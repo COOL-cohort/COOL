@@ -26,8 +26,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
- * SecondIntConverter converts the input day represented in format yyyy-MM-dd to integer which is the
- * number of days past the reference day.
+ * SecondIntConverter converts the input day represented in format yyyy-MM-dd to integer
+ * which is the number of days past the reference day.
  */
 public class SecondIntConverter implements ActionTimeIntConverter {
 

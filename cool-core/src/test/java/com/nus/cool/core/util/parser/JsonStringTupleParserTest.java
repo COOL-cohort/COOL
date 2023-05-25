@@ -48,7 +48,7 @@ public class JsonStringTupleParserTest {
           + "\"int64_field\":\"64\","
           + "\"role\":\"stonegolem\","
           + "\"playerId\":\"43e3e0d84da1056\","
-          + "\"eventDay\":\"2013-05-21\","
+          + "\"eventDay\":\"2013-05-21 00:00:00\","
           + "\"event\":\"fight\","
           + "\"money\":\"1638\","
           + "\"other\":\"Int96Value{Binary{3 constant bytes, [0, 0, 0]}}\"}";

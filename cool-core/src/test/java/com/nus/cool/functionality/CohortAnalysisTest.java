@@ -80,36 +80,43 @@ public class CohortAnalysisTest {
         "CubeRepo/TestCube").toString();
     return new Object[][] {
         // ecommerce
+       {cubeRepo,
+           "../datasets/ecommerce_query/sample_query/query.json",
+           "../datasets/ecommerce_query/sample_query/query_result.json"},
+       // heath_raw
+       {cubeRepo,
+           "../datasets/health_raw/sample_query_distinctcount/query.json",
+           "../datasets/health_raw/sample_query_distinctcount/query_result.json"},
+       {cubeRepo,
+           "../datasets/health_raw/sample_query_count/query.json",
+           "../datasets/health_raw/sample_query_count/query_result.json"},
+       {cubeRepo,
+           "../datasets/health_raw/sample_query_average/query.json",
+           "../datasets/health_raw/sample_query_average/query_result.json"},
+       {cubeRepo,
+           "../datasets/health_raw/sample_query_max/query.json",
+           "../datasets/health_raw/sample_query_max/query_result.json"},
+       {cubeRepo,
+           "../datasets/health_raw/sample_query_min/query.json",
+           "../datasets/health_raw/sample_query_min/query_result.json"},
+       {cubeRepo,
+           "../datasets/health_raw/sample_query_sum/query.json",
+           "../datasets/health_raw/sample_query_sum/query_result.json"},
+       // fraud_case
+       {cubeRepo,
+           "../datasets/fraud_case/sample_query_login_count/query.json",
+           "../datasets/fraud_case/sample_query_login_count/query_result.json"},
+       // health
+       {cubeRepo,
+           "../datasets/health/sample_query_distinctcount/query.json",
+           "../datasets/health/sample_query_distinctcount/query_result.json"},
+        //health_raw random time
         {cubeRepo,
-            "../datasets/ecommerce_query/sample_query/query.json",
-            "../datasets/ecommerce_query/sample_query/query_result.json"},
-        // heath_raw
+            "../datasets/health_raw_random_time/sample_query_distinctcount/query.json",
+            "../datasets/health_raw_random_time/sample_query_distinctcount/query_result.json"},
         {cubeRepo,
-            "../datasets/health_raw/sample_query_distinctcount/query.json",
-            "../datasets/health_raw/sample_query_distinctcount/query_result.json"},
-        {cubeRepo,
-            "../datasets/health_raw/sample_query_count/query.json",
-            "../datasets/health_raw/sample_query_count/query_result.json"},
-        {cubeRepo,
-            "../datasets/health_raw/sample_query_average/query.json",
-            "../datasets/health_raw/sample_query_average/query_result.json"},
-        {cubeRepo,
-            "../datasets/health_raw/sample_query_max/query.json",
-            "../datasets/health_raw/sample_query_max/query_result.json"},
-        {cubeRepo,
-            "../datasets/health_raw/sample_query_min/query.json",
-            "../datasets/health_raw/sample_query_min/query_result.json"},
-        {cubeRepo,
-            "../datasets/health_raw/sample_query_sum/query.json",
-            "../datasets/health_raw/sample_query_sum/query_result.json"},
-        // fraud_case
-        {cubeRepo,
-            "../datasets/fraud_case/sample_query_login_count/query.json",
-            "../datasets/fraud_case/sample_query_login_count/query_result.json"},
-        // health
-        {cubeRepo,
-            "../datasets/health/sample_query_distinctcount/query.json",
-            "../datasets/health/sample_query_distinctcount/query_result.json"}
+            "../datasets/health_raw_random_time/sample_query_count/query.json",
+            "../datasets/health_raw_random_time/sample_query_count/query_result.json"},
     };
   }
 

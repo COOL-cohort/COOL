@@ -15,7 +15,7 @@
         "type":"SET"},
       { "filterType": "filter",
         "fieldSchema": "O_ORDERDATE",
-        "acceptValue": ["1993-01-01 to 1994-01-02"],
+        "acceptValue": ["1993-01-01 00:00:00 to 1994-01-02 00:00:00"],
         "type":"RANGE"}
     ]
   },

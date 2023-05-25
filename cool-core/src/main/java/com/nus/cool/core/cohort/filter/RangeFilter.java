@@ -5,7 +5,7 @@ import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.field.RangeField;
 import com.nus.cool.core.field.ValueWrapper;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
-import com.nus.cool.core.util.converter.DayIntConverter;
+import com.nus.cool.core.util.converter.SecondIntConverter;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -140,9 +140,9 @@ public class RangeFilter implements Filter {
       r = part[1].equals(MaxLimit) ? null : ValueWrapper.of(Float.parseFloat(part[1]));
     } catch (Exception e)  {
       System.out.println("[Warning]. Parse using float failed, element = " + part[0]);
-      DayIntConverter dataConverter = new DayIntConverter();
-      int intValueMin = dataConverter.toInt(part[0]);
-      int intValueMax = dataConverter.toInt(part[1]);
+      SecondIntConverter secondConverter = new SecondIntConverter();
+      int intValueMin = secondConverter.toInt(part[0]);
+      int intValueMax = secondConverter.toInt(part[1]);
       l = part[0].equals(MinLimit) ? null : ValueWrapper.of(intValueMin);
       r = part[1].equals(MaxLimit) ? null : ValueWrapper.of(intValueMax);
     }
