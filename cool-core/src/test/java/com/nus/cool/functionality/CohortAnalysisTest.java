@@ -1,7 +1,5 @@
 package com.nus.cool.functionality;
 
-import static com.nus.cool.functionality.CohortAnalysis.performCohortAnalysis;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.storage.CohortRet;
@@ -39,26 +37,21 @@ public class CohortAnalysisTest {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void cohortSelectionUnitTest(String cubeRepo, String queryPath, String queryResultPath)
       throws IOException {
-    CohortRet ret = performCohortAnalysis(cubeRepo, queryPath);
+    CohortRet ret = CohortAnalysis.performCohortAnalysis(cubeRepo, queryPath);
 
     // validate the results
     ObjectMapper mapper = new ObjectMapper();
-    // HashMap<String, List<Integer>> cohortData = mapper.readValue(new
-    // File(queryResultPath), HashMap.class);
     HashMap<String, List<Integer>> cohortData = mapper.readValue(new File(queryResultPath),
         new TypeReference<HashMap<String, List<Integer>>>() {
         });
     // check the result
-    // System.out.println(ret.toString());
     // validate the cohortName
     Assert.assertEquals(ret.getCohortList().size(), cohortData.size());
 
     // System.out.println(ret.getCohortList());
     for (String cohortName : ret.getCohortList()) {
       Assert.assertTrue(cohortData.containsKey(cohortName));
-      // System.out.printf("True Result %s\n", cohortData.get(cohortName).toString());
-      // System.out.printf("Get Result %s\n", ret.getValuesByCohort(cohortName));
-      Assert.assertEquals(cohortData.get(cohortName), ret.getValuesByCohort(cohortName));
+      Assert.assertEquals(ret.getValuesByCohort(cohortName), cohortData.get(cohortName));
     }
   }
 
@@ -67,7 +60,7 @@ public class CohortAnalysisTest {
       "com.nus.cool.functionality.CohortSelectionTest.cohortSelectionUnitTest"})
   public void cohortSelectionWithInputCohortUnitTest(String cubeRepo, String queryPath
                                                      ) throws IOException {
-    CohortRet ret = performCohortAnalysis(cubeRepo, queryPath);
+    CohortRet ret = CohortAnalysis.performCohortAnalysis(cubeRepo, queryPath);
     System.out.println(ret);
   }
 
