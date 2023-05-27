@@ -1,7 +1,5 @@
 package com.nus.cool.functionality;
 
-import static com.nus.cool.functionality.FunnelAnalysis.performFunnelAnalysis;
-
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +29,7 @@ public class FunnelAnalysisTest {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void funnelAnalysisUnitTest(String queryPath, String cubeRepo, int[] out)
       throws IOException {
-    int[] ret = performFunnelAnalysis(cubeRepo, queryPath);
+    int[] ret = FunnelAnalysis.performFunnelAnalysis(cubeRepo, queryPath);
     Assert.assertEquals(ret, out);
   }
 
