@@ -27,7 +27,6 @@ if __name__ == '__main__':
         product_id = item['Product_ID']
         if product_id not in have_birth_products:
             have_birth_products.add(product_id)
-            continue
 
         # now have birth day, start to calculate
         cohort = str(item['First_Reported_Date'].to_pydatetime().date())

@@ -67,8 +67,6 @@ public class BirthSelectionContext {
       // If Satisfied, we update the birthEventTime
       // the new added event make the ContextWindow satisfy the requirement
       // means the new added event's date is the "birth Time"
-      // System.out.println("UserId " + userId + "\tdate:" +
-      // DateUtils.convertString(date));
       userSelected.put(userId, date);
       userBirthTime.remove(userId);
       // free the context content for selected user.

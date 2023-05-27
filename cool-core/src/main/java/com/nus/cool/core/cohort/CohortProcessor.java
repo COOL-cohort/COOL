@@ -308,43 +308,46 @@ public class CohortProcessor {
       return;
     }
 
-    // TODO: there is an error in the following code
-    // Error: A user with only one record will never be birthed.
-    // Please check the CohortSelectionTest.java file
     LocalDateTime actionTime =
         DateUtils.daysSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
+        
     // check whether its birthEvent is selected
     if (!this.birthSelector.isUserSelected(userId)) {
-      // if birthEvent is not selected
-      this.birthSelector.selectEvent(userId, actionTime, this.tuple);
-    } else {
-      // the birthEvent is selected
-      // extract the cohort this tuple belong to
-      String cohortName = this.cohortSelector.selectCohort(this.tuple, metaChunk);
-      if (cohortName == null) {
-        // cohort is outofrange
+      boolean selected = this.birthSelector.selectEvent(userId, actionTime, this.tuple);
+      if (!selected || !this.birthSelector.isUserSelected(userId)) {
+        // if birthEvent is not selected, or birth event selected but user not born yet.
+        return;
+      } 
+    }
+    // user is born
+    // extract the cohort this tuple belong to
+    String cohortName = this.cohortSelector.selectCohort(this.tuple, metaChunk);
+    if (cohortName == null) {
+      // cohort is outofrange
+      return;
+    }
+    this.result.addUserid(cohortName, userId);
+
+    if (this.ageSelector != null && this.valueSelector != null) {
+      // do time_diff to generate age / get the BirthEvent Date
+      LocalDateTime birthTime = this.birthSelector.getUserBirthEventDate(userId);
+      
+      assert birthTime != null : "birthTime null";
+      assert actionTime != null : "actionTime null";
+      int age = this.ageSelector.generateAge(birthTime, actionTime);
+      if (age == AgeSelection.DefaultNullAge) {
+        // age is outofrange
         return;
       }
-      this.result.addUserid(cohortName, userId);
-
-      if (this.ageSelector != null && this.valueSelector != null) {
-        // do time_diff to generate age / get the BirthEvent Date
-        LocalDateTime birthTime = this.birthSelector.getUserBirthEventDate(userId);
-        int age = this.ageSelector.generateAge(birthTime, actionTime);
-        if (age == AgeSelection.DefaultNullAge) {
-          // age is outofrange
-          return;
-        }
-        if (!this.valueSelector.isSelected(this.tuple)) {
-          // value outofrange
-          return;
-        }
-        // Pass all above filter, we can store value into CohortRet
-        // get the temporary result for this CohortGroup and this age
-        RetUnit ret = this.result.getByAge(cohortName, age);
-
-        this.valueSelector.getAggregateFunc().calculate(ret, tuple);
+      if (!this.valueSelector.isSelected(this.tuple)) {
+        // value outofrange
+        return;
       }
+      // Pass all above filter, we can store value into CohortRet
+      // get the temporary result for this CohortGroup and this age
+      RetUnit ret = this.result.getByAge(cohortName, age);
+
+      this.valueSelector.getAggregateFunc().calculate(ret, tuple);
     }
   }
 
