@@ -79,9 +79,8 @@ public class BirthSelection {
     if (birthEvents.isEmpty()) {
       if (!context.isUserSelected(userId)) {
         context.setUserSelected(userId, date);
-        return true;
       }
-      return false;
+      return true;
     }
 
     // if birthEvents is not null
