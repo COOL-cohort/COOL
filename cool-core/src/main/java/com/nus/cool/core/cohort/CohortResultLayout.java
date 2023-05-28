@@ -16,26 +16,22 @@ public class CohortResultLayout {
   @AllArgsConstructor
   @JsonSerializableSchema
   private static class CohortResInfo {
-    @JsonProperty("name")
-    private String name;
     @JsonProperty("cohortName")
     private String cohortName;
     @JsonProperty("cohortSize")
     private int cohortSize;
   }
 
-  private CohortQueryLayout cohortQuery;
   private ArrayList<CohortResInfo> cohortResList = new ArrayList<>();
 
   /**
    * Adding a cohort res.
    *
-   * @param name cohort file name
    * @param cohortName cohortName
    * @param cohortSize cohortSize
    */
-  public void addOneCohortRes(String name, String cohortName, int cohortSize) {
-    CohortResInfo cRes = new CohortResInfo(name, cohortName, cohortSize);
+  public void addOneCohortRes(String cohortName, int cohortSize) {
+    CohortResInfo cRes = new CohortResInfo(cohortName, cohortSize);
     this.cohortResList.add(cRes);
   }
 }

@@ -58,6 +58,10 @@ public class CohortQueryLayout {
     return readFromJson(new File(path));
   }
 
+  public boolean selectAll() {
+    return this.cohortSelectionLayout.getType() == FilterType.ALL;
+  }
+
   /**
    * Return the schema set.
    */

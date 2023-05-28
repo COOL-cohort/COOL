@@ -2,8 +2,9 @@ package com.nus.cool.core.cohort.storage;
 
 import com.nus.cool.core.field.FieldValue;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Partial of a tuple in project, when generated, the layout of schemas is
@@ -14,7 +15,7 @@ public class ProjectedTuple {
 
   private FieldValue[] tuple;
 
-  private HashMap<String, Integer> schema2Index;
+  private Map<String, Integer> schema2Index;
 
   /**
    * Get the value by field name.
@@ -29,7 +30,7 @@ public class ProjectedTuple {
   /**
    * Create a partial tuple with selected fields.
    */
-  public ProjectedTuple(HashSet<String> schemaList) {
+  public ProjectedTuple(Set<String> schemaList) {
     this.schema2Index = new HashMap<>();
     int idx = 0;
     for (String schema : schemaList) {

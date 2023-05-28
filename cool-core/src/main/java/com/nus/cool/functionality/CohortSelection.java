@@ -19,8 +19,10 @@
 
 package com.nus.cool.functionality;
 
+import com.google.common.io.Files;
 import com.nus.cool.core.cohort.CohortProcessor;
 import com.nus.cool.core.cohort.CohortQueryLayout;
+import com.nus.cool.core.cohort.CohortWriter;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
@@ -48,13 +50,24 @@ public class CohortSelection {
     coolModel.reload(cohortProcessor.getDataSource());
     CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
 
+    CohortRet ret = cohortProcessor.process(cube);
+
     // get current dir path
     File currentVersion = coolModel.getLatestVersion(cohortProcessor.getDataSource());
-    CohortRet ret = cohortProcessor.process(cube);
-    String cohortStoragePath = cohortProcessor.persistCohort(currentVersion.toString());
+    String outputPath = currentVersion.toString() + "/cohort/" + layout.getQueryName();
+    CohortWriter.setUpOutputFolder(outputPath);
+    Files.copy(new File(queryPath), new File(outputPath + "/query.json"));;
+    CohortWriter.persistCohortResult(ret, outputPath);
+
+    // persist cohort
+    if (layout.selectAll()) {
+      CohortWriter.persistOneCohort(ret, "all", outputPath); 
+    }
+    // TODO should handle explicit picked cohort.
+
     coolModel.close();
 
-    return cohortStoragePath;
+    return outputPath;
   }
 
 
