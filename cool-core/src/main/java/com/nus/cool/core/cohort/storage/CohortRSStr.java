@@ -64,12 +64,17 @@ public class CohortRSStr implements Input {
 
   @Override
   public void readFrom(ByteBuffer buffer) {
-    InputVector<String> valueVec = InputVectorFactory.genStrFieldInputVector(buffer, this.charset);
-    int valueCount = valueVec.size();
-    values = new ArrayList<>(valueCount);
-    for (int i = 0; i < valueCount; i++) {
-      String value = valueVec.get(i);
-      values.add(value);
+    try {
+      InputVector<String> valueVec =
+          InputVectorFactory.genStrFieldInputVector(buffer, this.charset);
+      int valueCount = valueVec.size();
+      values = new ArrayList<>(valueCount);
+      for (int i = 0; i < valueCount; i++) {
+        String value = valueVec.get(i);
+        values.add(value);
+      }
+    } catch (IllegalArgumentException e) {
+      System.out.println("invalid argument for cohort user loading");
     }
   }
 

@@ -83,12 +83,18 @@ public class ProcessorTest extends CsvLoaderTest {
     CohortWriter.persistCohortResult(ret, outputPath);
     if (layout.selectAll()) {
       CohortWriter.persistOneCohort(ret, "all", outputPath); 
+    } else if (layout.isOutputAll()) {
+      CohortWriter.persistAllCohorts(ret, outputPath); 
+    } else {
+      String outputCohort = layout.getOutputCohort();
+      if (outputCohort != null && !outputCohort.isEmpty()) {
+        CohortWriter.persistOneCohort(ret, outputCohort, outputPath);
+      }
     }
 
-    // // check loading cohort
-    // // TODO: write a separate unit test
-    // cohortProcessor.readQueryCohorts(outputPath);
-    // Assert.assertTrue(cohortProcessor.getInputCohortSize() > 0);
+    // check loading cohort
+    cohortProcessor.readQueryCohort(layout.getOutputCohort(), outputPath);
+    Assert.assertTrue(cohortProcessor.getInputCohortSize() > 0);
   }
 
   /**

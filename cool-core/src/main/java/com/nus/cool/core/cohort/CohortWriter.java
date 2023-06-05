@@ -46,15 +46,11 @@ public interface CohortWriter {
   }
 
   /**
-   * Output the users of a cohort to file.
-   *
-   * @param res cohort processing result
-   * @param cohortName the cohort to output
-   * @param outputDir the directory to store the file
+   * Persist the cohort write store into a file.
    */
-  public static void persistOneCohort(CohortRet res, String cohortName, String outputDir) {
+  public static void persistCohortWS(String cohortName, Optional<CohortWSStr> cohort,
+      String outputDir) {
     try {
-      Optional<CohortWSStr> cohort = res.genCohortUser(cohortName);
       if (!cohort.isPresent()) {
         System.out.println("failed to persist cohort: " + cohortName + " " + "(not found)");
         return;
@@ -70,12 +66,33 @@ public interface CohortWriter {
   }
 
   /**
-   * Persist a set of cohorts from the result in to individual files.
+   * Output the users of a cohort to file.
+   *
+   * @param res cohort processing result
+   * @param cohortName the cohort to output
+   * @param outputDir the directory to store the file
+   */
+  public static void persistOneCohort(CohortRet res, String cohortName, String outputDir) {
+    Optional<CohortWSStr> cohort = res.genCohortUser(cohortName);
+    persistCohortWS(cohortName, cohort, outputDir);
+  }
+
+  /**
+   * Persist a set of cohorts from the result into individual files.
    *
    * @param picked named cohorts to write out.
    */
-  public static void persistSelectedCohorts(CohortRet res, Set<String> picked, String outputDir)
-      throws IOException {
+  public static void persistSelectedCohorts(CohortRet res, Set<String> picked, String outputDir) {
     picked.stream().forEach(x -> persistOneCohort(res, x, outputDir));
+  }
+
+  /**
+   * Persist all non-empty cohorts from the result into individual files.
+   */
+  public static void persistAllCohorts(CohortRet res, String outputDir) {
+    res.genAllCohortUsers()
+        .entrySet()
+        .stream()
+        .forEach(x -> persistCohortWS(x.getKey(), x.getValue(), outputDir));
   }
 }

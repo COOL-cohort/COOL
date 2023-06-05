@@ -39,6 +39,12 @@ public class CohortQueryLayout {
   @JsonProperty("inputCohort")
   private String inputCohort;
 
+  @JsonProperty("outputCohort")
+  private String outputCohort;
+
+  @JsonProperty("outputAll")
+  private boolean outputAll;
+
   /**
    * Read the cohort query in a json.
    */

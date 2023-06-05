@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
 import lombok.Getter;
 
 /**
@@ -127,25 +126,19 @@ public class CohortProcessor {
    *
    * @param cohortFolderPath the path to store the previous stored cohort.
    */
-  public void readQueryCohorts(String cohortFolderPath) throws IOException {
-    CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
-
-    File file = new File(cohortFolderPath);
-    File[] fs = file.listFiles();
+  public void readQueryCohort(String cohortName, String cohortFolderPath) throws IOException {
+    
+    // check folder
+    File folder = new File(cohortFolderPath);
+    File[] fs = folder.listFiles();
     if (fs == null) {
       return;
     }
-    for (File f : fs) {
-      int pointIndex = f.getName().lastIndexOf(".");
-      if (pointIndex == -1) {
-        continue;
-      }
-      String extension = f.getName().substring(pointIndex);
-      if (!f.isDirectory() && extension.equals(".cohort")) {
-        crs.readFrom(Files.map(f));
-        this.previousCohortUsers.addAll(crs.getUsers());
-      }
-    }
+    File cohortFile = new File(folder, cohortName + ".cohort");
+
+    CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
+    crs.readFrom(Files.map(cohortFile));
+    this.previousCohortUsers.addAll(crs.getUsers());
   }
 
   /**

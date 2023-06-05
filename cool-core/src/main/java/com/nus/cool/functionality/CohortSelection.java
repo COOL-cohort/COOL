@@ -62,8 +62,14 @@ public class CohortSelection {
     // persist cohort
     if (layout.selectAll()) {
       CohortWriter.persistOneCohort(ret, "all", outputPath); 
+    } else if (layout.isOutputAll()) {
+      CohortWriter.persistAllCohorts(ret, outputPath); 
+    } else {
+      String outputCohort = layout.getOutputCohort();
+      if (outputCohort != null && !outputCohort.isEmpty()) {
+        CohortWriter.persistOneCohort(ret, outputCohort, outputPath);
+      }
     }
-    // TODO should handle explicit picked cohort.
 
     coolModel.close();
 
