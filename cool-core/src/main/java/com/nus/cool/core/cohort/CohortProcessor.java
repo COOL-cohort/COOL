@@ -120,13 +120,14 @@ public class CohortProcessor {
   }
 
   /**
-   * Read all cohorts from the results of a previous query,
+   * Read one cohort from the results of a previous query,
    * cohort is named cohortName.cohort, e,g. "1980-1990.cohort".
    * Where 1980-1990 is the cohortName in our cohort query for health-raw dataset.
    *
+   * @param cohortName name of the previous stored cohort.
    * @param cohortFolderPath the path to store the previous stored cohort.
    */
-  public void readQueryCohort(String cohortName, String cohortFolderPath) throws IOException {
+  public void readOneCohort(String cohortName, String cohortFolderPath) throws IOException {
     
     // check folder
     File folder = new File(cohortFolderPath);
@@ -135,10 +136,7 @@ public class CohortProcessor {
       return;
     }
     File cohortFile = new File(folder, cohortName + ".cohort");
-
-    CohortRSStr crs = new CohortRSStr(StandardCharsets.UTF_8);
-    crs.readFrom(Files.map(cohortFile));
-    this.previousCohortUsers.addAll(crs.getUsers());
+    readOneCohort(cohortFile);
   }
 
   /**

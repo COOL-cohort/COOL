@@ -65,14 +65,6 @@ public class ProcessorTest extends CsvLoaderTest {
     CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
     File currentVersion = this.coolModel.getCubeStorePath(cohortProcessor.getDataSource());
 
-    // load input cohort
-    if (cohortProcessor.getInputCohort() != null) {
-      File cohortFile = new File(currentVersion, "cohort/" + cohortProcessor.getInputCohort());
-      if (cohortFile.exists()) {
-        cohortProcessor.readOneCohort(cohortFile);
-      }
-    }
-
     // get current dir path
     CohortRet ret = cohortProcessor.process(cube);
 
@@ -93,7 +85,7 @@ public class ProcessorTest extends CsvLoaderTest {
     }
 
     // check loading cohort
-    cohortProcessor.readQueryCohort(layout.getOutputCohort(), outputPath);
+    cohortProcessor.readOneCohort(layout.getOutputCohort(), outputPath);
     Assert.assertTrue(cohortProcessor.getInputCohortSize() > 0);
   }
 
