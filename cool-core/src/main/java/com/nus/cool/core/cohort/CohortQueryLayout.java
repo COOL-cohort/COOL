@@ -39,6 +39,12 @@ public class CohortQueryLayout {
   @JsonProperty("inputCohort")
   private String inputCohort;
 
+  @JsonProperty("outputCohort")
+  private String outputCohort;
+
+  @JsonProperty("outputAll")
+  private boolean outputAll;
+
   /**
    * Read the cohort query in a json.
    */
@@ -56,6 +62,10 @@ public class CohortQueryLayout {
 
   public static CohortQueryLayout readFromJson(String path) throws IOException {
     return readFromJson(new File(path));
+  }
+
+  public boolean selectAll() {
+    return this.cohortSelectionLayout.getType() == FilterType.ALL;
   }
 
   /**

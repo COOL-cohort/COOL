@@ -3,11 +3,15 @@ package com.nus.cool.queryserver.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nus.cool.core.cohort.CohortProcessor;
 import com.nus.cool.core.cohort.CohortQueryLayout;
+import com.nus.cool.core.cohort.CohortWriter;
+import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
 import com.nus.cool.queryserver.singleton.ModelConfig;
 import com.nus.cool.queryserver.utils.Util;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import javax.ws.rs.QueryParam;
 import org.springframework.http.MediaType;
@@ -94,11 +98,31 @@ public class CohortController {
     System.out.println("reload success...");
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
     CubeRS cubeRS = ModelConfig.cachedCoolModel.getCube(cohortProcessor.getDataSource());
-    String res = cohortProcessor.process(cubeRS).toString();
+    CohortRet ret = cohortProcessor.process(cubeRS);
     File currentVersion =
         ModelConfig.cachedCoolModel.getLatestVersion(cohortProcessor.getDataSource());
-    cohortProcessor.persistCohort(currentVersion.toString());
-    return ResponseEntity.ok().body(res);
+    // store the cohort
+    String outputPath = currentVersion.toString() + "/cohort/" + layout.getQueryName();
+    CohortWriter.setUpOutputFolder(outputPath);
+    // store the query
+    BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath + "/query.json"));
+    writer.write(queryContent);
+    writer.close();
+    // store results
+    CohortWriter.persistCohortResult(ret, outputPath);
+    // persist cohort
+    if (layout.selectAll()) {
+      CohortWriter.persistOneCohort(ret, "all", outputPath); 
+    } else if (layout.isOutputAll()) {
+      CohortWriter.persistAllCohorts(ret, outputPath); 
+    } else {
+      String outputCohort = layout.getOutputCohort();
+      if (outputCohort != null && !outputCohort.isEmpty()) {
+        CohortWriter.persistOneCohort(ret, outputCohort, outputPath);
+      }
+    }
+
+    return ResponseEntity.ok().body(ret.toString());
   }
 
   /**

@@ -20,8 +20,10 @@
 
 package com.nus.cool.functionality;
 
+import com.google.common.io.Files;
 import com.nus.cool.core.cohort.CohortProcessor;
 import com.nus.cool.core.cohort.CohortQueryLayout;
+import com.nus.cool.core.cohort.CohortWriter;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.io.readstore.CubeRS;
 import com.nus.cool.model.CoolModel;
@@ -58,12 +60,15 @@ public class CohortAnalysis {
       }
     }
 
-    // get current dir path
+    // run analysis
     CohortRet ret = cohortProcessor.process(cube);
-    String cohortStoragePath = cohortProcessor.persistCohort(currentVersion.toString());
-    cohortProcessor.readQueryCohorts(cohortStoragePath);
-    coolModel.close();
 
+    // persist the results
+    String outputPath = currentVersion.toString() + "/cohort/" + layout.getQueryName();
+    CohortWriter.setUpOutputFolder(outputPath);
+    Files.copy(new File(queryPath), new File(outputPath + "/query.json"));;
+    CohortWriter.persistCohortResult(ret, outputPath);
+    coolModel.close();
     return ret;
   }
 

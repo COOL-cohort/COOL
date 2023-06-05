@@ -46,5 +46,6 @@
         "function":"DISTINCT",
         "observedSchema":"id"
     },
-    "dataSource": "health_raw"
+    "dataSource": "health_raw", 
+    "outputCohort": "1950-1960"
 }
