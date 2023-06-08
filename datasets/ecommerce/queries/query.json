@@ -3,7 +3,7 @@
   "selection": {
     "filterType": "filter",
     "fieldSchema": "Reported_Date",
-    "acceptValue": ["2021-01-01 to 2021-02-01"],
+    "acceptValue": ["2021-01-01 00:00:00 to 2021-02-01 00:00:00"],
     "type":"RANGE"},
   "groupFields":["Reported_Date"],
   "groupFieldsGranularity": "MONTH",

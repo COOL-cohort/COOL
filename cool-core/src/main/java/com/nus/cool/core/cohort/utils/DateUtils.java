@@ -19,9 +19,8 @@ public class DateUtils {
         TimeZone.getDefault().toZoneId());
   }
 
-  public static LocalDateTime daysSinceEpoch(int days) {
-    long unixTime = days * 24 * 3600;
-    return createCalender(unixTime);
+  public static LocalDateTime secondsSinceEpoch(int seconds) {
+    return createCalender(seconds);
   }
 
   /**
@@ -66,10 +65,10 @@ public class DateUtils {
         return new TimeWindow(d.toHours(), TimeUtils.TimeUnit.HOUR);
       case MINUTE:
         return new TimeWindow(d.toMinutes(), TimeUtils.TimeUnit.MINUTE);
+      case SECOND:
+        return new TimeWindow(d.toMillis() / 1000, TimeUtils.TimeUnit.SECOND);
       case MONTH:
         return new TimeWindow(d.toDays() / 30, TimeUtils.TimeUnit.MONTH);
-      case SECOND:
-        return new TimeWindow(d.toMinutes() * 60, TimeUtils.TimeUnit.SECOND);
       case WEEK:
         return new TimeWindow(d.toDays() / 7, TimeUtils.TimeUnit.WEEK);
       case YEAR:

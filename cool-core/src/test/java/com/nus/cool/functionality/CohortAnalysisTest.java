@@ -102,7 +102,14 @@ public class CohortAnalysisTest {
         // health
         {cubeRepo,
             "../datasets/health/sample_query_distinctcount/query.json",
-            "../datasets/health/sample_query_distinctcount/query_result.json"}
+            "../datasets/health/sample_query_distinctcount/query_result.json"},
+        //health_raw random time
+        {cubeRepo,
+            "../datasets/health_raw_random_time/sample_query_distinctcount/query.json",
+            "../datasets/health_raw_random_time/sample_query_distinctcount/query_result.json"},
+        {cubeRepo,
+            "../datasets/health_raw_random_time/sample_query_count/query.json",
+            "../datasets/health_raw_random_time/sample_query_count/query_result.json"},
     };
   }
 

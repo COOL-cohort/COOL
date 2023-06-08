@@ -1,0 +1,50 @@
+{
+    "queryName": "sample_query_sum",
+    "birthSelector":{
+        "birthEvents":[
+            {
+                "filters":[
+                    {
+                        "fieldSchema":"prescribe",
+                        "type":"SET",
+                        "acceptValue":["Medicine-A"]
+                    }
+                ],
+                "frequency":2
+            }
+        ]
+    },
+
+    "ageSelector":{
+        "unit":"DAY",
+        "min":0,
+        "max":7,
+        "interval":1
+    },
+
+    "cohortSelector":{
+        "fieldSchema":"birthyear",
+        "type":"RANGE",
+        "min":1950,
+        "max":2000,
+        "interval":10
+    },
+
+    "valueSelector":{
+        "filters":[
+            {
+                "fieldSchema":"labtest",
+                "type":"SET",
+                "acceptValue":["Labtest-C"]
+            },
+            {
+                "fieldSchema":"value",
+                "type":"RANGE",
+                "acceptValue":["MIN to 45", "131 to MAX"]
+            }
+        ],
+        "function":"SUM",
+        "observedSchema":"value"
+    },
+    "dataSource": "health_raw_random_time"
+}

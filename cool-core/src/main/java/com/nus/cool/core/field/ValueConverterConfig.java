@@ -1,7 +1,7 @@
 package com.nus.cool.core.field;
 
 import com.nus.cool.core.util.converter.ActionTimeIntConverter;
-import com.nus.cool.core.util.converter.DayIntConverter;
+import com.nus.cool.core.util.converter.SecondIntConverter;
 import lombok.Data;
 
 
@@ -11,5 +11,5 @@ import lombok.Data;
  */
 @Data
 public class ValueConverterConfig {
-  ActionTimeIntConverter actionTimeIntConverter = DayIntConverter.getInstance();
+  ActionTimeIntConverter actionTimeIntConverter = SecondIntConverter.getInstance();
 }

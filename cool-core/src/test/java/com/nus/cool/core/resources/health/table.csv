@@ -1,101 +1,101 @@
 id,birthYear,event,attr1,attr2,attr3,attr4,time
-P-7,1990,labtest,None,None,Labtest-C,70,2012-11-23
-P-10,1972,labtest,None,None,Labtest-B,27,2012-01-21
-P-10,1972,diagnose,Disease-C,None,None,0,2012-08-01
-P-12,1971,prescribe,None,Medicine-B,None,0,2012-08-25
-P-2,1980,labtest,None,None,Labtest-B,15,2012-01-05
-P-10,1972,labtest,None,None,Labtest-B,29,2012-06-18
-P-0,1954,diagnose,Disease-B,None,None,0,2012-01-01
-P-10,1972,labtest,None,None,Labtest-A,39,2012-01-01
-P-12,1971,labtest,None,None,Labtest-B,2,2012-01-13
-P-12,1971,prescribe,None,Medicine-B,None,0,2012-08-26
-P-0,1954,prescribe,None,Medicine-C,None,0,2012-01-01
-P-9,1983,labtest,None,None,Labtest-C,39,2012-01-04
-P-10,1972,labtest,None,None,Labtest-B,43,2012-08-06
-P-5,1979,labtest,None,None,Labtest-C,17,2012-01-07
-P-4,1990,labtest,None,None,Labtest-B,49,2012-04-13
-P-9,1983,prescribe,None,Medicine-B,None,0,2012-01-01
-P-12,1971,labtest,None,None,Labtest-B,35,2012-12-11
-P-0,1954,labtest,None,None,Labtest-B,16,2012-05-22
-P-6,1971,diagnose,Disease-A,None,None,0,2012-01-01
-P-12,1971,prescribe,None,Medicine-B,None,0,2012-08-24
-P-10,1972,diagnose,Disease-C,None,None,0,2012-01-19
-P-11,1993,diagnose,Disease-A,None,None,0,2012-09-18
-P-12,1971,prescribe,None,Medicine-B,None,0,2012-10-23
-P-1,1976,labtest,None,None,Labtest-C,40,2012-01-02
-P-5,1979,labtest,None,None,Labtest-B,29,2012-12-12
-P-2,1980,prescribe,None,Medicine-B,None,0,2012-01-06
-P-11,1993,labtest,None,None,Labtest-A,52,2012-09-21
-P-4,1990,labtest,None,None,Labtest-B,38,2012-04-14
-P-2,1980,diagnose,Disease-B,None,None,0,2012-12-15
-P-7,1990,prescribe,None,Medicine-B,None,0,2012-01-06
-P-4,1990,prescribe,None,Medicine-C,None,0,2012-01-04
-P-5,1979,labtest,None,None,Labtest-C,22,2012-03-21
-P-5,1979,prescribe,None,Medicine-A,None,0,2012-03-23
-P-7,1990,labtest,None,None,Labtest-A,39,2012-01-02
-P-7,1990,labtest,None,None,Labtest-A,32,2012-01-01
-P-6,1971,labtest,None,None,Labtest-C,51,2012-01-01
-P-2,1980,labtest,None,None,Labtest-A,1,2012-12-19
-P-12,1971,labtest,None,None,Labtest-A,3,2012-10-21
-P-12,1971,labtest,None,None,Labtest-B,58,2012-12-13
-P-9,1983,prescribe,None,Medicine-B,None,0,2012-01-04
-P-2,1980,labtest,None,None,Labtest-A,3,2012-12-20
-P-10,1972,labtest,None,None,Labtest-B,6,2012-08-02
-P-5,1979,labtest,None,None,Labtest-C,37,2012-03-23
-P-10,1972,prescribe,None,Medicine-C,None,0,2012-06-20
-P-4,1990,diagnose,Disease-C,None,None,0,2012-11-24
-P-9,1983,labtest,None,None,Labtest-C,14,2012-01-01
-P-7,1990,diagnose,Disease-A,None,None,0,2012-01-10
-P-9,1983,labtest,None,None,Labtest-C,58,2012-01-02
-P-2,1980,labtest,None,None,Labtest-B,21,2012-01-09
-P-4,1990,labtest,None,None,Labtest-B,44,2012-05-30
-P-11,1993,prescribe,None,Medicine-B,None,0,2012-09-20
-P-7,1990,labtest,None,None,Labtest-B,21,2012-01-12
-P-3,2000,labtest,None,None,Labtest-C,38,2012-01-21
-P-12,1971,labtest,None,None,Labtest-B,2,2012-12-12
-P-2,1980,labtest,None,None,Labtest-B,40,2012-01-07
-P-11,1993,prescribe,None,Medicine-B,None,0,2012-09-23
-P-11,1993,labtest,None,None,Labtest-A,40,2012-09-23
-P-12,1971,labtest,None,None,Labtest-C,33,2012-08-24
-P-2,1980,prescribe,None,Medicine-B,None,0,2012-01-01
-P-10,1972,prescribe,None,Medicine-B,None,0,2012-01-20
-P-4,1990,labtest,None,None,Labtest-B,5,2012-04-15
-P-7,1990,prescribe,None,Medicine-C,None,0,2012-01-13
-P-2,1980,labtest,None,None,Labtest-A,0,2012-12-22
-P-5,1979,prescribe,None,Medicine-B,None,0,2012-01-04
-P-12,1971,labtest,None,None,Labtest-B,5,2012-12-09
-P-3,2000,diagnose,Disease-B,None,None,0,2012-01-21
-P-10,1972,labtest,None,None,Labtest-B,45,2012-01-19
-P-4,1990,labtest,None,None,Labtest-B,3,2012-01-04
-P-9,1983,diagnose,Disease-B,None,None,0,2012-03-18
-P-10,1972,labtest,None,None,Labtest-B,30,2012-01-20
-P-10,1972,prescribe,None,Medicine-A,None,0,2012-08-05
-P-10,1972,diagnose,Disease-A,None,None,0,2012-01-04
-P-4,1990,prescribe,None,Medicine-B,None,0,2012-11-24
-P-5,1979,prescribe,None,Medicine-B,None,0,2012-01-05
-P-12,1971,diagnose,Disease-B,None,None,0,2012-01-08
-P-12,1971,labtest,None,None,Labtest-C,4,2012-08-28
-P-4,1990,prescribe,None,Medicine-C,None,0,2012-01-03
-P-8,1986,labtest,None,None,Labtest-B,40,2012-01-01
-P-0,1954,labtest,None,None,Labtest-B,2,2012-05-18
-P-5,1979,labtest,None,None,Labtest-C,23,2012-01-01
-P-7,1990,prescribe,None,Medicine-B,None,0,2012-01-03
-P-4,1990,labtest,None,None,Labtest-B,2,2012-11-26
-P-12,1971,labtest,None,None,Labtest-B,23,2012-01-01
-P-10,1972,labtest,None,None,Labtest-A,20,2012-01-04
-P-9,1983,diagnose,Disease-B,None,None,0,2012-01-01
-P-5,1979,prescribe,None,Medicine-B,None,0,2012-01-03
-P-12,1971,diagnose,Disease-C,None,None,0,2012-10-21
-P-10,1972,prescribe,None,Medicine-A,None,0,2012-01-02
-P-12,1971,prescribe,None,Medicine-B,None,0,2012-01-01
-P-11,1993,labtest,None,None,Labtest-A,1,2012-09-27
-P-3,2000,labtest,None,None,Labtest-B,47,2012-01-01
-P-11,1993,labtest,None,None,Labtest-A,28,2012-09-18
-P-2,1980,prescribe,None,Medicine-B,None,0,2012-12-16
-P-10,1972,labtest,None,None,Labtest-B,30,2012-08-07
-P-5,1979,prescribe,None,Medicine-C,None,0,2012-12-12
-P-9,1983,labtest,None,None,Labtest-C,1,2012-03-24
-P-10,1972,diagnose,Disease-C,None,None,0,2012-06-17
-P-7,1990,prescribe,None,Medicine-C,None,0,2012-01-14
-P-7,1990,diagnose,Disease-C,None,None,0,2012-07-05
-P-9,1983,prescribe,None,Medicine-C,None,0,2012-03-19
+P-7,1990,labtest,None,None,Labtest-C,70,2012-11-23 00:00:00
+P-10,1972,labtest,None,None,Labtest-B,27,2012-01-21 00:00:00
+P-10,1972,diagnose,Disease-C,None,None,0,2012-08-01 00:00:00
+P-12,1971,prescribe,None,Medicine-B,None,0,2012-08-25 00:00:00
+P-2,1980,labtest,None,None,Labtest-B,15,2012-01-05 00:00:00
+P-10,1972,labtest,None,None,Labtest-B,29,2012-06-18 00:00:00
+P-0,1954,diagnose,Disease-B,None,None,0,2012-01-01 00:00:00
+P-10,1972,labtest,None,None,Labtest-A,39,2012-01-01 00:00:00
+P-12,1971,labtest,None,None,Labtest-B,2,2012-01-13 00:00:00
+P-12,1971,prescribe,None,Medicine-B,None,0,2012-08-26 00:00:00
+P-0,1954,prescribe,None,Medicine-C,None,0,2012-01-01 00:00:00
+P-9,1983,labtest,None,None,Labtest-C,39,2012-01-04 00:00:00
+P-10,1972,labtest,None,None,Labtest-B,43,2012-08-06 00:00:00
+P-5,1979,labtest,None,None,Labtest-C,17,2012-01-07 00:00:00
+P-4,1990,labtest,None,None,Labtest-B,49,2012-04-13 00:00:00
+P-9,1983,prescribe,None,Medicine-B,None,0,2012-01-01 00:00:00
+P-12,1971,labtest,None,None,Labtest-B,35,2012-12-11 00:00:00
+P-0,1954,labtest,None,None,Labtest-B,16,2012-05-22 00:00:00
+P-6,1971,diagnose,Disease-A,None,None,0,2012-01-01 00:00:00
+P-12,1971,prescribe,None,Medicine-B,None,0,2012-08-24 00:00:00
+P-10,1972,diagnose,Disease-C,None,None,0,2012-01-19 00:00:00
+P-11,1993,diagnose,Disease-A,None,None,0,2012-09-18 00:00:00
+P-12,1971,prescribe,None,Medicine-B,None,0,2012-10-23 00:00:00
+P-1,1976,labtest,None,None,Labtest-C,40,2012-01-02 00:00:00
+P-5,1979,labtest,None,None,Labtest-B,29,2012-12-12 00:00:00
+P-2,1980,prescribe,None,Medicine-B,None,0,2012-01-06 00:00:00
+P-11,1993,labtest,None,None,Labtest-A,52,2012-09-21 00:00:00
+P-4,1990,labtest,None,None,Labtest-B,38,2012-04-14 00:00:00
+P-2,1980,diagnose,Disease-B,None,None,0,2012-12-15 00:00:00
+P-7,1990,prescribe,None,Medicine-B,None,0,2012-01-06 00:00:00
+P-4,1990,prescribe,None,Medicine-C,None,0,2012-01-04 00:00:00
+P-5,1979,labtest,None,None,Labtest-C,22,2012-03-21 00:00:00
+P-5,1979,prescribe,None,Medicine-A,None,0,2012-03-23 00:00:00
+P-7,1990,labtest,None,None,Labtest-A,39,2012-01-02 00:00:00
+P-7,1990,labtest,None,None,Labtest-A,32,2012-01-01 00:00:00
+P-6,1971,labtest,None,None,Labtest-C,51,2012-01-01 00:00:00
+P-2,1980,labtest,None,None,Labtest-A,1,2012-12-19 00:00:00
+P-12,1971,labtest,None,None,Labtest-A,3,2012-10-21 00:00:00
+P-12,1971,labtest,None,None,Labtest-B,58,2012-12-13 00:00:00
+P-9,1983,prescribe,None,Medicine-B,None,0,2012-01-04 00:00:00
+P-2,1980,labtest,None,None,Labtest-A,3,2012-12-20 00:00:00
+P-10,1972,labtest,None,None,Labtest-B,6,2012-08-02 00:00:00
+P-5,1979,labtest,None,None,Labtest-C,37,2012-03-23 00:00:00
+P-10,1972,prescribe,None,Medicine-C,None,0,2012-06-20 00:00:00
+P-4,1990,diagnose,Disease-C,None,None,0,2012-11-24 00:00:00
+P-9,1983,labtest,None,None,Labtest-C,14,2012-01-01 00:00:00
+P-7,1990,diagnose,Disease-A,None,None,0,2012-01-10 00:00:00
+P-9,1983,labtest,None,None,Labtest-C,58,2012-01-02 00:00:00
+P-2,1980,labtest,None,None,Labtest-B,21,2012-01-09 00:00:00
+P-4,1990,labtest,None,None,Labtest-B,44,2012-05-30 00:00:00
+P-11,1993,prescribe,None,Medicine-B,None,0,2012-09-20 00:00:00
+P-7,1990,labtest,None,None,Labtest-B,21,2012-01-12 00:00:00
+P-3,2000,labtest,None,None,Labtest-C,38,2012-01-21 00:00:00
+P-12,1971,labtest,None,None,Labtest-B,2,2012-12-12 00:00:00
+P-2,1980,labtest,None,None,Labtest-B,40,2012-01-07 00:00:00
+P-11,1993,prescribe,None,Medicine-B,None,0,2012-09-23 00:00:00
+P-11,1993,labtest,None,None,Labtest-A,40,2012-09-23 00:00:00
+P-12,1971,labtest,None,None,Labtest-C,33,2012-08-24 00:00:00
+P-2,1980,prescribe,None,Medicine-B,None,0,2012-01-01 00:00:00
+P-10,1972,prescribe,None,Medicine-B,None,0,2012-01-20 00:00:00
+P-4,1990,labtest,None,None,Labtest-B,5,2012-04-15 00:00:00
+P-7,1990,prescribe,None,Medicine-C,None,0,2012-01-13 00:00:00
+P-2,1980,labtest,None,None,Labtest-A,0,2012-12-22 00:00:00
+P-5,1979,prescribe,None,Medicine-B,None,0,2012-01-04 00:00:00
+P-12,1971,labtest,None,None,Labtest-B,5,2012-12-09 00:00:00
+P-3,2000,diagnose,Disease-B,None,None,0,2012-01-21 00:00:00
+P-10,1972,labtest,None,None,Labtest-B,45,2012-01-19 00:00:00
+P-4,1990,labtest,None,None,Labtest-B,3,2012-01-04 00:00:00
+P-9,1983,diagnose,Disease-B,None,None,0,2012-03-18 00:00:00
+P-10,1972,labtest,None,None,Labtest-B,30,2012-01-20 00:00:00
+P-10,1972,prescribe,None,Medicine-A,None,0,2012-08-05 00:00:00
+P-10,1972,diagnose,Disease-A,None,None,0,2012-01-04 00:00:00
+P-4,1990,prescribe,None,Medicine-B,None,0,2012-11-24 00:00:00
+P-5,1979,prescribe,None,Medicine-B,None,0,2012-01-05 00:00:00
+P-12,1971,diagnose,Disease-B,None,None,0,2012-01-08 00:00:00
+P-12,1971,labtest,None,None,Labtest-C,4,2012-08-28 00:00:00
+P-4,1990,prescribe,None,Medicine-C,None,0,2012-01-03 00:00:00
+P-8,1986,labtest,None,None,Labtest-B,40,2012-01-01 00:00:00
+P-0,1954,labtest,None,None,Labtest-B,2,2012-05-18 00:00:00
+P-5,1979,labtest,None,None,Labtest-C,23,2012-01-01 00:00:00
+P-7,1990,prescribe,None,Medicine-B,None,0,2012-01-03 00:00:00
+P-4,1990,labtest,None,None,Labtest-B,2,2012-11-26 00:00:00
+P-12,1971,labtest,None,None,Labtest-B,23,2012-01-01 00:00:00
+P-10,1972,labtest,None,None,Labtest-A,20,2012-01-04 00:00:00
+P-9,1983,diagnose,Disease-B,None,None,0,2012-01-01 00:00:00
+P-5,1979,prescribe,None,Medicine-B,None,0,2012-01-03 00:00:00
+P-12,1971,diagnose,Disease-C,None,None,0,2012-10-21 00:00:00
+P-10,1972,prescribe,None,Medicine-A,None,0,2012-01-02 00:00:00
+P-12,1971,prescribe,None,Medicine-B,None,0,2012-01-01 00:00:00
+P-11,1993,labtest,None,None,Labtest-A,1,2012-09-27 00:00:00
+P-3,2000,labtest,None,None,Labtest-B,47,2012-01-01 00:00:00
+P-11,1993,labtest,None,None,Labtest-A,28,2012-09-18 00:00:00
+P-2,1980,prescribe,None,Medicine-B,None,0,2012-12-16 00:00:00
+P-10,1972,labtest,None,None,Labtest-B,30,2012-08-07 00:00:00
+P-5,1979,prescribe,None,Medicine-C,None,0,2012-12-12 00:00:00
+P-9,1983,labtest,None,None,Labtest-C,1,2012-03-24 00:00:00
+P-10,1972,diagnose,Disease-C,None,None,0,2012-06-17 00:00:00
+P-7,1990,prescribe,None,Medicine-C,None,0,2012-01-14 00:00:00
+P-7,1990,diagnose,Disease-C,None,None,0,2012-07-05 00:00:00
+P-9,1983,prescribe,None,Medicine-C,None,0,2012-03-19 00:00:00

@@ -1,0 +1,19 @@
+{
+    "queryName": "sample_query_selection",
+    "birthSelector":{
+        "birthEvents":[
+            {
+                "filters":[
+                    {
+                        "fieldSchema":"diagnose",
+                        "type":"SET",
+                        "acceptValue":["Disease-B"]
+                    }
+                ],
+                "frequency":1
+            }
+        ]
+    },
+
+    "dataSource": "health_raw_random_time"
+}

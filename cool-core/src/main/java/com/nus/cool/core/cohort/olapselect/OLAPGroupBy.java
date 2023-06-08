@@ -26,7 +26,7 @@ import com.nus.cool.core.io.readstore.FieldRS;
 import com.nus.cool.core.io.readstore.MetaChunkRS;
 import com.nus.cool.core.io.readstore.MetaFieldRS;
 import com.nus.cool.core.schema.FieldType;
-import com.nus.cool.core.util.converter.DayIntConverter;
+import com.nus.cool.core.util.converter.SecondIntConverter;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -169,7 +169,7 @@ public class OLAPGroupBy {
       }
       // convert data int to month str according to granularity
       int dataInt = field.getValueByIndex(nextPos).getInt();
-      DayIntConverter converter = new DayIntConverter();
+      SecondIntConverter converter = new SecondIntConverter();
       String dataStr = converter.getString(dataInt);
       // convert to month based string
       String[] parts = dataStr.split("-");

@@ -37,7 +37,8 @@ public class CubeMetaTest {
     "{\"charset\":\"UTF-8\",\"type\":\"Segment\",\"values\":[\"Labtest-A\",\"Labtest-B\","
       + "\"Labtest-C\",\"None\"]}",
     "{\"type\":\"Float\",\"min\":\"0.0\",\"max\":\"70.0\"}",
-    "{\"type\":\"ActionTime\",\"min\":\"15340\",\"max\":\"15696\"}"
+    "{\"type\":\"ActionTime\",\"min\":\"" + Integer.toString(15340 * 24 * 3600)
+      + "\",\"max\":\"" +  Integer.toString(15696 * 24 * 3600) + "\"}"
   };
 
   /**

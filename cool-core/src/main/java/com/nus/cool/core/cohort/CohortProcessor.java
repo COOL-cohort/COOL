@@ -235,8 +235,7 @@ public class CohortProcessor {
     }
 
     LocalDateTime actionTime =
-        DateUtils.daysSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
-        
+        DateUtils.secondsSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
     // check whether its birthEvent is selected
     if (!this.birthSelector.isUserSelected(userId)) {
       boolean selected = this.birthSelector.selectEvent(userId, actionTime, this.tuple);
