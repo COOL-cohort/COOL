@@ -1,13 +1,19 @@
 package com.nus.cool.core.cohort.storage;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.nus.cool.core.cohort.CohortResultLayout;
 import com.nus.cool.core.cohort.ageselect.AgeSelectionLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import lombok.Getter;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Class for Cohort Analysis Result We consider the Cohort Analysis Result as a
@@ -18,7 +24,7 @@ import lombok.Getter;
  */
 public class CohortRet {
 
-  private HashMap<String, Xaxis> cohortToValueList;
+  private final HashMap<String, Xaxis> cohortToValueList;
 
   private int min;
 
@@ -28,8 +34,22 @@ public class CohortRet {
 
   private int size;
 
-  @Getter
-  private final HashMap<String, List<String>> cohortToUserIdList = new HashMap<>();
+  private class UserList {
+    Set<String> added = new HashSet<>();
+    List<String> userSequence = new LinkedList<>();
+
+    int size() {
+      return userSequence.size();
+    }
+
+    void add(String user) {
+      if (!added.contains(user)) {
+        userSequence.add(user);
+      }
+    }
+  }
+
+  private final Map<String, UserList> cohortToUserIdList = new HashMap<>();
 
   /**
    * Create a cohort ret with ageSelection.
@@ -133,8 +153,7 @@ public class CohortRet {
    */
   public void addUserid(String cohortName, String userId) {
     if (!this.cohortToUserIdList.containsKey(cohortName)) {
-      List<String> userIdList = new ArrayList<>();
-      this.cohortToUserIdList.put(cohortName, userIdList);
+      this.cohortToUserIdList.put(cohortName, new UserList());
     }
     this.cohortToUserIdList.get(cohortName).add(userId);
   }
@@ -159,6 +178,55 @@ public class CohortRet {
     }
     Xaxis x = this.cohortToValueList.get(cohort);
     return x.getValues();
+  }
+
+  /**
+   * Prepare query result object that contains the mapping of cohort name and size.
+   */
+  public CohortResultLayout genResult() {
+    CohortResultLayout ret = new CohortResultLayout();
+    for (Map.Entry<String, UserList> e : this.cohortToUserIdList.entrySet()) {
+      ret.addOneCohortRes(e.getKey(), e.getValue().size());
+    }
+    return ret;
+  }
+
+  /**
+   * Prepare a cohort write store that is used to persist cohort user list.
+   *
+   * @param cohortName the picked cohort
+   * @return cohort write store that contains the selected cohort users.
+   */
+  public Optional<CohortWSStr> genCohortUser(String cohortName) {
+    return Optional.of(this.cohortToUserIdList.get(cohortName))
+      .transform(x -> {
+        if (x.size() == 0) {
+          return null;
+        } else {
+          CohortWSStr c = new CohortWSStr();
+          c.addCubletResults(x.userSequence);
+          return c;
+        }
+      }); 
+  }
+
+
+  /**
+   * Prepare cohort write stores that for all non-empty cohort user list.
+   */
+  public Map<String, Optional<CohortWSStr>> genAllCohortUsers() {
+    return this.cohortToUserIdList.entrySet()
+               .stream()
+               .collect(Collectors.toMap(x -> x.getKey(),
+                  x -> {
+                    if (x.getValue().size() == 0) {
+                      return Optional.of(null);
+                    } else {
+                      CohortWSStr c = new CohortWSStr();
+                      c.addCubletResults(x.getValue().userSequence);
+                      return Optional.of(c);
+                    }
+                  }));
   }
 
   @Override

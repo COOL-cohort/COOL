@@ -1,8 +1,10 @@
 package com.nus.cool.core;
 
 
+import com.google.common.io.Files;
 import com.nus.cool.core.cohort.CohortProcessor;
 import com.nus.cool.core.cohort.CohortQueryLayout;
+import com.nus.cool.core.cohort.CohortWriter;
 import com.nus.cool.core.cohort.OLAPProcessor;
 import com.nus.cool.core.cohort.OLAPQueryLayout;
 import com.nus.cool.core.cohort.aggregate.AggregateType;
@@ -53,27 +55,38 @@ public class ProcessorTest extends CsvLoaderTest {
   public void processQueryAndValidResult(String queryPath, String queryResultPath)
       throws IOException {
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
+    System.out.println(queryPath);
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
 
     // start a new cool model and reload the cube
     this.coolModel = new CoolModel(this.cubeRepo);
+    System.out.println(cohortProcessor.getDataSource());
     coolModel.reload(cohortProcessor.getDataSource());
     CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
     File currentVersion = this.coolModel.getCubeStorePath(cohortProcessor.getDataSource());
 
-    // load input cohort
-    if (cohortProcessor.getInputCohort() != null) {
-      File cohortFile = new File(currentVersion, "cohort/" + cohortProcessor.getInputCohort());
-      if (cohortFile.exists()) {
-        cohortProcessor.readOneCohort(cohortFile);
+    // get current dir path
+    CohortRet ret = cohortProcessor.process(cube);
+
+    // persist the results
+    String outputPath = currentVersion.toString() + "/cohort/" + layout.getQueryName();
+    CohortWriter.setUpOutputFolder(outputPath);
+    Files.copy(new File(queryPath), new File(outputPath + "/query.json"));;
+    CohortWriter.persistCohortResult(ret, outputPath);
+    if (layout.selectAll()) {
+      CohortWriter.persistOneCohort(ret, "all", outputPath); 
+    } else if (layout.isOutputAll()) {
+      CohortWriter.persistAllCohorts(ret, outputPath); 
+    } else {
+      String outputCohort = layout.getOutputCohort();
+      if (outputCohort != null && !outputCohort.isEmpty()) {
+        CohortWriter.persistOneCohort(ret, outputCohort, outputPath);
       }
     }
 
-    // get current dir path
-    CohortRet ret = cohortProcessor.process(cube);
-    String cohortStoragePath = cohortProcessor.persistCohort(currentVersion.toString());
-    cohortProcessor.readQueryCohorts(cohortStoragePath);
-    Assert.assertTrue(cohortProcessor.getPreviousCohortUsers().size() > 0);
+    // check loading cohort
+    cohortProcessor.readOneCohort(layout.getOutputCohort(), outputPath);
+    Assert.assertTrue(cohortProcessor.getInputCohortSize() > 0);
   }
 
   /**
@@ -94,7 +107,6 @@ public class ProcessorTest extends CsvLoaderTest {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
   public void processQueryAndValidResultAP(String queryDir) throws Exception {
     String queryName = "query.json";
-    String resultName = "query_result.json";
     String queryPath = Paths.get(queryDir, queryName).toString();
     OLAPQueryLayout layout = OLAPQueryLayout.readFromJson(queryPath);
     String dataSource = layout.getDataSource();
