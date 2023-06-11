@@ -44,6 +44,7 @@ public class CohortRet {
 
     void add(String user) {
       if (!added.contains(user)) {
+        added.add(user);
         userSequence.add(user);
       }
     }

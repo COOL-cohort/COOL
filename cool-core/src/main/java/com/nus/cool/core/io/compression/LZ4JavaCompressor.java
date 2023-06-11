@@ -78,7 +78,6 @@ public class LZ4JavaCompressor implements Compressor {
       // compress
       int maxLen = lz4.maxCompressedLength(srcBuf.size()) + HEADACC;
       byte[] compressed = new byte[maxLen];
-      System.out.print(srcBuf.size());
       int zlen = this.lz4.compress(srcBuf.getData(), 0, srcBuf.size(), compressed,
           HEADACC, maxLen - HEADACC);
       ByteBuffer buffer = ByteBuffer.wrap(compressed, 0, HEADACC);
