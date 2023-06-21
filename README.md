@@ -198,7 +198,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionalit
 Run Server
 
 ```
-java -jar cool-queryserver/target/cool-queryserver-0.0.1-SNAPSHOT.jar CubeRepo/ 9009 STANDALONE
+java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar CubeRepo/ 9009 STANDALONE
 ```
 
 ## CONNECT TO EXTERNAL STORAGE SERVICES
