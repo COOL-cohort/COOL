@@ -60,7 +60,7 @@ public class ProcessorTest extends CsvLoaderTest {
 
     // start a new cool model and reload the cube
     this.coolModel = new CoolModel(this.cubeRepo);
-    System.out.println(cohortProcessor.getDataSource());
+    //System.out.println(cohortProcessor.getDataSource());
     coolModel.reload(cohortProcessor.getDataSource());
     CubeRS cube = coolModel.getCube(cohortProcessor.getDataSource());
     File currentVersion = this.coolModel.getCubeStorePath(cohortProcessor.getDataSource());
@@ -73,19 +73,18 @@ public class ProcessorTest extends CsvLoaderTest {
     CohortWriter.setUpOutputFolder(outputPath);
     Files.copy(new File(queryPath), new File(outputPath + "/query.json"));;
     CohortWriter.persistCohortResult(ret, outputPath);
-    if (layout.selectAll()) {
-      CohortWriter.persistOneCohort(ret, "all", outputPath); 
-    } else if (layout.isOutputAll()) {
-      CohortWriter.persistAllCohorts(ret, outputPath); 
-    } else {
-      String outputCohort = layout.getOutputCohort();
-      if (outputCohort != null && !outputCohort.isEmpty()) {
-        CohortWriter.persistOneCohort(ret, outputCohort, outputPath);
+
+    if (layout.isSaveCohort()) {
+      if (layout.selectAll()) {
+        String cohortName = layout.getOutputCohort();
+        CohortWriter.persistOneCohort(ret, cohortName, outputPath);
+      } else {
+        CohortWriter.persistAllCohorts(ret, outputPath);
       }
     }
 
     // check loading cohort
-    cohortProcessor.readOneCohort(layout.getOutputCohort(), outputPath);
+    cohortProcessor.readOneCohort("1950-1960", outputPath);
     Assert.assertTrue(cohortProcessor.getInputCohortSize() > 0);
   }
 

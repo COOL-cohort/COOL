@@ -28,7 +28,7 @@ public class CohortQueryLayout {
   private CohortSelectionLayout cohortSelectionLayout;
 
   @JsonProperty("ageSelector")
-  private AgeSelectionLayout agetSelectionLayout;
+  private AgeSelectionLayout ageSelectionLayout;
 
   @JsonProperty("valueSelector")
   private ValueSelectionLayout valueSelectionLayout;
@@ -42,8 +42,8 @@ public class CohortQueryLayout {
   @JsonProperty("outputCohort")
   private String outputCohort;
 
-  @JsonProperty("outputAll")
-  private boolean outputAll;
+  @JsonProperty("saveCohort")
+  private boolean saveCohort;
 
   /**
    * Read the cohort query in a json.
@@ -54,10 +54,20 @@ public class CohortQueryLayout {
     if (instance.queryName == null) {
       throw new IOException("[x] please add a query Name for this query.");
     }
-    if (instance.cohortSelectionLayout == null) {
-      instance.cohortSelectionLayout = new CohortSelectionLayout();
-    }
+    instance.initCohortQuery();
     return instance;
+  }
+
+  /**
+   * add cohort selection layout
+   */
+  public void initCohortQuery() {
+    if (this.cohortSelectionLayout == null) {
+      this.cohortSelectionLayout = new CohortSelectionLayout();
+    }
+    if (this.saveCohort & this.outputCohort == null) {
+      this.outputCohort = "all";
+    }
   }
 
   public static CohortQueryLayout readFromJson(String path) throws IOException {

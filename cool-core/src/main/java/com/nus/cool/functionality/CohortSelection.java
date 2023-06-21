@@ -43,6 +43,7 @@ public class CohortSelection {
   public static String performCohortSelection(String cubeRepo, String queryPath)
       throws IOException {
     CohortQueryLayout layout = CohortQueryLayout.readFromJson(queryPath);
+    layout.initCohortQuery();
     CohortProcessor cohortProcessor = new CohortProcessor(layout);
 
     // start a new cool model and reload the cube
@@ -59,15 +60,12 @@ public class CohortSelection {
     Files.copy(new File(queryPath), new File(outputPath + "/query.json"));;
     CohortWriter.persistCohortResult(ret, outputPath);
 
-    // persist cohort
-    if (layout.selectAll()) {
-      CohortWriter.persistOneCohort(ret, "all", outputPath); 
-    } else if (layout.isOutputAll()) {
-      CohortWriter.persistAllCohorts(ret, outputPath); 
-    } else {
-      String outputCohort = layout.getOutputCohort();
-      if (outputCohort != null && !outputCohort.isEmpty()) {
-        CohortWriter.persistOneCohort(ret, outputCohort, outputPath);
+    if (layout.isSaveCohort()) {
+      if (layout.selectAll()) {
+        String cohortName = layout.getOutputCohort();
+        CohortWriter.persistOneCohort(ret, cohortName, outputPath);
+      } else {
+        CohortWriter.persistAllCohorts(ret, outputPath);
       }
     }
 
