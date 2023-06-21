@@ -60,6 +60,15 @@ public class ByteBuffers {
     return ~fromIndex;
   }
 
+  /**
+   *  this is traverseSearch.
+   *
+   * @param buffer buffer.
+   * @param fromIndex fromIndex.
+   * @param toIndex toIndex.
+   * @param key key.
+   * @return value
+   */
   public static int traverseSearch(ByteBuffer buffer, int fromIndex, int toIndex, byte key) {
     checkNotNull(buffer);
     checkArgument(fromIndex < buffer.limit() && toIndex <= buffer.limit());
@@ -67,8 +76,9 @@ public class ByteBuffers {
     int ikey = key & 0xFF;
     for (int i = fromIndex; i < toIndex; i++) {
       int e = buffer.get(i) & 0xFF;
-      if (e == ikey)
+      if (e == ikey) {
         return i;
+      }
     }
     return -1;
   }

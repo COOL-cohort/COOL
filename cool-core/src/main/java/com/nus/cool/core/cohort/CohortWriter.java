@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.google.common.base.Optional;
-import java.util.Optional;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.cohort.storage.CohortWSStr;
 import java.io.DataOutputStream;
@@ -12,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
 
 /**

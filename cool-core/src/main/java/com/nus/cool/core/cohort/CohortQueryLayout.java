@@ -59,7 +59,15 @@ public class CohortQueryLayout {
   }
 
   /**
-   * add cohort selection layout
+   * readFromJson.
+   *
+   */
+  public static CohortQueryLayout readFromJson(String path) throws IOException {
+    return readFromJson(new File(path));
+  }
+
+  /**
+   * add cohort selection layout.
    */
   public void initCohortQuery() {
     if (this.cohortSelectionLayout == null) {
@@ -68,10 +76,6 @@ public class CohortQueryLayout {
     if (this.saveCohort & this.outputCohort == null) {
       this.outputCohort = "all";
     }
-  }
-
-  public static CohortQueryLayout readFromJson(String path) throws IOException {
-    return readFromJson(new File(path));
   }
 
   public boolean selectAll() {
