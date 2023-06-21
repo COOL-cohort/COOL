@@ -59,13 +59,23 @@ public class IntBuffers {
     return ~fromIndex;
   }
 
+  /**
+   *  this is traverseSearch.
+   *
+   * @param buffer buffer.
+   * @param fromIndex fromIndex.
+   * @param toIndex toIndex.
+   * @param key key.
+   * @return value
+   */
   public static int traverseSearch(IntBuffer buffer, int fromIndex, int toIndex, int key) {
     checkNotNull(buffer);
     checkArgument(fromIndex < buffer.limit() && toIndex <= buffer.limit());
     for (int i = fromIndex; i < toIndex; i++) {
       int e = buffer.get(i);
-      if (e == key)
+      if (e == key) {
         return i;
+      }
     }
     return -1;
   }
