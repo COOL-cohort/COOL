@@ -1,8 +1,5 @@
 package com.nus.cool.core.cohort.storage;
 
-//import com.google.common.base.Optional;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import java.util.Optional;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.CohortResultLayout;
 import com.nus.cool.core.cohort.ageselect.AgeSelectionLayout;
@@ -14,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.json.JSONObject;

@@ -37,7 +37,7 @@ public class DataLoaderHandler {
       consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> load(@RequestBody LoadQuery query) {
     System.out.println("[*] This query is for loading a new cube: " + query);
-    try{
+    try {
       query.isValid();
       String fileType = query.getDataFileType().toUpperCase();
       DataLoaderConfig config;
@@ -59,7 +59,7 @@ public class DataLoaderHandler {
       String out = coolLoader.load(query.getCubeName(), query.getSchemaPath(), query.getDataPath(),
           query.getOutputPath());
       return ResponseEntity.ok().body(out);
-    } catch(Exception e){
+    } catch (Exception e) {
       return ResponseEntity.internalServerError().body(e.toString());
     }
     // String resStr = "Cube " + query.getCubeName() + " is loaded successfully";
