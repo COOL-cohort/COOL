@@ -36,6 +36,11 @@
             <version>2.5</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20170516</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -49,7 +54,7 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
+                                <goal>shade</goal>
                         </goals>
                     </execution>
                 </executions>
