@@ -15,15 +15,15 @@ public class TimeUtils {
 
     HOUR("HOUR"),
 
+    MINUTE("MINUTE"),
+
+    SECOND("SECOND"),
+
     DAY("DAY"),
 
     WEEK("WEEK"),
 
     MONTH("MONTH"),
-
-    MINUTE("MINUTE"),
-
-    SECOND("SECOND"),
 
     YEAR("YEAR");
 

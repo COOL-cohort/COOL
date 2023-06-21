@@ -3,7 +3,8 @@ package com.nus.cool.core.cohort;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
+//import com.google.common.base.Optional;
+import java.util.Optional;
 import com.nus.cool.core.cohort.storage.CohortRet;
 import com.nus.cool.core.cohort.storage.CohortWSStr;
 import java.io.DataOutputStream;
@@ -27,7 +28,7 @@ public interface CohortWriter {
   }
   
   /**
-   * Persist cohort file .cohort to output disk to the same level with the .dz file.
+   * Persist cohort results file to output disk to the same level with the .dz file.
    * E,g. ../CubeRepo/health_raw/v00000012/cohort/queryName/all.cohort.
    *
    * @param outputDir the output file path

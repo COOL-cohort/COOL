@@ -1,6 +1,8 @@
 package com.nus.cool.core.cohort.storage;
 
-import com.google.common.base.Optional;
+//import com.google.common.base.Optional;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import java.util.Optional;
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.CohortResultLayout;
 import com.nus.cool.core.cohort.ageselect.AgeSelectionLayout;
@@ -14,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.json.JSONObject;
 
 /**
  * Class for Cohort Analysis Result We consider the Cohort Analysis Result as a
@@ -86,7 +89,7 @@ public class CohortRet {
   }
 
   /**
-   * Initialize the missing intance Get the certain RetUnit, user can modify
+   * Initialize the missing instance Get the certain RetUnit, user can modify
    * RetUnit in place.
    */
   public RetUnit getByAge(String cohort, int age) {
@@ -103,7 +106,7 @@ public class CohortRet {
    */
   private int getCohortAge(int index) {
     Preconditions.checkArgument(index <= max && index >= min,
-        "input tuple didn't pass the ageSelection" + index + "min: " + min + "max: " + max);
+        "input tuple didn't pass the ageSelection " + index + "min: " + min + "max: " + max);
     int offset = (index - this.min) / this.interval;
     return offset;
   }
@@ -200,7 +203,7 @@ public class CohortRet {
    */
   public Optional<CohortWSStr> genCohortUser(String cohortName) {
     return Optional.of(this.cohortToUserIdList.get(cohortName))
-      .transform(x -> {
+      .map(x -> {
         if (x.size() == 0) {
           return null;
         } else {
@@ -246,5 +249,25 @@ public class CohortRet {
       ret += entry.getKey() + ":" + entry.getValue().toString() + "\n";
     }
     return ret;
+  }
+
+  /**
+   * return the JSON format.
+   */
+  public JSONObject toJson() {
+    HashMap<String, Object> out = new HashMap<>();
+    HashMap<String, Integer> format = new HashMap<>();
+    format.put("interval", interval);
+    format.put("max", max);
+    format.put("min", min);
+    format.put("size", size);
+    out.put("format", format);
+    HashMap<String, List<Integer>> results = new HashMap<>();
+    for (Entry<String, Xaxis> entry : this.cohortToValueList.entrySet()) {
+      results.put(entry.getKey(), entry.getValue().getValues());
+    }
+    out.put("results", results);
+    JSONObject obj = new JSONObject(out);
+    return obj;
   }
 }

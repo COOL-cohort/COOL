@@ -64,25 +64,22 @@ public class CohortProcessor {
    * @param layout query layout
    */
   public CohortProcessor(CohortQueryLayout layout) {
-    // get age selector
-    if (layout.getAgetSelectionLayout() != null) {
-      this.ageSelector = layout.getAgetSelectionLayout().generate();
-      this.result = new CohortRet(layout.getAgetSelectionLayout());
-    }
     // get birth selector
     if (layout.getBirthSelectionLayout() != null) {
       this.birthSelector = layout.getBirthSelectionLayout().generate();
     }
     // get cohort selector
     this.cohortSelector = layout.getCohortSelectionLayout().generate();
-    if (this.cohortSelector.selectAll()) {
-      this.result = new CohortRet();
+    this.result = new CohortRet();
+    // get age selector
+    if (layout.getAgeSelectionLayout() != null) {
+      this.ageSelector = layout.getAgeSelectionLayout().generate();
+      this.result = new CohortRet(layout.getAgeSelectionLayout());
     }
     // get value selector
     if (layout.getValueSelectionLayout() != null) {
       this.valueSelector = layout.getValueSelectionLayout().generate();
     }
-
     this.projectedSchemaSet = layout.getSchemaSet();
     this.dataSource = layout.getDataSource();
     this.inputCohort = layout.getInputCohort();
