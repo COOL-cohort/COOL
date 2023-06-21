@@ -58,7 +58,7 @@ public class CoolLoader {
    * @param dataFileName   path to the data.csv
    * @param cubeRepo       the name of the output cube repository
    */
-  public synchronized void load(String dataSourceName, String schemaFileName, String dataFileName,
+  public synchronized String load(String dataSourceName, String schemaFileName, String dataFileName,
                                 String cubeRepo) throws IOException {
     // check the existence of the data repository
     File root = new File(cubeRepo);
@@ -116,5 +116,6 @@ public class CoolLoader {
     loader.load();
     // copy the table.yaml to new version folder
     Files.copy(schemaFile, new File(outputCubeVersionDir, "table.yaml"));
+    return outputCubeVersionDir.getName();
   }
 }

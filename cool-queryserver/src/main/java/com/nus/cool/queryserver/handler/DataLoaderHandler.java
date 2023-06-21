@@ -35,30 +35,34 @@ public class DataLoaderHandler {
   @PostMapping(value = "/load",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> load(@RequestBody LoadQuery query) throws IOException {
+  public ResponseEntity<String> load(@RequestBody LoadQuery query) {
     System.out.println("[*] This query is for loading a new cube: " + query);
-    query.isValid();
-    String fileType = query.getDataFileType().toUpperCase();
-    DataLoaderConfig config;
-    switch (fileType) {
-      case "CSV":
-        config = new CsvDataLoaderConfig();
-        break;
-      case "PARQUET":
-        config = new ParquetDataLoaderConfig();
-        break;
-      case "AVRO":
-        config = new AvroDataLoaderConfig(new File(query.getConfigPath()));
-        break;
-      default:
-        throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
+    try{
+      query.isValid();
+      String fileType = query.getDataFileType().toUpperCase();
+      DataLoaderConfig config;
+      switch (fileType) {
+        case "CSV":
+          config = new CsvDataLoaderConfig();
+          break;
+        case "PARQUET":
+          config = new ParquetDataLoaderConfig();
+          break;
+        case "AVRO":
+          config = new AvroDataLoaderConfig(new File(query.getConfigPath()));
+          break;
+        default:
+          throw new IllegalArgumentException("[x] Invalid load file type: " + fileType);
+      }
+      System.out.println(config.getClass().getName());
+      CoolLoader coolLoader = new CoolLoader(config);
+      String out = coolLoader.load(query.getCubeName(), query.getSchemaPath(), query.getDataPath(),
+          query.getOutputPath());
+      return ResponseEntity.ok().body(out);
+    } catch(Exception e){
+      return ResponseEntity.internalServerError().body(e.toString());
     }
-    System.out.println(config.getClass().getName());
-    CoolLoader coolLoader = new CoolLoader(config);
-    coolLoader.load(query.getCubeName(), query.getSchemaPath(), query.getDataPath(),
-        query.getOutputPath());
-    String resStr = "Cube " + query.getCubeName() + " is loaded successfully";
-    return ResponseEntity.ok().body(resStr);
+    // String resStr = "Cube " + query.getCubeName() + " is loaded successfully";
   }
 
 }

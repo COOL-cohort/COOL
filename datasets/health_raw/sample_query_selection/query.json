@@ -14,5 +14,6 @@
             }
         ]
     },
-    "dataSource": "health_raw"
+    "dataSource": "health_raw",
+    "saveCohort": true
 }
