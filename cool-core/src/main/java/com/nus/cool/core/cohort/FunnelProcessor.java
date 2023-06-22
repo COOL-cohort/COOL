@@ -134,7 +134,9 @@ public class FunnelProcessor {
     String userId = userMetaField.get(userGlobalID).map(FieldValue::getString).orElse("");
 
     LocalDateTime actionTime =
-        DateUtils.secondsSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
+        // DateUtils.secondsSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
+        DateUtils.secondsSinceEpoch(
+          tuple.getValueBySchema(this.actionTimeSchema).getInt() * 3600);
     // check whether its birthEvent is selected
 
     // i: the number of birth event
