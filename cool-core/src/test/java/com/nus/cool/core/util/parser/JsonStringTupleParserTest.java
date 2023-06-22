@@ -48,7 +48,7 @@ public class JsonStringTupleParserTest {
           + "\"int64_field\":\"64\","
           + "\"role\":\"stonegolem\","
           + "\"playerId\":\"43e3e0d84da1056\","
-          + "\"eventDay\":\"2013-05-21 00:00:00\","
+          + "\"eventDay\":\"2013-05-21 12:45:00\","
           + "\"event\":\"fight\","
           + "\"money\":\"1638\","
           + "\"other\":\"Int96Value{Binary{3 constant bytes, [0, 0, 0]}}\"}";
@@ -60,7 +60,8 @@ public class JsonStringTupleParserTest {
       Assert.assertEquals(ret[2].getString(), "stonegolem");
       Assert.assertEquals(ret[3].getString(), "1638");
       Assert.assertEquals(ret[4].getString(), "fight");
-      Assert.assertEquals(ret[5].getString(), Integer.toString(15846 * 24 * 3600));
+      // Assert.assertEquals(ret[5].getString(), Integer.toString(15846 * 24 * 3600));
+      Assert.assertEquals(ret[5].getString(), Integer.toString(15846 * 24 + 12));
       Assert.assertEquals(ret[6].getString(),
           "Int96Value{Binary{3 constant bytes, [0, 0, 0]}}");
     } catch (IOException e) {

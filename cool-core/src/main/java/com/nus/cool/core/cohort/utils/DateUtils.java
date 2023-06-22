@@ -19,7 +19,7 @@ public class DateUtils {
         TimeZone.getDefault().toZoneId());
   }
 
-  public static LocalDateTime secondsSinceEpoch(int seconds) {
+  public static LocalDateTime secondsSinceEpoch(long seconds) {
     return createCalender(seconds);
   }
 
