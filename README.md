@@ -176,29 +176,13 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionalit
 Finally, there will be a cube generated under the `CubeRepo` directory, which is named `tpc-h-10g`.
 
 #### Execute queries
-
-Now we could execute OLAP query on the generated datasets. eg, if we want to run following query,
-
-```sql
-SELECT cout(*), sum(O_TOTALPRICE) 
-FROM TPC_H WHERE O_ORDERPRIORITY = 2-HIGH AND R_NAME = EUROPE
-GROUP BY N_NAME,R_NAME 
-HAVING O_ORDERDATE >= '1993-01-01' AND O_ORDERDATE <= '1994-01-01' 
-```
-
-- Firstly define a query.json as shown in [query.json](olap-tpch/query.json)
-- Then execute following cmd
-
-```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar com.nus.cool.functionality.IcebergLoader CubeRepo olap-tpch/query.json
-```
-
- Results for the query  [query.json](olap-tpch/query.json) on the `tpc-h-10g` dataset are as at [result.json](olap-tpch/result2.json)
-
 Run Server
 
+1. put the `application.property file at the same level as the .jar file.
+2. edit the server configuration in the `application.property file.
+3. run the below commond line.
 ```
-java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar CubeRepo/ 9009 STANDALONE
+java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar
 ```
 
 ## CONNECT TO EXTERNAL STORAGE SERVICES
