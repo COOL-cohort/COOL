@@ -9,7 +9,7 @@
 
 ## Introduction to COOL
 
-![ COOL](./assets/img/arch.svg)
+![ COOL](./assets/img/arch2.png)
 
 Different groups of people often have different behaviors or trends. For example, the bones of older people are more porous than those of younger people. It is of great value to explore the behaviors and trends of different groups of people, especially in healthcare, because we could adopt appropriate measures in time to avoid tragedy. The easiest way to do this is **cohort analysis**.
 
