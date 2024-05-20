@@ -2,7 +2,7 @@
 
 ---
 
-[Website](http://13.212.99.209:3301/) | [Documentation](http://13.212.99.209:3301/docs/getting-started/quickstart) | [Blog](http://13.212.99.209:3301/blog) | [Demo](https://www.comp.nus.edu.sg/~dbsystem/cool/#/demo) | [GitHub](https://github.com/COOL-cohort/COOL)
+[Website](http://13.212.99.209:3301/) | [Documentation](http://13.212.99.209:3301/docs/getting-started/quickstart) | [Blog](http://13.212.99.209:3301/blog) | [Demo](http://13.212.99.209:8201/) | [GitHub](https://github.com/COOL-cohort/COOL)
 
 ---
 
