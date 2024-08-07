@@ -182,7 +182,8 @@ public class NativeDataWriter implements DataWriter {
     if (maybeSwitchChunk(curUser)) {
       if (maybeSwitchCublet()) {
         // create a new data chunk with offset 0
-        this.dataChunk = DataChunkWS.newDataChunk(this.tableSchema, this.metaChunk.getMetaFields(), 0);
+        this.dataChunk = DataChunkWS.newDataChunk(
+          this.tableSchema, this.metaChunk.getMetaFields(), 0);
       }
     }
     lastUser = curUser;

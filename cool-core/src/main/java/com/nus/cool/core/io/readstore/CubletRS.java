@@ -21,18 +21,18 @@ package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.nio.ByteBuffer;
-import java.util.BitSet;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
 import com.nus.cool.core.schema.TableSchema;
+import java.nio.ByteBuffer;
+import java.util.BitSet;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Read cublet store
