@@ -1,5 +1,6 @@
 package com.nus.cool.core.io.writestore;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.nus.cool.core.field.FieldValue;
 import com.nus.cool.core.field.HashField;
@@ -14,6 +15,7 @@ import com.nus.cool.core.schema.TableSchema;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,12 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
   public MetaUserFieldWS(FieldType type, Charset charset, MetaChunkWS metaChunkWS) {
     super(type, charset);
     this.metaChunkWS = metaChunkWS;
-    for (int invariantIdx : metaChunkWS.getTableSchema().getInvariantFieldIdxs()) {
+    this.resetInvariantIdxToValueList();
+  }
+
+  private void resetInvariantIdxToValueList() {
+    this.invariantIdxToValueList.clear();
+    for (int invariantIdx : this.metaChunkWS.getTableSchema().getInvariantFieldIdxs()) {
       this.invariantIdxToValueList.put(invariantIdx, new LinkedList<>());
     }
   }
@@ -47,7 +54,7 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
   public void put(FieldValue[] tuple, int idx) throws IllegalArgumentException {
     if (!(tuple[idx] instanceof HashField)) {
       throw new IllegalArgumentException(
-        "Illegal argument for MetaUserFieldWS (HashField required).");
+          "Illegal argument for MetaUserFieldWS (HashField required).");
     }
     HashField user = (HashField) tuple[idx];
     int hashKey = user.getInt();
@@ -89,15 +96,12 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
 
   @Override
   public void cleanForNextCublet() {
-    this.fingerToGid.clear();
-    this.invariantIdxToValueList.clear();
-    this.valueList.clear();
-    this.nextGid = 0; // a field can have different id across cublet.
+    super.cleanForNextCublet();
+    this.resetInvariantIdxToValueList();
   }
 
   @Override
   public int writeTo(DataOutput out) throws IOException {
-
     int bytesWritten = writeFingersAndGids(out);
 
     TableSchema tableSchema = this.metaChunkWS.getTableSchema();
@@ -121,13 +125,13 @@ public class MetaUserFieldWS extends MetaHashFieldWS {
           .numOfValues(values.size())
           .build();
       bytesWritten += OutputCompressor.writeTo(CompressType.Value, hist,
-        values, out);
+          values, out);
     }
 
     // Write value
     bytesWritten += OutputCompressor.writeTo(CompressType.KeyString,
-    Histogram.builder().charset(charset).build(),
-    valueList, out);
+        Histogram.builder().charset(charset).build(),
+        valueList, out);
 
     return bytesWritten;
   }
