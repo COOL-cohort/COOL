@@ -21,14 +21,16 @@ package com.nus.cool.core.io.readstore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.nio.ByteBuffer;
+import java.util.BitSet;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.nus.cool.core.io.Input;
 import com.nus.cool.core.io.compression.SimpleBitSetCompressor;
 import com.nus.cool.core.schema.TableSchema;
-import java.nio.ByteBuffer;
-import java.util.BitSet;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -49,6 +51,8 @@ import lombok.Setter;
  * chunk header offsets record the position of the chunk's header
  */
 public class CubletRS implements Input {
+
+  static final Logger logger = LoggerFactory.getLogger(CubletRS.class);
 
   /**
    * MetaChunk for this cublet.
@@ -82,6 +86,8 @@ public class CubletRS implements Input {
    */
   @Override
   public void readFrom(ByteBuffer buffer) {
+    logger.debug("readFrom: buffer.limit()=" + buffer.limit());
+
     // Read header offset
     int end = buffer.limit();
     this.limit = end;
@@ -105,12 +111,15 @@ public class CubletRS implements Input {
       }
     }
 
+    logger.debug("headOffset=" + headOffset);
+
     // Get #chunk and chunk offsets
     buffer.position(headOffset);
     int chunks = buffer.getInt();
     int[] chunkOffsets = new int[chunks];
     for (int i = 0; i < chunks; i++) {
       chunkOffsets[i] = buffer.getInt();
+      logger.debug("chunkOffsets[" + i + "]=" + chunkOffsets[i]);
     }
 
     // read the metaChunk, which is the last one in #chunks
@@ -124,6 +133,7 @@ public class CubletRS implements Input {
     for (int i = 0; i < chunks - 1; i++) {
       buffer.position(chunkOffsets[i]);
       chunkHeadOffset = buffer.getInt();
+      logger.debug("chunkHeadOffset[" + i + "]=" + chunkHeadOffset);
       buffer.position(chunkHeadOffset);
       ChunkRS chunk = new ChunkRS(this.schema, this.metaChunk);
       chunk.readFrom(buffer);

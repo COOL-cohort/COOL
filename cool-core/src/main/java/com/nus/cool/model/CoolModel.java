@@ -143,12 +143,20 @@ public class CoolModel implements Closeable {
     CubeRS cubeRS = new CubeRS(schema);
 
     File[] cubletFiles = currentVersion.listFiles((file, s) -> s.endsWith(".dz"));
+    Arrays.sort(cubletFiles);
+
     logger.info("Cube " + cube + ", Use version: " + currentVersion.getName());
     storePath.put(cube, currentVersion);
+
+    logger.debug("cublet files: ");
+    for (int i = 0; i < cubletFiles.length; i++) {
+      logger.debug(cubletFiles[i].getPath());
+    }
 
     // Load all cubes under latest version
     checkNotNull(cubletFiles);
     for (File cubletFile : cubletFiles) {
+      logger.debug("loading cublet file: " + cubletFile);
       cubeRS.addCublet(cubletFile);
     }
 

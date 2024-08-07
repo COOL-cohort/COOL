@@ -58,7 +58,7 @@ public class DataChunkWS implements Output {
   /**
    * Chunk beginning offset, don't update.
    */
-  private final int chunkBeginOffset;
+  private int chunkBeginOffset;
 
   /**
    * Number of records.
@@ -80,6 +80,10 @@ public class DataChunkWS implements Output {
     this.dataFields = checkNotNull(fields);
     checkArgument(offset >= 0 && fields.length > 0);
     this.chunkBeginOffset = offset;
+  }
+
+  public void setChunkBeginOffset(int value) {
+    this.chunkBeginOffset = value;
   }
 
   /**
