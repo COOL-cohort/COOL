@@ -13,12 +13,16 @@ import java.io.IOException;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Native data writer writes a set of records in cool storage format.
  */
 @RequiredArgsConstructor
 public class NativeDataWriter implements DataWriter {
+
+  static final Logger logger = LoggerFactory.getLogger(NativeDataWriter.class);
 
   @NotNull
   private final TableSchema tableSchema;
@@ -107,6 +111,7 @@ public class NativeDataWriter implements DataWriter {
     }
     finishChunk();
     // create a new data chunk, init tuple Count
+    logger.debug("newDataChunk: offset=" + offset);
     dataChunk = DataChunkWS.newDataChunk(tableSchema, metaChunk.getMetaFields(), offset);
     tupleCount = 0;
     return true;
@@ -134,6 +139,8 @@ public class NativeDataWriter implements DataWriter {
     // 4. flush after writing whole Cublet.
     out.flush();
     out.close();
+
+    this.offset = 0;
   }
 
   /**
@@ -146,7 +153,6 @@ public class NativeDataWriter implements DataWriter {
     System.out.println("[*] A new cublet " + fileName + " is created!");
     File cublet = new File(outputDir, fileName);
     DataOutputStream out = new DataOutputStream(new FileOutputStream(cublet));
-    offset = 0;
     chunkHeaderOffsets.clear();
     return out;
   }
@@ -154,12 +160,16 @@ public class NativeDataWriter implements DataWriter {
   /**
    * Switch a new cublet File once meet 1GB.
    */
-  private void maybeSwitchCublet() throws IOException {
+  private boolean maybeSwitchCublet() throws IOException {
     if (offset < cubletSize) {
-      return;
+      return false;
     }
     finishCublet();
+    logger.debug("switching cublet...");
+
     out = newCublet();
+
+    return true;
   }
 
   @Override
@@ -170,7 +180,11 @@ public class NativeDataWriter implements DataWriter {
     }
     // start a new chunk
     if (maybeSwitchChunk(curUser)) {
-      maybeSwitchCublet();
+      if (maybeSwitchCublet()) {
+        // create a new data chunk with offset 0
+        this.dataChunk = DataChunkWS.newDataChunk(
+          this.tableSchema, this.metaChunk.getMetaFields(), 0);
+      }
     }
     lastUser = curUser;
     // update metachunk / metafield
