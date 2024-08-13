@@ -37,7 +37,7 @@ mvn clean package
 
 ### Required sources
 
-1. **dataset file**: a CSV file with "," delimiter (normally dumped from a database table), and the table header removed.
+1. **dataset file**: a CSV file with "," delimiter (normally dumped from a database table) and the table header removed.
 2. **dataset schema file**: a `table.yaml` file specifying the dataset's columns and their measure fields.
 3. **query file**: a YAML file specifying the parameters for the running query server.
 
@@ -46,8 +46,7 @@ mvn clean package
 Before query processing, we need to load the dataset into COOL native format. The sample code to load csv dataset with data loader can be found in [CsvLoader.java](cool-core/src/main/java/com/nus/cool/functionality/CsvLoader.java).
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CsvLoader \
+./cool load \
     dataset \
     path/to/your/.yaml \
     path/to/your/datafile \
@@ -56,7 +55,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
 
 The five arguments in the command have the following meaning:
 
-1. a unique dataset name given under the directory
+1. the dataset name
 2. the `table.yaml` (the third required source)
 3. the dataset file (the first required source)
 4. the output directory for the compacted dataset
@@ -70,8 +69,7 @@ We provide an example for cohort query processing in [CohortAnalysis.java](cool-
 #### Cohort Selection
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CohortSelection \
+./cool cohortselection \
     path/to/output/datasource/directory \
     path/to/your/queryfile
 ```
@@ -79,8 +77,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
 #### Cohort Query
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CohortAnalysis \
+./cool cohortquery \
     path/to/output/datasource/directory \
     path/to/your/cohortqueryfile
 ```
@@ -88,8 +85,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
 #### Funnel Query
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.FunnelAnalysis \
+./cool funnelquery \
     path/to/output/datasource/directory \
     path/to/your/funnelqueryfile
 ```
@@ -97,8 +93,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
 #### OLAP Query
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.IcebergLoader \
+./cool olapquery \
     path/to/output/datasource/directory \
     path/to/your/queryfile
 ```
@@ -112,8 +107,7 @@ We have provided examples in `sogamo` directory and `health_raw` directory. Now 
 The COOL system supports CSV data format by default, and you can load `sogamo` dataset with the following command.
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CsvLoader \
+./cool load \
     sogamo \
     datasets/sogamo/table.yaml \
     datasets/sogamo/data.csv \
@@ -161,8 +155,7 @@ There will be a cube generated under the `./CubeRepo` directory, which is named 
 Similarly, load the `health_raw` dataset with:
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CsvLoader \
+./cool load \
     health_raw \
     datasets/health_raw/table.yaml \
     datasets/health_raw/data.csv \
@@ -176,8 +169,7 @@ We use the `health_raw` dataset for example to demonstrate the cohort analysis.
 #### Select the specific users
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CohortSelection \
+./cool cohortselection \
     ./CubeRepo \
     datasets/health_raw/sample_query_selection/query.json
 ```
@@ -185,7 +177,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
 where the arguments are:
 
 1. `./CubeRepo`: the output directory for the compacted dataset
-2. `datasets/health_raw/sample_query_selection/query.json`: the JSON file for the cohort query
+2. `datasets/health_raw/sample_query_selection/query.json`: the cohort query (in JSON)
 
 <!--
 - Display all selected records of the cohort in the terminal for exploration
@@ -193,7 +185,7 @@ where the arguments are:
 ```bash
 java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
     com.nus.cool.functionality.CohortExploration \
-    CubeRepo \
+    ./CubeRepo \
     health_raw \
     sample_query_selection
 ```
@@ -202,8 +194,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
 #### Execute cohort query
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CohortAnalysis \
+./cool cohortquery \
     ./CubeRepo \
     datasets/health_raw/sample_query_average/query.json
 ```
@@ -213,8 +204,7 @@ java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
 We use the `sogamo` dataset for example to demonstrate the funnel analysis.
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.FunnelAnalysis \
+./cool funnelquery \
     ./CubeRepo \
     datasets/sogamo/sample_funnel_analysis/query.json
 ```
@@ -228,8 +218,7 @@ We have provided examples in `olap-tpch` directory.
 The COOL system supports CSV data format by default, and you can load `tpc-h` dataset with the following command.
 
 ```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CsvLoader \
+./cool load \
     tpc-h-10g \
     datasets/olap-tpch/table.yaml \
     datasets/olap-tpch/scripts/data.csv \
@@ -244,10 +233,10 @@ Run Server
 
 1. put the `application.property` file at the same level as the .jar file.
 2. edit the server configuration in the `application.property` file.
-3. run the below command line.
+3. run the below command.
 
 ```bash
-java -jar cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar
+./cool server
 ```
 
 ## CONNECT TO EXTERNAL STORAGE SERVICES
