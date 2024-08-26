@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+COOL_CORE_PATH="${COOL_CORE_JAR_PATH:-./cool-core/target/cool-core-0.1-SNAPSHOT.jar}"
+COOL_QUERY_SERVER_PATH="${COOL_QUERY_SERVER_PATH:-./cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar}"
+
+
+main_help() {
+    COOL_HELP_LEFT_ALIGN="%-17s"
+
+    echo "Usage: $0 <command> [<args>]"
+    echo
+    echo Commands
+    printf "   $COOL_HELP_LEFT_ALIGN %s\n" "help" "Show this help menu"
+    printf "   $COOL_HELP_LEFT_ALIGN %s\n" "load" "Load dataset"
+    printf "   $COOL_HELP_LEFT_ALIGN %s\n" "cohortselection" "Perform cohort selection"
+    printf "   $COOL_HELP_LEFT_ALIGN %s\n" "cohortquery" "Perform cohort query"
+    printf "   $COOL_HELP_LEFT_ALIGN %s\n" "funnelquery" "Perform funnel query"
+    printf "   $COOL_HELP_LEFT_ALIGN %s\n" "olapquery" "Perform OLAP query"
+    printf "   $COOL_HELP_LEFT_ALIGN %s\n" "server" "Start query server"
+
+    exit ${1:-0}
+}
+
+main_load() {
+    java -cp $COOL_CORE_PATH com.nus.cool.functionality.CsvLoader "$@"
+}
+
+main_cohortselection() {
+    java -cp $COOL_CORE_PATH com.nus.cool.functionality.CohortSelection "$@"
+}
+
+main_cohortquery() {
+    java -cp $COOL_CORE_PATH com.nus.cool.functionality.CohortAnalysis "$@"
+}
+
+main_funnelquery() {
+    java -cp $COOL_CORE_PATH com.nus.cool.functionality.FunnelAnalysis "$@"
+}
+
+main_olapquery() {
+    java -cp $COOL_CORE_PATH com.nus.cool.functionality.IcebergLoader "$@"
+}
+
+main_server() {
+    java -jar $COOL_QUERY_SERVER_PATH
+}
+
+function main() {
+    if (($# == 0)); then
+        main_help 0
+    fi
+
+    case ${1} in
+    help | load | cohortselection | cohortquery | funnelquery | olapquery | server)
+        "main_$1" "${@:2}"
+        ;;
+    *)
+        echo "unknown command: $1"
+        main_help 1
+        exit 1
+        ;;
+    esac
+}
+
+main "$@"
