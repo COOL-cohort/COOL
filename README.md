@@ -100,28 +100,26 @@ We provide an example for cohort query processing in [CohortAnalysis.java](cool-
 
 ## Example: Cohort Analysis
 
-### Load dataset
+### Load dataset from different formats
 
 We have provided examples in `sogamo` directory and `health_raw` directory. Now we take `sogamo` for example.
 
 The COOL system supports CSV data format by default, and you can load `sogamo` dataset with the following command.
 
 ```bash
-./cool load \
+./cool load csv \
     sogamo \
     datasets/sogamo/table.yaml \
     datasets/sogamo/data.csv \
     ./CubeRepo
 ```
 
-<!-- disabled as currently not working -->
-<!--
 In addition, you can run the following command to load the dataset in other formats under the `sogamo` directory.
 
 - parquet format data
 
 ```bash
-java -jar cool-extensions/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar \
+./cool load parquet \
     sogamo \
     datasets/sogamo/table.yaml \
     datasets/sogamo/data.parquet \
@@ -131,7 +129,7 @@ java -jar cool-extensions/parquet-extensions/target/parquet-extensions-0.1-SNAPS
 - Arrow format data
 
 ```bash
-java -jar cool-extensions/arrow-extensions/target/arrow-extensions-0.1-SNAPSHOT.jar \
+./cool load arrow \
     sogamo \
     datasets/sogamo/table.yaml \
     datasets/sogamo/data.arrow \
@@ -141,14 +139,13 @@ java -jar cool-extensions/arrow-extensions/target/arrow-extensions-0.1-SNAPSHOT.
 - Avro format data
 
 ```bash
-java -jar cool-extensions/avro-extensions/target/avro-extensions-0.1-SNAPSHOT.jar \
+./cool load avro \
     sogamo \
     datasets/sogamo/table.yaml \
     datasets/sogamo/avro/test.avro \
     ./CubeRepo \
     datasets/sogamo/avro/schema.avsc
 ```
--->
 
 There will be a cube generated under the `./CubeRepo` directory, which is named `sogamo`.
 
@@ -162,7 +159,7 @@ Similarly, load the `health_raw` dataset with:
     ./CubeRepo
 ```
 
-### Execute queries
+### Execute cohort queries
 
 We use the `health_raw` dataset for example to demonstrate the cohort analysis.
 
@@ -211,7 +208,7 @@ We use the `sogamo` dataset for example to demonstrate the funnel analysis.
 
 ## Example: OLAP Analysis
 
-### Load dataset
+### Load OLAP dataset
 
 We have provided examples in `olap-tpch` directory.
 
@@ -227,7 +224,7 @@ The COOL system supports CSV data format by default, and you can load `tpc-h` da
 
 Finally, there will be a cube generated under the `./CubeRepo` directory, which is named `tpc-h-10g`.
 
-### Execute queries
+### Execute OLAP queries
 
 Run Server
 
