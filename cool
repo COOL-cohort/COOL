@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 COOL_CORE_PATH="${COOL_CORE_JAR_PATH:-./cool-core/target/cool-core-0.1-SNAPSHOT.jar}"
+COOL_EXTENSION_PATH_PREFIX="${COOL_EXTENSION_PATH_PREFIX:-./cool-extensions}"
 COOL_QUERY_SERVER_PATH="${COOL_QUERY_SERVER_PATH:-./cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar}"
 
 
@@ -22,7 +23,25 @@ main_help() {
 }
 
 main_load() {
-    java -cp $COOL_CORE_PATH com.nus.cool.functionality.CsvLoader "$@"
+    case ${1} in csv)
+        java -cp $COOL_CORE_PATH com.nus.cool.functionality.CsvLoader "${@:2}"
+        ;;
+    parquet)
+        echo "java -jar $COOL_EXTENSION_PATH_PREFIX/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar ${@:2}"
+        java -jar $COOL_EXTENSION_PATH_PREFIX/parquet-extensions/target/parquet-extensions-0.1-SNAPSHOT.jar "${@:2}"
+        ;;
+    avro)
+        java -jar $COOL_EXTENSION_PATH_PREFIX/avro-extensions/target/avro-extensions-0.1-SNAPSHOT.jar "${@:2}"
+        ;;
+    arrow)
+        java -jar $COOL_EXTENSION_PATH_PREFIX/arrow-extensions/target/arrow-extensions-0.1-SNAPSHOT.jar "${@:2}"
+        ;;
+    *)
+        echo "unknown format: $1"
+        main_help 1
+        exit 1
+        ;;
+    esac
 }
 
 main_cohortselection() {

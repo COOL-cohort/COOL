@@ -24,6 +24,8 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
+import org.joda.time.format.DateTimeParser;
 
 /**
  * SecondIntConverter converts the input day represented in format yyyy-MM-dd to integer
@@ -35,7 +37,14 @@ public class SecondIntConverter implements ActionTimeIntConverter {
    * Date formatter.
    */
   public static final DateTimeFormatter FORMATTER
-      = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZoneUTC();
+      = new DateTimeFormatterBuilder()
+      .append(
+        DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").getPrinter(),
+        new DateTimeParser[] {
+          DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").getParser(),
+          DateTimeFormat.forPattern("yyyy-MM-dd").getParser()
+        }
+      ).toFormatter().withZoneUTC();
 
   /**
    * Reference day.
