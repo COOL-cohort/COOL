@@ -45,6 +45,9 @@ public class CohortQueryLayout {
   @JsonProperty("saveCohort")
   private boolean saveCohort;
 
+  @JsonProperty("resultType")
+  private ResultType resultType = ResultType.INT; 
+
   /**
    * Read the cohort query in a json.
    */

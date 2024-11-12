@@ -2,7 +2,9 @@ package com.nus.cool.functionality;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nus.cool.core.cohort.ResultType;
 import com.nus.cool.core.cohort.storage.CohortRet;
+import com.nus.cool.core.util.ArrayUtil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -33,33 +35,40 @@ public class CohortAnalysisTest {
         String.format("Tear Down UnitTest %s\n", CohortAnalysisTest.class.getSimpleName()));
   }
 
-//   @Test(dataProvider = "cohortAnalysisTestDP", dependsOnMethods = {
-//       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest"})
-//   public void cohortSelectionUnitTest(String cubeRepo, String queryPath, String queryResultPath)
-//       throws IOException {
-//     CohortRet ret = CohortAnalysis.performCohortAnalysis(cubeRepo, queryPath);
-//
-//     // validate the results
-//     ObjectMapper mapper = new ObjectMapper();
-//     HashMap<String, List<Float>> cohortData = mapper.readValue(new File(queryResultPath),
-//         new TypeReference<HashMap<String, List<Float>>>() {
-//         });
-//     // check the result
-//     // validate the cohortName
-//     Assert.assertEquals(ret.getCohortList().size(), cohortData.size());
-//
-//     // System.out.println(ret.getCohortList());
-//     for (String cohortName : ret.getCohortList()) {
-//       Assert.assertTrue(cohortData.containsKey(cohortName));
-//       Assert.assertEquals(ret.getValuesByCohort(cohortName), cohortData.get(cohortName));
-//     }
-//   }
+  @Test(dataProvider = "cohortAnalysisTestDP", dependsOnMethods = {
+      "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest" })
+  public void cohortSelectionUnitTest(String cubeRepo, String queryPath, String queryResultPath)
+      throws IOException {
+    CohortRet ret = CohortAnalysis.performCohortAnalysis(cubeRepo, queryPath);
+
+    // validate the results
+    ObjectMapper mapper = new ObjectMapper();
+    HashMap<String, List<Float>> cohortData = mapper.readValue(new File(queryResultPath),
+        new TypeReference<HashMap<String, List<Float>>>() {
+        });
+    // check the result
+    // validate the cohortName
+    Assert.assertEquals(ret.getCohortList().size(), cohortData.size());
+
+    // System.out.println(ret.getCohortList());
+    for (String cohortName : ret.getCohortList()) {
+      Assert.assertTrue(cohortData.containsKey(cohortName));
+      if (ret.getResultType() == ResultType.INT) {
+        Assert.assertEquals(ret.getValuesByCohort(cohortName), cohortData.get(cohortName));
+      } else if (ret.getResultType() == ResultType.FLOAT) {
+        Assert.assertEquals(ArrayUtil.toArray(ret.getValuesByCohort(cohortName)),
+            ArrayUtil.toArray(cohortData.get(cohortName)), (float) 1e-4);
+      } else {
+        Assert.fail();
+      }
+    }
+  }
 
   @Test(dataProvider = "cohortAnalysisWithInputCohortTestDP", dependsOnMethods = {
       "com.nus.cool.functionality.CsvLoaderTest.csvLoaderUnitTest",
-      "com.nus.cool.functionality.CohortSelectionTest.cohortSelectionUnitTest"})
-  public void cohortSelectionWithInputCohortUnitTest(String cubeRepo, String queryPath
-                                                     ) throws IOException {
+      "com.nus.cool.functionality.CohortSelectionTest.cohortSelectionUnitTest" })
+  public void cohortSelectionWithInputCohortUnitTest(
+      String cubeRepo, String queryPath) throws IOException {
     CohortRet ret = CohortAnalysis.performCohortAnalysis(cubeRepo, queryPath);
     System.out.println(ret);
   }
@@ -73,43 +82,46 @@ public class CohortAnalysisTest {
         "CubeRepo/TestCube").toString();
     return new Object[][] {
         // ecommerce
-        {cubeRepo,
+        { cubeRepo,
             "../datasets/ecommerce_query/sample_query/query.json",
-            "../datasets/ecommerce_query/sample_query/query_result.json"},
+            "../datasets/ecommerce_query/sample_query/query_result.json" },
         // heath_raw
-        {cubeRepo,
+        { cubeRepo,
             "../datasets/health_raw/sample_query_distinctcount/query.json",
-            "../datasets/health_raw/sample_query_distinctcount/query_result.json"},
-        {cubeRepo,
+            "../datasets/health_raw/sample_query_distinctcount/query_result.json" },
+        { cubeRepo,
             "../datasets/health_raw/sample_query_count/query.json",
-            "../datasets/health_raw/sample_query_count/query_result.json"},
-        {cubeRepo,
+            "../datasets/health_raw/sample_query_count/query_result.json" },
+        { cubeRepo,
             "../datasets/health_raw/sample_query_average/query.json",
-            "../datasets/health_raw/sample_query_average/query_result.json"},
-        {cubeRepo,
+            "../datasets/health_raw/sample_query_average/query_result.json" },
+        { cubeRepo,
+            "../datasets/health_raw/sample_query_average_float/query.json",
+            "../datasets/health_raw/sample_query_average_float/query_result.json" },
+        { cubeRepo,
             "../datasets/health_raw/sample_query_max/query.json",
-            "../datasets/health_raw/sample_query_max/query_result.json"},
-        {cubeRepo,
+            "../datasets/health_raw/sample_query_max/query_result.json" },
+        { cubeRepo,
             "../datasets/health_raw/sample_query_min/query.json",
-            "../datasets/health_raw/sample_query_min/query_result.json"},
-        {cubeRepo,
+            "../datasets/health_raw/sample_query_min/query_result.json" },
+        { cubeRepo,
             "../datasets/health_raw/sample_query_sum/query.json",
-            "../datasets/health_raw/sample_query_sum/query_result.json"},
+            "../datasets/health_raw/sample_query_sum/query_result.json" },
         // fraud_case
-        {cubeRepo,
+        { cubeRepo,
             "../datasets/fraud_case/sample_query_login_count/query.json",
-            "../datasets/fraud_case/sample_query_login_count/query_result.json"},
+            "../datasets/fraud_case/sample_query_login_count/query_result.json" },
         // health
-        {cubeRepo,
+        { cubeRepo,
             "../datasets/health/sample_query_distinctcount/query.json",
-            "../datasets/health/sample_query_distinctcount/query_result.json"},
-        //health_raw random time
-        {cubeRepo,
+            "../datasets/health/sample_query_distinctcount/query_result.json" },
+        // health_raw random time
+        { cubeRepo,
             "../datasets/health_raw_random_time/sample_query_distinctcount/query.json",
-            "../datasets/health_raw_random_time/sample_query_distinctcount/query_result.json"},
-        {cubeRepo,
+            "../datasets/health_raw_random_time/sample_query_distinctcount/query_result.json" },
+        { cubeRepo,
             "../datasets/health_raw_random_time/sample_query_count/query.json",
-            "../datasets/health_raw_random_time/sample_query_count/query_result.json"},
+            "../datasets/health_raw_random_time/sample_query_count/query_result.json" },
     };
   }
 
@@ -122,8 +134,8 @@ public class CohortAnalysisTest {
         "CubeRepo/TestCube").toString();
     return new Object[][] {
         // heath_raw
-        {cubeRepo,
-            "../datasets/health_raw/sample_query_with_inputcohort/query.json"},
+        { cubeRepo,
+            "../datasets/health_raw/sample_query_with_inputcohort/query.json" },
 
     };
   }

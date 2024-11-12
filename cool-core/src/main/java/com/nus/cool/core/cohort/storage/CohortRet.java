@@ -2,6 +2,7 @@ package com.nus.cool.core.cohort.storage;
 
 import com.google.common.base.Preconditions;
 import com.nus.cool.core.cohort.CohortResultLayout;
+import com.nus.cool.core.cohort.ResultType;
 import com.nus.cool.core.cohort.ageselect.AgeSelectionLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +36,8 @@ public class CohortRet {
 
   private int size;
 
+  private ResultType resultType;
+
   private class UserList {
     Set<String> added = new HashSet<>();
     List<String> userSequence = new LinkedList<>();
@@ -56,12 +59,13 @@ public class CohortRet {
   /**
    * Create a cohort ret with ageSelection.
    */
-  public CohortRet(AgeSelectionLayout ageSelection) {
+  public CohortRet(AgeSelectionLayout ageSelection, ResultType resultType) {
     this.cohortToValueList = new HashMap<>();
     this.interval = ageSelection.getInterval();
     this.min = ageSelection.getMin();
     this.max = ageSelection.getMax();
     this.size = (this.max - this.min) / this.interval + 1;
+    this.resultType = resultType;
   }
 
   /**
@@ -127,15 +131,20 @@ public class CohortRet {
       return this.retUnits[i];
     }
 
-    // TODO(lingze), only support int type value
     public List<Float> getValues() {
       ArrayList<Float> ret = new ArrayList<>();
       for (int i = 0; i < retUnits.length; i++) {
         if (retUnits[i] == null) {
-          ret.add(null);
+          ret.add(Float.valueOf(0));
           continue;
         }
-        ret.add(retUnits[i].getValue());
+
+        Float value = retUnits[i].getValue();
+        if (resultType == ResultType.INT) {
+          value = Float.valueOf(value.intValue());
+        }
+
+        ret.add(value);
       }
       return ret;
     }
@@ -182,8 +191,13 @@ public class CohortRet {
     return x.getValues();
   }
 
+  public ResultType getResultType() {
+    return this.resultType;
+  }
+
   /**
-   * Prepare query result object that contains the mapping of cohort name and size.
+   * Prepare query result object that contains the mapping of cohort name and
+   * size.
    */
   public CohortResultLayout genResult() {
     CohortResultLayout ret = new CohortResultLayout();
@@ -201,48 +215,46 @@ public class CohortRet {
    */
   public Optional<CohortWSStr> genCohortUser(String cohortName) {
     return Optional.of(this.cohortToUserIdList.get(cohortName))
-      .map(x -> {
-        if (x.size() == 0) {
-          return null;
-        } else {
-          CohortWSStr c = new CohortWSStr();
-          c.addCubletResults(x.userSequence);
-          return c;
-        }
-      }); 
+        .map(x -> {
+          if (x.size() == 0) {
+            return null;
+          } else {
+            CohortWSStr c = new CohortWSStr();
+            c.addCubletResults(x.userSequence);
+            return c;
+          }
+        });
   }
-
 
   /**
    * Prepare cohort write stores that for all non-empty cohort user list.
    */
   public Map<String, Optional<CohortWSStr>> genAllCohortUsers() {
     return this.cohortToUserIdList.entrySet()
-               .stream()
-               .collect(Collectors.toMap(x -> x.getKey(),
-                  x -> {
-                    if (x.getValue().size() == 0) {
-                      return Optional.of(null);
-                    } else {
-                      CohortWSStr c = new CohortWSStr();
-                      c.addCubletResults(x.getValue().userSequence);
-                      return Optional.of(c);
-                    }
-                  }));
+        .stream()
+        .collect(Collectors.toMap(x -> x.getKey(),
+            x -> {
+              if (x.getValue().size() == 0) {
+                return Optional.of(null);
+              } else {
+                CohortWSStr c = new CohortWSStr();
+                c.addCubletResults(x.getValue().userSequence);
+                return Optional.of(c);
+              }
+            }));
   }
 
   @Override
   public String toString() {
-    String ret =
-        "CohortRet [interval="
-            + interval
-            + ", max="
-            + max
-            + ", min="
-            + min
-            + ", size="
-            + size
-            + "]\n";
+    String ret = "CohortRet [interval="
+        + interval
+        + ", max="
+        + max
+        + ", min="
+        + min
+        + ", size="
+        + size
+        + "]\n";
     for (Entry<String, Xaxis> entry : this.cohortToValueList.entrySet()) {
       ret += entry.getKey() + ":" + entry.getValue().toString() + "\n";
     }

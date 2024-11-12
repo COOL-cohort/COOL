@@ -1,5 +1,6 @@
 package com.nus.cool.core.cohort;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.io.Files;
 import com.nus.cool.core.cohort.ageselect.AgeSelection;
 import com.nus.cool.core.cohort.birthselect.BirthSelection;
@@ -40,6 +41,9 @@ public class CohortProcessor {
   private BirthSelection birthSelector;
 
   @Getter
+  private ResultType resultType;
+
+  @Getter
   private final String dataSource;
 
   @Getter
@@ -74,7 +78,7 @@ public class CohortProcessor {
     // get age selector
     if (layout.getAgeSelectionLayout() != null) {
       this.ageSelector = layout.getAgeSelectionLayout().generate();
-      this.result = new CohortRet(layout.getAgeSelectionLayout());
+      this.result = new CohortRet(layout.getAgeSelectionLayout(), layout.getResultType());
     }
     // get value selector
     if (layout.getValueSelectionLayout() != null) {
@@ -121,11 +125,10 @@ public class CohortProcessor {
    * cohort is named cohortName.cohort, e,g. "1980-1990.cohort".
    * Where 1980-1990 is the cohortName in our cohort query for health-raw dataset.
    *
-   * @param cohortName name of the previous stored cohort.
+   * @param cohortName       name of the previous stored cohort.
    * @param cohortFolderPath the path to store the previous stored cohort.
    */
   public void readOneCohort(String cohortName, String cohortFolderPath) throws IOException {
-    
     // check folder
     File folder = new File(cohortFolderPath);
     File[] fs = folder.listFiles();
@@ -231,15 +234,15 @@ public class CohortProcessor {
       return;
     }
 
-    LocalDateTime actionTime =
-        DateUtils.secondsSinceEpoch(tuple.getValueBySchema(this.actionTimeSchema).getInt());
+    LocalDateTime actionTime = DateUtils.secondsSinceEpoch(
+        tuple.getValueBySchema(this.actionTimeSchema).getInt());
     // check whether its birthEvent is selected
     if (!this.birthSelector.isUserSelected(userId)) {
       boolean selected = this.birthSelector.selectEvent(userId, actionTime, this.tuple);
       if (!selected || !this.birthSelector.isUserSelected(userId)) {
         // if birthEvent is not selected, or birth event selected but user not born yet.
         return;
-      } 
+      }
     }
     // user is born
     // extract the cohort this tuple belong to
@@ -253,7 +256,7 @@ public class CohortProcessor {
     if (this.ageSelector != null && this.valueSelector != null) {
       // do time_diff to generate age / get the BirthEvent Date
       LocalDateTime birthTime = this.birthSelector.getUserBirthEventDate(userId);
-      
+
       assert birthTime != null : "birthTime null";
       assert actionTime != null : "actionTime null";
       int age = this.ageSelector.generateAge(birthTime, actionTime);
@@ -286,10 +289,9 @@ public class CohortProcessor {
     // 2. check birth selection
     // 3. check value Selector,
     return birthSelector.maybeSkipMetaChunk(metaChunk)
-      && cohortSelector.maybeSkipMetaChunk(metaChunk)
-      && valueSelector.maybeSkipMetaChunk(metaChunk);
+        && cohortSelector.maybeSkipMetaChunk(metaChunk)
+        && valueSelector.maybeSkipMetaChunk(metaChunk);
   }
-
 
   /***
    * Now is not implemented.

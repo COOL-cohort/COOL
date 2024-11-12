@@ -19,6 +19,8 @@
 
 package com.nus.cool.core.util;
 
+import java.util.List;
+
 /**
  * ArrayUtil contains the missing functions we need to use in java Array.
  * The class contains the function to get the max and min value of an Array
@@ -51,5 +53,20 @@ public class ArrayUtil {
       min = Math.min(min, v);
     }
     return min;
+  }
+
+  
+  /**
+   * Convert a Float List to a float array.
+   *
+   * @param list target Float List
+   * @return the float array
+   */
+  public static float[] toArray(List<Float> list) {
+    float[] ret = new float[list.size()];
+    for (int i = 0; i < list.size(); i++) {
+      ret[i] = list.get(i);
+    }
+    return ret;
   }
 }
