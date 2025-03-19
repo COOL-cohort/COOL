@@ -176,24 +176,18 @@ where the arguments are:
 1. `./CubeRepo`: the output directory for the compacted dataset
 2. `datasets/health_raw/sample_query_selection/query.json`: the cohort query (in JSON)
 
-<!--
-- Display all selected records of the cohort in the terminal for exploration
-
-```bash
-java -cp ./cool-core/target/cool-core-0.1-SNAPSHOT.jar \
-    com.nus.cool.functionality.CohortExploration \
-    ./CubeRepo \
-    health_raw \
-    sample_query_selection
-```
--->
-
 #### Execute cohort query
 
 ```bash
 ./cool cohortquery \
     ./CubeRepo \
     datasets/health_raw/sample_query_average/query.json
+```
+
+#### Export cohort records
+
+```bash
+./cool cohortexport ./CubeRepo/ health_raw sample_query_selection/all.cohort cohort_records.csv
 ```
 
 #### Funnel Analysis
