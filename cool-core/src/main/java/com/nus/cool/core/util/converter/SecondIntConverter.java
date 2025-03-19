@@ -52,9 +52,13 @@ public class SecondIntConverter implements ActionTimeIntConverter {
   public static final DateTime BASE
       = FORMATTER.parseDateTime("1970-01-01 00:00:00").withZone(DateTimeZone.UTC);
 
+  /**
+   * Get the instance of the converter.
+   *
+   * @return the instance of the converter
+   */
   public static final ActionTimeIntConverter getInstance() {
-    // return x -> Days.daysBetween(BASE, FORMATTER.parseDateTime(x)).getDays();
-    return x -> Seconds.secondsBetween(BASE, FORMATTER.parseDateTime(x)).getSeconds();
+    return new SecondIntConverter();
   }
 
   /**
@@ -75,6 +79,7 @@ public class SecondIntConverter implements ActionTimeIntConverter {
    * @param seconds number of seconds past the reference day
    * @return date string value for specific format
    */
+  @Override
   public String getString(int seconds) {
     DateTime dt = BASE.plusSeconds(seconds);
     return FORMATTER.print(dt);

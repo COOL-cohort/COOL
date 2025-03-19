@@ -4,7 +4,6 @@ COOL_CORE_PATH="${COOL_CORE_JAR_PATH:-./cool-core/target/cool-core-0.1-SNAPSHOT.
 COOL_EXTENSION_PATH_PREFIX="${COOL_EXTENSION_PATH_PREFIX:-./cool-extensions}"
 COOL_QUERY_SERVER_PATH="${COOL_QUERY_SERVER_PATH:-./cool-queryserver/target/cool-queryserver-0.1-SNAPSHOT.jar}"
 
-
 main_help() {
     COOL_HELP_LEFT_ALIGN="%-17s"
 
@@ -60,6 +59,10 @@ main_olapquery() {
     java -cp $COOL_CORE_PATH com.nus.cool.functionality.IcebergLoader "$@"
 }
 
+main_cohortexport() {
+    java -cp $COOL_CORE_PATH com.nus.cool.functionality.CohortExploration "$@"
+}
+
 main_server() {
     java -jar $COOL_QUERY_SERVER_PATH
 }
@@ -70,7 +73,7 @@ function main() {
     fi
 
     case ${1} in
-    help | load | cohortselection | cohortquery | funnelquery | olapquery | server)
+    help | load | cohortselection | cohortquery | funnelquery | olapquery | cohortexport | server)
         "main_$1" "${@:2}"
         ;;
     *)
